@@ -20,4 +20,8 @@ public class UnmatchedDbContext: DbContext
     public DbSet<League> Leagues { get; set; }
     
     public DbSet<Map> Maps { get; set; }
+    
+    public DbSet<DuelMatch> DuelMatches { get; set; }
+    
+    public DbSet<Opponent> Opponents { get; set; }
 }

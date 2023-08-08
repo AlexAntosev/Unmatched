@@ -22,5 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ILeagueRepository, LeagueRepository>();
         services.AddTransient<ISidekickRepository, SidekickRepository>();
         services.AddTransient<IMapRepository, MapRepository>();
+        services.AddTransient<IDuelMatchRepository, DuelMatchRepository>();
+        services.AddTransient<IOpponentRepository, OpponentRepository>();
     }
 }
