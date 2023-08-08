@@ -38,7 +38,10 @@ public class UnmatchedService : IUnmatchedService
         await _fighterRepository.AddAsync(fighter);
         await _fighterRepository.AddAsync(opponent);
 
-        await _ratingCalculator.CalculateAsync(fighter, opponent, match.Tournament);
+        if (match.Tournament is not null)
+        {
+            await _ratingCalculator.CalculateAsync(fighter, opponent, match.Tournament);
+        }
 
         await _matchRepository.SaveChangesAsync();
         await _fighterRepository.SaveChangesAsync();
