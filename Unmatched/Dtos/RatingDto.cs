@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-public class GlobalRatingDto
+public class RatingDto
 {
     public Guid Id { get; set; }
     
@@ -12,5 +12,5 @@ public class GlobalRatingDto
     
     public virtual HeroDto Hero { get; set; }
     
-    public int Rating { get; set; }
+    public int Points { get; set; }
 }

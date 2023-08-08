@@ -1,23 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Unmatched.Dtos;
 
-namespace Unmatched.Entities;
-
-public class MatchParticipant
+public class FighterDto
 {
-    [Key]
     public Guid Id { get; set; }
     
     public Guid MatchId { get; set; }
     
-    public virtual Match Match { get; set; }
+    public virtual MatchDto Match { get; set; }
     
     public Guid PlayerId { get; set; }
     
-    public virtual Player Player { get; set; }
+    public virtual PlayerDto Player { get; set; }
     
     public Guid HeroId { get; set; }
     
-    public virtual Hero Hero { get; set; }
+    public virtual HeroDto Hero { get; set; }
     
     public int HpLeft { get; set; }
     

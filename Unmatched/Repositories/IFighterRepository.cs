@@ -2,7 +2,7 @@
 
 namespace Unmatched.Repositories;
 
-public interface IGlobalRatingRepository : IRepository<GlobalRating>
+public interface IFighterRepository : IRepository<Fighter>
 {
     
 }

@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISidekickRepository, SidekickRepository>();
         services.AddTransient<IMapRepository, MapRepository>();
         services.AddTransient<IMatchRepository, MatchRepository>();
-        services.AddTransient<IMatchParticipantRepository, MatchParticipantRepository>();
-        services.AddTransient<IGlobalRatingRepository, GlobalRatingRepository>();
+        services.AddTransient<IFighterRepository, FighterRepository>();
+        services.AddTransient<IRatingRepository, RatingRepository>();
     }
 }

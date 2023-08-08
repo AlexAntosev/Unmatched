@@ -23,7 +23,7 @@ public class UnmatchedDbContext: DbContext
     
     public DbSet<Match> Matches { get; set; }
     
-    public DbSet<MatchParticipant> MatchParticipants { get; set; }
+    public DbSet<Fighter> Fighters { get; set; }
     
-    public DbSet<GlobalRating> GlobalRatings { get; set; }
+    public DbSet<Rating> Ratings { get; set; }
 }

@@ -2,7 +2,7 @@
 
 namespace Unmatched.Entities;
 
-public class GlobalRating
+public class Rating
 {
     [Key]
     public Guid Id { get; set; }
@@ -15,5 +15,5 @@ public class GlobalRating
     
     public virtual Hero Hero { get; set; }
     
-    public int Rating { get; set; }
+    public int Points { get; set; }
 }

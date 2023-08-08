@@ -13,8 +13,8 @@ public class UnmatchedMapper : Profile
         CreateMap<Sidekick, SidekickDto>().ReverseMap();
         CreateMap<Map, MapDto>().ReverseMap();
         CreateMap<Match, MatchDto>().ReverseMap();
-        CreateMap<MatchParticipant, MatchParticipantDto>().ReverseMap();
+        CreateMap<Fighter, FighterDto>().ReverseMap();
         CreateMap<Tournament, TournamentDto>().ReverseMap();
-        CreateMap<GlobalRating, GlobalRatingDto>().ReverseMap();
+        CreateMap<Rating, RatingDto>().ReverseMap();
     }
 }
