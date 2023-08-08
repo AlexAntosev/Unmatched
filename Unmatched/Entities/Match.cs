@@ -2,26 +2,18 @@
 
 namespace Unmatched.Entities;
 
-public class DuelMatch
+public class Match
 {
     [Key]
     public Guid Id { get; set; }
     
-    public Guid LeagueId { get; set; }
+    public Guid? TournamentId { get; set; }
     
-    public virtual League League { get; set; }
+    public virtual Tournament? Tournament { get; set; }
     
     public Guid MapId { get; set; }
     
     public virtual Map Map { get; set; }
-    
-    public Guid WinnerId { get; set; }
-    
-    public virtual Opponent Winner { get; set; }
-    
-    public Guid LoserId { get; set; }
-    
-    public virtual Opponent Loser { get; set; }
     
     public DateTime Date { get; set; }
     

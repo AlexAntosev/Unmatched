@@ -17,11 +17,13 @@ public class UnmatchedDbContext: DbContext
     
     public DbSet<Sidekick> Sidekicks { get; set; }
     
-    public DbSet<League> Leagues { get; set; }
+    public DbSet<Tournament> Tournaments { get; set; }
     
     public DbSet<Map> Maps { get; set; }
     
-    public DbSet<DuelMatch> DuelMatches { get; set; }
+    public DbSet<Match> Matches { get; set; }
     
-    public DbSet<Opponent> Opponents { get; set; }
+    public DbSet<MatchParticipant> MatchParticipants { get; set; }
+    
+    public DbSet<GlobalRating> GlobalRatings { get; set; }
 }

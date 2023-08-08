@@ -2,7 +2,7 @@
 
 namespace Unmatched.Repositories;
 
-public interface IOpponentRepository : IRepository<Opponent>
+public interface IMatchRepository : IRepository<Match>
 {
     
 }

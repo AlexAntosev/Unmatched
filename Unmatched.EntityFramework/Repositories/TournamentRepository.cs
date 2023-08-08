@@ -4,28 +4,28 @@ using Unmatched.Repositories;
 
 namespace Unmatched.EntityFramework.Repositories;
 
-public class LeagueRepository : ILeagueRepository
+public class TournamentRepository : ITournamentRepository
 {
     private readonly UnmatchedDbContext _dbContext;
 
-    public LeagueRepository(UnmatchedDbContext dbContext)
+    public TournamentRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
     
-    public async Task<League> GetByIdAsync(Guid id)
+    public async Task<Tournament> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Leagues.FindAsync(id);
+        var entity = await _dbContext.Tournaments.FindAsync(id);
             
         return entity;
     }
 
-    public IEnumerable<League> Query()
+    public IEnumerable<Tournament> Query()
     {
-        return _dbContext.Leagues;
+        return _dbContext.Tournaments;
     }
 
-    public async Task<League> AddAsync(League model)
+    public async Task<Tournament> AddAsync(Tournament model)
     {
         var createdEntityEntry = await _dbContext.AddAsync(model);
         var createdEntity = createdEntityEntry.Entity;
@@ -35,7 +35,7 @@ public class LeagueRepository : ILeagueRepository
 
     public async Task Delete(Guid id)
     {
-        var entity = await _dbContext.Leagues.FindAsync(id);
+        var entity = await _dbContext.Tournaments.FindAsync(id);
         if (entity is null)
         {
             return;

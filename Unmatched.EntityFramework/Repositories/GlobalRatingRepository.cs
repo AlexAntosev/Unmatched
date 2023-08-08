@@ -4,28 +4,28 @@ using Unmatched.Repositories;
 
 namespace Unmatched.EntityFramework.Repositories;
 
-public class OpponentRepository : IOpponentRepository
+public class GlobalRatingRepository : IGlobalRatingRepository
 {
     private readonly UnmatchedDbContext _dbContext;
 
-    public OpponentRepository(UnmatchedDbContext dbContext)
+    public GlobalRatingRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
     
-    public async Task<Opponent> GetByIdAsync(Guid id)
+    public async Task<GlobalRating> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Opponents.FindAsync(id);
+        var entity = await _dbContext.GlobalRatings.FindAsync(id);
             
         return entity;
     }
 
-    public IEnumerable<Opponent> Query()
+    public IEnumerable<GlobalRating> Query()
     {
-        return _dbContext.Opponents;
+        return _dbContext.GlobalRatings;
     }
 
-    public async Task<Opponent> AddAsync(Opponent model)
+    public async Task<GlobalRating> AddAsync(GlobalRating model)
     {
         var createdEntityEntry = await _dbContext.AddAsync(model);
         var createdEntity = createdEntityEntry.Entity;
@@ -35,7 +35,7 @@ public class OpponentRepository : IOpponentRepository
 
     public async Task Delete(Guid id)
     {
-        var entity = await _dbContext.Opponents.FindAsync(id);
+        var entity = await _dbContext.GlobalRatings.FindAsync(id);
         if (entity is null)
         {
             return;

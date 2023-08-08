@@ -19,10 +19,11 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IPlayerRepository, PlayerRepository>();
         services.AddTransient<IHeroRepository, HeroRepository>();
-        services.AddTransient<ILeagueRepository, LeagueRepository>();
+        services.AddTransient<ITournamentRepository, TournamentRepository>();
         services.AddTransient<ISidekickRepository, SidekickRepository>();
         services.AddTransient<IMapRepository, MapRepository>();
-        services.AddTransient<IDuelMatchRepository, DuelMatchRepository>();
-        services.AddTransient<IOpponentRepository, OpponentRepository>();
+        services.AddTransient<IMatchRepository, MatchRepository>();
+        services.AddTransient<IMatchParticipantRepository, MatchParticipantRepository>();
+        services.AddTransient<IGlobalRatingRepository, GlobalRatingRepository>();
     }
 }

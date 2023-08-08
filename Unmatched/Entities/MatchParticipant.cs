@@ -2,10 +2,14 @@
 
 namespace Unmatched.Entities;
 
-public class Opponent
+public class MatchParticipant
 {
     [Key]
     public Guid Id { get; set; }
+    
+    public Guid MatchId { get; set; }
+    
+    public virtual Match Match { get; set; }
     
     public Guid PlayerId { get; set; }
     
@@ -22,4 +26,8 @@ public class Opponent
     public int SidekickHpLeft { get; set; }
     
     public int ItemsUsed { get; set; }
+    
+    public int Turn { get; set; }
+    
+    public bool IsWinner { get; set; }
 }

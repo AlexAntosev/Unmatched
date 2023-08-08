@@ -2,7 +2,7 @@
 
 namespace Unmatched.Repositories;
 
-public interface IDuelMatchRepository : IRepository<DuelMatch>
+public interface ITournamentRepository : IRepository<Tournament>
 {
     
 }
