@@ -1,0 +1,14 @@
+﻿namespace Unmatched.Entities;
+
+public class Sidekick
+{
+    public Guid Id { get; set; }
+    
+    public string Name { get; set; }
+    
+    public int Hp { get; set; }
+    
+    public Guid HeroId { get; set; }
+    
+    public virtual Hero Hero { get; set; }
+}
