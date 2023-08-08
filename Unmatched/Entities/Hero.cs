@@ -14,4 +14,6 @@ public class Hero
     public int DeckSize { get; set; }
     
     public IEnumerable<Sidekick> Sidekicks { get; set; }
+    
+    public bool IsRanged { get; set; }
 }

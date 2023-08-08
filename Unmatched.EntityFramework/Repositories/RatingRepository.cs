@@ -33,6 +33,11 @@ public class RatingRepository : IRatingRepository
 
         return createdEntity;
     }
+    
+    public async Task AddRangeAsync(IEnumerable<Rating> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
 
     public async Task Delete(Guid id)
     {

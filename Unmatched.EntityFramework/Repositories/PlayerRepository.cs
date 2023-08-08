@@ -32,6 +32,11 @@ public class PlayerRepository : IPlayerRepository
 
         return createdEntity;
     }
+    
+    public async Task AddRangeAsync(IEnumerable<Player> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
 
     public async Task Delete(Guid id)
     {

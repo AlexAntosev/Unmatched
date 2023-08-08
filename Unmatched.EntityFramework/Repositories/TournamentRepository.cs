@@ -32,6 +32,11 @@ public class TournamentRepository : ITournamentRepository
 
         return createdEntity;
     }
+    
+    public async Task AddRangeAsync(IEnumerable<Tournament> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
 
     public async Task Delete(Guid id)
     {

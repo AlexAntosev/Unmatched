@@ -14,6 +14,6 @@ public class Tournament
 
 public enum TournamentType
 {
-    NonRating,
-    Rating
+    League,
+    Championship
 }

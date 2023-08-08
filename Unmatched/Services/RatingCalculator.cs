@@ -13,11 +13,7 @@ public class RatingCalculator : IRatingCalculator
     }
     public async Task CalculateAsync(Fighter fighter, Fighter opponent, Tournament tournament)
     {
-        var fighterOldRating = await _ratingRepository.GetByHeroIdAsync(fighter.HeroId, tournament.Id);
-        var opponentOldRating = await _ratingRepository.GetByHeroIdAsync(opponent.HeroId, tournament.Id);
-
-        var fighterNewPoints = CalculatePoints();
-        var opponentNewPoints = CalculatePoints();
+        var (fighterNewPoints, opponentNewPoints) = await CalculatePointsAsync(fighter, opponent, tournament);
         
         var fighterNewRating = new Rating
         {
@@ -38,8 +34,17 @@ public class RatingCalculator : IRatingCalculator
         await _ratingRepository.SaveChangesAsync();
     }
 
-    private int CalculatePoints()
+    private async Task<(int fighterNewPoints, int opponentNewPoints)> CalculatePointsAsync(
+        Fighter fighter,
+        Fighter opponent,
+        Tournament tournament)
     {
-        return 0;
+        var fighterOldRating = await _ratingRepository.GetByHeroIdAsync(fighter.HeroId, tournament.Id);
+        var opponentOldRating = await _ratingRepository.GetByHeroIdAsync(opponent.HeroId, tournament.Id);
+        
+        var fighterNewPoints = 0;
+        var opponentNewPoints = 0;
+        
+        return (fighterNewPoints, opponentNewPoints);
     }
 }

@@ -32,6 +32,11 @@ public class HeroRepository : IHeroRepository
 
         return createdEntity;
     }
+    
+    public async Task AddRangeAsync(IEnumerable<Hero> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
 
     public async Task Delete(Guid id)
     {

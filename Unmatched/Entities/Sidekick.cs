@@ -14,4 +14,8 @@ public class Sidekick
     public Guid HeroId { get; set; }
     
     public virtual Hero Hero { get; set; }
+    
+    public bool IsRanged { get; set; }
+
+    public int Count { get; set; } = 1;
 }

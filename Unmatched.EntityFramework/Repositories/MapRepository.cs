@@ -33,6 +33,11 @@ public class MapRepository : IMapRepository
         return createdEntity;
     }
 
+    public async Task AddRangeAsync(IEnumerable<Map> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
+    
     public async Task Delete(Guid id)
     {
         var entity = await _dbContext.Maps.FindAsync(id);

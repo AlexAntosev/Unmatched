@@ -32,6 +32,11 @@ public class SidekickRepository : ISidekickRepository
 
         return createdEntity;
     }
+    
+    public async Task AddRangeAsync(IEnumerable<Sidekick> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
 
     public async Task Delete(Guid id)
     {

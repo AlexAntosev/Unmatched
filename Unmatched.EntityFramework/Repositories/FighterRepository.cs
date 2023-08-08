@@ -32,6 +32,11 @@ public class FighterRepository : IFighterRepository
 
         return createdEntity;
     }
+    
+    public async Task AddRangeAsync(IEnumerable<Fighter> models)
+    {
+        await _dbContext.AddRangeAsync(models);
+    }
 
     public async Task Delete(Guid id)
     {
