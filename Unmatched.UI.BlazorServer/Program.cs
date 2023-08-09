@@ -1,16 +1,20 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Unmatched.UI.BlazorServer.Data;
+using Unmatched.EntityFramework.Registration;
+using Unmatched.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.RegisterServices();
+builder.Services.RegisterMapping();
+builder.Services.RegisterDataInitializers();
+builder.Services.RegisterDbContext(builder.Configuration);
+builder.Services.RegisterRepositories();
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

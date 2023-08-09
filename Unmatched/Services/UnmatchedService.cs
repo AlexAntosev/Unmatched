@@ -46,4 +46,9 @@ public class UnmatchedService : IUnmatchedService
         await _matchRepository.SaveChangesAsync();
         await _fighterRepository.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    {
+        return await Task.FromResult(new List<MatchLogDto>());
+    }
 }
