@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched", "Unmatched\Unma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.EntityFramework", "Unmatched.EntityFramework\Unmatched.EntityFramework.csproj", "{A154A2B6-FB18-421A-864A-4FC138CD2171}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.UI.BlazorServer", "Unmatched.UI.BlazorServer\Unmatched.UI.BlazorServer.csproj", "{5A7B1D8D-4ED5-4296-9D47-187FB5CD67DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{A154A2B6-FB18-421A-864A-4FC138CD2171}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A154A2B6-FB18-421A-864A-4FC138CD2171}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A154A2B6-FB18-421A-864A-4FC138CD2171}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A7B1D8D-4ED5-4296-9D47-187FB5CD67DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A7B1D8D-4ED5-4296-9D47-187FB5CD67DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A7B1D8D-4ED5-4296-9D47-187FB5CD67DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A7B1D8D-4ED5-4296-9D47-187FB5CD67DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

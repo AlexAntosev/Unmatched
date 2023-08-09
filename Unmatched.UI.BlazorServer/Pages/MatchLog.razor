@@ -1,0 +1,47 @@
+﻿@page "/matchLog"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@inject IUnmatchedService UnmatchedService
+
+<PageTitle>Match log</PageTitle>
+
+<h1>Match log</h1>
+
+@if (matchLogEntries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Tournament</th>
+            <th>Map</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var matchLogEntry in matchLogEntries)
+        {
+            <tr>
+                <td>@matchLogEntry.Date.ToShortDateString()</td>
+                <td>@matchLogEntry.TournamentName</td>
+                <td>@matchLogEntry.MapName</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<MatchLogDto> matchLogEntries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        matchLogEntries = await UnmatchedService.GetMatchLogAsync();
+    }
+
+}
