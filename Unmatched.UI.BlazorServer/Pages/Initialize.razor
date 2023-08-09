@@ -1,0 +1,23 @@
+﻿@page "/initialize"
+
+@using Unmatched.DataInitialization
+@using Unmatched.Entities
+
+@inject IDataInitializer<Player> PlayersDataInitializer
+@inject IDataInitializer<Map> MapsDataInitializer
+@inject IDataInitializer<Tournament> TournamentsDataInitializer
+@inject IDataInitializer<Sidekick> SidekicksDataInitializer
+@inject IDataInitializer<Hero> HeroesDataInitializer
+
+<button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
+
+@code {
+    private async Task InitializeData()
+    {
+        await PlayersDataInitializer.InitializeAsync();
+        await MapsDataInitializer.InitializeAsync();
+        await TournamentsDataInitializer.InitializeAsync();
+        await SidekicksDataInitializer.InitializeAsync();
+        await HeroesDataInitializer.InitializeAsync();
+    }
+}
