@@ -9,4 +9,6 @@ public interface IUnmatchedService
     
     IEnumerable<PlayerDto> GetAllPlayers();
     IEnumerable<HeroDto> GetAllHeroes();
+    IEnumerable<MapDto> GetAllMaps();
+    IEnumerable<TournamentDto> GetAllTournaments();
 }

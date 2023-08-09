@@ -6,27 +6,46 @@
 <PageTitle>Add match</PageTitle>
 <div class="row">
     <div class="column center">
-        <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes"></FighterInfo>
+        <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes"></FighterInfo>
     </div>
     <div class="column center">
-        <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes"></FighterInfo>
+        <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes"></FighterInfo>
     </div>
 </div>
 
 <div class="row">
     <div class="triple-column"></div>
     <div class="triple-column center">
-        <div>
+        <EditForm Model=@Match>
+            <div>
+                <label for="Map">Map:</label>
+                <InputSelect @bind-Value=Match.MapId name="Map" id="maps" class="form-select">
+                    @foreach (var map in _maps)  
+                    {  
+                      <option value="@map.Id"> @map.Name</option>  
+                    } 
+                </InputSelect >
+            </div>
+            <div>
+                <label for="Tournament">Tournament:</label>
+                <InputSelect @bind-Value=Match.TournamentId name="Tournament" id="tournaments" class="form-select">
+                    @foreach (var tournament in _tournaments)  
+                    {  
+                      <option value="@tournament.Id"> @tournament.Name</option>  
+                    } 
+                </InputSelect >
+            </div>
             <div>
                 <label for="Date">Date:</label>
-                <input type="date" name="Date" value=""/>
+                <InputDate @bind-Value=Match.Date name="Date" class="form-control"/>
             </div>
             <div>
                 <label for="Comment">Comment:</label>
-                <input type="text" name="Comment" value=""/>
+                <InputText @bind-Value=Match.Comment name="Comment" class="form-control"/>
             </div>
+            <p></p>
             <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
-        </div>
+        </EditForm>
     </div>
     <div class="triple-column"></div>
 </div>
@@ -34,18 +53,30 @@
 @code {
     private IEnumerable<PlayerDto> _players;
     private IEnumerable<HeroDto> _heroes;
+    private IEnumerable<MapDto> _maps;
+    private IEnumerable<TournamentDto> _tournaments;
+
+    public FighterInfo FighterComponent;
+    public FighterInfo OpponentComponent;
+    
+    MatchDto Match = new ()
+    {
+        Date = DateTime.Today
+    };
     
     protected override async Task OnInitializedAsync()
     {
         _players = UnmatchedService.GetAllPlayers();
         _heroes = UnmatchedService.GetAllHeroes();
+        _maps = UnmatchedService.GetAllMaps();
+        _tournaments = UnmatchedService.GetAllTournaments();
     }
     
     private async Task AddNewMatch()
     {
-        var match = new MatchDto();
-        var fighter = new FighterDto();
-        var opponent = new FighterDto();
-        await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
+        var fighter = FighterComponent.BuildDto();
+        var opponent = OpponentComponent.BuildDto();
+        var match = Match;
+        // await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
     }
 }

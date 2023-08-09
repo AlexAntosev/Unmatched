@@ -1,51 +1,51 @@
 ﻿@using Unmatched.Dtos
-<form method="post" >
+<EditForm Model=@Fighter>
   <fieldset>
     <legend>@Title</legend>
     <div>
       <label for="players">Player:</label>
-      <select name="Player" id="players">
+      <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
         @foreach (var player in Players)  
         {  
           <option value="@player.Id"> @player.Name</option>  
         }  
-      </select>
+      </InputSelect >
     </div>
     <div>
       <label for="hero">Hero:</label>
-      <select name="Hero" id="hero">
+      <InputSelect @bind-Value=Fighter.HeroId name="Hero" id="hero" class="form-select">
         @foreach (var hero in Heroes)  
         {  
             <option value="@hero.Id"> @hero.Name</option>  
         }  
-      </select>
+      </InputSelect>
     </div>
     <div>
       <label for="hp">HP:</label>
-      <input type="number" id="hp" value="" />
+      <InputNumber @bind-Value=Fighter.HpLeft id="hp" class="form-control" />
     </div>
     <div>
       <label for="sidekickHP">Sidekick HP:</label>
-      <input type="number" id="sidekickHP" value="" />
+      <InputNumber @bind-Value=Fighter.SidekickHpLeft id="sidekickHP" class="form-control" />
     </div>
     <div>
       <label for="cardsLeft">Cards Left:</label>
-      <input type="number" id="cardsLeft" value="" />
+      <InputNumber @bind-Value=Fighter.CardsLeft id="cardsLeft" class="form-control" />
     </div>
     <div>
       <label for="itemsUsed">Items Used:</label>
-      <input type="number" id="itemsUsed" value="" />
+      <InputNumber @bind-Value=Fighter.ItemsUsed id="itemsUsed" class="form-control" />
     </div>
     <div>
       <label for="isWinner">Winner:</label>
-      <input type="radio" id="isWinner" value="" />
+      <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check-label"/>
     </div>
     <div>
-      <label for="isFirst">First:</label>
-      <input type="radio" id="isFirst" value="" />
+      <label for="turn">Turn:</label>
+      <InputNumber @bind-Value=Fighter.Turn id="turn" class="form-control" />
     </div>
   </fieldset>
-</form>
+</EditForm>
 
 @code {
   [Parameter]
@@ -56,4 +56,11 @@
   
   [Parameter]
   public IEnumerable<PlayerDto> Players { get; set; }
+  
+  FighterDto Fighter = new FighterDto();
+
+  public FighterDto BuildDto()
+  {
+    return Fighter;
+  }
 }

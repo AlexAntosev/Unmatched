@@ -13,6 +13,8 @@ public class UnmatchedService : IUnmatchedService
     private readonly IRatingCalculator _ratingCalculator;
     private readonly IPlayerRepository _playerRepository;
     private readonly IHeroRepository _heroRepository;
+    private readonly IMapRepository _mapRepository;
+    private readonly ITournamentRepository _tournamentRepository;
 
     public UnmatchedService(
         IMapper mapper,
@@ -20,7 +22,9 @@ public class UnmatchedService : IUnmatchedService
         IFighterRepository fighterRepository,
         IRatingCalculator ratingCalculator,
         IPlayerRepository playerRepository,
-        IHeroRepository heroRepository)
+        IHeroRepository heroRepository,
+        IMapRepository mapRepository,
+        ITournamentRepository tournamentRepository)
     {
         _mapper = mapper;
         _matchRepository = matchRepository;
@@ -28,6 +32,8 @@ public class UnmatchedService : IUnmatchedService
         _ratingCalculator = ratingCalculator;
         _playerRepository = playerRepository;
         _heroRepository = heroRepository;
+        _mapRepository = mapRepository;
+        _tournamentRepository = tournamentRepository;
     }
     
     public async Task AddDuelMatchAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
@@ -70,5 +76,19 @@ public class UnmatchedService : IUnmatchedService
         var entities = _heroRepository.Query();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
         return heroes;
+    }
+
+    public IEnumerable<MapDto> GetAllMaps()
+    {
+        var entities = _mapRepository.Query();
+        var maps = _mapper.Map<IEnumerable<MapDto>>(entities);
+        return maps;
+    }
+
+    public IEnumerable<TournamentDto> GetAllTournaments()
+    {
+        var entities = _tournamentRepository.Query();
+        var tournaments = _mapper.Map<IEnumerable<TournamentDto>>(entities);
+        return tournaments;
     }
 }
