@@ -1,0 +1,17 @@
+﻿.column {
+    flex: 50%;
+}
+
+.triple-column {
+    flex: 33.3%;
+}
+
+.row:after {
+    display: flex;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

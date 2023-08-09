@@ -1,0 +1,59 @@
+﻿@using Unmatched.Dtos
+<form method="post" >
+  <fieldset>
+    <legend>@Title</legend>
+    <div>
+      <label for="players">Player:</label>
+      <select name="Player" id="players">
+        @foreach (var player in Players)  
+        {  
+          <option value="@player.Id"> @player.Name</option>  
+        }  
+      </select>
+    </div>
+    <div>
+      <label for="hero">Hero:</label>
+      <select name="Hero" id="hero">
+        @foreach (var hero in Heroes)  
+        {  
+            <option value="@hero.Id"> @hero.Name</option>  
+        }  
+      </select>
+    </div>
+    <div>
+      <label for="hp">HP:</label>
+      <input type="number" id="hp" value="" />
+    </div>
+    <div>
+      <label for="sidekickHP">Sidekick HP:</label>
+      <input type="number" id="sidekickHP" value="" />
+    </div>
+    <div>
+      <label for="cardsLeft">Cards Left:</label>
+      <input type="number" id="cardsLeft" value="" />
+    </div>
+    <div>
+      <label for="itemsUsed">Items Used:</label>
+      <input type="number" id="itemsUsed" value="" />
+    </div>
+    <div>
+      <label for="isWinner">Winner:</label>
+      <input type="radio" id="isWinner" value="" />
+    </div>
+    <div>
+      <label for="isFirst">First:</label>
+      <input type="radio" id="isFirst" value="" />
+    </div>
+  </fieldset>
+</form>
+
+@code {
+  [Parameter]
+  public string Title { get; set; }
+  
+  [Parameter]
+  public IEnumerable<HeroDto> Heroes { get; set; }
+  
+  [Parameter]
+  public IEnumerable<PlayerDto> Players { get; set; }
+}

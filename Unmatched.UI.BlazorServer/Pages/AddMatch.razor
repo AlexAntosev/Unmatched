@@ -1,19 +1,51 @@
 ﻿@page "/addMatch"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@inject IUnmatchedService UnmatchedService
 
 <PageTitle>Add match</PageTitle>
+<div class="row">
+    <div class="column center">
+        <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes"></FighterInfo>
+    </div>
+    <div class="column center">
+        <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes"></FighterInfo>
+    </div>
+</div>
 
-<h1>Counter</h1>
-
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<div class="row">
+    <div class="triple-column"></div>
+    <div class="triple-column center">
+        <div>
+            <div>
+                <label for="Date">Date:</label>
+                <input type="date" name="Date" value=""/>
+            </div>
+            <div>
+                <label for="Comment">Comment:</label>
+                <input type="text" name="Comment" value=""/>
+            </div>
+            <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
+        </div>
+    </div>
+    <div class="triple-column"></div>
+</div>
 
 @code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
+    private IEnumerable<PlayerDto> _players;
+    private IEnumerable<HeroDto> _heroes;
+    
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        _players = UnmatchedService.GetAllPlayers();
+        _heroes = UnmatchedService.GetAllHeroes();
     }
-
+    
+    private async Task AddNewMatch()
+    {
+        var match = new MatchDto();
+        var fighter = new FighterDto();
+        var opponent = new FighterDto();
+        await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
+    }
 }
