@@ -33,6 +33,11 @@ public class MapRepository : IMapRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Map model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Map> models)
     {
         await _dbContext.AddRangeAsync(models);

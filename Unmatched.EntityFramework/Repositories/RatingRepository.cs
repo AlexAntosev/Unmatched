@@ -33,7 +33,12 @@ public class RatingRepository : IRatingRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Rating model)
+    {
+        _dbContext.Update(model);
+    }
+
     public async Task AddRangeAsync(IEnumerable<Rating> models)
     {
         await _dbContext.AddRangeAsync(models);
@@ -55,9 +60,9 @@ public class RatingRepository : IRatingRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<Rating> GetByHeroIdAsync(Guid heroId, Guid tournamentId)
+    public async Task<Rating> GetByHeroIdAsync(Guid heroId)
     {
-        var entity = await _dbContext.Ratings.FirstOrDefaultAsync(r => r.HeroId == heroId && r.TournamentId == tournamentId);
+        var entity = await _dbContext.Ratings.FirstOrDefaultAsync(r => r.HeroId == heroId);
             
         return entity;
     }

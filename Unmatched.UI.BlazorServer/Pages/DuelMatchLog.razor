@@ -1,0 +1,93 @@
+﻿@page "/duelMatchLog"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@inject IUnmatchedService UnmatchedService
+
+<PageTitle>Duel Match log</PageTitle>
+
+<h1>Duel Match log</h1>
+
+@if (matchLogEntries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th colspan="7">Fighter</th>
+            <th colspan="7">Opponent</th>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <th>Tournament</th>
+            <th>Map</th>
+            <th>Comment</th>
+            <th>Player</th>
+            <th>Hero</th>
+            <th>Hp left</th>
+            <th>Sidekick</th>
+            <th>Sidekick Hp left</th>
+            <th>Cards left</th>
+            <th>Items used</th>
+            <th>Turn</th>
+            <th>Is winner</th>
+            <th>Player</th>
+            <th>Hero</th>
+            <th>Hp left</th>
+            <th>Sidekick</th>
+            <th>Sidekick Hp left</th>
+            <th>Cards left</th>
+            <th>Items used</th>
+            <th>Turn</th>
+            <th>Is winner</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var matchLogEntry in matchLogEntries)
+        {
+            <tr>
+                <td>@matchLogEntry.Date.ToShortDateString()</td>
+                <td>@matchLogEntry.TournamentName</td>
+                <td>@matchLogEntry.MapName</td>
+                <td>@matchLogEntry.Comment</td>
+                <td>@matchLogEntry.Fighters.First().Player.Name</td>
+                <td>@matchLogEntry.Fighters.First().Hero.Name</td>
+                <td>@matchLogEntry.Fighters.First().HpLeft</td>
+                <td>@matchLogEntry.Fighters.First().Hero.Sidekicks.First().Name</td>
+                <td>@matchLogEntry.Fighters.First().SidekickHpLeft</td>
+                <td>@matchLogEntry.Fighters.First().CardsLeft</td>
+                <td>@matchLogEntry.Fighters.First().ItemsUsed</td>
+                <td>@matchLogEntry.Fighters.First().Turn</td>
+                <td>@matchLogEntry.Fighters.First().IsWinner</td>
+                <td>@matchLogEntry.Fighters.Last().Player.Name</td>
+                <td>@matchLogEntry.Fighters.First().Hero.Name</td>
+                <td>@matchLogEntry.Fighters.Last().HpLeft</td>
+                <td>@matchLogEntry.Fighters.Last().Hero.Sidekicks.First().Name</td>
+                <td>@matchLogEntry.Fighters.Last().SidekickHpLeft</td>
+                <td>@matchLogEntry.Fighters.Last().CardsLeft</td>
+                <td>@matchLogEntry.Fighters.Last().ItemsUsed</td>
+                <td>@matchLogEntry.Fighters.Last().Turn</td>
+                <td>@matchLogEntry.Fighters.Last().IsWinner</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<MatchLogDto> matchLogEntries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        matchLogEntries = await UnmatchedService.GetMatchLogAsync();
+    }
+
+}

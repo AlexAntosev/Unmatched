@@ -4,5 +4,11 @@ namespace Unmatched.Services;
 
 public interface IRatingCalculator
 {
-    Task CalculateAsync(Fighter fighter, Fighter opponent, Tournament tournament);
+    Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent);
+}
+
+public struct HeroMatchPoints
+{
+    public Guid HeroId { get; set; }
+    public int Points { get; set; }
 }

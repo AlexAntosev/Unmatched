@@ -32,7 +32,12 @@ public class PlayerRepository : IPlayerRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Player model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Player> models)
     {
         await _dbContext.AddRangeAsync(models);

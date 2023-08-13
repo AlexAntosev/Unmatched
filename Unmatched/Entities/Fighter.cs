@@ -30,4 +30,6 @@ public class Fighter
     public int Turn { get; set; }
     
     public bool IsWinner { get; set; }
+    
+    public int MatchPoints { get; set; }
 }

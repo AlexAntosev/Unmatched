@@ -32,7 +32,12 @@ public class MatchRepository : IMatchRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Match model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Match> models)
     {
         await _dbContext.AddRangeAsync(models);

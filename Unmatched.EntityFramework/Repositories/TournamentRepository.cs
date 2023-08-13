@@ -32,7 +32,12 @@ public class TournamentRepository : ITournamentRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Tournament model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Tournament> models)
     {
         await _dbContext.AddRangeAsync(models);

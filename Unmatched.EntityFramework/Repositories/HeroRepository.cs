@@ -32,7 +32,12 @@ public class HeroRepository : IHeroRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Hero model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Hero> models)
     {
         await _dbContext.AddRangeAsync(models);

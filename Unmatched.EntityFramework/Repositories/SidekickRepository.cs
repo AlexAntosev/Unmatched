@@ -32,7 +32,12 @@ public class SidekickRepository : ISidekickRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Sidekick model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Sidekick> models)
     {
         await _dbContext.AddRangeAsync(models);

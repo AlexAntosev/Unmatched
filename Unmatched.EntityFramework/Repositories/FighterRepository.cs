@@ -32,7 +32,12 @@ public class FighterRepository : IFighterRepository
 
         return createdEntity;
     }
-    
+
+    public void AddOrUpdate(Fighter model)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task AddRangeAsync(IEnumerable<Fighter> models)
     {
         await _dbContext.AddRangeAsync(models);
