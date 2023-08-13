@@ -15,13 +15,19 @@ public class PlayersDataInitializer : IDataInitializer<Player>
 
     public async Task InitializeAsync()
     {
-        var defaultPlayers = new List<Player>
-        {
-            new() { Name = PlayerNames.Andrii },
-            new() { Name = PlayerNames.Oleksandr },
-        };
+        var defaultPlayers = GetEntities();
         
         await _playerRepository.AddRangeAsync(defaultPlayers);
         await _playerRepository.SaveChangesAsync();
+    }
+
+    public IEnumerable<Player> GetEntities()
+    {
+        return new List<Player>
+        {
+            new() { Name = PlayerNames.Andrii },
+            new() { Name = PlayerNames.Oleksandr },
+            new() { Name = PlayerNames.Ksuha },
+        };
     }
 }

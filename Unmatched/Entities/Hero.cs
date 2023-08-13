@@ -4,6 +4,11 @@ namespace Unmatched.Entities;
 
 public class Hero
 {
+    public Hero()
+    {
+        Id = Guid.NewGuid();
+    }
+
     [Key]
     public Guid Id { get; set; }
     

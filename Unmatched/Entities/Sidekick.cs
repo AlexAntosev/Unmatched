@@ -4,6 +4,11 @@ namespace Unmatched.Entities;
 
 public class Sidekick
 {
+    public Sidekick()
+    {
+        Id = Guid.NewGuid();
+    }
+
     [Key]
     public Guid Id { get; set; }
     

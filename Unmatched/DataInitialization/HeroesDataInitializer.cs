@@ -17,8 +17,16 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
 
     public async Task InitializeAsync()
     {
+        var defaultHeroes = GetEntities();
+
+        await _heroRepository.AddRangeAsync(defaultHeroes);
+        await _heroRepository.SaveChangesAsync();
+    }
+
+    public IEnumerable<Hero> GetEntities()
+    {
         var defaultSidekicks = _sidekickRepository.Query().ToList();
-        
+
         var merlin = defaultSidekicks.First(s => s.Name == SidekickNames.Merlin);
         var harpies = defaultSidekicks.First(s => s.Name == SidekickNames.Harpies);
         var porter = defaultSidekicks.First(s => s.Name == SidekickNames.ThePorter);
@@ -34,15 +42,23 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
         var archers = defaultSidekicks.First(s => s.Name == SidekickNames.Archers);
         var patroclus = defaultSidekicks.First(s => s.Name == SidekickNames.Patroclus);
         var malcolm = defaultSidekicks.First(s => s.Name == SidekickNames.DrMalcolm);
+
         var workers = defaultSidekicks.First(s => s.Name == SidekickNames.IngenWorkers);
-        
-        var defaultHeroes = new List<Hero>
+        return new List<Hero>
         {
-            new() { Name = HeroNames.KingArthur, Hp = 18, DeckSize = 30, Sidekicks = new List<Sidekick> { merlin }},
-            new() { Name = HeroNames.Medusa, Hp = 16, DeckSize = 30, IsRanged = true, Sidekicks = new List<Sidekick> { harpies } },
+            new() { Name = HeroNames.KingArthur, Hp = 18, DeckSize = 30, Sidekicks = new List<Sidekick> { merlin } },
+            new()
+            {
+                Name = HeroNames.Medusa, Hp = 16, DeckSize = 30, IsRanged = true,
+                Sidekicks = new List<Sidekick> { harpies }
+            },
             new() { Name = HeroNames.Sindbad, Hp = 15, DeckSize = 30, Sidekicks = new List<Sidekick> { porter } },
             new() { Name = HeroNames.Alice, Hp = 13, DeckSize = 30, Sidekicks = new List<Sidekick> { jabberwock } },
-            new() { Name = HeroNames.RobinHood, Hp = 13, DeckSize = 30, IsRanged = true, Sidekicks = new List<Sidekick> { outlaws } },
+            new()
+            {
+                Name = HeroNames.RobinHood, Hp = 13, DeckSize = 30, IsRanged = true,
+                Sidekicks = new List<Sidekick> { outlaws }
+            },
             new() { Name = HeroNames.Bigfoot, Hp = 16, DeckSize = 30, Sidekicks = new List<Sidekick> { jackalope } },
             new() { Name = HeroNames.Dracula, Hp = 13, DeckSize = 30, Sidekicks = new List<Sidekick> { sisters } },
             new() { Name = HeroNames.JakylAndHide, Hp = 16, DeckSize = 30 },
@@ -57,16 +73,21 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
             new() { Name = HeroNames.MoonKnight, Hp = 16, DeckSize = 30 },
             new() { Name = HeroNames.LukeCage, Hp = 13, DeckSize = 30, Sidekicks = new List<Sidekick> { mistyKnight } },
             new() { Name = HeroNames.BloodyMary, Hp = 16, DeckSize = 30 },
-            new() { Name = HeroNames.PrincessYennega, Hp = 15, DeckSize = 30, IsRanged = true, Sidekicks = new List<Sidekick> { archers } },
+            new()
+            {
+                Name = HeroNames.PrincessYennega, Hp = 15, DeckSize = 30, IsRanged = true,
+                Sidekicks = new List<Sidekick> { archers }
+            },
             new() { Name = HeroNames.Achilles, Hp = 18, DeckSize = 30, Sidekicks = new List<Sidekick> { patroclus } },
             new() { Name = HeroNames.SunWukong, Hp = 17, DeckSize = 30 },
             new() { Name = HeroNames.DrSattler, Hp = 13, DeckSize = 30, Sidekicks = new List<Sidekick> { malcolm } },
             new() { Name = HeroNames.TRex, Hp = 27, DeckSize = 30 },
             new() { Name = HeroNames.Raptors, Hp = 21, DeckSize = 30 },
-            new() { Name = HeroNames.Ingen, Hp = 14, DeckSize = 30, IsRanged = true, Sidekicks = new List<Sidekick> { workers } },
+            new()
+            {
+                Name = HeroNames.Ingen, Hp = 14, DeckSize = 30, IsRanged = true,
+                Sidekicks = new List<Sidekick> { workers }
+            }
         };
-        
-        await _heroRepository.AddRangeAsync(defaultHeroes);
-        await _heroRepository.SaveChangesAsync();
     }
 }

@@ -43,18 +43,25 @@ public class RatingCalculator : IRatingCalculator
 
     private int CalculateForLooser(MatchContext matchContext)
     {
-        int forSidekickHp;
-        int forWinnerHpLeft;
+        int forSidekickHp=0 ;
+        int forWinnerHpLeft =0;
         var result = -(100 + forSidekickHp + forWinnerHpLeft);
         return matchContext.LooserPointsBeforeMatch + result > 0 ? result : 0;
     }
 
     private int CalculateForWinner(MatchContext matchContext)
     {
-        int forLooserSidekick;
-        int forCardsLeft;
-        int forHandicap;
-        int forHpLeft;
+        var maxLooserSidekicksHp = matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxWinnerSidekicksHp = matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        int forLooserSidekick = maxLooserSidekicksHp == 0
+            ? 40
+            : (int)Math.Round(
+                40.0 * (1.0 - Math.Round((double)matchContext.LooserFighter.SidekickHpLeft / maxLooserSidekicksHp, 1,
+                    MidpointRounding.ToPositiveInfinity)), 0);
+        
+        int forCardsLeft =Convert.ToInt32(80*Math.Round(matchContext.WinnerFighter.CardsLeft/(0.8*matchContext.WinnerReferenceHero.DeckSize),1,MidpointRounding.ToPositiveInfinity));
+        int forHandicap = Convert.ToInt32((matchContext.LooserPointsBeforeMatch > matchContext.WinnerPointsBeforeMatch) ? 100*((matchContext.LooserPointsBeforeMatch-matchContext.WinnerPointsBeforeMatch)/500): 0);
+        int forHpLeft =Convert.ToInt32(80*Math.Round((double)(matchContext.WinnerFighter.HpLeft+matchContext.WinnerFighter.SidekickHpLeft)/(matchContext.WinnerReferenceHero.Hp +maxWinnerSidekicksHp),1,MidpointRounding.ToPositiveInfinity));;
         var result = 200 + forLooserSidekick + forCardsLeft + forHandicap + forHpLeft;
         return result;
     }

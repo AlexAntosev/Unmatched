@@ -15,13 +15,18 @@ public class TournamentsDataInitializer : IDataInitializer<Tournament>
 
     public async Task InitializeAsync()
     {
-        var defaultTournaments = new List<Tournament>
+        var defaultTournaments = GetEntities();
+        
+        await _tournamentRepository.AddRangeAsync(defaultTournaments);
+        await _tournamentRepository.SaveChangesAsync();
+    }
+
+    public IEnumerable<Tournament> GetEntities()
+    {
+        return new List<Tournament>
         {
             new() { Name = TournamentNames.UnmatchedFirstTournament, Type = TournamentType.Championship },
             new() { Name = TournamentNames.GoldenHalatLeague, Type = TournamentType.League },
         };
-        
-        await _tournamentRepository.AddRangeAsync(defaultTournaments);
-        await _tournamentRepository.SaveChangesAsync();
     }
 }

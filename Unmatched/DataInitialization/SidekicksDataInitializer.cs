@@ -15,7 +15,15 @@ public class SidekicksDataInitializer : IDataInitializer<Sidekick>
 
     public async Task InitializeAsync()
     {
-        var defaultSidekicks = new List<Sidekick>
+        var defaultSidekicks = GetEntities();
+        
+        await _sidekickRepository.AddRangeAsync(defaultSidekicks);
+        await _sidekickRepository.SaveChangesAsync();
+    }
+
+    public IEnumerable<Sidekick> GetEntities()
+    {
+        return  new List<Sidekick>
         {
             new() { Name = SidekickNames.Merlin, Hp = 7, IsRanged = true },
             new() { Name = SidekickNames.Harpies, Hp = 1, Count = 3 },
@@ -34,8 +42,5 @@ public class SidekicksDataInitializer : IDataInitializer<Sidekick>
             new() { Name = SidekickNames.DrMalcolm, Hp = 7 },
             new() { Name = SidekickNames.IngenWorkers, Hp = 1, Count = 3, IsRanged = true }
         };
-        
-        await _sidekickRepository.AddRangeAsync(defaultSidekicks);
-        await _sidekickRepository.SaveChangesAsync();
     }
 }
