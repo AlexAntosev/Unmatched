@@ -35,9 +35,16 @@ public class GlobalRatingHeroDto : IComparable<GlobalRatingHeroDto>
                 : -1;
         }
 
-        if (Points != other.Points)
+        if (Kd != other.Kd)
         {
-            return Points > other.Points
+            return Kd > other.Kd
+                ? 1
+                : -1;
+        }
+        
+        if (TotalMatches != other.TotalMatches)
+        {
+            return TotalMatches > other.TotalMatches
                 ? 1
                 : -1;
         }

@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataInitializer<Player>, PlayersDataInitializer>();
         services.AddTransient<IDataInitializer<Sidekick>, SidekicksDataInitializer>();
         services.AddTransient<IDataInitializer<Tournament>, TournamentsDataInitializer>();
+        services.AddTransient<IUnrankedMatchDataInitializer, UnrankedMatchDataInitializer>();
     }
 
     public static void RegisterMapping(this IServiceCollection services)

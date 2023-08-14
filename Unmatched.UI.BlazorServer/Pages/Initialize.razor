@@ -7,6 +7,7 @@
 @inject IDataInitializer<Tournament> TournamentsDataInitializer
 @inject IDataInitializer<Sidekick> SidekicksDataInitializer
 @inject IDataInitializer<Hero> HeroesDataInitializer
+@inject IUnrankedMatchDataInitializer UnrankedMatchDataInitializer
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
 
@@ -19,6 +20,7 @@
         await TournamentsDataInitializer.InitializeAsync();
         await SidekicksDataInitializer.InitializeAsync();
         await HeroesDataInitializer.InitializeAsync();
-    }
 
+        await UnrankedMatchDataInitializer.InitializeAsync();
+    }
 }

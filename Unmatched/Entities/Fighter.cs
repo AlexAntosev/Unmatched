@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class Fighter
 {
@@ -20,7 +21,7 @@ public class Fighter
     public int? ItemsUsed { get; set; }
 
     public virtual Match Match { get; set; }
-
+    
     public Guid MatchId { get; set; }
 
     public int? MatchPoints { get; set; }

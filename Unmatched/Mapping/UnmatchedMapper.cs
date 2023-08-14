@@ -15,7 +15,7 @@ public class UnmatchedMapper : Profile
         CreateMap<Map, MapDto>().ReverseMap();
         CreateMap<Match, MatchDto>().ReverseMap();
         CreateMap<Match, MatchLogDto>()
-            .ForMember(x => x.MapName, c => c.MapFrom(x => x.Map.Name))
+            .ForMember(x => x.MapName, c => c.MapFrom(x => TryGetMapName(x.Map)))
             .ForMember(x => x.MatchId, c => c.MapFrom(x => x.Id))
             .ForMember(x => x.TournamentName, c => c.MapFrom(x => TryGetTournamentName(x.Tournament)))
             .ForMember(x => x.Fighters, c => c.Ignore())
@@ -31,8 +31,13 @@ public class UnmatchedMapper : Profile
         CreateMap<Tournament, TournamentDto>().ReverseMap();
     }
 
+    private string TryGetMapName(Map? map)
+    {
+        return map?.Name ?? "<forgotten>";
+    }
+
     private string TryGetTournamentName(Tournament tournament)
     {
-        return tournament?.Name ?? string.Empty;
+        return tournament?.Name ?? "<unranked>";
     }
 }

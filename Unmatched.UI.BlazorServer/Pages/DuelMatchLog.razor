@@ -30,19 +30,17 @@ else
             <th>Date</th>
             <th>Tournament</th>
             <th>Map</th>
+            <th>Player</th>
+            <th>Hero</th>
+            <th>HP</th>
+            <th>Sidekick HP</th>
+            <th>Cards left</th>
+            <th>Player</th>
+            <th>Hero</th>
+            <th>HP</th>
+            <th>Sidekick HP</th>
+            <th>Cards left</th>
             <th>Comment</th>
-            <th>Player</th>
-            <th>Hero</th>
-            <th>HP</th>
-            <th>Sidekick HP</th>
-            <th>Cards left</th>
-            <th>Items used</th>
-            <th>Player</th>
-            <th>Hero</th>
-            <th>HP</th>
-            <th>Sidekick HP</th>
-            <th>Cards left</th>
-            <th>Items used</th>
         </tr>
         </thead>
         <tbody>
@@ -54,19 +52,17 @@ else
                 <td>@matchLogEntry.Date.ToShortDateString()</td>
                 <td>@matchLogEntry.TournamentName</td>
                 <td>@matchLogEntry.MapName</td>
-                <td>@matchLogEntry.Comment</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.PlayerName</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HeroName</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HpLeft</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.SidekickHpLeft</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.CardsLeft</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.ItemsUsed</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.PlayerName</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HeroName</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HpLeft</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.SidekickHpLeft</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.CardsLeft</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.ItemsUsed</td>
+                <td>@matchLogEntry.Comment</td>
             </tr>
         }
         </tbody>

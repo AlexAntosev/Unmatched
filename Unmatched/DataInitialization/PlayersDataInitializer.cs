@@ -29,6 +29,11 @@ public class PlayersDataInitializer : IDataInitializer<Player>
                     {
                         Name = PlayerNames.Ksuha
                     },
+                
+                new()
+                    {
+                        Name = PlayerNames.Tetyana
+                    },
             };
     }
 
