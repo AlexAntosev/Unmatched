@@ -4,21 +4,22 @@ using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 
-public interface IUnrankedMatchDataInitializer: IDataInitializer<Match>
-{
-}
 public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
-    
+
 {
     private readonly IHeroRepository _heroRepository;
 
-    private readonly IPlayerRepository _playerRepository;
+    private readonly IMapRepository _mapRepository;
 
     private readonly IMatchRepository _matchRepository;
 
-    private readonly IMapRepository _mapRepository;
+    private readonly IPlayerRepository _playerRepository;
 
-    public UnrankedMatchDataInitializer(IHeroRepository heroRepository, IPlayerRepository playerRepository, IMatchRepository matchRepository, IMapRepository mapRepository)
+    public UnrankedMatchDataInitializer(
+        IHeroRepository heroRepository,
+        IPlayerRepository playerRepository,
+        IMatchRepository matchRepository,
+        IMapRepository mapRepository)
     {
         _heroRepository = heroRepository;
         _playerRepository = playerRepository;
@@ -49,7 +50,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -70,7 +71,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -91,7 +92,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -112,7 +113,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -133,7 +134,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -154,7 +155,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -175,7 +176,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -196,7 +197,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -217,7 +218,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -238,7 +239,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -259,7 +260,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -280,7 +281,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -301,7 +302,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -324,7 +325,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -347,7 +348,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -368,7 +369,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -389,7 +390,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -410,7 +411,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -431,7 +432,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -452,7 +453,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -475,7 +476,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -498,7 +499,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -521,7 +522,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -544,7 +545,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -565,7 +566,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -586,7 +587,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -608,7 +609,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -630,7 +631,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -652,7 +653,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -674,7 +675,7 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
+
         matches.Add(
             new Match()
                 {
@@ -696,14 +697,8 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
-        
 
         return matches;
-    }
-
-    private Guid? GetMap(string name)
-    {
-        return _mapRepository.Query().First(x => x.Name == name).Id;
     }
 
     public async Task InitializeAsync()
@@ -715,11 +710,16 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
 
     private Guid GetHero(string name)
     {
-        return _heroRepository.Query().First(x => x.Name == name).Id;
+        return _heroRepository.GetIdByName(name);
+    }
+
+    private Guid? GetMap(string name)
+    {
+        return _mapRepository.GetIdByName(name);
     }
 
     private Guid GetPlayer(string name)
     {
-        return _playerRepository.Query().First(x => x.Name == name).Id;
+        return _playerRepository.GetIdByName(name);
     }
 }

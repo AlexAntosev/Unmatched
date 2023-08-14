@@ -58,4 +58,9 @@ public class PlayerRepository : IPlayerRepository
     {
         await _dbContext.SaveChangesAsync();
     }
+
+    public Guid GetIdByName(string name)
+    {
+        return _dbContext.Players.First(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).Id;
+    }
 }

@@ -58,4 +58,9 @@ public class HeroRepository : IHeroRepository
     {
         await _dbContext.SaveChangesAsync();
     }
+
+    public Guid GetIdByName(string name)
+    {
+        return _dbContext.Heroes.First(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).Id;
+    }
 }

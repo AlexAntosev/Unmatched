@@ -58,4 +58,9 @@ public class MapRepository : IMapRepository
     {
         await _dbContext.SaveChangesAsync();
     }
+
+    public Guid GetIdByName(string name)
+    {
+        return _dbContext.Maps.First(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).Id;
+    }
 }
