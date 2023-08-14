@@ -11,9 +11,9 @@ public class Match
     [Key]
     public Guid Id { get; set; }
 
-    public virtual Map Map { get; set; }
+    public virtual Map? Map { get; set; }
 
-    public Guid MapId { get; set; }
+    public Guid? MapId { get; set; }
 
     public virtual Tournament? Tournament { get; set; }
 

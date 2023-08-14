@@ -81,7 +81,7 @@ public class RatingCalculator : IRatingCalculator
             : (int)Math.Round(40.0 * (1.0 - Math.Round((double)matchContext.LooserFighter.SidekickHpLeft / maxLooserSidekicksHp, 1, MidpointRounding.ToPositiveInfinity)), 0);
 
         var forCardsLeft = Convert.ToInt32(
-            80 * Math.Round(matchContext.WinnerFighter.CardsLeft / (0.8 * matchContext.WinnerReferenceHero.DeckSize), 1, MidpointRounding.ToPositiveInfinity));
+            80 * Math.Round(matchContext.WinnerFighter.CardsLeft.Value / (0.8 * matchContext.WinnerReferenceHero.DeckSize), 1, MidpointRounding.ToPositiveInfinity));
         var forHandicap = Convert.ToInt32(
             matchContext.LooserPointsBeforeMatch > matchContext.WinnerPointsBeforeMatch
                 ? 100 * ((matchContext.LooserPointsBeforeMatch - matchContext.WinnerPointsBeforeMatch) / 500)
