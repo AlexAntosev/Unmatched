@@ -151,6 +151,32 @@ public class UnmatchedService : IUnmatchedService
         return ratingDtos;
     }
 
+    public async Task<IEnumerable<GlobalRatingHeroDto>> GetGlobalRatingAsync()
+    {
+        var heroes = await _heroRepository.Query().ToListAsync();
+        var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
+
+        var ratingDtos = new List<RankedRatingHeroDto>();
+
+        foreach (var hero in heroes)
+        {
+            var heroParticipations = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
+
+            var ratingHero = new RankedRatingHeroDto()
+                {
+                    HeroName = hero.Name,
+                    TotalMatches = heroParticipations.Length,
+                    TotalWins = heroParticipations.Count(x => x.IsWinner),
+                    TotalLooses = heroParticipations.Count(x => x.IsWinner == false),
+                    LastMatchPoints = heroParticipations.FirstOrDefault()?.MatchPoints ?? 0
+                };
+
+            ratingDtos.Add(ratingHero);
+        }
+
+        return ratingDtos;
+    }
+
     public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
     {
         var allMatches = await _matchRepository.Query().Include(x => x.Map).Include(x => x.Tournament).ToListAsync();

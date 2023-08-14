@@ -75,7 +75,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        matchLogEntries = await UnmatchedService.GetMatchLogAsync();
+        matchLogEntries = (await UnmatchedService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
         foreach (var matchLogEntry in matchLogEntries)
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);

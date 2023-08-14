@@ -15,6 +15,7 @@ public interface IUnmatchedService
     Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
 
     Task<IEnumerable<RankedRatingHeroDto>> GetRankedRatingAsync();
+    Task<IEnumerable<GlobalRatingHeroDto>> GetGlobalRatingAsync();
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
 }
