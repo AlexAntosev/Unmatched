@@ -58,4 +58,9 @@ public class TournamentRepository : ITournamentRepository
     {
         await _dbContext.SaveChangesAsync();
     }
+
+    public Guid GetIdByName(string name)
+    {
+        return _dbContext.Tournaments.First(x => x.Name.Equals(name)).Id;
+    }
 }

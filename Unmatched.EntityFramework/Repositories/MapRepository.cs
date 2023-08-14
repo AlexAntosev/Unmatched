@@ -61,6 +61,6 @@ public class MapRepository : IMapRepository
 
     public Guid GetIdByName(string name)
     {
-        return _dbContext.Maps.First(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).Id;
+        return _dbContext.Maps.First(x => x.Name.Equals(name)).Id;
     }
 }

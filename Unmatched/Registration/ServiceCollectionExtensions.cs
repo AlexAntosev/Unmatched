@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataInitializer<Sidekick>, SidekicksDataInitializer>();
         services.AddTransient<IDataInitializer<Tournament>, TournamentsDataInitializer>();
         services.AddTransient<IUnrankedMatchDataInitializer, UnrankedMatchDataInitializer>();
+        services.AddTransient<IFirstTournamentMatchesDataInitializer, FirstTournamentMatchesDataInitializer>();
     }
 
     public static void RegisterMapping(this IServiceCollection services)
@@ -29,5 +30,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IUnmatchedService, UnmatchedService>();
         services.AddTransient<IRatingCalculator, RatingCalculator>();
+        services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
     }
 }
