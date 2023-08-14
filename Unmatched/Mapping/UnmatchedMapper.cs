@@ -29,7 +29,6 @@ public class UnmatchedMapper : Profile
             .ForMember(x => x.Player, c => c.Ignore())
             .ForMember(x => x.Hero, c => c.Ignore());
         CreateMap<Tournament, TournamentDto>().ReverseMap();
-        CreateMap<Rating, RatingDto>().ReverseMap();
     }
 
     private string TryGetTournamentName(Tournament tournament)
