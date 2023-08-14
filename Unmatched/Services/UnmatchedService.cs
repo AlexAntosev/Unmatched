@@ -44,8 +44,8 @@ public class UnmatchedService : IUnmatchedService
     public async Task AddDuelMatchAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
     {
         var match = _mapper.Map<Match>(matchDto);
-        var fighter = _mapper.Map<Fighter>(matchDto);
-        var opponent = _mapper.Map<Fighter>(matchDto);
+        var fighter = _mapper.Map<Fighter>(fighterDto);
+        var opponent = _mapper.Map<Fighter>(opponentDto);
 
         var createdMatch = await _matchRepository.AddAsync(match);
 
@@ -79,16 +79,19 @@ public class UnmatchedService : IUnmatchedService
 
     public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
     {
-        var allMatches = await _matchRepository.Query().ToListAsync();
+        var allMatches = await _matchRepository.Query().Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
 
         var matchLogs = new List<MatchLogDto>();
         foreach (var match in allMatches)
         {
             var matchLog = _mapper.Map<MatchLogDto>(match);
-            
-            var fighters = (await _fighterRepository.Query().Where(x => matchLog.MatchId == x.MatchId).ToListAsync()).Select(fighter => _mapper.Map<FighterDto>(fighter)).ToArray();
+
+            var fighters =
+                (await _fighterRepository.Query().Include(x => x.Player).Include(x => x.Hero)
+                    .Where(x => matchLog.MatchId == x.MatchId).ToListAsync())
+                .Select(fighter => _mapper.Map<FighterDto>(fighter)).ToArray();
             matchLog.Fighters = fighters;
-            
+
             matchLogs.Add(matchLog);
         }
 

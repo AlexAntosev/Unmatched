@@ -1,6 +1,7 @@
 ﻿@page "/duelMatchLog"
 @using Unmatched.Services
 @using Unmatched.Dtos
+@using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
 
 <PageTitle>Duel Match log</PageTitle>
@@ -32,50 +33,40 @@ else
             <th>Comment</th>
             <th>Player</th>
             <th>Hero</th>
-            <th>Hp left</th>
-            <th>Sidekick</th>
-            <th>Sidekick Hp left</th>
+            <th>HP</th>
+            <th>Sidekick HP</th>
             <th>Cards left</th>
             <th>Items used</th>
-            <th>Turn</th>
-            <th>Is winner</th>
             <th>Player</th>
             <th>Hero</th>
-            <th>Hp left</th>
-            <th>Sidekick</th>
-            <th>Sidekick Hp left</th>
+            <th>HP</th>
+            <th>Sidekick HP</th>
             <th>Cards left</th>
             <th>Items used</th>
-            <th>Turn</th>
-            <th>Is winner</th>
         </tr>
         </thead>
         <tbody>
         @foreach (var matchLogEntry in matchLogEntries)
         {
+            var firstFighter = matchLogEntry.Fighters.First();
+            var secondFighter = matchLogEntry.Fighters.Last();
             <tr>
                 <td>@matchLogEntry.Date.ToShortDateString()</td>
                 <td>@matchLogEntry.TournamentName</td>
                 <td>@matchLogEntry.MapName</td>
                 <td>@matchLogEntry.Comment</td>
-                <td>@matchLogEntry.Fighters.First().Player.Name</td>
-                <td>@matchLogEntry.Fighters.First().Hero.Name</td>
-                <td>@matchLogEntry.Fighters.First().HpLeft</td>
-                <td>@matchLogEntry.Fighters.First().Hero.Sidekicks.First().Name</td>
-                <td>@matchLogEntry.Fighters.First().SidekickHpLeft</td>
-                <td>@matchLogEntry.Fighters.First().CardsLeft</td>
-                <td>@matchLogEntry.Fighters.First().ItemsUsed</td>
-                <td>@matchLogEntry.Fighters.First().Turn</td>
-                <td>@matchLogEntry.Fighters.First().IsWinner</td>
-                <td>@matchLogEntry.Fighters.Last().Player.Name</td>
-                <td>@matchLogEntry.Fighters.First().Hero.Name</td>
-                <td>@matchLogEntry.Fighters.Last().HpLeft</td>
-                <td>@matchLogEntry.Fighters.Last().Hero.Sidekicks.First().Name</td>
-                <td>@matchLogEntry.Fighters.Last().SidekickHpLeft</td>
-                <td>@matchLogEntry.Fighters.Last().CardsLeft</td>
-                <td>@matchLogEntry.Fighters.Last().ItemsUsed</td>
-                <td>@matchLogEntry.Fighters.Last().Turn</td>
-                <td>@matchLogEntry.Fighters.Last().IsWinner</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.PlayerName</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HeroName</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HpLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.SidekickHpLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.CardsLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.ItemsUsed</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.PlayerName</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HeroName</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HpLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.SidekickHpLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.CardsLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.ItemsUsed</td>
             </tr>
         }
         </tbody>
@@ -88,6 +79,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         matchLogEntries = await UnmatchedService.GetMatchLogAsync();
+        foreach (var matchLogEntry in matchLogEntries)
+        {
+            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
+        }
     }
 
+    private string GetWinLooseColor(bool isWinner)
+    {
+        return isWinner ? Colors.WinnerColor : Colors.LooserColor;
+    }
 }

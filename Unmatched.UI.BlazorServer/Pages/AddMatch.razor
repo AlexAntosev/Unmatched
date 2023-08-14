@@ -1,6 +1,6 @@
 ﻿@page "/addMatch"
-@using Unmatched.Services
 @using Unmatched.Dtos
+@using Unmatched.Services
 @inject IUnmatchedService UnmatchedService
 
 <PageTitle>Add match</PageTitle>
@@ -59,6 +59,7 @@ else
         <div class="triple-column"></div>
     </div>
 }
+
 @code {
     private IEnumerable<PlayerDto> _players;
     private IEnumerable<HeroDto> _heroes;
@@ -67,12 +68,12 @@ else
 
     public FighterInfo FighterComponent;
     public FighterInfo OpponentComponent;
-    
-    MatchDto Match = new ()
+
+    readonly MatchDto Match = new()
     {
         Date = DateTime.Today
     };
-    
+
     protected override async Task OnInitializedAsync()
     {
         _players = await UnmatchedService.GetAllPlayersAsync();
@@ -80,12 +81,14 @@ else
         _maps = await UnmatchedService.GetAllMapsAsync();
         _tournaments = await UnmatchedService.GetAllTournamentsAsync();
     }
-    
+
     private async Task AddNewMatch()
     {
+        var match = Match;
         var fighter = FighterComponent.BuildDto();
         var opponent = OpponentComponent.BuildDto();
-        var match = Match;
-        // await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
+
+        await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
     }
+
 }
