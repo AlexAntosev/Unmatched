@@ -4,9 +4,9 @@
 @using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
 
-<PageTitle>Global rating</PageTitle>
+<PageTitle>Ranked rating</PageTitle>
 
-<h1>Global rating</h1>
+<h1>Ranked rating</h1>
 
 @if (ratingHeroes == null)
 {
@@ -47,11 +47,11 @@ else
 
 @code {
 
-    private IEnumerable<GlobalRatingHeroDto> ratingHeroes;
+    private IEnumerable<RankedRatingHeroDto> ratingHeroes;
 
     protected override async Task OnInitializedAsync()
     {
-        ratingHeroes = (await UnmatchedService.GetGlobalRatingAsync()).OrderDescending().ToArray();
+        ratingHeroes = (await UnmatchedService.GetRankedRatingAsync()).OrderDescending().ToArray();
 
         var place = 1;
         foreach (var ratingHero in ratingHeroes)

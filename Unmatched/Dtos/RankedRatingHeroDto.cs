@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-public class GlobalRatingHeroDto : IComparable<GlobalRatingHeroDto>
+public class RankedRatingHeroDto : IComparable<RankedRatingHeroDto>
 {
     public string HeroName { get; set; }
 
@@ -21,7 +21,7 @@ public class GlobalRatingHeroDto : IComparable<GlobalRatingHeroDto>
 
     public int TotalWins { get; set; }
 
-    public int CompareTo(GlobalRatingHeroDto? other)
+    public int CompareTo(RankedRatingHeroDto? other)
     {
         if (other == null)
         {
@@ -49,6 +49,7 @@ public class GlobalRatingHeroDto : IComparable<GlobalRatingHeroDto>
                 : -1;
         }
 
-        return 0;
+        return HeroName.CompareTo(other.HeroName);
+
     }
 }
