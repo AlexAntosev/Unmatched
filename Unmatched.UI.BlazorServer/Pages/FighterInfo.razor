@@ -13,7 +13,10 @@
         </div>
         <div>
             <label for="hero">Hero:</label>
-            <InputSelect @bind-Value=Fighter.HeroId name="Hero" id="hero" class="form-select">
+            @* ValueChanged="@((string value) => HeroChanged(value))" *@
+            <InputSelect name="Hero" id="hero" class="form-select" ValueExpression="@(()=>Fighter.HeroId)" 
+                         Value="@Fighter.HeroId" 
+                         ValueChanged="@((Guid value) => HeroChanged(value))">
                 @foreach (var hero in Heroes)
                 {
                     <option value="@hero.Id"> @hero.Name</option>
@@ -23,6 +26,10 @@
         <div>
             <label for="hp">HP:</label>
             <InputNumber @bind-Value=Fighter.HpLeft id="hp" class="form-control"/>
+        </div>
+        <div>
+            <label for="sidekick">Sidekick:</label>
+            <InputText @bind-Value=Fighter.SidekickName id="sidekick" class="form-control" disabled="true"/>
         </div>
         <div>
             <label for="sidekickHP">Sidekick HP:</label>
@@ -58,11 +65,25 @@
     [Parameter]
     public IEnumerable<PlayerDto> Players { get; set; }
 
-    FighterDto Fighter = new FighterDto();
+    public FighterDto Fighter = new ();
 
     public FighterDto BuildDto()
     {
         return Fighter;
     }
 
+    private void HeroChanged(Guid heroId)
+    {
+        var hero = Heroes.First(h => h.Id == heroId);
+        SetHeroInfo(hero);
+    }
+
+    public void SetHeroInfo(HeroDto hero)
+    {
+        Fighter.HpLeft = hero.Hp;
+        Fighter.HeroId = hero.Id;
+        Fighter.SidekickName = hero.Sidekicks.FirstOrDefault()?.Name;
+        Fighter.SidekickHpLeft = hero.Sidekicks.Sum(s => s.Hp * s.Count);
+        Fighter.CardsLeft = hero.DeckSize;
+    }
 }
