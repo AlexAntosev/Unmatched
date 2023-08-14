@@ -8,23 +8,18 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
 {
     private readonly IHeroRepository _heroRepository;
     private readonly ISidekickRepository _sidekickRepository;
-    private readonly IRatingRepository _ratingRepository;
 
-    public HeroesDataInitializer(IHeroRepository heroRepository, ISidekickRepository sidekickRepository, IRatingRepository ratingRepository)
+    public HeroesDataInitializer(IHeroRepository heroRepository, ISidekickRepository sidekickRepository)
     {
         _heroRepository = heroRepository;
         _sidekickRepository = sidekickRepository;
-        _ratingRepository = ratingRepository;
     }
 
     public async Task InitializeAsync()
     {
         var defaultHeroes = GetEntities();
-        var defaultRatings = defaultHeroes.Select(hero => new Rating() { HeroId = hero.Id, Points = 0 }).ToArray();
         
         await _heroRepository.AddRangeAsync(defaultHeroes);
-        await _ratingRepository.AddRangeAsync(defaultRatings);
-        
         await _heroRepository.SaveChangesAsync();
     }
 

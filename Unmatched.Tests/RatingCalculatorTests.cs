@@ -145,7 +145,7 @@ public class RatingCalculatorTests
         var mockSidekickRepository = new Mock<ISidekickRepository>();
         mockSidekickRepository.Setup(x => x.Query()).Returns(new SidekicksDataInitializer(null).GetEntities().AsQueryable);
 
-        var heroDataInitializer = new HeroesDataInitializer(null, mockSidekickRepository.Object, null);
+        var heroDataInitializer = new HeroesDataInitializer(null, mockSidekickRepository.Object);
 
         var mockHeroRepository = new Mock<IHeroRepository>();
         var heroes = heroDataInitializer.GetEntities();
