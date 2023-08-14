@@ -16,11 +16,14 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
 
     private readonly IMatchRepository _matchRepository;
 
-    public UnrankedMatchDataInitializer(IHeroRepository heroRepository, IPlayerRepository playerRepository, IMatchRepository matchRepository)
+    private readonly IMapRepository _mapRepository;
+
+    public UnrankedMatchDataInitializer(IHeroRepository heroRepository, IPlayerRepository playerRepository, IMatchRepository matchRepository, IMapRepository mapRepository)
     {
         _heroRepository = heroRepository;
         _playerRepository = playerRepository;
         _matchRepository = matchRepository;
+        _mapRepository = mapRepository;
     }
 
     public IEnumerable<Match> GetEntities()
@@ -518,8 +521,189 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
                                 },
                         }
                 });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("01/16/2023"),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Bigfoot),
+                                    IsWinner = true,
+                                    HpLeft = 0,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.JakylAndHide),
+                                    IsWinner = false,
+                                    HpLeft = 1,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("01/17/2023"),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.MoonKnight),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.KingArthur),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("01/18/2023"),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Beowulf),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Elektra),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("07/22/2023"),
+                    MapId = GetMap(MapNames.Mansion),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.LittleRed),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.MoonKnight),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("07/24/2023"),
+                    MapId = GetMap(MapNames.GreenForest),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.JakylAndHide),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.TRex),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("07/24/2023"),
+                    MapId = GetMap(MapNames.GoldenForest),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Raptors),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Bigfoot),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("07/24/2023"),
+                    MapId = GetMap(MapNames.Castle),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Elektra),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Dracula),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("08/01/2023"),
+                    MapId = GetMap(MapNames.Ruins),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.SunWukong),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii)
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.LukeCage),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr)
+                                },
+                        }
+                });
+        
 
         return matches;
+    }
+
+    private Guid? GetMap(string name)
+    {
+        return _mapRepository.Query().First(x => x.Name == name).Id;
     }
 
     public async Task InitializeAsync()
