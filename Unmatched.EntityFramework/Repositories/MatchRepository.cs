@@ -20,7 +20,7 @@ public class MatchRepository : IMatchRepository
         return entity;
     }
 
-    public IEnumerable<Match> Query()
+    public IQueryable<Match> Query()
     {
         return _dbContext.Matches;
     }

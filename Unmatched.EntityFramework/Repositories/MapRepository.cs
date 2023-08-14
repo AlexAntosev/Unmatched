@@ -20,7 +20,7 @@ public class MapRepository : IMapRepository
         return entity;
     }
 
-    public IEnumerable<Map> Query()
+    public IQueryable<Map> Query()
     {
         return _dbContext.Maps;
     }

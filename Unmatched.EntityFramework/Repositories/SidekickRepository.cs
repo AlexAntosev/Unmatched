@@ -20,7 +20,7 @@ public class SidekickRepository : ISidekickRepository
         return entity;
     }
 
-    public IEnumerable<Sidekick> Query()
+    public IQueryable<Sidekick> Query()
     {
         return _dbContext.Sidekicks;
     }

@@ -20,7 +20,7 @@ public class TournamentRepository : ITournamentRepository
         return entity;
     }
 
-    public IEnumerable<Tournament> Query()
+    public IQueryable<Tournament> Query()
     {
         return _dbContext.Tournaments;
     }

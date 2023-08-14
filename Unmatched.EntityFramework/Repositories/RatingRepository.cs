@@ -21,7 +21,7 @@ public class RatingRepository : IRatingRepository
         return entity;
     }
 
-    public IEnumerable<Rating> Query()
+    public IQueryable<Rating> Query()
     {
         return _dbContext.Ratings;
     }

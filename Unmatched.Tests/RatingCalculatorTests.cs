@@ -143,13 +143,13 @@ public class RatingCalculatorTests
     private IHeroRepository CreateMockHeroRepository()
     {
         var mockSidekickRepository = new Mock<ISidekickRepository>();
-        mockSidekickRepository.Setup(x => x.Query()).Returns(new SidekicksDataInitializer(null).GetEntities());
+        mockSidekickRepository.Setup(x => x.Query()).Returns(new SidekicksDataInitializer(null).GetEntities().AsQueryable);
 
         var heroDataInitializer = new HeroesDataInitializer(null, mockSidekickRepository.Object);
 
         var mockHeroRepository = new Mock<IHeroRepository>();
         var heroes = heroDataInitializer.GetEntities();
-        mockHeroRepository.Setup(x => x.Query()).Returns(heroes);
+        mockHeroRepository.Setup(x => x.Query()).Returns(heroes.AsQueryable);
         mockHeroRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
             .Returns((Guid id) => Task.FromResult(heroes.First(x => x.Id == id)));
 

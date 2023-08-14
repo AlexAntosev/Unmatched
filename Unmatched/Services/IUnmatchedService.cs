@@ -6,9 +6,9 @@ public interface IUnmatchedService
 {
     Task AddDuelMatchAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto);
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
-    
-    IEnumerable<PlayerDto> GetAllPlayers();
-    IEnumerable<HeroDto> GetAllHeroes();
-    IEnumerable<MapDto> GetAllMaps();
-    IEnumerable<TournamentDto> GetAllTournaments();
+
+    Task<IEnumerable<PlayerDto>> GetAllPlayersAsync();
+    Task<IEnumerable<HeroDto>> GetAllHeroesAsync();
+    Task<IEnumerable<MapDto>> GetAllMapsAsync();
+    Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
 }

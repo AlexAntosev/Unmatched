@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Unmatched.Constants;
 using Unmatched.Dtos;
 using Unmatched.Entities;
@@ -78,93 +79,46 @@ public class UnmatchedService : IUnmatchedService
 
     public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
     {
-        return await Task.FromResult(new List<MatchLogDto>()
+        var allMatches = await _matchRepository.Query().ToListAsync();
+
+        var matchLogs = new List<MatchLogDto>();
+        foreach (var match in allMatches)
         {
-            new MatchLogDto()
-            {
-                Date = DateTime.Today,
-                Comment = "Comment",
-                MapName = MapNames.RaptorPaddock,
-                TournamentName = TournamentNames.GoldenHalatLeague,
-                Fighters = new List<FighterDto>()
-                {
-                    new FighterDto()
-                    {
-                        Player = new PlayerDto()
-                        {
-                            Name = PlayerNames.Oleksandr
-                        },
-                        Hero = new HeroDto()
-                        {
-                            Name = HeroNames.Achilles,
-                            Sidekicks = new List<SidekickDto>()
-                            {
-                                new SidekickDto()
-                                {
-                                    Name = SidekickNames.Patroclus
-                                }
-                            }
-                        },
-                        HpLeft = 10,
-                        SidekickHpLeft = 0,
-                        CardsLeft = 4,
-                        ItemsUsed = 0,
-                        IsWinner = true,
-                        Turn = 2
-                    },
-                    new FighterDto()
-                    {
-                        Player = new PlayerDto()
-                        {
-                            Name = PlayerNames.Andrii
-                        },
-                        Hero = new HeroDto()
-                        {
-                            Name = HeroNames.SherlokHolmes,
-                            Sidekicks = new List<SidekickDto>()
-                            {
-                                new SidekickDto()
-                                {
-                                    Name = SidekickNames.DrWatson
-                                }
-                            }
-                        },
-                        HpLeft = 0,
-                        SidekickHpLeft = 2,
-                        CardsLeft = 9,
-                        ItemsUsed = 0,
-                        IsWinner = false,
-                        Turn = 1
-                    }
-                }
-            }
-        });
+            var matchLog = _mapper.Map<MatchLogDto>(match);
+            
+            var fighters = (await _fighterRepository.Query().Where(x => matchLog.MatchId == x.MatchId).ToListAsync()).Select(fighter => _mapper.Map<FighterDto>(fighter)).ToArray();
+            matchLog.Fighters = fighters;
+            
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
     }
 
-    public IEnumerable<PlayerDto> GetAllPlayers()
+    public async Task<IEnumerable<PlayerDto>> GetAllPlayersAsync()
     {
-        var entities = _playerRepository.Query();
+        var entities = await _playerRepository.Query().ToListAsync();
         var players = _mapper.Map<IEnumerable<PlayerDto>>(entities);
         return players;
     }
 
-    public IEnumerable<HeroDto> GetAllHeroes()
+    public async Task<IEnumerable<HeroDto>> GetAllHeroesAsync()
     {
-        var entities = _heroRepository.Query();
+        var entities = await _heroRepository.Query().ToListAsync();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
         return heroes;
     }
 
-    public IEnumerable<MapDto> GetAllMaps()
+    public async Task<IEnumerable<MapDto>> GetAllMapsAsync()
     {
-        var entities = _mapRepository.Query();
+        var entities = await _mapRepository.Query().ToListAsync();
         var maps = _mapper.Map<IEnumerable<MapDto>>(entities);
         return maps;
     }
 
-    public IEnumerable<TournamentDto> GetAllTournaments()
+    public async Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync()
     {
-        var entities = _tournamentRepository.Query();
+        var entities = await _tournamentRepository.Query().ToListAsync();
         var tournaments = _mapper.Map<IEnumerable<TournamentDto>>(entities);
         return tournaments;
     }

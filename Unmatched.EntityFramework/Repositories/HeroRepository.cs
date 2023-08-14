@@ -20,7 +20,7 @@ public class HeroRepository : IHeroRepository
         return entity;
     }
 
-    public IEnumerable<Hero> Query()
+    public IQueryable<Hero> Query()
     {
         return _dbContext.Heroes;
     }

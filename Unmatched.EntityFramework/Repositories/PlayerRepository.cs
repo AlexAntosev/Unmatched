@@ -20,7 +20,7 @@ public class PlayerRepository : IPlayerRepository
         return entity;
     }
 
-    public IEnumerable<Player> Query()
+    public IQueryable<Player> Query()
     {
         return _dbContext.Players;
     }

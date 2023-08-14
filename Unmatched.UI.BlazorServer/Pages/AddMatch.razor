@@ -66,10 +66,10 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _players = UnmatchedService.GetAllPlayers();
-        _heroes = UnmatchedService.GetAllHeroes();
-        _maps = UnmatchedService.GetAllMaps();
-        _tournaments = UnmatchedService.GetAllTournaments();
+        _players = await UnmatchedService.GetAllPlayersAsync();
+        _heroes = await UnmatchedService.GetAllHeroesAsync();
+        _maps = await UnmatchedService.GetAllMapsAsync();
+        _tournaments = await UnmatchedService.GetAllTournamentsAsync();
     }
     
     private async Task AddNewMatch()

@@ -20,7 +20,7 @@ public class FighterRepository : IFighterRepository
         return entity;
     }
 
-    public IEnumerable<Fighter> Query()
+    public IQueryable<Fighter> Query()
     {
         return _dbContext.Fighters;
     }
