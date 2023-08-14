@@ -1,6 +1,7 @@
 ﻿@page "/addMatch"
 @using Unmatched.Dtos
 @using Unmatched.Services
+@using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
 
 <PageTitle>Add match</PageTitle>
@@ -57,6 +58,7 @@ else
                 </div>
                 <p></p>
                 <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
+                <button class="btn btn-secondary" @onclick="Randomize">Randomize</button>
             </EditForm>
         </div>
         <div class="triple-column"></div>
@@ -99,4 +101,27 @@ else
         await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
     }
 
+    private async Task Randomize()
+    {
+        RandomizeMap();
+        RandomizeFighter(FighterComponent);
+        RandomizeFighter(OpponentComponent);
+    }
+
+    private void RandomizeMap()
+    {
+        var mapIndex = new Random().Next(0, _maps.Count());
+        Match.MapId = _maps.ToArray()[mapIndex].Id;
+    }
+
+    private void RandomizeFighter(FighterInfo fighterInfo)
+    {
+        fighterInfo.Fighter.PlayerId = _players.First(p => p.Name == PlayerNames.Andrii).Id;
+        
+        var heroIndex = new Random().Next(0, _heroes.Count());
+        var hero = _heroes.ToArray()[heroIndex];
+        fighterInfo.SetHeroInfo(hero);
+        
+        fighterInfo.Fighter.ItemsUsed = 0;
+    }
 }

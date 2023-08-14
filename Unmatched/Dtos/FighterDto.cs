@@ -21,6 +21,8 @@ public class FighterDto
     public Guid PlayerId { get; set; }
 
     public string PlayerName { get; set; }
+    
+    public string? SidekickName { get; set; }
 
     public int SidekickHpLeft { get; set; }
 

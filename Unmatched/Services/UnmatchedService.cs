@@ -96,7 +96,7 @@ public class UnmatchedService : IUnmatchedService
 
     public async Task<IEnumerable<HeroDto>> GetAllHeroesAsync()
     {
-        var entities = await _heroRepository.Query().ToListAsync();
+        var entities = await _heroRepository.Query().Include(e => e.Sidekicks).ToListAsync();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
         return heroes;
     }
