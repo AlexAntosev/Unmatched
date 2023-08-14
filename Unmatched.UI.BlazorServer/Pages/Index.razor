@@ -46,6 +46,7 @@ else
 }
 
 @code {
+
     private IEnumerable<GlobalRatingHeroDto> ratingHeroes;
 
     protected override async Task OnInitializedAsync()
@@ -62,6 +63,9 @@ else
 
     private string GetWinLooseColor(bool isWinner)
     {
-        return isWinner ? Colors.WinnerColor : Colors.LooserColor;
+        return isWinner
+            ? Colors.WinnerColor
+            : Colors.LooserColor;
     }
+
 }

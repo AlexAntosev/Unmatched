@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class FighterRepository : IFighterRepository
 {
@@ -11,18 +11,6 @@ public class FighterRepository : IFighterRepository
     public FighterRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Fighter> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Fighters.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Fighter> Query()
-    {
-        return _dbContext.Fighters;
     }
 
     public async Task<Fighter> AddAsync(Fighter model)
@@ -50,8 +38,20 @@ public class FighterRepository : IFighterRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Fighter> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Fighters.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Fighter> Query()
+    {
+        return _dbContext.Fighters;
     }
 
     public async Task SaveChangesAsync()

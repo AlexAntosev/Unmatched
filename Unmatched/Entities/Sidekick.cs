@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Unmatched.Entities;
 
-namespace Unmatched.Entities;
+using System.ComponentModel.DataAnnotations;
 
 public class Sidekick
 {
@@ -9,18 +9,18 @@ public class Sidekick
         Id = Guid.NewGuid();
     }
 
+    public int Count { get; set; } = 1;
+
+    public virtual Hero? Hero { get; set; }
+
+    public Guid? HeroId { get; set; }
+
+    public int Hp { get; set; }
+
     [Key]
     public Guid Id { get; set; }
-    
-    public string Name { get; set; }
-    
-    public int Hp { get; set; }
-    
-    public Guid? HeroId { get; set; }
-    
-    public virtual Hero? Hero { get; set; }
-    
+
     public bool IsRanged { get; set; }
 
-    public int Count { get; set; } = 1;
+    public string Name { get; set; }
 }

@@ -2,13 +2,7 @@
 
 public class FighterDto
 {
-    public Guid Id { get; set; }
-
-    public Guid MatchId { get; set; }
-
-    public Guid PlayerId { get; set; }
-
-    public string PlayerName { get; set; }
+    public int CardsLeft { get; set; }
 
     public Guid HeroId { get; set; }
 
@@ -16,13 +10,19 @@ public class FighterDto
 
     public int HpLeft { get; set; }
 
-    public int CardsLeft { get; set; }
+    public Guid Id { get; set; }
 
-    public int SidekickHpLeft { get; set; }
+    public bool IsWinner { get; set; }
 
     public int ItemsUsed { get; set; }
 
-    public int Turn { get; set; }
+    public Guid MatchId { get; set; }
 
-    public bool IsWinner { get; set; }
+    public Guid PlayerId { get; set; }
+
+    public string PlayerName { get; set; }
+
+    public int SidekickHpLeft { get; set; }
+
+    public int Turn { get; set; }
 }

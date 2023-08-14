@@ -3,6 +3,8 @@
 public static class PlayerNames
 {
     public const string Andrii = "Andrii";
-    public const string Oleksandr = "Oleksandr";
+
     public const string Ksuha = "Ksuha";
+
+    public const string Oleksandr = "Oleksandr";
 }

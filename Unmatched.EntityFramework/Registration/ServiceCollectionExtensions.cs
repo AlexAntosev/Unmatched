@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿namespace Unmatched.EntityFramework.Registration;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Unmatched.EntityFramework.Context;
 using Unmatched.EntityFramework.Repositories;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Registration;
 
 public static class ServiceCollectionExtensions
 {
@@ -14,7 +15,7 @@ public static class ServiceCollectionExtensions
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<UnmatchedDbContext>(options => options.UseSqlServer(connectionString));
     }
-        
+
     public static void RegisterRepositories(this IServiceCollection services)
     {
         services.AddTransient<IPlayerRepository, PlayerRepository>();

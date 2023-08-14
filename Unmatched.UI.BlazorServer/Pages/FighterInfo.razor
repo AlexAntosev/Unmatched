@@ -1,66 +1,68 @@
 ﻿@using Unmatched.Dtos
 <EditForm Model=@Fighter>
-  <fieldset>
-    <legend>@Title</legend>
-    <div>
-      <label for="players">Player:</label>
-      <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
-        @foreach (var player in Players)  
-        {  
-          <option value="@player.Id"> @player.Name</option>  
-        }  
-      </InputSelect >
-    </div>
-    <div>
-      <label for="hero">Hero:</label>
-      <InputSelect @bind-Value=Fighter.HeroId name="Hero" id="hero" class="form-select">
-        @foreach (var hero in Heroes)  
-        {  
-            <option value="@hero.Id"> @hero.Name</option>  
-        }  
-      </InputSelect>
-    </div>
-    <div>
-      <label for="hp">HP:</label>
-      <InputNumber @bind-Value=Fighter.HpLeft id="hp" class="form-control" />
-    </div>
-    <div>
-      <label for="sidekickHP">Sidekick HP:</label>
-      <InputNumber @bind-Value=Fighter.SidekickHpLeft id="sidekickHP" class="form-control" />
-    </div>
-    <div>
-      <label for="cardsLeft">Cards Left:</label>
-      <InputNumber @bind-Value=Fighter.CardsLeft id="cardsLeft" class="form-control" />
-    </div>
-    <div>
-      <label for="itemsUsed">Items Used:</label>
-      <InputNumber @bind-Value=Fighter.ItemsUsed id="itemsUsed" class="form-control" />
-    </div>
-    <div>
-      <label for="isWinner">Winner:</label>
-      <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check-label"/>
-    </div>
-    <div>
-      <label for="turn">Turn:</label>
-      <InputNumber @bind-Value=Fighter.Turn id="turn" class="form-control" />
-    </div>
-  </fieldset>
+    <fieldset>
+        <legend>@Title</legend>
+        <div>
+            <label for="players">Player:</label>
+            <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
+                @foreach (var player in Players)
+                {
+                    <option value="@player.Id"> @player.Name</option>
+                }
+            </InputSelect >
+        </div>
+        <div>
+            <label for="hero">Hero:</label>
+            <InputSelect @bind-Value=Fighter.HeroId name="Hero" id="hero" class="form-select">
+                @foreach (var hero in Heroes)
+                {
+                    <option value="@hero.Id"> @hero.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label for="hp">HP:</label>
+            <InputNumber @bind-Value=Fighter.HpLeft id="hp" class="form-control"/>
+        </div>
+        <div>
+            <label for="sidekickHP">Sidekick HP:</label>
+            <InputNumber @bind-Value=Fighter.SidekickHpLeft id="sidekickHP" class="form-control"/>
+        </div>
+        <div>
+            <label for="cardsLeft">Cards Left:</label>
+            <InputNumber @bind-Value=Fighter.CardsLeft id="cardsLeft" class="form-control"/>
+        </div>
+        <div>
+            <label for="itemsUsed">Items Used:</label>
+            <InputNumber @bind-Value=Fighter.ItemsUsed id="itemsUsed" class="form-control"/>
+        </div>
+        <div>
+            <label for="isWinner">Winner:</label>
+            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check-label"/>
+        </div>
+        <div>
+            <label for="turn">Turn:</label>
+            <InputNumber @bind-Value=Fighter.Turn id="turn" class="form-control"/>
+        </div>
+    </fieldset>
 </EditForm>
 
 @code {
-  [Parameter]
-  public string Title { get; set; }
-  
-  [Parameter]
-  public IEnumerable<HeroDto> Heroes { get; set; }
-  
-  [Parameter]
-  public IEnumerable<PlayerDto> Players { get; set; }
-  
-  FighterDto Fighter = new FighterDto();
 
-  public FighterDto BuildDto()
-  {
-    return Fighter;
-  }
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public IEnumerable<HeroDto> Heroes { get; set; }
+
+    [Parameter]
+    public IEnumerable<PlayerDto> Players { get; set; }
+
+    FighterDto Fighter = new FighterDto();
+
+    public FighterDto BuildDto()
+    {
+        return Fighter;
+    }
+
 }

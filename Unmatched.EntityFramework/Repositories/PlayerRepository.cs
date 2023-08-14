@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class PlayerRepository : IPlayerRepository
 {
@@ -11,18 +11,6 @@ public class PlayerRepository : IPlayerRepository
     public PlayerRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Player> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Players.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Player> Query()
-    {
-        return _dbContext.Players;
     }
 
     public async Task<Player> AddAsync(Player model)
@@ -50,8 +38,20 @@ public class PlayerRepository : IPlayerRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Player> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Players.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Player> Query()
+    {
+        return _dbContext.Players;
     }
 
     public async Task SaveChangesAsync()

@@ -1,15 +1,20 @@
-﻿using Unmatched.Dtos;
+﻿namespace Unmatched.Services;
 
-namespace Unmatched.Services;
+using Unmatched.Dtos;
 
 public interface IUnmatchedService
 {
     Task AddDuelMatchAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto);
-    Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
-    Task<IEnumerable<GlobalRatingHeroDto>> GetGlobalRatingAsync();
+
+    Task<IEnumerable<HeroDto>> GetAllHeroesAsync();
+
+    Task<IEnumerable<MapDto>> GetAllMapsAsync();
 
     Task<IEnumerable<PlayerDto>> GetAllPlayersAsync();
-    Task<IEnumerable<HeroDto>> GetAllHeroesAsync();
-    Task<IEnumerable<MapDto>> GetAllMapsAsync();
+
     Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
+
+    Task<IEnumerable<GlobalRatingHeroDto>> GetGlobalRatingAsync();
+
+    Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
 }

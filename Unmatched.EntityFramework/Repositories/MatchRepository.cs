@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class MatchRepository : IMatchRepository
 {
@@ -11,18 +11,6 @@ public class MatchRepository : IMatchRepository
     public MatchRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Match> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Matches.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Match> Query()
-    {
-        return _dbContext.Matches;
     }
 
     public async Task<Match> AddAsync(Match model)
@@ -50,8 +38,20 @@ public class MatchRepository : IMatchRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Match> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Matches.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Match> Query()
+    {
+        return _dbContext.Matches;
     }
 
     public async Task SaveChangesAsync()

@@ -1,9 +1,9 @@
-﻿using System.Linq.Expressions;
+﻿namespace Unmatched.Mapping;
+
 using AutoMapper;
+
 using Unmatched.Dtos;
 using Unmatched.Entities;
-
-namespace Unmatched.Mapping;
 
 public class UnmatchedMapper : Profile
 {

@@ -5,7 +5,10 @@
 
 <PageTitle>Add match</PageTitle>
 
-@if (_maps == null || _players == null || _heroes == null || _tournaments == null)
+@if (_maps == null
+    || _players == null
+    || _heroes == null
+    || _tournaments == null)
 {
     <p>
         <em>Loading...</em>
@@ -61,18 +64,23 @@ else
 }
 
 @code {
+
     private IEnumerable<PlayerDto> _players;
+
     private IEnumerable<HeroDto> _heroes;
+
     private IEnumerable<MapDto> _maps;
+
     private IEnumerable<TournamentDto> _tournaments;
 
     public FighterInfo FighterComponent;
+
     public FighterInfo OpponentComponent;
 
     readonly MatchDto Match = new()
-    {
-        Date = DateTime.Today
-    };
+        {
+            Date = DateTime.Today
+        };
 
     protected override async Task OnInitializedAsync()
     {

@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class SidekickRepository : ISidekickRepository
 {
@@ -11,18 +11,6 @@ public class SidekickRepository : ISidekickRepository
     public SidekickRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Sidekick> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Sidekicks.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Sidekick> Query()
-    {
-        return _dbContext.Sidekicks;
     }
 
     public async Task<Sidekick> AddAsync(Sidekick model)
@@ -50,8 +38,20 @@ public class SidekickRepository : ISidekickRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Sidekick> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Sidekicks.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Sidekick> Query()
+    {
+        return _dbContext.Sidekicks;
     }
 
     public async Task SaveChangesAsync()

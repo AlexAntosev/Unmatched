@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class RatingRepository : IRatingRepository
 {
@@ -12,18 +13,6 @@ public class RatingRepository : IRatingRepository
     public RatingRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Rating> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Ratings.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Rating> Query()
-    {
-        return _dbContext.Ratings;
     }
 
     public async Task<Rating> AddAsync(Rating model)
@@ -51,19 +40,31 @@ public class RatingRepository : IRatingRepository
         {
             return;
         }
-        
-        _dbContext.Remove(entity);
-    }
 
-    public async Task SaveChangesAsync()
-    {
-        await _dbContext.SaveChangesAsync();
+        _dbContext.Remove(entity);
     }
 
     public async Task<Rating> GetByHeroIdAsync(Guid heroId)
     {
         var entity = await _dbContext.Ratings.FirstOrDefaultAsync(r => r.HeroId == heroId);
-            
+
         return entity;
+    }
+
+    public async Task<Rating> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Ratings.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Rating> Query()
+    {
+        return _dbContext.Ratings;
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _dbContext.SaveChangesAsync();
     }
 }

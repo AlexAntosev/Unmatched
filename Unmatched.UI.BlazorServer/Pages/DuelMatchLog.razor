@@ -1,6 +1,6 @@
 ﻿@page "/duelMatchLog"
-@using Unmatched.Services
 @using Unmatched.Dtos
+@using Unmatched.Services
 @using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
 
@@ -74,6 +74,7 @@ else
 }
 
 @code {
+
     private IEnumerable<MatchLogDto> matchLogEntries;
 
     protected override async Task OnInitializedAsync()
@@ -87,6 +88,9 @@ else
 
     private string GetWinLooseColor(bool isWinner)
     {
-        return isWinner ? Colors.WinnerColor : Colors.LooserColor;
+        return isWinner
+            ? Colors.WinnerColor
+            : Colors.LooserColor;
     }
+
 }

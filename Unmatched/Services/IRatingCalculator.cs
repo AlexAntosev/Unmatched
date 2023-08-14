@@ -1,6 +1,6 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.Services;
 
-namespace Unmatched.Services;
+using Unmatched.Entities;
 
 public interface IRatingCalculator
 {
@@ -10,5 +10,6 @@ public interface IRatingCalculator
 public struct HeroMatchPoints
 {
     public Guid HeroId { get; set; }
+
     public int Points { get; set; }
 }

@@ -1,8 +1,8 @@
-﻿using Unmatched.Constants;
+﻿namespace Unmatched.DataInitialization;
+
+using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
-
-namespace Unmatched.DataInitialization;
 
 public class PlayersDataInitializer : IDataInitializer<Player>
 {
@@ -13,21 +13,30 @@ public class PlayersDataInitializer : IDataInitializer<Player>
         _playerRepository = playerRepository;
     }
 
-    public async Task InitializeAsync()
-    {
-        var defaultPlayers = GetEntities();
-        
-        await _playerRepository.AddRangeAsync(defaultPlayers);
-        await _playerRepository.SaveChangesAsync();
-    }
-
     public IEnumerable<Player> GetEntities()
     {
         return new List<Player>
-        {
-            new() { Name = PlayerNames.Andrii },
-            new() { Name = PlayerNames.Oleksandr },
-            new() { Name = PlayerNames.Ksuha },
-        };
+            {
+                new()
+                    {
+                        Name = PlayerNames.Andrii
+                    },
+                new()
+                    {
+                        Name = PlayerNames.Oleksandr
+                    },
+                new()
+                    {
+                        Name = PlayerNames.Ksuha
+                    },
+            };
+    }
+
+    public async Task InitializeAsync()
+    {
+        var defaultPlayers = GetEntities();
+
+        await _playerRepository.AddRangeAsync(defaultPlayers);
+        await _playerRepository.SaveChangesAsync();
     }
 }

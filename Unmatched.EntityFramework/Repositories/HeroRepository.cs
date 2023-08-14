@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class HeroRepository : IHeroRepository
 {
@@ -11,18 +11,6 @@ public class HeroRepository : IHeroRepository
     public HeroRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Hero> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Heroes.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Hero> Query()
-    {
-        return _dbContext.Heroes;
     }
 
     public async Task<Hero> AddAsync(Hero model)
@@ -50,8 +38,20 @@ public class HeroRepository : IHeroRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Hero> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Heroes.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Hero> Query()
+    {
+        return _dbContext.Heroes;
     }
 
     public async Task SaveChangesAsync()

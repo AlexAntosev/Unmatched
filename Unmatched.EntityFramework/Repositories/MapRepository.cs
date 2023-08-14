@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class MapRepository : IMapRepository
 {
@@ -11,18 +11,6 @@ public class MapRepository : IMapRepository
     public MapRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Map> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Maps.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Map> Query()
-    {
-        return _dbContext.Maps;
     }
 
     public async Task<Map> AddAsync(Map model)
@@ -42,7 +30,7 @@ public class MapRepository : IMapRepository
     {
         await _dbContext.AddRangeAsync(models);
     }
-    
+
     public async Task Delete(Guid id)
     {
         var entity = await _dbContext.Maps.FindAsync(id);
@@ -50,8 +38,20 @@ public class MapRepository : IMapRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Map> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Maps.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Map> Query()
+    {
+        return _dbContext.Maps;
     }
 
     public async Task SaveChangesAsync()

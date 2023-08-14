@@ -1,8 +1,8 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.EntityFramework.Repositories;
+
+using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
-
-namespace Unmatched.EntityFramework.Repositories;
 
 public class TournamentRepository : ITournamentRepository
 {
@@ -11,18 +11,6 @@ public class TournamentRepository : ITournamentRepository
     public TournamentRepository(UnmatchedDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-    
-    public async Task<Tournament> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Tournaments.FindAsync(id);
-            
-        return entity;
-    }
-
-    public IQueryable<Tournament> Query()
-    {
-        return _dbContext.Tournaments;
     }
 
     public async Task<Tournament> AddAsync(Tournament model)
@@ -50,8 +38,20 @@ public class TournamentRepository : ITournamentRepository
         {
             return;
         }
-        
+
         _dbContext.Remove(entity);
+    }
+
+    public async Task<Tournament> GetByIdAsync(Guid id)
+    {
+        var entity = await _dbContext.Tournaments.FindAsync(id);
+
+        return entity;
+    }
+
+    public IQueryable<Tournament> Query()
+    {
+        return _dbContext.Tournaments;
     }
 
     public async Task SaveChangesAsync()

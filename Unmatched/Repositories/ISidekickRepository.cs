@@ -1,8 +1,7 @@
-﻿using Unmatched.Entities;
+﻿namespace Unmatched.Repositories;
 
-namespace Unmatched.Repositories;
+using Unmatched.Entities;
 
 public interface ISidekickRepository : IRepository<Sidekick>
 {
-    
 }
