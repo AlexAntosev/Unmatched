@@ -122,20 +122,20 @@ public class UnmatchedService : IUnmatchedService
         return tournaments;
     }
 
-    public async Task<IEnumerable<RankedRatingHeroDto>> GetRankedRatingAsync()
+    public async Task<IEnumerable<RankedRatingHeroStatisticsDto>> GetRankedRatingAsync()
     {
         var heroes = await _heroRepository.Query().ToListAsync();
         var ratings = await _ratingRepository.Query().ToListAsync();
         var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
 
-        var ratingDtos = new List<RankedRatingHeroDto>();
+        var ratingDtos = new List<RankedRatingHeroStatisticsDto>();
 
         foreach (var hero in heroes)
         {
             var points = ratings.FirstOrDefault(x => x.HeroId.Equals(hero.Id))?.Points ?? 0;
             var heroParticipations = fighters.Where(x => x.HeroId.Equals(hero.Id) && x.Match.TournamentId != null).OrderByDescending(x => x.Match.Date).ToArray();
 
-            var ratingHero = new RankedRatingHeroDto()
+            var ratingHero = new RankedRatingHeroStatisticsDto()
                 {
                     HeroName = hero.Name,
                     Points = points,
@@ -151,18 +151,18 @@ public class UnmatchedService : IUnmatchedService
         return ratingDtos;
     }
 
-    public async Task<IEnumerable<GlobalRatingHeroDto>> GetGlobalRatingAsync()
+    public async Task<IEnumerable<HeroStatisticsDto>> GetStatisticsAsync()
     {
         var heroes = await _heroRepository.Query().ToListAsync();
         var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
 
-        var ratingDtos = new List<RankedRatingHeroDto>();
+        var ratingDtos = new List<RankedRatingHeroStatisticsDto>();
 
         foreach (var hero in heroes)
         {
             var heroParticipations = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
 
-            var ratingHero = new RankedRatingHeroDto()
+            var ratingHero = new RankedRatingHeroStatisticsDto()
                 {
                     HeroName = hero.Name,
                     TotalMatches = heroParticipations.Length,
