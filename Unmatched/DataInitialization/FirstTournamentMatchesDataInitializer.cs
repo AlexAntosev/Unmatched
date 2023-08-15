@@ -7,21 +7,13 @@ using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services;
 
-class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitializer
+class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTournamentMatchesDataInitializer
 {
-    private readonly IHeroRepository _heroRepository;
-
-    private readonly IMapRepository _mapRepository;
-
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
 
     private readonly IRatingRepository _ratingRepository;
 
     private readonly IMatchRepository _matchRepository;
-
-    private readonly ITournamentRepository _tournamentRepository;
-
-    private readonly IPlayerRepository _playerRepository;
 
     public FirstTournamentMatchesDataInitializer(
         IHeroRepository heroRepository,
@@ -30,14 +22,10 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
         IMatchRepository matchRepository,
         ITournamentRepository tournamentRepository,
         IPlayerRepository playerRepository,
-        IFirstTournamentRatingCalculator ratingCalculator)
+        IFirstTournamentRatingCalculator ratingCalculator) : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
-        _heroRepository = heroRepository;
-        _mapRepository = mapRepository;
         _ratingRepository = ratingRepository;
         _matchRepository = matchRepository;
-        _tournamentRepository = tournamentRepository;
-        _playerRepository = playerRepository;
         _ratingCalculator = ratingCalculator;
     }
 
@@ -132,12 +120,12 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                 {
                     Date = match.Date,
                     MapId = match.MapId,
-                    TournamentId = _tournamentRepository.GetIdByName(TournamentNames.UnmatchedFirstTournament),
+                    TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament),
                     Fighters = new List<Fighter>()
                         {
                             new()
                                 {
-                                    PlayerId = _playerRepository.GetIdByName(PlayerNames.Andrii),
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
                                     IsWinner = match.AndriiHp > 0,
                                     HpLeft = match.AndriiHp,
                                     HeroId = match.AndriiHeroId,
@@ -145,7 +133,7 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                                 },
                             new()
                                 {
-                                    PlayerId = _playerRepository.GetIdByName(PlayerNames.Oleksandr),
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
                                     IsWinner = match.OlexHp > 0,
                                     HpLeft = match.OlexHp,
                                     HeroId = match.OlexHeroId,
@@ -155,8 +143,7 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                 };
 
             await _matchRepository.AddAsync(matchEntity);
-
-            // TODO: fix points
+            
             if (ratings.TryGetValue(match.AndriiHeroId, out var apoints))
             {
                 ratings[match.AndriiHeroId] = apoints + andriiPoints;
@@ -188,15 +175,5 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
 
         await _matchRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();
-    }
-
-    private Guid GetHero(string name)
-    {
-        return _heroRepository.GetIdByName(name);
-    }
-
-    private Guid GetMap(string name)
-    {
-        return _mapRepository.GetIdByName(name);
     }
 }

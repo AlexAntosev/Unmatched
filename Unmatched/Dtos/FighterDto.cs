@@ -2,19 +2,21 @@
 
 public class FighterDto
 {
-    public int CardsLeft { get; set; }
+    public int? CardsLeft { get; set; }
 
     public Guid HeroId { get; set; }
 
     public string HeroName { get; set; }
+    
+    public int? MatchPoints { get; set; }
 
-    public int HpLeft { get; set; }
+    public int? HpLeft { get; set; }
 
     public Guid Id { get; set; }
 
     public bool IsWinner { get; set; }
 
-    public int ItemsUsed { get; set; }
+    public int? ItemsUsed { get; set; }
 
     public Guid MatchId { get; set; }
 
@@ -24,7 +26,7 @@ public class FighterDto
     
     public string? SidekickName { get; set; }
 
-    public int SidekickHpLeft { get; set; }
+    public int? SidekickHpLeft { get; set; }
 
-    public int Turn { get; set; }
+    public int? Turn { get; set; }
 }

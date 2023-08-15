@@ -2,6 +2,6 @@
 
 using Unmatched.Entities;
 
-public interface IUnrankedMatchDataInitializer: IDataInitializer<Match>
+public interface IRankedMatchDataInitializer: IDataInitializer<Match>
 {
 }

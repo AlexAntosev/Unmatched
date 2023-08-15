@@ -35,11 +35,13 @@ else
             <th>HP</th>
             <th>Sidekick HP</th>
             <th>Cards left</th>
+            <th>Points</th>
             <th>Player</th>
             <th>Hero</th>
             <th>HP</th>
             <th>Sidekick HP</th>
             <th>Cards left</th>
+            <th>Points</th>
             <th>Comment</th>
         </tr>
         </thead>
@@ -57,11 +59,13 @@ else
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HpLeft</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.SidekickHpLeft</td>
                 <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.CardsLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.MatchPoints</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.PlayerName</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HeroName</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HpLeft</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.SidekickHpLeft</td>
                 <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.CardsLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.MatchPoints</td>
                 <td>@matchLogEntry.Comment</td>
             </tr>
         }

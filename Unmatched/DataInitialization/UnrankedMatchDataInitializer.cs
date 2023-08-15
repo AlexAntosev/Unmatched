@@ -4,27 +4,19 @@ using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 
-public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
-
+public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedMatchDataInitializer
 {
-    private readonly IHeroRepository _heroRepository;
-
-    private readonly IMapRepository _mapRepository;
-
     private readonly IMatchRepository _matchRepository;
-
-    private readonly IPlayerRepository _playerRepository;
 
     public UnrankedMatchDataInitializer(
         IHeroRepository heroRepository,
         IPlayerRepository playerRepository,
         IMatchRepository matchRepository,
-        IMapRepository mapRepository)
+        IMapRepository mapRepository,
+        ITournamentRepository tournamentRepository)
+        : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
-        _heroRepository = heroRepository;
-        _playerRepository = playerRepository;
         _matchRepository = matchRepository;
-        _mapRepository = mapRepository;
     }
 
     public IEnumerable<Match> GetEntities()
@@ -706,20 +698,5 @@ public class UnrankedMatchDataInitializer : IUnrankedMatchDataInitializer
         var entities = GetEntities();
         await _matchRepository.AddRangeAsync(entities);
         await _matchRepository.SaveChangesAsync();
-    }
-
-    private Guid GetHero(string name)
-    {
-        return _heroRepository.GetIdByName(name);
-    }
-
-    private Guid? GetMap(string name)
-    {
-        return _mapRepository.GetIdByName(name);
-    }
-
-    private Guid GetPlayer(string name)
-    {
-        return _playerRepository.GetIdByName(name);
     }
 }

@@ -8,6 +8,7 @@
 @inject IDataInitializer<Sidekick> SidekicksDataInitializer
 @inject IDataInitializer<Hero> HeroesDataInitializer
 @inject IUnrankedMatchDataInitializer UnrankedMatchDataInitializer
+@inject IRankedMatchDataInitializer RankedMatchDataInitializer
 @inject IFirstTournamentMatchesDataInitializer FirstTournamentMatchesDataInitializer
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
@@ -16,6 +17,7 @@
 
     private async Task InitializeData()
     {
+        // Sequence is important
         await PlayersDataInitializer.InitializeAsync();
         await MapsDataInitializer.InitializeAsync();
         await TournamentsDataInitializer.InitializeAsync();
@@ -24,5 +26,6 @@
 
         await UnrankedMatchDataInitializer.InitializeAsync();
         await FirstTournamentMatchesDataInitializer.InitializeAsync();
+        await RankedMatchDataInitializer.InitializeAsync();
     }
 }
