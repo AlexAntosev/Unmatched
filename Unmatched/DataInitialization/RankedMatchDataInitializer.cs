@@ -126,244 +126,223 @@ public class RankedMatchDataInitializer : BaseMatchDataInitializer, IRankedMatch
                         }
                 });
         
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("04/05/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
-        //                             Turn = 1,
-        //                             HpLeft = 0,
-        //                             SidekickHpLeft = 0,
-        //                             CardsLeft = 
-        //                         },
-        //                 }
-        //         });
-        //
-        // matches.Add(
-        //     new Match()
-        //         {
-        //             Date = DateTime.Parse("07/24/2023"),
-        //             MapId = GetMap(MapNames.GoldenForest),
-        //             Fighters = new List<Fighter>()
-        //                 {
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Raptors),
-        //                             IsWinner = true,
-        //                             PlayerId = GetPlayer(PlayerNames.Andrii)
-        //                         },
-        //                     new()
-        //                         {
-        //                             HeroId = GetHero(HeroNames.Bigfoot),
-        //                             IsWinner = false,
-        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr)
-        //                         },
-        //                 }
-        //         });
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("04/17/2023"),
+                    MapId = GetMap(MapNames.Ruins),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.TRex),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
+                                    Turn = 1,
+                                    HpLeft = 17,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 16
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.SherlokHolmes),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 2,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 7,
+                                    CardsLeft = 18
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("04/17/2023"),
+                    MapId = GetMap(MapNames.London),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.InvisibleMan),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 2,
+                                    HpLeft = 6,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 7
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Sindbad),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
+                                    Turn = 1,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 5,
+                                    CardsLeft = 9
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("04/28/2023"),
+                    MapId = GetMap(MapNames.Castle),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Raptors),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 1,
+                                    HpLeft = 8,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 11
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Dracula),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
+                                    Turn = 2,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 1,
+                                    CardsLeft = 10
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("05/09/2023"),
+                    MapId = GetMap(MapNames.Ship),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Medusa),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
+                                    Turn = 1,
+                                    HpLeft = 5,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 2
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.BloodyMary),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 2,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 1
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("06/21/2023"),
+                    MapId = GetMap(MapNames.HellsKitchen),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Ingen),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 2,
+                                    HpLeft = 5,
+                                    SidekickHpLeft = 1,
+                                    CardsLeft = 7
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.SherlokHolmes),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
+                                    Turn = 1,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 7,
+                                    CardsLeft = 8
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("07/16/2023"),
+                    MapId = GetMap(MapNames.TRexPaddock),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Alice),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 1,
+                                    HpLeft = 1,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 11
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.Bullseye),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Andrii),
+                                    Turn = 2,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 16
+                                },
+                        }
+                });
+        
+        matches.Add(
+            new Match()
+                {
+                    Date = DateTime.Parse("08/11/2023"),
+                    MapId = GetMap(MapNames.Tavern),
+                    TournamentId = GetTournament(TournamentNames.GoldenHalatLeague),
+                    Fighters = new List<Fighter>()
+                        {
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.SherlokHolmes),
+                                    IsWinner = true,
+                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
+                                    Turn = 2,
+                                    HpLeft = 11,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 6
+                                },
+                            new()
+                                {
+                                    HeroId = GetHero(HeroNames.LittleRed),
+                                    IsWinner = false,
+                                    PlayerId = GetPlayer(PlayerNames.Ksuha),
+                                    Turn = 1,
+                                    HpLeft = 0,
+                                    SidekickHpLeft = 0,
+                                    CardsLeft = 0
+                                },
+                        }
+                });
+        
         return matches;
     }
 
