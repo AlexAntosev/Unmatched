@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-public class RankedRatingHeroDto : GlobalRatingHeroDto
+public class RankedRatingHeroDto : GlobalRatingHeroDto, IComparable<RankedRatingHeroDto>
 {
     public int Points { get; set; }
     

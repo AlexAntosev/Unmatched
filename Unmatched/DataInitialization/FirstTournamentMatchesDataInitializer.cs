@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.DataInitialization;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -60,7 +62,7 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                     new("11/17/2022", GetMap(MapNames.Tavern), GetHero(HeroNames.LittleRed), 2, GetHero(HeroNames.MoonKnight), 0, MatchLevel.Group),
                     new("11/17/2022", GetMap(MapNames.Tavern), GetHero(HeroNames.Daredevil), 0, GetHero(HeroNames.BloodyMary), 10, MatchLevel.Group),
                     new("11/17/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.Alice), 3, GetHero(HeroNames.SherlokHolmes), 0, MatchLevel.Group),
-                    
+
                     new("11/18/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.RobinHood), 2, GetHero(HeroNames.KingArthur), 0, MatchLevel.Group),
                     new("11/18/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.PrincessYennega), 0, GetHero(HeroNames.Elektra), 6, MatchLevel.Group),
                     new("11/21/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.LukeCage), 3, GetHero(HeroNames.Bullseye), 0, MatchLevel.Group),
@@ -76,7 +78,7 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                     new("11/29/2022", GetMap(MapNames.Ship), GetHero(HeroNames.Beowulf), 1, GetHero(HeroNames.KingArthur), 0, MatchLevel.Group),
                     new("11/30/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.PrincessYennega), 4, GetHero(HeroNames.MoonKnight), 0, MatchLevel.Group),
                     new("11/30/2022", GetMap(MapNames.Ship), GetHero(HeroNames.Sindbad), 0, GetHero(HeroNames.LukeCage), 2, MatchLevel.Group),
-                    
+
                     new("12/01/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.Achilles), 11, GetHero(HeroNames.Alice), 0, MatchLevel.Group),
                     new("12/03/2022", GetMap(MapNames.London), GetHero(HeroNames.RobinHood), 0, GetHero(HeroNames.Beowulf), 7, MatchLevel.Group),
                     new("12/03/2022", GetMap(MapNames.Castle), GetHero(HeroNames.JakylAndHide), 4, GetHero(HeroNames.MoonKnight), 0, MatchLevel.Group),
@@ -100,29 +102,32 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                     new("12/21/2022", GetMap(MapNames.Castle), GetHero(HeroNames.SunWukong), 6, GetHero(HeroNames.Dracula), 0, MatchLevel.Group),
                     new("12/22/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.Bigfoot), 3, GetHero(HeroNames.BloodyMary), 0, MatchLevel.Group),
                     new("12/22/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.Ghostrider), 0, GetHero(HeroNames.Achilles), 2, MatchLevel.Group),
-                    
+
                     new("12/24/2022", GetMap(MapNames.GreenForest), GetHero(HeroNames.Beowulf), 0, GetHero(HeroNames.Achilles), 15, MatchLevel.QuarterFinals),
                     new("12/24/2022", GetMap(MapNames.Castle), GetHero(HeroNames.LittleRed), 0, GetHero(HeroNames.LukeCage), 2, MatchLevel.QuarterFinals),
-                    new("12/25/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.PrincessYennega), 4,GetHero(HeroNames.BloodyMary), 0,  MatchLevel.QuarterFinals),
-                    new("12/25/2022", GetMap(MapNames.Tavern),GetHero(HeroNames.RobinHood), 0, GetHero(HeroNames.SunWukong), 2 , MatchLevel.QuarterFinals),
-                    
+                    new("12/25/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.PrincessYennega), 4, GetHero(HeroNames.BloodyMary), 0, MatchLevel.QuarterFinals),
+                    new("12/25/2022", GetMap(MapNames.Tavern), GetHero(HeroNames.RobinHood), 0, GetHero(HeroNames.SunWukong), 2, MatchLevel.QuarterFinals),
+
                     new("12/27/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.Achilles), 1, GetHero(HeroNames.LukeCage), 0, MatchLevel.SemiFinals),
                     new("12/29/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.PrincessYennega), 0, GetHero(HeroNames.SunWukong), 3, MatchLevel.SemiFinals),
 
                     new("12/29/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.LukeCage), 1, GetHero(HeroNames.PrincessYennega), 0, MatchLevel.ThirdPlaceFinals),
-                        
-                    new("01/02/2022", GetMap(MapNames.Ship), GetHero(HeroNames.Achilles), 0, GetHero(HeroNames.SunWukong), 3, MatchLevel.Finals),
-                    new("01/02/2022", GetMap(MapNames.London), GetHero(HeroNames.SunWukong), 1, GetHero(HeroNames.Achilles), 0, MatchLevel.Finals),
-                    
+
+                    new("01/02/2023", GetMap(MapNames.Ship), GetHero(HeroNames.Achilles), 0, GetHero(HeroNames.SunWukong), 3, MatchLevel.Finals),
+                    new("01/02/2023", GetMap(MapNames.London), GetHero(HeroNames.SunWukong), 1, GetHero(HeroNames.Achilles), 0, MatchLevel.Finals),
+
                 }.OrderBy(x => x.Date)
             .ToArray();
+
+        // we assume that this are the very first rating matches so we do not read existing ratings 
+        var ratings = new Dictionary<Guid, int>();
 
         foreach (var match in matches)
         {
             var heroPoints = await _ratingCalculator.CalculateAsync(match);
             var andriiPoints = heroPoints.First(x => x.HeroId == match.AndriiHeroId).Points;
             var olexPoints = heroPoints.First(x => x.HeroId == match.OlexHeroId).Points;
-            
+
             var matchEntity = new Match()
                 {
                     Date = match.Date,
@@ -150,15 +155,36 @@ class FirstTournamentMatchesDataInitializer : IFirstTournamentMatchesDataInitial
                 };
 
             await _matchRepository.AddAsync(matchEntity);
-            
+
             // TODO: fix points
-            var andriiHeroPreviousRating = await _ratingRepository.GetByHeroIdAsync(match.AndriiHeroId) ?? new Rating(){HeroId = match.AndriiHeroId,Points = 0};
-            andriiHeroPreviousRating.Points += andriiPoints;
-            var olexHeroPreviousRating = await _ratingRepository.GetByHeroIdAsync(match.OlexHeroId) ?? new Rating(){HeroId = match.OlexHeroId,Points = 0};
-            olexHeroPreviousRating.Points += olexPoints;
-            _ratingRepository.AddOrUpdate(andriiHeroPreviousRating);
-            _ratingRepository.AddOrUpdate(olexHeroPreviousRating);
+            if (ratings.TryGetValue(match.AndriiHeroId, out var apoints))
+            {
+                ratings[match.AndriiHeroId] = apoints + andriiPoints;
+            }
+            else
+            {
+                ratings[match.AndriiHeroId] = andriiPoints;
+            }
+
+            if (ratings.TryGetValue(match.OlexHeroId, out var opoints))
+            {
+                ratings[match.OlexHeroId] = opoints + olexPoints;
+            }
+            else
+            {
+                ratings[match.OlexHeroId] = olexPoints;
+            }
         }
+
+
+        await _ratingRepository.AddRangeAsync(
+            ratings.Select(
+                x => new Rating()
+                    {
+                        HeroId = x.Key,
+                        Points = x.Value
+                    }));
+
 
         await _matchRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();
