@@ -40,7 +40,7 @@ public static class HeroNames
 
     public const string MoonKnight = "Moon Knight";
 
-    public const string PrincessYennega = "Princess Yennega";
+    public const string PrincessYennenga = "Princess Yennenga";
 
     public const string Raptors = "Raptors";
 

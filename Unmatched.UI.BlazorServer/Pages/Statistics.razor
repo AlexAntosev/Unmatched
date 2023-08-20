@@ -3,6 +3,7 @@
 @using Unmatched.Services
 @using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
+@inject NavigationManager NavManager
 
 <PageTitle>Statistics</PageTitle>
 
@@ -30,7 +31,7 @@ else
         @foreach (var ratingHero in ratingHeroes)
         {
             <tr>
-                <td >@ratingHero.HeroName</td>
+                <td @onclick="@(e => OnHeroClick(ratingHero.HeroId))">@ratingHero.HeroName</td>
                 <td >@ratingHero.TotalMatches</td>
                 <td >@ratingHero.TotalWins</td>
                 <td >@ratingHero.TotalLooses</td>
@@ -48,5 +49,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         ratingHeroes = (await UnmatchedService.GetStatisticsAsync()).OrderBy(x => x.HeroName).ToArray();
+    }
+
+    protected void OnHeroClick(Guid heroId)
+    {
+        var url = $"/statistics/{heroId}";
+        NavManager.NavigateTo(url);
     }
 }

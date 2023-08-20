@@ -206,7 +206,7 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
                     },
                 new()
                     {
-                        Name = HeroNames.PrincessYennega,
+                        Name = HeroNames.PrincessYennenga,
                         Hp = 15,
                         DeckSize = 30,
                         IsRanged = true,

@@ -1,0 +1,18 @@
+﻿@page "/statistics/{heroId}"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@inject IUnmatchedService UnmatchedService
+
+<h3>@Hero.Name</h3>
+
+@code {
+    [Parameter]
+    public string heroId { get; set; }
+    
+    public HeroDto Hero { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Hero = await UnmatchedService.GetHeroByIdAsync(Guid.Parse(heroId));
+    }
+}

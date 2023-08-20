@@ -39,7 +39,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
         var matches = new List<FirstTournamentMatchInfo>()
                 {
                     new("11/11/2022", GetMap(MapNames.GreenForest), GetHero(HeroNames.InvisibleMan), 7, GetHero(HeroNames.RobinHood), 0, MatchLevel.Group),
-                    new("11/11/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.PrincessYennega), 7, GetHero(HeroNames.JakylAndHide), 0, MatchLevel.Group),
+                    new("11/11/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.PrincessYennenga), 7, GetHero(HeroNames.JakylAndHide), 0, MatchLevel.Group),
                     new("11/11/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.LukeCage), 0, GetHero(HeroNames.Bigfoot), 3, MatchLevel.Group),
                     new("11/11/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.SunWukong), 0, GetHero(HeroNames.Ghostrider), 3, MatchLevel.Group),
                     new("11/13/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.KingArthur), 0, GetHero(HeroNames.Medusa), 15, MatchLevel.Group),
@@ -52,7 +52,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     new("11/17/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.Alice), 3, GetHero(HeroNames.SherlokHolmes), 0, MatchLevel.Group),
 
                     new("11/18/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.RobinHood), 2, GetHero(HeroNames.KingArthur), 0, MatchLevel.Group),
-                    new("11/18/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.PrincessYennega), 0, GetHero(HeroNames.Elektra), 6, MatchLevel.Group),
+                    new("11/18/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.PrincessYennenga), 0, GetHero(HeroNames.Elektra), 6, MatchLevel.Group),
                     new("11/21/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.LukeCage), 3, GetHero(HeroNames.Bullseye), 0, MatchLevel.Group),
                     new("11/21/2022", GetMap(MapNames.Castle), GetHero(HeroNames.Achilles), 0, GetHero(HeroNames.SunWukong), 6, MatchLevel.Group),
                     new("11/23/2022", GetMap(MapNames.GreenForest), GetHero(HeroNames.Medusa), 0, GetHero(HeroNames.Beowulf), 5, MatchLevel.Group),
@@ -64,7 +64,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     new("11/26/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.BloodyMary), 0, GetHero(HeroNames.Sindbad), 5, MatchLevel.Group),
                     new("11/29/2022", GetMap(MapNames.Castle), GetHero(HeroNames.SherlokHolmes), 0, GetHero(HeroNames.Ghostrider), 2, MatchLevel.Group),
                     new("11/29/2022", GetMap(MapNames.Ship), GetHero(HeroNames.Beowulf), 1, GetHero(HeroNames.KingArthur), 0, MatchLevel.Group),
-                    new("11/30/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.PrincessYennega), 4, GetHero(HeroNames.MoonKnight), 0, MatchLevel.Group),
+                    new("11/30/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.PrincessYennenga), 4, GetHero(HeroNames.MoonKnight), 0, MatchLevel.Group),
                     new("11/30/2022", GetMap(MapNames.Ship), GetHero(HeroNames.Sindbad), 0, GetHero(HeroNames.LukeCage), 2, MatchLevel.Group),
 
                     new("12/01/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.Achilles), 11, GetHero(HeroNames.Alice), 0, MatchLevel.Group),
@@ -73,7 +73,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     new("12/04/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.Sindbad), 3, GetHero(HeroNames.Bigfoot), 0, MatchLevel.Group),
                     new("12/04/2022", GetMap(MapNames.Ship), GetHero(HeroNames.SherlokHolmes), 0, GetHero(HeroNames.Dracula), 7, MatchLevel.Group),
                     new("12/06/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.RobinHood), 1, GetHero(HeroNames.Medusa), 0, MatchLevel.Group),
-                    new("12/11/2022", GetMap(MapNames.Castle), GetHero(HeroNames.LittleRed), 2, GetHero(HeroNames.PrincessYennega), 0, MatchLevel.Group),
+                    new("12/11/2022", GetMap(MapNames.Castle), GetHero(HeroNames.LittleRed), 2, GetHero(HeroNames.PrincessYennenga), 0, MatchLevel.Group),
                     new("12/11/2022", GetMap(MapNames.Ship), GetHero(HeroNames.Daredevil), 0, GetHero(HeroNames.Bullseye), 8, MatchLevel.Group),
                     new("12/12/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.SunWukong), 5, GetHero(HeroNames.Alice), 0, MatchLevel.Group),
                     new("12/12/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.InvisibleMan), 0, GetHero(HeroNames.KingArthur), 9, MatchLevel.Group),
@@ -93,13 +93,13 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
                     new("12/24/2022", GetMap(MapNames.GreenForest), GetHero(HeroNames.Beowulf), 0, GetHero(HeroNames.Achilles), 15, MatchLevel.QuarterFinals),
                     new("12/24/2022", GetMap(MapNames.Castle), GetHero(HeroNames.LittleRed), 0, GetHero(HeroNames.LukeCage), 2, MatchLevel.QuarterFinals),
-                    new("12/25/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.PrincessYennega), 4, GetHero(HeroNames.BloodyMary), 0, MatchLevel.QuarterFinals),
+                    new("12/25/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.PrincessYennenga), 4, GetHero(HeroNames.BloodyMary), 0, MatchLevel.QuarterFinals),
                     new("12/25/2022", GetMap(MapNames.Tavern), GetHero(HeroNames.RobinHood), 0, GetHero(HeroNames.SunWukong), 2, MatchLevel.QuarterFinals),
 
                     new("12/27/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.Achilles), 1, GetHero(HeroNames.LukeCage), 0, MatchLevel.SemiFinals),
-                    new("12/29/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.PrincessYennega), 0, GetHero(HeroNames.SunWukong), 3, MatchLevel.SemiFinals),
+                    new("12/29/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.PrincessYennenga), 0, GetHero(HeroNames.SunWukong), 3, MatchLevel.SemiFinals),
 
-                    new("12/29/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.LukeCage), 1, GetHero(HeroNames.PrincessYennega), 0, MatchLevel.ThirdPlaceFinals),
+                    new("12/29/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.LukeCage), 1, GetHero(HeroNames.PrincessYennenga), 0, MatchLevel.ThirdPlaceFinals),
 
                     new("01/02/2023", GetMap(MapNames.Ship), GetHero(HeroNames.Achilles), 0, GetHero(HeroNames.SunWukong), 3, MatchLevel.Finals),
                     new("01/02/2023", GetMap(MapNames.London), GetHero(HeroNames.SunWukong), 1, GetHero(HeroNames.Achilles), 0, MatchLevel.Finals),

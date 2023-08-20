@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Unmatched.EntityFramework\Unmatched.EntityFramework.csproj"/>
-        <ProjectReference Include="..\Unmatched\Unmatched.csproj"/>
+        <ProjectReference Include="..\Unmatched.EntityFramework\Unmatched.EntityFramework.csproj" />
+        <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
     </ItemGroup>
 
 </Project>

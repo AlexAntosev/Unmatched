@@ -484,7 +484,7 @@ public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedM
                                 },
                             new()
                                 {
-                                    HeroId = GetHero(HeroNames.PrincessYennega),
+                                    HeroId = GetHero(HeroNames.PrincessYennenga),
                                     IsWinner = false,
                                     HpLeft = 0,
                                     PlayerId = GetPlayer(PlayerNames.Oleksandr)

@@ -94,6 +94,13 @@ public class UnmatchedService : IUnmatchedService
         await _ratingRepository.SaveChangesAsync();
     }
 
+    public async Task<HeroDto> GetHeroByIdAsync(Guid heroId)
+    {
+        var entity = await _heroRepository.GetByIdAsync(heroId);
+        var hero = _mapper.Map<HeroDto>(entity);
+        return hero;
+    }
+
     public async Task<IEnumerable<HeroDto>> GetAllHeroesAsync()
     {
         var entities = await _heroRepository.Query().Include(e => e.Sidekicks).ToListAsync();
@@ -164,6 +171,7 @@ public class UnmatchedService : IUnmatchedService
 
             var ratingHero = new RankedRatingHeroStatisticsDto()
                 {
+                    HeroId = hero.Id,
                     HeroName = hero.Name,
                     TotalMatches = heroParticipations.Length,
                     TotalWins = heroParticipations.Count(x => x.IsWinner),
