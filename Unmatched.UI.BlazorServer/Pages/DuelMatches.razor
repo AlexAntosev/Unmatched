@@ -1,0 +1,88 @@
+﻿@using Unmatched.Dtos
+@using Unmatched.Constants
+@if (matchLogEntries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th colspan="7">Fighter</th>
+            <th colspan="7">Opponent</th>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <th>Tournament</th>
+            <th>Map</th>
+            <th>Player</th>
+            <th>Hero</th>
+            <th>HP</th>
+            <th>Sidekick HP</th>
+            <th>Cards left</th>
+            <th>Points</th>
+            <th>Player</th>
+            <th>Hero</th>
+            <th>HP</th>
+            <th>Sidekick HP</th>
+            <th>Cards left</th>
+            <th>Points</th>
+            <th>Comment</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var matchLogEntry in matchLogEntries)
+        {
+            var firstFighter = matchLogEntry.Fighters.First();
+            var secondFighter = matchLogEntry.Fighters.Last();
+            <tr>
+                <td>@matchLogEntry.Date.ToShortDateString()</td>
+                <td>@matchLogEntry.TournamentName</td>
+                <td>@matchLogEntry.MapName</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.PlayerName</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HeroName</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HpLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.SidekickHpLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.CardsLeft</td>
+                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.MatchPoints</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.PlayerName</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HeroName</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HpLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.SidekickHpLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.CardsLeft</td>
+                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.MatchPoints</td>
+                <td>@matchLogEntry.Comment</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [Parameter]
+    public IEnumerable<MatchLogDto> matchLogEntries { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // matchLogEntries = (await UnmatchedService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
+        // foreach (var matchLogEntry in matchLogEntries)
+        // {
+        //     matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
+        // }
+    }
+
+    private string GetWinLooseColor(bool isWinner)
+    {
+        return isWinner
+            ? Colors.WinnerColor
+            : Colors.LooserColor;
+    }
+}

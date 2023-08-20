@@ -1,18 +1,31 @@
-﻿@page "/statistics/{heroId}"
+﻿@page "/statistics/{id}"
 @using Unmatched.Services
 @using Unmatched.Dtos
 @inject IUnmatchedService UnmatchedService
 
-<h3>@Hero.Name</h3>
+<h3>@Hero.HeroName</h3>
+<h4>Total Matches: @Hero.TotalMatches</h4>
+<h4>Total Wins: @Hero.TotalWins</h4>
+<h4>Total Looses: @Hero.TotalLooses</h4>
+<h4> Matches: </h4>
+<DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 
 @code {
     [Parameter]
-    public string heroId { get; set; }
+    public string id { get; set; }
     
-    public HeroDto Hero { get; set; }
+    private IEnumerable<MatchLogDto> matchLogEntries;
+
+    public HeroStatisticsDto Hero { get; set; } = new ();
     
     protected override async Task OnInitializedAsync()
     {
-        Hero = await UnmatchedService.GetHeroByIdAsync(Guid.Parse(heroId));
+        var heroId = Guid.Parse(id);
+        Hero = await UnmatchedService.GetStatisticsByHeroIdAsync(heroId);
+        matchLogEntries = (await UnmatchedService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToArray();
+        foreach (var matchLogEntry in matchLogEntries)
+        {
+            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
+        }
     }
 }

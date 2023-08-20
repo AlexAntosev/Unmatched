@@ -18,6 +18,10 @@ public interface IUnmatchedService
 
     Task<IEnumerable<RankedRatingHeroStatisticsDto>> GetRankedRatingAsync();
     Task<IEnumerable<HeroStatisticsDto>> GetStatisticsAsync();
+    
+    Task<HeroStatisticsDto> GetStatisticsByHeroIdAsync(Guid heroId);
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
+    
+    Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId);
 }
