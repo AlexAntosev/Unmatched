@@ -525,14 +525,12 @@ public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedM
                                 {
                                     HeroId = GetHero(HeroNames.Bigfoot),
                                     IsWinner = true,
-                                    HpLeft = 0,
                                     PlayerId = GetPlayer(PlayerNames.Andrii)
                                 },
                             new()
                                 {
                                     HeroId = GetHero(HeroNames.JakylAndHide),
                                     IsWinner = false,
-                                    HpLeft = 1,
                                     PlayerId = GetPlayer(PlayerNames.Oleksandr)
                                 },
                         }

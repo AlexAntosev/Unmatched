@@ -9,8 +9,6 @@ public class UnmatchedDbContext : DbContext
     public UnmatchedDbContext(DbContextOptions contextOptions)
         : base(contextOptions)
     {
-        // Database.EnsureDeleted();
-        Database.EnsureCreated();
     }
 
     public DbSet<Fighter> Fighters { get; set; }
