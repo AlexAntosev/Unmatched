@@ -215,13 +215,15 @@ public class UnmatchedService : IUnmatchedService
     public async Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync()
     {
         var maps = await _mapRepository.Query().ToListAsync();
-        var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
+        var mapMatches = await _matchRepository
+            .Query()
+            .ToListAsync();
 
         var ratingDtos = new List<MapStatisticsDto>();
 
         foreach (var map in maps)
         {
-            var mapFighters = fighters.Where(x => x.Match.MapId.Equals(map.Id)).OrderByDescending(x => x.Match.Date).ToArray();
+            var mapFighters = mapMatches.Where(x => x.MapId.Equals(map.Id)).OrderByDescending(x => x.Date).ToArray();
 
             var ratingPlayer = new MapStatisticsDto()
                 {
@@ -288,18 +290,17 @@ public class UnmatchedService : IUnmatchedService
     {
         var map = await _mapRepository.GetByIdAsync(mapId);
         
-        var mapFighters = await _fighterRepository
+        var mapMatches = await _matchRepository
             .Query()
-            .Include(x => x.Match)
-            .Where(x => x.Match.MapId.Equals(map.Id))
-            .OrderByDescending(x => x.Match.Date)
+            .Where(x => x.MapId.Equals(map.Id))
+            .OrderByDescending(x => x.Date)
             .ToListAsync();
         
         var statistics = new MapStatisticsDto()
             {
                 MapId = map.Id,
                 MapName = map.Name,
-                TotalMatches = mapFighters.Count,
+                TotalMatches = mapMatches.Count,
             };
         
         return statistics;
