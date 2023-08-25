@@ -1,0 +1,33 @@
+﻿@page "/maps-statistics/{id}"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@inject IUnmatchedService UnmatchedService
+
+<h3 align="center">@Map.MapName</h3>
+<img src="@imageSource" />
+<h4>Total Matches: @Map.TotalMatches</h4>
+<h4> Matches: </h4>
+<DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    
+    private IEnumerable<MatchLogDto> matchLogEntries;
+
+    public MapStatisticsDto Map { get; set; } = new ();
+
+    private string? imageSource;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var mapId = Guid.Parse(id);
+        Map = await UnmatchedService.GetMapStatisticsAsync(mapId);
+        matchLogEntries = (await UnmatchedService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToArray();
+        foreach (var matchLogEntry in matchLogEntries)
+        {
+            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);
+        }
+        imageSource = $"/{Map.MapName}.png";
+    }
+}

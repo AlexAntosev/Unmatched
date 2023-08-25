@@ -17,11 +17,17 @@ public interface IUnmatchedService
     Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
 
     Task<IEnumerable<RankedRatingHeroStatisticsDto>> GetRankedRatingAsync();
-    Task<IEnumerable<HeroStatisticsDto>> GetStatisticsAsync();
+    Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync();
+    Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync();
+    Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync();
     
-    Task<HeroStatisticsDto> GetStatisticsByHeroIdAsync(Guid heroId);
+    Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId);
+    Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId);
+    Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId);
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
     
     Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId);
+    Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId);
+    Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId);
 }

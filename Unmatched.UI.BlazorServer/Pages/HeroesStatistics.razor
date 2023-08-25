@@ -1,15 +1,15 @@
-﻿@page "/statistics"
+﻿@page "/heroes-statistics"
 @using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
 @inject NavigationManager NavManager
 
-<PageTitle>Statistics</PageTitle>
+<PageTitle>Heroes Statistics</PageTitle>
 
-<h1>Statistics</h1>
+<h1>Heroes Statistics</h1>
 
-@if (ratingHeroes == null)
+@if (heroes == null)
 {
     <p>
         <em>Loading...</em>
@@ -28,14 +28,14 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var ratingHero in ratingHeroes)
+        @foreach (var hero in heroes)
         {
             <tr>
-                <td @onclick="@(e => OnHeroClick(ratingHero.HeroId))">@ratingHero.HeroName</td>
-                <td >@ratingHero.TotalMatches</td>
-                <td >@ratingHero.TotalWins</td>
-                <td >@ratingHero.TotalLooses</td>
-                <td >@ratingHero.Kd</td>
+                <td @onclick="@(e => OnHeroClick(hero.HeroId))">@hero.HeroName</td>
+                <td >@hero.TotalMatches</td>
+                <td >@hero.TotalWins</td>
+                <td >@hero.TotalLooses</td>
+                <td >@hero.Kd</td>
             </tr>
         }
         </tbody>
@@ -44,16 +44,16 @@ else
 
 @code {
 
-    private IEnumerable<HeroStatisticsDto> ratingHeroes;
+    private IEnumerable<HeroStatisticsDto> heroes;
 
     protected override async Task OnInitializedAsync()
     {
-        ratingHeroes = (await UnmatchedService.GetStatisticsAsync()).OrderBy(x => x.HeroName).ToArray();
+        heroes = (await UnmatchedService.GetHeroesStatisticsAsync()).OrderBy(x => x.HeroName).ToArray();
     }
 
     protected void OnHeroClick(Guid heroId)
     {
-        var url = $"/statistics/{heroId}";
+        var url = $"/heroes-statistics/{heroId}";
         NavManager.NavigateTo(url);
     }
 }

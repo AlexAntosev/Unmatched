@@ -1,0 +1,52 @@
+﻿@page "/maps-statistics"
+@using Unmatched.Dtos
+@using Unmatched.Services
+@inject IUnmatchedService UnmatchedService
+@inject NavigationManager NavManager
+
+<PageTitle>Maps Statistics</PageTitle>
+
+<h1>Maps Statistics</h1>
+
+@if (maps == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Map</th>
+            <th>Matches</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var map in maps)
+        {
+            <tr>
+                <td @onclick="@(e => OnMapClick(map.MapId))">@map.MapName</td>
+                <td >@map.TotalMatches</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private IEnumerable<MapStatisticsDto> maps;
+
+    protected override async Task OnInitializedAsync()
+    {
+        maps = (await UnmatchedService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToArray();
+    }
+
+    protected void OnMapClick(Guid heroId)
+    {
+        var url = $"/maps-statistics/{heroId}";
+        NavManager.NavigateTo(url);
+    }
+}

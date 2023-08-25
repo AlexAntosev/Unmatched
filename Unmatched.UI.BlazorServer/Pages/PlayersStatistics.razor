@@ -1,0 +1,59 @@
+﻿@page "/players-statistics"
+@using Unmatched.Dtos
+@using Unmatched.Services
+@using Unmatched.Constants
+@inject IUnmatchedService UnmatchedService
+@inject NavigationManager NavManager
+
+<PageTitle>Players Statistics</PageTitle>
+
+<h1>Players Statistics</h1>
+
+@if (players == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Player</th>
+            <th>Matches</th>
+            <th style="background-color: @Colors.WinnerColor">Wins</th>
+            <th style="background-color: @Colors.LooserColor">Looses</th>
+            <th>K/D</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var player in players)
+        {
+            <tr>
+                <td @onclick="@(e => OnPlayerClick(player.PlayerId))">@player.PlayerName</td>
+                <td >@player.TotalMatches</td>
+                <td >@player.TotalWins</td>
+                <td >@player.TotalLooses</td>
+                <td >@player.Kd</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private IEnumerable<PlayerStatisticsDto> players;
+
+    protected override async Task OnInitializedAsync()
+    {
+        players = (await UnmatchedService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToArray();
+    }
+
+    protected void OnPlayerClick(Guid heroId)
+    {
+        var url = $"/players-statistics/{heroId}";
+        NavManager.NavigateTo(url);
+    }
+}
