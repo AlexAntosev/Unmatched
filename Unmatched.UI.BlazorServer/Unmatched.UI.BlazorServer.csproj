@@ -92,4 +92,9 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Syncfusion.Blazor" Version="22.2.11" />
+      <PackageReference Include="Syncfusion.Blazor.Themes" Version="22.2.11" />
+    </ItemGroup>
+
 </Project>

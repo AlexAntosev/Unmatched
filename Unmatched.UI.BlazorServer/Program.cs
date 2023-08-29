@@ -1,3 +1,5 @@
+using Syncfusion.Blazor;
+
 using Unmatched.EntityFramework.Registration;
 using Unmatched.Registration;
 
@@ -11,6 +13,7 @@ builder.Services.RegisterMapping();
 builder.Services.RegisterDataInitializers();
 builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();
+builder.Services.AddSyncfusionBlazor();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
