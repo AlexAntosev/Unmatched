@@ -1,5 +1,6 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Constants
+@using System.Dynamic
 @if (matchLogEntries == null)
 {
     <p>
@@ -8,67 +9,78 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-        <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th colspan="7">Fighter</th>
-            <th colspan="7">Opponent</th>
-        </tr>
-        <tr>
-            <th>Date</th>
-            <th>Tournament</th>
-            <th>Map</th>
-            <th>Player</th>
-            <th>Hero</th>
-            <th>HP</th>
-            <th>Sidekick HP</th>
-            <th>Cards left</th>
-            <th>Points</th>
-            <th>Player</th>
-            <th>Hero</th>
-            <th>HP</th>
-            <th>Sidekick HP</th>
-            <th>Cards left</th>
-            <th>Points</th>
-            <th>Comment</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var matchLogEntry in matchLogEntries)
-        {
-            var firstFighter = matchLogEntry.Fighters.First();
-            var secondFighter = matchLogEntry.Fighters.Last();
-            <tr>
-                <td>@matchLogEntry.Date.ToShortDateString()</td>
-                <td>@matchLogEntry.TournamentName</td>
-                <td>@matchLogEntry.MapName</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.PlayerName</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HeroName</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.HpLeft</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.SidekickHpLeft</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.CardsLeft</td>
-                <td style="background-color: @GetWinLooseColor(firstFighter.IsWinner)">@firstFighter.MatchPoints</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.PlayerName</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HeroName</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.HpLeft</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.SidekickHpLeft</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.CardsLeft</td>
-                <td style="background-color: @GetWinLooseColor(secondFighter.IsWinner)">@secondFighter.MatchPoints</td>
-                <td>@matchLogEntry.Comment</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridEvents QueryCellInfo="CustomizeCell" TValue="ExpandoObject"></GridEvents>
+        <GridColumns>
+            <GridColumn Field="Date" Format="d" Type="ColumnType.Date" HeaderText="Date" Width="40" HeaderTextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="Tournament" HeaderText="Tournament" Width="70" HeaderTextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="Map" HeaderText="Map" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn HeaderText="Fighter" HeaderTextAlign="TextAlign.Center" Width="300">
+                <GridColumns>
+                    <GridColumn Field="FighterPlayer" HeaderText="Player" Width="40"></GridColumn>
+                    <GridColumn Field="FighterHero" HeaderText="Hero" Width="60"></GridColumn>
+                    <GridColumn Field="FighterHp" HeaderText="Hp" Width="30"></GridColumn>
+                    <GridColumn Field="FighterSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
+                    <GridColumn Field="FighterCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
+                    <GridColumn Field="FighterPoints" HeaderText="Points" Width="40"></GridColumn>
+                </GridColumns>
+            </GridColumn>
+            <GridColumn HeaderText="Opponent" HeaderTextAlign="TextAlign.Center" Width="300">
+                <GridColumns>
+                    <GridColumn Field="OpponentPlayer" HeaderText="Player" Width="40"></GridColumn>
+                    <GridColumn Field="OpponentHero" HeaderText="Hero" Width="60"></GridColumn>
+                    <GridColumn Field="OpponentHp" HeaderText="Hp" Width="30"></GridColumn>
+                    <GridColumn Field="OpponentSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
+                    <GridColumn Field="OpponentCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
+                    <GridColumn Field="OpponentPoints" HeaderText="Points" Width="40"></GridColumn>
+                </GridColumns>
+            </GridColumn>
+            <GridColumn Field="Comment" HeaderText="Comment" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }
 
 @code {
-
+    private IEnumerable<MatchLogDto> _matchLogEntries;
     [Parameter]
-    public IEnumerable<MatchLogDto> matchLogEntries { get; set; }
+    public IEnumerable<MatchLogDto> matchLogEntries {
+        get => _matchLogEntries;
+        set
+        {
+            _matchLogEntries = value;
+            if (value is not null)
+            {
+                GridData = _matchLogEntries.Select(e =>
+                    {
+                        dynamic d = new ExpandoObject();
+                        d.Date = e.Date;
+                        d.Tournament = e.TournamentName;
+                        d.Map = e.MapName;
+                        var fighter = e.Fighters.First();
+                        d.FighterPlayer = fighter.PlayerName;
+                        d.FighterHero = fighter.HeroName;
+                        d.FighterHp = fighter.HpLeft;
+                        d.FighterSidekickHp = fighter.SidekickHpLeft;
+                        d.FighterCardsLeft = fighter.CardsLeft;
+                        d.FighterPoints = fighter.MatchPoints;
+                        d.IsFighterWinner = fighter.IsWinner;
+                        var opponent = e.Fighters.Last();
+                        d.OpponentPlayer = opponent.PlayerName;
+                        d.OpponentHero = opponent.HeroName;
+                        d.OpponentHp = opponent.HpLeft;
+                        d.OpponentSidekickHp = opponent.SidekickHpLeft;
+                        d.OpponentCardsLeft = opponent.CardsLeft;
+                        d.OpponentPoints = opponent.MatchPoints;
+                        d.IsOpponentWinner = opponent.IsWinner;
+                        d.Comment = e.Comment;
+                        return d;
+                    }).Cast<ExpandoObject>().ToList();
+            }
+            
+        } }
+    
+    public List<ExpandoObject> GridData { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,6 +90,34 @@ else
         //     matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
         // }
     }
+    
+    public void CustomizeCell(QueryCellInfoEventArgs<ExpandoObject> args)
+    {
+        var isFighterWinner = ((dynamic)args.Data).IsFighterWinner;
+        var isOpponentWinner = ((dynamic)args.Data).IsOpponentWinner;
+        if (args.Column.Field is "FighterPlayer" or "FighterHero" or "FighterHp" or "FighterSidekickHp" or "FighterCardsLeft" or "FighterPoints")
+        {
+            if (isFighterWinner)
+            {
+                args.Cell.AddClass(new [] { "winner-cell" });
+            }
+            else
+            {
+                args.Cell.AddClass(new [] { "looser-cell" });
+            }
+        }
+        if (args.Column.Field is "OpponentPlayer" or "OpponentHero" or "OpponentHp" or "OpponentSidekickHp" or "OpponentCardsLeft" or "OpponentPoints")
+        {
+            if (isOpponentWinner)
+            {
+                args.Cell.AddClass(new [] { "winner-cell" });
+            }
+            else
+            {
+                args.Cell.AddClass(new [] { "looser-cell" });
+            }
+        }
+    }
 
     private string GetWinLooseColor(bool isWinner)
     {
@@ -86,3 +126,13 @@ else
             : Colors.LooserColor;
     }
 }
+
+<style>
+    .winner-cell {
+        background-color: @Colors.WinnerColor;
+    }
+    
+    .looser-cell {
+        background-color: @Colors.LooserColor;
+    }
+</style>
