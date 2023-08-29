@@ -2,6 +2,7 @@
 <EditForm Model=@Fighter>
     <fieldset>
         <legend>@Title</legend>
+        <img src="@playerImageSource" />
         <div>
             <label for="players">Player:</label>
             <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
@@ -11,6 +12,7 @@
                 }
             </InputSelect >
         </div>
+        <img src="@heroImageSource" />
         <div>
             <label for="hero">Hero:</label>
             @* ValueChanged="@((string value) => HeroChanged(value))" *@
@@ -58,6 +60,23 @@
 
     [Parameter]
     public string Title { get; set; }
+
+    private string? playerImageSource
+    {
+        get
+        {
+            var player = Players.FirstOrDefault(p => p.Id == Fighter.PlayerId);
+            return $"/{player?.Name}.png";
+        }
+    }
+
+    private string? heroImageSource {
+        get
+        {
+            var hero = Heroes.FirstOrDefault(p => p.Id == Fighter.HeroId);
+            return $"/{hero?.Name}.png";
+        }
+    }
 
     [Parameter]
     public IEnumerable<HeroDto> Heroes { get; set; }

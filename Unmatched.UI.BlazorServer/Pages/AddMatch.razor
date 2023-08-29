@@ -90,6 +90,12 @@ else
         _heroes = await UnmatchedService.GetAllHeroesAsync();
         _maps = await UnmatchedService.GetAllMapsAsync();
         _tournaments = await UnmatchedService.GetAllTournamentsAsync();
+
+        var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.GoldenHalatLeague);
+        if (defaultTournament != null)
+        {
+            Match.TournamentId = defaultTournament.Id;
+        }
     }
 
     private async Task AddNewMatch()
@@ -104,24 +110,40 @@ else
     private async Task Randomize()
     {
         RandomizeMap();
+        
         RandomizeFighter(FighterComponent);
-        RandomizeFighter(OpponentComponent);
-    }
+        FighterComponent.Fighter.Turn = 1;
+        
+        RandomizeFighter(OpponentComponent, FighterComponent);
+        OpponentComponent.Fighter.Turn = 2;
 
+    }
+    
     private void RandomizeMap()
     {
         var mapIndex = new Random().Next(0, _maps.Count());
         Match.MapId = _maps.ToArray()[mapIndex].Id;
     }
 
-    private void RandomizeFighter(FighterInfo fighterInfo)
+    private void RandomizeFighter(FighterInfo targetFighterComponent, params FighterInfo[] exceptFighters)
     {
-        fighterInfo.Fighter.PlayerId = _players.First(p => p.Name == PlayerNames.Andrii).Id;
+        var exceptPlayers = exceptFighters.Select(x => x.Fighter.PlayerId).ToArray();
+        var availablePlayers = _players.Where(x => x.Name is PlayerNames.Andrii or PlayerNames.Oleksandr).Select(x => x.Id).Except(exceptPlayers).ToArray();
         
-        var heroIndex = new Random().Next(0, _heroes.Count());
-        var hero = _heroes.ToArray()[heroIndex];
-        fighterInfo.SetHeroInfo(hero);
+        var randomPlayerIndex = new Random().Next(0, availablePlayers.Count());
+        var randomPlayerId = availablePlayers.ToArray()[randomPlayerIndex];
+        var randomPlayer = _players.First(x => x.Id == randomPlayerId);
         
-        fighterInfo.Fighter.ItemsUsed = 0;
+        targetFighterComponent.Fighter.PlayerId = randomPlayer.Id;
+        
+        var exceptHeroes = exceptFighters.Select(x => x.Fighter.HeroId).ToArray();
+        var availableHeroes = _heroes.Select(x => x.Id).Except(exceptHeroes).ToArray();
+        
+        var heroIndex = new Random().Next(0, availableHeroes.Count());
+        var randomHeroId = availableHeroes.ToArray()[heroIndex];
+        var randomHero = _heroes.First(x => x.Id == randomHeroId);
+        targetFighterComponent.SetHeroInfo(randomHero);
+        
+        targetFighterComponent.Fighter.ItemsUsed = 0;
     }
 }
