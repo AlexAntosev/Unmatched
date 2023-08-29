@@ -16,33 +16,18 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Place</th>
-            <th>Hero</th>
-            <th>Points</th>
-            <th>Matches</th>
-            <th style="background-color: @Colors.WinnerColor">Wins</th>
-            <th style="background-color: @Colors.LooserColor">Looses</th>
-            <th>K/D</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var ratingHero in ratingHeroes)
-        {
-            <tr>
-                <td >@ratingHero.Place</td>
-                <td >@ratingHero.HeroName</td>
-                <td >@ratingHero.Points</td>
-                <td >@ratingHero.TotalMatches</td>
-                <td >@ratingHero.TotalWins</td>
-                <td >@ratingHero.TotalLooses</td>
-                <td >@ratingHero.Kd</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <SfGrid DataSource="@ratingHeroes" AllowPaging="true" AllowSorting="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.Place) HeaderText="Place" Width="20"></GridColumn>
+            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.HeroName) HeaderText="Hero" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            <GridColumn CustomAttributes="@(new Dictionary<string, object>(){ { "class", "winner-cell" }})" Field=@nameof(RankedRatingHeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+            <GridColumn CustomAttributes="@(new Dictionary<string, object>(){ { "class", "looser-cell" }})" Field=@nameof(RankedRatingHeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }
 
 @code {
@@ -60,12 +45,14 @@ else
             place++;
         }
     }
-
-    private string GetWinLooseColor(bool isWinner)
-    {
-        return isWinner
-            ? Colors.WinnerColor
-            : Colors.LooserColor;
-    }
-
 }
+
+<style>
+    .winner-cell {
+        background-color: @Colors.WinnerColor !important;
+    }
+    
+    .looser-cell {
+        background-color: @Colors.LooserColor !important;
+    }
+</style>

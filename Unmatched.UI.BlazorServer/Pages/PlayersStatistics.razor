@@ -1,7 +1,6 @@
 ﻿@page "/players-statistics"
 @using Unmatched.Dtos
 @using Unmatched.Services
-@using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
 @inject NavigationManager NavManager
 
@@ -17,29 +16,17 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Player</th>
-            <th>Matches</th>
-            <th style="background-color: @Colors.WinnerColor">Wins</th>
-            <th style="background-color: @Colors.LooserColor">Looses</th>
-            <th>K/D</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var player in players)
-        {
-            <tr>
-                <td @onclick="@(e => OnPlayerClick(player.PlayerId))">@player.PlayerName</td>
-                <td >@player.TotalMatches</td>
-                <td >@player.TotalWins</td>
-                <td >@player.TotalLooses</td>
-                <td >@player.Kd</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <SfGrid DataSource="@players" AllowPaging="true" AllowSorting="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>
+        <GridColumns>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.PlayerName) HeaderText="Player" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }
 
 @code {
@@ -50,10 +37,11 @@ else
     {
         players = (await UnmatchedService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToArray();
     }
-
-    protected void OnPlayerClick(Guid heroId)
+    
+    public void RecordClickHandler(RecordClickEventArgs<PlayerStatisticsDto> args)
     {
-        var url = $"/players-statistics/{heroId}";
+        var playerId = args.RowData.PlayerId;
+        var url = $"/players-statistics/{playerId}";
         NavManager.NavigateTo(url);
     }
 }
