@@ -4,6 +4,8 @@ public static class SidekickNames
 {
     public const string Archers = "Archers";
 
+    public const string Bess = "Bess";
+
     public const string DrMalcolm = "Dr. Malcolm";
 
     public const string DrWatson = "Dr. Watson";

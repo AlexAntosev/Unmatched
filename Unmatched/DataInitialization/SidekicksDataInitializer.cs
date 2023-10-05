@@ -108,7 +108,14 @@ public class SidekicksDataInitializer : IDataInitializer<Sidekick>
                         Hp = 1,
                         Count = 3,
                         IsRanged = true
-                    }
+                    },
+                new()
+                    {
+                        Name = SidekickNames.Bess,
+                        Hp = 5,
+                        Count = 1,
+                        IsRanged = false
+                    },
             };
     }
 

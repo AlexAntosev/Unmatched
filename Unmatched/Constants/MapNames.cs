@@ -10,6 +10,8 @@ public class MapNames
 
     public const string HellsKitchen = "Hells Kitchen";
 
+    public const string KingSolomonsMine = "King Solomon's Mine";
+
     public const string Laboratory = "Laboratory";
 
     public const string London = "London";

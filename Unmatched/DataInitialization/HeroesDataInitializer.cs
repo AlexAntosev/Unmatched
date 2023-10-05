@@ -35,6 +35,7 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
         var archers = defaultSidekicks.First(s => s.Name == SidekickNames.Archers);
         var patroclus = defaultSidekicks.First(s => s.Name == SidekickNames.Patroclus);
         var malcolm = defaultSidekicks.First(s => s.Name == SidekickNames.DrMalcolm);
+        var bess = defaultSidekicks.First(s => s.Name == SidekickNames.Bess);
 
         var workers = defaultSidekicks.First(s => s.Name == SidekickNames.IngenWorkers);
         return new List<Hero>
@@ -262,6 +263,24 @@ public class HeroesDataInitializer : IDataInitializer<Hero>
                         Sidekicks = new List<Sidekick>
                             {
                                 workers
+                            }
+                    },
+                new()
+                    {
+                        Name = HeroNames.TheGenie,
+                        Hp = 16,
+                        DeckSize = 30,
+                        IsRanged = true
+                    },
+                new()
+                    {
+                        Name = HeroNames.Houdini,
+                        Hp = 14,
+                        DeckSize = 30,
+                        IsRanged = false,
+                        Sidekicks = new List<Sidekick>
+                            {
+                                bess
                             }
                     }
             };
