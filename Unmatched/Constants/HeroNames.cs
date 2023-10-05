@@ -24,6 +24,8 @@ public static class HeroNames
 
     public const string Ghostrider = "Ghostrider";
 
+    public const string Houdini = "Houdini";
+
     public const string Ingen = "Ingen";
 
     public const string InvisibleMan = "Invisible Man";
@@ -51,6 +53,8 @@ public static class HeroNames
     public const string Sindbad = "Sindbad";
 
     public const string SunWukong = "Sun Wukong";
+
+    public const string TheGenie = "The Genie";
 
     public const string TRex = "T-Rex";
 }

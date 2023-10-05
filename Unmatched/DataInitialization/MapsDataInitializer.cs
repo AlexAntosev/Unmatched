@@ -64,7 +64,11 @@ public class MapsDataInitializer : IDataInitializer<Map>
                 new()
                     {
                         Name = MapNames.TRexPaddock
-                    }
+                    },
+                new()
+                    {
+                        Name = MapNames.KingSolomonsMine
+                    },
             };
     }
 
