@@ -50,55 +50,25 @@ public class UnmatchedService : IUnmatchedService
         _ratingRepository = ratingRepository;
     }
 
-    public async Task AddDuelMatchAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
+    public async Task AddDuelMatchAsync(MatchDto matchDto, FighterDto firstFighterDto, FighterDto secondFighterDto)
     {
         var match = _mapper.Map<Match>(matchDto);
-        var fighter = _mapper.Map<Fighter>(fighterDto);
-        var opponent = _mapper.Map<Fighter>(opponentDto);
+        var firstFighter = _mapper.Map<Fighter>(firstFighterDto);
+        var secondFighter = _mapper.Map<Fighter>(secondFighterDto);
 
         var createdMatch = await _matchRepository.AddAsync(match);
 
-        fighter.MatchId = createdMatch.Id;
-        opponent.MatchId = createdMatch.Id;
+        firstFighter.MatchId = createdMatch.Id;
+        secondFighter.MatchId = createdMatch.Id;
 
-        var heroMatchPoints = await _ratingCalculator.CalculateAsync(fighter, opponent);
+        var heroMatchPoints = await _ratingCalculator.CalculateAsync(firstFighter, secondFighter);
 
-        var fighterRating = await _ratingRepository.GetByHeroIdAsync(fighter.HeroId)
-         ?? new Rating
-                {
-                    HeroId = fighter.HeroId
-                };
-        var opponentRating = await _ratingRepository.GetByHeroIdAsync(opponent.HeroId)
-         ?? new Rating
-                {
-                    HeroId = fighter.HeroId
-                };
-
-        var fighterMatchPoints = heroMatchPoints.First(x => x.HeroId == fighter.HeroId).Points;
-        var opponentMatchPoints = heroMatchPoints.First(x => x.HeroId == opponent.HeroId).Points;
-
-        fighterRating.Points += fighterMatchPoints;
-        opponentRating.Points += opponentMatchPoints;
-
-        fighter.MatchPoints = fighterMatchPoints;
-        opponent.MatchPoints = opponentMatchPoints;
-
-        await _fighterRepository.AddAsync(fighter);
-        await _fighterRepository.AddAsync(opponent);
-
-        _ratingRepository.AddOrUpdate(fighterRating);
-        _ratingRepository.AddOrUpdate(opponentRating);
+        await UpdateFighterRating(firstFighter, heroMatchPoints);
+        await UpdateFighterRating(secondFighter, heroMatchPoints);
 
         await _matchRepository.SaveChangesAsync();
         await _fighterRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();
-    }
-
-    public async Task<HeroDto> GetHeroByIdAsync(Guid heroId)
-    {
-        var entity = await _heroRepository.GetByIdAsync(heroId);
-        var hero = _mapper.Map<HeroDto>(entity);
-        return hero;
     }
 
     public async Task<IEnumerable<HeroDto>> GetAllHeroesAsync()
@@ -127,6 +97,237 @@ public class UnmatchedService : IUnmatchedService
         var entities = await _tournamentRepository.Query().ToListAsync();
         var tournaments = _mapper.Map<IEnumerable<TournamentDto>>(entities);
         return tournaments;
+    }
+
+    public async Task<HeroDto> GetHeroByIdAsync(Guid heroId)
+    {
+        var entity = await _heroRepository.GetByIdAsync(heroId);
+        var hero = _mapper.Map<HeroDto>(entity);
+        return hero;
+    }
+
+    public async Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync()
+    {
+        var heroes = await _heroRepository.Query().ToListAsync();
+        var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
+
+        var ratingDtos = new List<RankedRatingHeroStatisticsDto>();
+
+        foreach (var hero in heroes)
+        {
+            var heroParticipations = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
+
+            var ratingHero = new RankedRatingHeroStatisticsDto()
+                {
+                    HeroId = hero.Id,
+                    HeroName = hero.Name,
+                    TotalMatches = heroParticipations.Length,
+                    TotalWins = heroParticipations.Count(x => x.IsWinner),
+                    TotalLooses = heroParticipations.Count(x => x.IsWinner == false),
+                    LastMatchPoints = heroParticipations.FirstOrDefault()?.MatchPoints ?? 0
+                };
+
+            ratingDtos.Add(ratingHero);
+        }
+
+        return ratingDtos;
+    }
+
+    public async Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId)
+    {
+        var heroMatches = await _matchRepository.Query().Where(m => m.Fighters.Any(f => f.HeroId == heroId)).Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
+
+        var matchLogs = new List<MatchLogDto>();
+        foreach (var match in heroMatches)
+        {
+            var matchLog = _mapper.Map<MatchLogDto>(match);
+
+            var fighters = await _fighterRepository.Query()
+                .Where(x => matchLog.MatchId == x.MatchId)
+                .Include(x => x.Player)
+                .Include(x => x.Hero)
+                .Select(fighter => _mapper.Map<FighterDto>(fighter))
+                .ToListAsync();
+
+            matchLog.Fighters = fighters;
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
+    {
+        var hero = await _heroRepository.GetByIdAsync(heroId);
+
+        var heroFighters = await _fighterRepository.Query().Include(x => x.Match).Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToListAsync();
+
+        var statistics = new HeroStatisticsDto()
+            {
+                HeroId = hero.Id,
+                HeroName = hero.Name,
+                TotalMatches = heroFighters.Count,
+                TotalWins = heroFighters.Count(x => x.IsWinner),
+                TotalLooses = heroFighters.Count(x => x.IsWinner == false),
+                LastMatchPoints = heroFighters.FirstOrDefault()?.MatchPoints ?? 0
+            };
+
+        return statistics;
+    }
+
+    public async Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId)
+    {
+        var mapMatches = await _matchRepository.Query().Where(m => m.MapId == mapId).Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
+
+        var matchLogs = new List<MatchLogDto>();
+        foreach (var match in mapMatches)
+        {
+            var matchLog = _mapper.Map<MatchLogDto>(match);
+
+            var fighters = await _fighterRepository.Query()
+                .Where(x => matchLog.MatchId == x.MatchId)
+                .Include(x => x.Player)
+                .Include(x => x.Hero)
+                .Select(fighter => _mapper.Map<FighterDto>(fighter))
+                .ToListAsync();
+
+            matchLog.Fighters = fighters;
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync()
+    {
+        var maps = await _mapRepository.Query().ToListAsync();
+        var mapMatches = await _matchRepository.Query().ToListAsync();
+
+        var ratingDtos = new List<MapStatisticsDto>();
+
+        foreach (var map in maps)
+        {
+            var mapFighters = mapMatches.Where(x => x.MapId.Equals(map.Id)).OrderByDescending(x => x.Date).ToArray();
+
+            var ratingPlayer = new MapStatisticsDto()
+                {
+                    MapId = map.Id,
+                    MapName = map.Name,
+                    TotalMatches = mapFighters.Length,
+                };
+
+            ratingDtos.Add(ratingPlayer);
+        }
+
+        return ratingDtos;
+    }
+
+    public async Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId)
+    {
+        var map = await _mapRepository.GetByIdAsync(mapId);
+
+        var mapMatches = await _matchRepository.Query().Where(x => x.MapId.Equals(map.Id)).OrderByDescending(x => x.Date).ToListAsync();
+
+        var statistics = new MapStatisticsDto()
+            {
+                MapId = map.Id,
+                MapName = map.Name,
+                TotalMatches = mapMatches.Count,
+            };
+
+        return statistics;
+    }
+
+    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    {
+        var allMatches = await _matchRepository.Query().Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
+
+        var matchLogs = new List<MatchLogDto>();
+        foreach (var match in allMatches)
+        {
+            var matchLog = _mapper.Map<MatchLogDto>(match);
+
+            var fighters = (await _fighterRepository.Query().Include(x => x.Player).Include(x => x.Hero).Where(x => matchLog.MatchId == x.MatchId).ToListAsync())
+                .Select(fighter => _mapper.Map<FighterDto>(fighter))
+                .ToArray();
+            matchLog.Fighters = fighters;
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId)
+    {
+        var playerMatches = await _matchRepository.Query().Where(m => m.Fighters.Any(f => f.PlayerId == playerId)).Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
+
+        var matchLogs = new List<MatchLogDto>();
+        foreach (var match in playerMatches)
+        {
+            var matchLog = _mapper.Map<MatchLogDto>(match);
+
+            var fighters = await _fighterRepository.Query()
+                .Where(x => matchLog.MatchId == x.MatchId)
+                .Include(x => x.Player)
+                .Include(x => x.Hero)
+                .Select(fighter => _mapper.Map<FighterDto>(fighter))
+                .ToListAsync();
+
+            matchLog.Fighters = fighters;
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
+    {
+        var players = await _playerRepository.Query().ToListAsync();
+        var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
+
+        var ratingDtos = new List<PlayerStatisticsDto>();
+
+        foreach (var player in players)
+        {
+            var playerFighters = fighters.Where(x => x.PlayerId.Equals(player.Id)).OrderByDescending(x => x.Match.Date).ToArray();
+
+            var ratingPlayer = new PlayerStatisticsDto()
+                {
+                    PlayerId = player.Id,
+                    PlayerName = player.Name,
+                    TotalMatches = playerFighters.Length,
+                    TotalWins = playerFighters.Count(x => x.IsWinner),
+                    TotalLooses = playerFighters.Count(x => x.IsWinner == false),
+                    LastMatchPoints = playerFighters.FirstOrDefault()?.MatchPoints ?? 0
+                };
+
+            ratingDtos.Add(ratingPlayer);
+        }
+
+        return ratingDtos;
+    }
+
+    public async Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId)
+    {
+        var player = await _playerRepository.GetByIdAsync(playerId);
+
+        var playerFighters = await _fighterRepository.Query().Include(x => x.Match).Where(x => x.PlayerId.Equals(player.Id)).OrderByDescending(x => x.Match.Date).ToListAsync();
+
+        var statistics = new PlayerStatisticsDto()
+            {
+                PlayerId = player.Id,
+                PlayerName = player.Name,
+                TotalMatches = playerFighters.Count,
+                TotalWins = playerFighters.Count(x => x.IsWinner),
+                TotalLooses = playerFighters.Count(x => x.IsWinner == false),
+                LastMatchPoints = playerFighters.FirstOrDefault()?.MatchPoints ?? 0
+            };
+
+        return statistics;
     }
 
     public async Task<IEnumerable<RankedRatingHeroStatisticsDto>> GetRankedRatingAsync()
@@ -158,261 +359,19 @@ public class UnmatchedService : IUnmatchedService
         return ratingDtos;
     }
 
-    public async Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync()
+    private async Task UpdateFighterRating(Fighter fighter, IEnumerable<HeroMatchPoints> heroMatchPoints)
     {
-        var heroes = await _heroRepository.Query().ToListAsync();
-        var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
-
-        var ratingDtos = new List<RankedRatingHeroStatisticsDto>();
-
-        foreach (var hero in heroes)
-        {
-            var heroParticipations = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
-
-            var ratingHero = new RankedRatingHeroStatisticsDto()
+        var fighterRating = await _ratingRepository.GetByHeroIdAsync(fighter.HeroId)
+         ?? new Rating
                 {
-                    HeroId = hero.Id,
-                    HeroName = hero.Name,
-                    TotalMatches = heroParticipations.Length,
-                    TotalWins = heroParticipations.Count(x => x.IsWinner),
-                    TotalLooses = heroParticipations.Count(x => x.IsWinner == false),
-                    LastMatchPoints = heroParticipations.FirstOrDefault()?.MatchPoints ?? 0
+                    HeroId = fighter.HeroId
                 };
 
-            ratingDtos.Add(ratingHero);
-        }
+        var fighterMatchPoints = heroMatchPoints.Where(x => x.HeroId == fighter.HeroId).Sum(x => x.Points);
+        fighterRating.Points += fighterMatchPoints;
+        fighter.MatchPoints = fighterMatchPoints;
 
-        return ratingDtos;
-    }
-
-    public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
-    {
-        var players = await _playerRepository.Query().ToListAsync();
-        var fighters = await _fighterRepository.Query().Include(x => x.Match).ToListAsync();
-
-        var ratingDtos = new List<PlayerStatisticsDto>();
-
-        foreach (var player in players)
-        {
-            var playerFighters = fighters.Where(x => x.PlayerId.Equals(player.Id)).OrderByDescending(x => x.Match.Date).ToArray();
-
-            var ratingPlayer = new PlayerStatisticsDto()
-                {
-                    PlayerId = player.Id,
-                    PlayerName = player.Name,
-                    TotalMatches = playerFighters.Length,
-                    TotalWins = playerFighters.Count(x => x.IsWinner),
-                    TotalLooses = playerFighters.Count(x => x.IsWinner == false),
-                    LastMatchPoints = playerFighters.FirstOrDefault()?.MatchPoints ?? 0
-                };
-
-            ratingDtos.Add(ratingPlayer);
-        }
-
-        return ratingDtos;
-    }
-
-    public async Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync()
-    {
-        var maps = await _mapRepository.Query().ToListAsync();
-        var mapMatches = await _matchRepository
-            .Query()
-            .ToListAsync();
-
-        var ratingDtos = new List<MapStatisticsDto>();
-
-        foreach (var map in maps)
-        {
-            var mapFighters = mapMatches.Where(x => x.MapId.Equals(map.Id)).OrderByDescending(x => x.Date).ToArray();
-
-            var ratingPlayer = new MapStatisticsDto()
-                {
-                    MapId = map.Id,
-                    MapName = map.Name,
-                    TotalMatches = mapFighters.Length,
-                };
-
-            ratingDtos.Add(ratingPlayer);
-        }
-
-        return ratingDtos;
-    }
-
-    public async Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
-    {
-        var hero = await _heroRepository.GetByIdAsync(heroId);
-        
-        var heroFighters = await _fighterRepository
-            .Query()
-            .Include(x => x.Match)
-            .Where(x => x.HeroId.Equals(hero.Id))
-            .OrderByDescending(x => x.Match.Date)
-            .ToListAsync();
-        
-        var statistics = new HeroStatisticsDto()
-            {
-                HeroId = hero.Id,
-                HeroName = hero.Name,
-                TotalMatches = heroFighters.Count,
-                TotalWins = heroFighters.Count(x => x.IsWinner),
-                TotalLooses = heroFighters.Count(x => x.IsWinner == false),
-                LastMatchPoints = heroFighters.FirstOrDefault()?.MatchPoints ?? 0
-            };
-        
-        return statistics;
-    }
-
-    public async Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId)
-    {
-        var player = await _playerRepository.GetByIdAsync(playerId);
-        
-        var playerFighters = await _fighterRepository
-            .Query()
-            .Include(x => x.Match)
-            .Where(x => x.PlayerId.Equals(player.Id))
-            .OrderByDescending(x => x.Match.Date)
-            .ToListAsync();
-        
-        var statistics = new PlayerStatisticsDto()
-            {
-                PlayerId = player.Id,
-                PlayerName = player.Name,
-                TotalMatches = playerFighters.Count,
-                TotalWins = playerFighters.Count(x => x.IsWinner),
-                TotalLooses = playerFighters.Count(x => x.IsWinner == false),
-                LastMatchPoints = playerFighters.FirstOrDefault()?.MatchPoints ?? 0
-            };
-        
-        return statistics;
-    }
-
-    public async Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId)
-    {
-        var map = await _mapRepository.GetByIdAsync(mapId);
-        
-        var mapMatches = await _matchRepository
-            .Query()
-            .Where(x => x.MapId.Equals(map.Id))
-            .OrderByDescending(x => x.Date)
-            .ToListAsync();
-        
-        var statistics = new MapStatisticsDto()
-            {
-                MapId = map.Id,
-                MapName = map.Name,
-                TotalMatches = mapMatches.Count,
-            };
-        
-        return statistics;
-    }
-
-    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
-    {
-        var allMatches = await _matchRepository.Query().Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
-
-        var matchLogs = new List<MatchLogDto>();
-        foreach (var match in allMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = (await _fighterRepository.Query().Include(x => x.Player).Include(x => x.Hero).Where(x => matchLog.MatchId == x.MatchId).ToListAsync())
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToArray();
-            matchLog.Fighters = fighters;
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
-    }
-
-    public async Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId)
-    {
-        var heroMatches = await _matchRepository
-            .Query()
-            .Where(m => m.Fighters.Any(f => f.HeroId == heroId))
-            .Include(x => x.Map)
-            .Include(x => x.Tournament)
-            .ToListAsync();
-
-        var matchLogs = new List<MatchLogDto>();
-        foreach (var match in heroMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = await _fighterRepository
-                .Query()
-                .Where(x => matchLog.MatchId == x.MatchId)
-                .Include(x => x.Player)
-                .Include(x => x.Hero)
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToListAsync();
-            
-            matchLog.Fighters = fighters;
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
-    }
-
-    public async Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId)
-    {
-        var playerMatches = await _matchRepository
-            .Query()
-            .Where(m => m.Fighters.Any(f => f.PlayerId == playerId))
-            .Include(x => x.Map)
-            .Include(x => x.Tournament)
-            .ToListAsync();
-
-        var matchLogs = new List<MatchLogDto>();
-        foreach (var match in playerMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = await _fighterRepository
-                .Query()
-                .Where(x => matchLog.MatchId == x.MatchId)
-                .Include(x => x.Player)
-                .Include(x => x.Hero)
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToListAsync();
-            
-            matchLog.Fighters = fighters;
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
-    }
-
-    public async Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId)
-    {
-        var mapMatches = await _matchRepository
-            .Query()
-            .Where(m => m.MapId == mapId)
-            .Include(x => x.Map)
-            .Include(x => x.Tournament)
-            .ToListAsync();
-
-        var matchLogs = new List<MatchLogDto>();
-        foreach (var match in mapMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = await _fighterRepository
-                .Query()
-                .Where(x => matchLog.MatchId == x.MatchId)
-                .Include(x => x.Player)
-                .Include(x => x.Hero)
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToListAsync();
-            
-            matchLog.Fighters = fighters;
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
+        await _fighterRepository.AddAsync(fighter);
+        _ratingRepository.AddOrUpdate(fighterRating);
     }
 }
