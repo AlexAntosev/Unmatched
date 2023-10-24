@@ -27,6 +27,11 @@ public class TournamentsDataInitializer : IDataInitializer<Tournament>
                         Name = TournamentNames.GoldenHalatLeague,
                         Type = TournamentType.League
                     },
+                new()
+                    {
+                        Name = TournamentNames.SilverhandTournament,
+                        Type = TournamentType.Championship
+                    },
             };
     }
 
