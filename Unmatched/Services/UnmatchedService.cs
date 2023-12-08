@@ -408,4 +408,15 @@ public class UnmatchedService : IUnmatchedService
 
         return matchLogs;
     }
+
+    public async Task RecalculateRating()
+    {
+        await _ratingRepository.ClearAllRatingsAsync();
+        var rankedMatches = await _matchRepository.Query().Where(x => x.Tournament != null).OrderBy(x => x.Date).ToListAsync();
+
+        foreach (var match in rankedMatches)
+        {
+            
+        }
+    }
 }

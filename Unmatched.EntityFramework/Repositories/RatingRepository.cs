@@ -51,6 +51,11 @@ public class RatingRepository : IRatingRepository
         return entity;
     }
 
+    public Task ClearAllRatingsAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Rating> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Ratings.FindAsync(id);

@@ -30,4 +30,6 @@ public interface IUnmatchedService
     Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId);
     Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId);
     Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId);
+
+    Task RecalculateRating();
 }
