@@ -2,7 +2,7 @@
 <EditForm Model=@Fighter>
     <fieldset>
         <legend>@Title</legend>
-        <img src="@playerImageSource" />
+        <img src="@playerImageSource"/>
         <div>
             <label for="players">Player:</label>
             <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
@@ -12,18 +12,21 @@
                 }
             </InputSelect >
         </div>
-        <img src="@heroImageSource" />
+        <img src="@heroImageSource"/>
         <div>
             <label for="hero">Hero:</label>
             @* ValueChanged="@((string value) => HeroChanged(value))" *@
-            <InputSelect name="Hero" id="hero" class="form-select" ValueExpression="@(()=>Fighter.HeroId)" 
-                         Value="@Fighter.HeroId" 
-                         ValueChanged="@((Guid value) => HeroChanged(value))">
-                @foreach (var hero in Heroes)
-                {
-                    <option value="@hero.Id"> @hero.Name</option>
-                }
-            </InputSelect>
+            <div style=" display: flex; flex-direction: row;">
+                <InputSelect name="Hero" id="hero" class="form-select" ValueExpression="@(() => Fighter.HeroId)"
+                             Value="@Fighter.HeroId"
+                             ValueChanged="@((Guid value) => HeroChanged(value))">
+                    @foreach (var hero in Heroes)
+                    {
+                        <option value="@hero.Id"> @hero.Name</option>
+                    }
+                </InputSelect>
+                <button style="border-width: 0" @onclick="() => RandomizeHero(Fighter.HeroId)">🎲</button>
+            </div>
         </div>
         <div>
             <label for="hp">HP:</label>
@@ -70,7 +73,8 @@
         }
     }
 
-    private string? heroImageSource {
+    private string? heroImageSource
+    {
         get
         {
             var hero = Heroes.FirstOrDefault(p => p.Id == Fighter.HeroId);
@@ -84,7 +88,7 @@
     [Parameter]
     public IEnumerable<PlayerDto> Players { get; set; }
 
-    public FighterDto Fighter = new ();
+    public FighterDto Fighter = new();
 
     public FighterDto BuildDto()
     {
@@ -97,7 +101,7 @@
         SetHeroInfo(hero);
     }
 
-    public void SetHeroInfo(HeroDto hero)
+    private void SetHeroInfo(HeroDto hero)
     {
         Fighter.HpLeft = hero.Hp;
         Fighter.HeroId = hero.Id;
@@ -105,4 +109,15 @@
         Fighter.SidekickHpLeft = hero.Sidekicks.Sum(s => s.Hp * s.Count);
         Fighter.CardsLeft = hero.DeckSize;
     }
+
+    public void RandomizeHero(params Guid[] exceptHeroIds)
+    {
+        var availableHeroes = Heroes.Select(x => x.Id).Except(exceptHeroIds).ToArray();
+
+        var heroIndex = new Random().Next(0, availableHeroes.Count());
+        var randomHeroId = availableHeroes.ToArray()[heroIndex];
+        var randomHero = Heroes.First(x => x.Id == randomHeroId);
+        SetHeroInfo(randomHero);
+    }
+
 }

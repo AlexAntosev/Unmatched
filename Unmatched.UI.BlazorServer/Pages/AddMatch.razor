@@ -3,6 +3,7 @@
 @using Unmatched.Services
 @using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
+@inject NavigationManager NavManager
 
 <PageTitle>Add match</PageTitle>
 
@@ -32,12 +33,15 @@ else
             <EditForm Model=@Match>
                 <div>
                     <label for="Map">Map:</label>
-                    <InputSelect @bind-Value=Match.MapId name="Map" id="maps" class="form-select">
-                        @foreach (var map in _maps)
-                        {
-                            <option value="@map.Id"> @map.Name</option>
-                        }
-                    </InputSelect >
+                    <div style=" display: flex; flex-direction: row;">
+                        <InputSelect @bind-Value=Match.MapId name="Map" id="maps" class="form-select">
+                            @foreach (var map in _maps)
+                            {
+                                <option value="@map.Id"> @map.Name</option>
+                            }
+                        </InputSelect >
+                        <button style="border-width: 0" @onclick="RandomizeMap">🎲</button>
+                    </div>
                 </div>
                 <div>
                     <label for="Tournament">Tournament:</label>
@@ -81,7 +85,7 @@ else
 
     readonly MatchDto Match = new()
         {
-            Date = DateTime.Today
+            Date = DateTime.UtcNow
         };
 
     protected override async Task OnInitializedAsync()
@@ -91,7 +95,7 @@ else
         _maps = await UnmatchedService.GetAllMapsAsync();
         _tournaments = await UnmatchedService.GetAllTournamentsAsync();
 
-        var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.GoldenHalatLeague);
+        var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.SilverhandTournament);
         if (defaultTournament != null)
         {
             Match.TournamentId = defaultTournament.Id;
@@ -105,6 +109,10 @@ else
         var opponent = OpponentComponent.BuildDto();
 
         await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
+        
+        //TODO: if successful 
+        var url = "/duelMatchLog";
+        NavManager.NavigateTo(url);
     }
 
     private async Task Randomize()
@@ -136,13 +144,8 @@ else
         
         targetFighterComponent.Fighter.PlayerId = randomPlayer.Id;
         
-        var exceptHeroes = exceptFighters.Select(x => x.Fighter.HeroId).ToArray();
-        var availableHeroes = _heroes.Select(x => x.Id).Except(exceptHeroes).ToArray();
-        
-        var heroIndex = new Random().Next(0, availableHeroes.Count());
-        var randomHeroId = availableHeroes.ToArray()[heroIndex];
-        var randomHero = _heroes.First(x => x.Id == randomHeroId);
-        targetFighterComponent.SetHeroInfo(randomHero);
+        var exceptHeroIds = exceptFighters.Select(x => x.Fighter.HeroId).ToArray();
+        targetFighterComponent.RandomizeHero(exceptHeroIds);
         
         targetFighterComponent.Fighter.ItemsUsed = 0;
     }
