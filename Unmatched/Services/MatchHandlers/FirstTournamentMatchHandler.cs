@@ -1,11 +1,63 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
+using Unmatched.DataInitialization;
 using Unmatched.Entities;
+using Unmatched.Repositories;
 
 public class FirstTournamentMatchHandler : BaseMatchHandler
 {
-    protected override void InnerHandle(Match match)
+    private readonly IFirstTournamentRatingCalculator _ratingCalculator;
+    private readonly IMatchRepository _matchRepository;
+    private readonly IRatingRepository _ratingRepository;
+    private readonly IFighterRepository _fighterRepository;
+    
+    public FirstTournamentMatchHandler(
+        IFirstTournamentRatingCalculator ratingCalculator,
+        IMatchRepository matchRepository,
+        IRatingRepository ratingRepository,
+        IFighterRepository fighterRepository)
     {
-        throw new NotImplementedException();
+        _ratingCalculator = ratingCalculator;
+        _matchRepository = matchRepository;
+        _ratingRepository = ratingRepository;
+        _fighterRepository = fighterRepository;
+    }
+    protected override async Task InnerHandleAsync(Match match)
+    {
+        var createdMatch = await _matchRepository.AddAsync(match);
+        
+        var matchLevel = MatchLevel.Finals; // extend match entity with MatchLevel
+        
+        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchLevel);
+
+        foreach (var fighter in match.Fighters)
+        {
+            fighter.MatchId = createdMatch.Id;
+            fighter.MatchPoints = matchPoints.FirstOrDefault(h => h.HeroId == fighter.HeroId).Points;
+            await _fighterRepository.AddAsync(fighter);
+        }
+
+        foreach (var heroMatchPoints in matchPoints)
+        {
+            await UpdateHeroRatingAsync(heroMatchPoints);
+        }
+
+        await _matchRepository.SaveChangesAsync();
+        await _fighterRepository.SaveChangesAsync();
+        await _ratingRepository.SaveChangesAsync();
+    }
+    
+    private async Task UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
+    {
+        var heroRating = await _ratingRepository.GetByHeroIdAsync(heroMatchPoints.HeroId)
+         ?? new Rating
+                {
+                    HeroId = heroMatchPoints.HeroId
+                };
+        
+        var matchPoints = heroMatchPoints.Points;
+        heroRating.Points += matchPoints;
+        
+        _ratingRepository.AddOrUpdate(heroRating);
     }
 }

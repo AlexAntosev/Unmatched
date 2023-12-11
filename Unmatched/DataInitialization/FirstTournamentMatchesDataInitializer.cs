@@ -38,15 +38,6 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
     {
         var matches = new List<FirstTournamentMatchInfo>()
                 {
-                    new("11/11/2022", GetMap(MapNames.GreenForest), GetHero(HeroNames.InvisibleMan), 7, GetHero(HeroNames.RobinHood), 0, MatchLevel.Group),
-                    new("11/11/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.PrincessYennenga), 7, GetHero(HeroNames.JakylAndHide), 0, MatchLevel.Group),
-                    new("11/11/2022", GetMap(MapNames.Laboratory), GetHero(HeroNames.LukeCage), 0, GetHero(HeroNames.Bigfoot), 3, MatchLevel.Group),
-                    new("11/11/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.SunWukong), 0, GetHero(HeroNames.Ghostrider), 3, MatchLevel.Group),
-                    new("11/13/2022", GetMap(MapNames.Ruins), GetHero(HeroNames.KingArthur), 0, GetHero(HeroNames.Medusa), 15, MatchLevel.Group),
-                    new("11/13/2022", GetMap(MapNames.HellsKitchen), GetHero(HeroNames.MoonKnight), 2, GetHero(HeroNames.Elektra), 0, MatchLevel.Group),
-                    new("11/13/2022", GetMap(MapNames.London), GetHero(HeroNames.Bullseye), 0, GetHero(HeroNames.Sindbad), 5, MatchLevel.Group),
-                    new("11/14/2022", GetMap(MapNames.Mansion), GetHero(HeroNames.Achilles), 6, GetHero(HeroNames.Dracula), 0, MatchLevel.Group),
-                    new("11/14/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.InvisibleMan), 0, GetHero(HeroNames.Beowulf), 6, MatchLevel.Group),
                     new("11/17/2022", GetMap(MapNames.Tavern), GetHero(HeroNames.LittleRed), 2, GetHero(HeroNames.MoonKnight), 0, MatchLevel.Group),
                     new("11/17/2022", GetMap(MapNames.Tavern), GetHero(HeroNames.Daredevil), 0, GetHero(HeroNames.BloodyMary), 10, MatchLevel.Group),
                     new("11/17/2022", GetMap(MapNames.GoldenForest), GetHero(HeroNames.Alice), 3, GetHero(HeroNames.SherlokHolmes), 0, MatchLevel.Group),
@@ -106,74 +97,128 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
                 }.OrderBy(x => x.Date)
             .ToArray();
+        
+        var m = new List<Match>()
+            {
+                new() {Date = new DateTime(2022, 11, 11),MapId = GetMap(MapNames.GreenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.InvisibleMan), HpLeft = 7, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.RobinHood), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 11),MapId = GetMap(MapNames.GoldenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.PrincessYennenga), HpLeft = 7, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.JakylAndHide), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 11),MapId = GetMap(MapNames.Laboratory), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.LukeCage), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Bigfoot), HpLeft = 3, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 11),MapId = GetMap(MapNames.GoldenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.SunWukong), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Ghostrider), HpLeft = 3, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 13),MapId = GetMap(MapNames.Ruins), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.KingArthur), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Medusa), HpLeft = 15, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 13),MapId = GetMap(MapNames.HellsKitchen), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.MoonKnight), HpLeft = 2, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Elektra), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 13),MapId = GetMap(MapNames.London), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.Bullseye), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Sindbad), HpLeft = 5, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 14),MapId = GetMap(MapNames.Mansion), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.Achilles), HpLeft = 6, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Dracula), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 14),MapId = GetMap(MapNames.GoldenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.InvisibleMan), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Beowulf), HpLeft = 6, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+                new() {Date = new DateTime(2022, 11, 14),MapId = GetMap(MapNames.GoldenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
+                    {
+                        new() {HeroId = GetHero(HeroNames.InvisibleMan), HpLeft = 0, IsWinner = false, PlayerId = GetPlayer(PlayerNames.Andrii)},
+                        new() {HeroId = GetHero(HeroNames.Beowulf), HpLeft = 6, IsWinner = true, PlayerId = GetPlayer(PlayerNames.Oleksandr)}
+                    }}, //MatchLevel.Group
+            };
 
         // we assume that this are the very first rating matches so we do not read existing ratings 
         var ratings = new Dictionary<Guid, int>();
 
-        foreach (var match in matches)
-        {
-            var heroPoints = await _ratingCalculator.CalculateAsync(match);
-            var andriiPoints = heroPoints.First(x => x.HeroId == match.AndriiHeroId).Points;
-            var olexPoints = heroPoints.First(x => x.HeroId == match.OlexHeroId).Points;
-
-            var matchEntity = new Match()
-                {
-                    Date = match.Date,
-                    MapId = match.MapId,
-                    TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament),
-                    Fighters = new List<Fighter>()
-                        {
-                            new()
-                                {
-                                    PlayerId = GetPlayer(PlayerNames.Andrii),
-                                    IsWinner = match.AndriiHp > 0,
-                                    HpLeft = match.AndriiHp,
-                                    HeroId = match.AndriiHeroId,
-                                    MatchPoints = andriiPoints,
-                                },
-                            new()
-                                {
-                                    PlayerId = GetPlayer(PlayerNames.Oleksandr),
-                                    IsWinner = match.OlexHp > 0,
-                                    HpLeft = match.OlexHp,
-                                    HeroId = match.OlexHeroId,
-                                    MatchPoints = olexPoints,
-                                }
-                        }
-                };
-
-            await _matchRepository.AddAsync(matchEntity);
-            
-            if (ratings.TryGetValue(match.AndriiHeroId, out var apoints))
-            {
-                ratings[match.AndriiHeroId] = apoints + andriiPoints;
-            }
-            else
-            {
-                ratings[match.AndriiHeroId] = andriiPoints;
-            }
-
-            if (ratings.TryGetValue(match.OlexHeroId, out var opoints))
-            {
-                ratings[match.OlexHeroId] = opoints + olexPoints;
-            }
-            else
-            {
-                ratings[match.OlexHeroId] = olexPoints;
-            }
-        }
-
-
-        await _ratingRepository.AddRangeAsync(
-            ratings.Select(
-                x => new Rating()
-                    {
-                        HeroId = x.Key,
-                        Points = x.Value
-                    }));
-
-
-        await _matchRepository.SaveChangesAsync();
-        await _ratingRepository.SaveChangesAsync();
+        // foreach (var match in m)
+        // {
+        //     var heroPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), MatchLevel.Group);
+        //     var andriiPoints = heroPoints.First(x => x.HeroId == match.AndriiHeroId).Points;
+        //     var olexPoints = heroPoints.First(x => x.HeroId == match.OlexHeroId).Points;
+        //
+        //     var matchEntity = new Match()
+        //         {
+        //             Date = match.Date,
+        //             MapId = match.MapId,
+        //             TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament),
+        //             Fighters = new List<Fighter>()
+        //                 {
+        //                     new()
+        //                         {
+        //                             PlayerId = GetPlayer(PlayerNames.Andrii),
+        //                             IsWinner = match.AndriiHp > 0,
+        //                             HpLeft = match.AndriiHp,
+        //                             HeroId = match.AndriiHeroId,
+        //                             MatchPoints = andriiPoints,
+        //                         },
+        //                     new()
+        //                         {
+        //                             PlayerId = GetPlayer(PlayerNames.Oleksandr),
+        //                             IsWinner = match.OlexHp > 0,
+        //                             HpLeft = match.OlexHp,
+        //                             HeroId = match.OlexHeroId,
+        //                             MatchPoints = olexPoints,
+        //                         }
+        //                 }
+        //         };
+        //
+        //     await _matchRepository.AddAsync(matchEntity);
+        //     
+        //     if (ratings.TryGetValue(match.AndriiHeroId, out var apoints))
+        //     {
+        //         ratings[match.AndriiHeroId] = apoints + andriiPoints;
+        //     }
+        //     else
+        //     {
+        //         ratings[match.AndriiHeroId] = andriiPoints;
+        //     }
+        //
+        //     if (ratings.TryGetValue(match.OlexHeroId, out var opoints))
+        //     {
+        //         ratings[match.OlexHeroId] = opoints + olexPoints;
+        //     }
+        //     else
+        //     {
+        //         ratings[match.OlexHeroId] = olexPoints;
+        //     }
+        // }
+        //
+        //
+        // await _ratingRepository.AddRangeAsync(
+        //     ratings.Select(
+        //         x => new Rating()
+        //             {
+        //                 HeroId = x.Key,
+        //                 Points = x.Value
+        //             }));
+        //
+        //
+        // await _matchRepository.SaveChangesAsync();
+        // await _ratingRepository.SaveChangesAsync();
     }
 }

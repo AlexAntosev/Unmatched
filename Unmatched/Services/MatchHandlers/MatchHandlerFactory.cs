@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Microsoft.Extensions.Logging;
-
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -9,15 +8,33 @@ using Unmatched.Repositories;
 public class MatchHandlerFactory
 {
     private readonly ILoggerFactory _loggerFactory;
-
     private readonly ITournamentRepository _tournamentRepository;
+    private readonly IRatingCalculator _ratingCalculator;
+
+    private readonly IFirstTournamentRatingCalculator _firstTournamentRatingCalculator;
+
+    private readonly IMatchRepository _matchRepository;
+    private readonly IRatingRepository _ratingRepository;
+    private readonly IFighterRepository _fighterRepository;
 
     private IEnumerable<Tournament>? _tournamentsCache;
 
-    public MatchHandlerFactory(ILoggerFactory loggerFactory, ITournamentRepository tournamentRepository)
+    public MatchHandlerFactory(
+        ILoggerFactory loggerFactory,
+        ITournamentRepository tournamentRepository,
+        IRatingCalculator ratingCalculator,
+        IFirstTournamentRatingCalculator firstTournamentRatingCalculator,
+        IMatchRepository matchRepository,
+        IRatingRepository ratingRepository,
+        IFighterRepository fighterRepository)
     {
         _loggerFactory = loggerFactory;
         _tournamentRepository = tournamentRepository;
+        _ratingCalculator = ratingCalculator;
+        _firstTournamentRatingCalculator = firstTournamentRatingCalculator;
+        _matchRepository = matchRepository;
+        _ratingRepository = ratingRepository;
+        _fighterRepository = fighterRepository;
     }
 
     private IEnumerable<Tournament> TournamentsCache => _tournamentsCache ??= _tournamentRepository.Query().ToList();
@@ -27,15 +44,15 @@ public class MatchHandlerFactory
         IMatchHandler handler = new EmptyMatchHandler(_loggerFactory);
         if (IsUnranked(match))
         {
-            handler = new UnrankedMatchHandler();
+            handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository);
         }
         else if (IsFirstTournament(match))
         {
-            handler = new FirstTournamentMatchHandler();
+            handler = new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository);
         }
         else if (IsGoldenHalatLeague(match))
         {
-            handler = new GoldenHalatLeagueMatchHandler();
+            handler = new GoldenHalatLeagueMatchHandler(_ratingCalculator, _matchRepository, _ratingRepository, _fighterRepository);
         }
 
         return handler;

@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services;
 
 using Unmatched.DataInitialization;
+using Unmatched.Entities;
 using Unmatched.Repositories;
 
 public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
@@ -12,23 +13,23 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
         _heroRepository = heroRepository;
     }
 
-    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(FirstTournamentMatchInfo matchInfo)
+    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent, MatchLevel matchLevel)
     {
-        var winnerHeroId = matchInfo.AndriiHp > 0
-            ? matchInfo.AndriiHeroId
-            : matchInfo.OlexHeroId;
+        var winnerHeroId = fighter.IsWinner
+            ? fighter.HeroId
+            : opponent.HeroId;
         
-        var winnerHp = matchInfo.AndriiHp > 0
-            ? matchInfo.AndriiHp
-            : matchInfo.OlexHp;
+        var winnerHp = fighter.IsWinner
+            ? fighter.HpLeft
+            : opponent.HpLeft;
         
-        var looserHeroId = matchInfo.OlexHp > 0
-            ? matchInfo.AndriiHeroId
-            : matchInfo.OlexHeroId;
+        var looserHeroId = fighter.IsWinner
+            ? opponent.HeroId
+            : fighter.HeroId;
 
         var winnerHeroMaxHp = (await _heroRepository.GetByIdAsync(winnerHeroId)).Hp;
         
-        var coeficient = matchInfo.MatchLevel switch
+        var coeficient = matchLevel switch
             {
                 MatchLevel.Group => 2,
                 MatchLevel.QuarterFinals => 8,

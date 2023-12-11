@@ -13,7 +13,7 @@ public class EmptyMatchHandler : BaseMatchHandler
         _logger = loggerFactory.CreateLogger<EmptyMatchHandler>();
     }
 
-    protected override void InnerHandle(Match match)
+    protected override async Task InnerHandleAsync(Match match)
     {
         _logger.LogError("Match was not handled due to handler was not found.");
     }
