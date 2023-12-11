@@ -4,7 +4,7 @@ using Unmatched.Entities;
 
 public abstract class BaseMatchHandler : IMatchHandler
 {
-    public void Handle(Match match)
+    public async Task HandleAsync(Match match)
     {
         var fighters = match.Fighters;
         if (IsNotEnoughFighters(fighters))
@@ -12,10 +12,10 @@ public abstract class BaseMatchHandler : IMatchHandler
             throw new ArgumentException("NOT ENOUGH FIGHTERS!");
         }
 
-        InnerHandle(match);
+        await InnerHandleAsync(match);
     }
 
-    protected abstract void InnerHandle(Match match);
+    protected abstract Task InnerHandleAsync(Match match);
 
     private static bool IsNotEnoughFighters(ICollection<Fighter>? fighters) => fighters is null || fighters.Count < 2;
 }

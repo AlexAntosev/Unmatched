@@ -8,16 +8,16 @@ using Match = Unmatched.Entities.Match;
 public class BaseMatchHandlerTests
 {
     [Fact]
-    public void Handle_NoFighters_ThrowException()
+    public async Task HandleAsync_NoFighters_ThrowException()
     {
         var match = new Match();
 
         var baseHandler = new TestMatchHandler();
-        Assert.Throws<ArgumentException>(() => baseHandler.Handle(match));
+        await Assert.ThrowsAsync<ArgumentException>(() => baseHandler.HandleAsync(match));
     }
 
     [Fact]
-    public void Handle_NotEnoughFighters_ThrowException()
+    public async Task  HandleAsync_NotEnoughFighters_ThrowException()
     {
         var match = new Match
             {
@@ -27,13 +27,13 @@ public class BaseMatchHandlerTests
                     }
             };
         var baseHandler = new TestMatchHandler();
-        Assert.Throws<ArgumentException>(() => baseHandler.Handle(match));
+        await Assert.ThrowsAsync<ArgumentException>(() => baseHandler.HandleAsync(match));
     }
 }
 
 public class TestMatchHandler : BaseMatchHandler
 {
-    protected override void InnerHandle(Match match)
+    protected override async Task InnerHandleAsync(Match match)
     {
     }
 }
