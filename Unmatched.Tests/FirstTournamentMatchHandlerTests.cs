@@ -45,13 +45,15 @@ public class FirstTournamentMatchHandlerTests
             {
                 HeroId = opponentHeroId
             };
-        var match = new Match
+        var stage = Stage.Group;
+        var match = new MatchWithStage
             {
                 Fighters = new List<Fighter>
                     {
                         fighter,
                         opponent
-                    }
+                    },
+                Stage = stage
             };
         var matchPoints = new List<HeroMatchPoints>()
             {
@@ -65,7 +67,6 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
 
-        var stage = Stage.Group;
         _ratingCalculator
             .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
@@ -84,11 +85,10 @@ public class FirstTournamentMatchHandlerTests
                 MatchId = createdMatch.Id,
                 Stage = stage
             };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
-        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
         
         // Act
-        await _handler.HandleAsync(match, stage);
+        await _handler.HandleAsync(match);
         
         // Assert
         _ratingCalculator.VerifyAll();
@@ -108,13 +108,15 @@ public class FirstTournamentMatchHandlerTests
             {
                 HeroId = opponentHeroId
             };
-        var match = new Match
+        var stage = Stage.Group;
+        var match = new MatchWithStage
             {
                 Fighters = new List<Fighter>
                     {
                         fighter,
                         opponent
-                    }
+                    },
+                Stage = stage
             };
         var matchPoints = new List<HeroMatchPoints>()
             {
@@ -128,7 +130,6 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
         
-        var stage = Stage.Group;
         _ratingCalculator
             .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
@@ -148,11 +149,10 @@ public class FirstTournamentMatchHandlerTests
                 MatchId = createdMatch.Id,
                 Stage = stage
             };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
-        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
         
         // Act
-        await _handler.HandleAsync(match, stage);
+        await _handler.HandleAsync(match);
         
         // Assert
         _matchRepository.VerifyAll();
@@ -172,13 +172,15 @@ public class FirstTournamentMatchHandlerTests
             {
                 HeroId = opponentHeroId
             };
-        var match = new Match
+        var stage = Stage.Group;
+        var match = new MatchWithStage
             {
                 Fighters = new List<Fighter>
                     {
                         fighter,
                         opponent
-                    }
+                    },
+                Stage = stage
             };
         var fighterMatchPoints = 100;
         var opponentMatchPoints = -100;
@@ -196,7 +198,6 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
         
-        var stage = Stage.Group;
         _ratingCalculator
             .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
@@ -224,11 +225,10 @@ public class FirstTournamentMatchHandlerTests
                 MatchId = createdMatch.Id,
                 Stage = stage
             };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
-        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
 
         // Act
-        await _handler.HandleAsync(match, stage);
+        await _handler.HandleAsync(match);
         
         // Assert
         Assert.Equal(createdMatchId, fighter.MatchId);
@@ -252,13 +252,15 @@ public class FirstTournamentMatchHandlerTests
             {
                 HeroId = opponentHeroId
             };
-        var match = new Match
+        var stage = Stage.Group;
+        var match = new MatchWithStage
             {
                 Fighters = new List<Fighter>
                     {
                         fighter,
                         opponent
-                    }
+                    },
+                Stage = stage
             };
         var fighterHeroRating = new Rating()
             {
@@ -286,7 +288,6 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
         
-        var stage = Stage.Group;
         _ratingCalculator
             .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
@@ -310,11 +311,10 @@ public class FirstTournamentMatchHandlerTests
                 MatchId = createdMatch.Id,
                 Stage = stage
             };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
-        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
         
         // Act
-        await _handler.HandleAsync(match, stage);
+        await _handler.HandleAsync(match);
         
         // Assert
         _ratingRepository.VerifyAll();

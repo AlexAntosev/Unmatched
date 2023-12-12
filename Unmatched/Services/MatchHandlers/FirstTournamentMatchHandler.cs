@@ -26,29 +26,12 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         _matchStageRepository = matchStageRepository;
     }
 
-    public async Task HandleAsync(Match match, Stage stage)
-    {
-        var createdMatch = await _matchRepository.AddAsync(match);
-
-        await CreateMatchStage(stage, createdMatch);
-        await _matchStageRepository.SaveChangesAsync();
-        
-        await HandleAsync(createdMatch);
-    }
-
-    private async Task CreateMatchStage(Stage stage, Match createdMatch)
-    {
-        var matchStage = new MatchStage
-            {
-                MatchId = createdMatch.Id,
-                Stage = stage
-            };
-        await _matchStageRepository.AddAsync(matchStage);
-    }
-
     protected override async Task InnerHandleAsync(Match match)
     {
-        var matchStage = await _matchStageRepository.GetByMatchIdAsync(match.Id);
+        var matchWithStage = (MatchWithStage)match;
+        var createdMatch = await _matchRepository.AddAsync(match);
+
+        var matchStage = await CreateMatchStage(matchWithStage.Stage, createdMatch);
         
         var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchStage.Stage);
 
@@ -63,8 +46,19 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         }
 
         await _matchRepository.SaveChangesAsync();
+        await _matchStageRepository.SaveChangesAsync();
         await _fighterRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();
+    }
+    
+    private async Task<MatchStage> CreateMatchStage(Stage stage, Match createdMatch)
+    {
+        var matchStage = new MatchStage
+            {
+                MatchId = createdMatch.Id,
+                Stage = stage
+            };
+        return await _matchStageRepository.AddAsync(matchStage);
     }
 
     private void UpdateFighterMatchPoints(Fighter fighter, IEnumerable<HeroMatchPoints> matchPoints)

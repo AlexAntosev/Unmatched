@@ -42,7 +42,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
     public async Task InitializeAsync()
     {
-        var groupStageMatches = new List<Match>()
+        var groupStageMatches = new List<MatchWithStage>()
             {
                 new() {Date = new DateTime(2022, 11, 11),MapId = GetMap(MapNames.GreenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -301,7 +301,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
         
-        var quarterFinalsMatches = new List<Match>()
+        var quarterFinalsMatches = new List<MatchWithStage>()
             {
                 new() {Date = new DateTime(2022, 12, 24),MapId = GetMap(MapNames.GreenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -325,7 +325,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
 
-        var semiFinalsMatches = new List<Match>()
+        var semiFinalsMatches = new List<MatchWithStage>()
             {
                 new() {Date = new DateTime(2022, 12, 27),MapId = GetMap(MapNames.GoldenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -339,7 +339,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
         
-        var thirdPlaceFinalsMatches = new List<Match>()
+        var thirdPlaceFinalsMatches = new List<MatchWithStage>()
             {
                 new() {Date = new DateTime(2022, 12, 29),MapId = GetMap(MapNames.Mansion), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -348,7 +348,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
 
-        var finalsMatches = new List<Match>()
+        var finalsMatches = new List<MatchWithStage>()
             {
                 new() {Date = new DateTime(2023, 1, 2),MapId = GetMap(MapNames.Ship), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -366,27 +366,32 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
         foreach (var match in groupStageMatches)
         {
-            await handler.HandleAsync(match, Stage.Group);
+            match.Stage = Stage.Group;
+            await handler.HandleAsync(match);
         }
         
         foreach (var match in quarterFinalsMatches)
         {
-            await handler.HandleAsync(match, Stage.QuarterFinals);
+            match.Stage = Stage.QuarterFinals;
+            await handler.HandleAsync(match);
         }
 
         foreach (var match in semiFinalsMatches)
         {
-            await handler.HandleAsync(match, Stage.SemiFinals);
+            match.Stage = Stage.SemiFinals;
+            await handler.HandleAsync(match);
         }
         
         foreach (var match in thirdPlaceFinalsMatches)
         {
-            await handler.HandleAsync(match, Stage.ThirdPlaceFinals);
+            match.Stage = Stage.ThirdPlaceFinals;
+            await handler.HandleAsync(match);
         }
         
         foreach (var match in finalsMatches)
         {
-            await handler.HandleAsync(match, Stage.Finals);
+            match.Stage = Stage.Finals;
+            await handler.HandleAsync(match);
         }
     }
 }
