@@ -2,8 +2,27 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 using Unmatched.Entities;
+
+public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDbContext>
+{
+    private readonly IConfiguration _configuration;
+
+    public UnmatchedDbContextFactory(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    public UnmatchedDbContext CreateDbContext(string[] args)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<UnmatchedDbContext>();
+        var connectionString = _configuration.GetConnectionString("DefaultConnection");
+        optionsBuilder.UseSqlServer(connectionString);
+
+        return new UnmatchedDbContext(optionsBuilder.Options);
+    }
+}
 
 public class UnmatchedDbContext : DbContext
 {
@@ -14,17 +33,6 @@ public class UnmatchedDbContext : DbContext
     public UnmatchedDbContext(DbContextOptions contextOptions)
         : base(contextOptions)
     {
-    }
-    
-    public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDbContext>
-    {
-        public UnmatchedDbContext CreateDbContext(string[] args)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<UnmatchedDbContext>();
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=Unmatched;Trusted_Connection=True;MultipleActiveResultSets=true");
-
-            return new UnmatchedDbContext(optionsBuilder.Options);
-        }
     }
 
     public DbSet<Fighter> Fighters { get; set; }
