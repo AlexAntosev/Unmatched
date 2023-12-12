@@ -26,5 +26,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMatchRepository, MatchRepository>();
         services.AddTransient<IFighterRepository, FighterRepository>();
         services.AddTransient<IRatingRepository, RatingRepository>();
+        services.AddTransient<IMatchStageRepository, MatchStageRepository>();
     }
 }

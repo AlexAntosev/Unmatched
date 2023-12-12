@@ -17,6 +17,8 @@ public class MatchHandlerFactory
     private readonly IRatingRepository _ratingRepository;
     private readonly IFighterRepository _fighterRepository;
 
+    private readonly IMatchStageRepository _matchStageRepository;
+
     private IEnumerable<Tournament>? _tournamentsCache;
 
     public MatchHandlerFactory(
@@ -26,7 +28,8 @@ public class MatchHandlerFactory
         IFirstTournamentRatingCalculator firstTournamentRatingCalculator,
         IMatchRepository matchRepository,
         IRatingRepository ratingRepository,
-        IFighterRepository fighterRepository)
+        IFighterRepository fighterRepository,
+        IMatchStageRepository matchStageRepository)
     {
         _loggerFactory = loggerFactory;
         _tournamentRepository = tournamentRepository;
@@ -35,6 +38,7 @@ public class MatchHandlerFactory
         _matchRepository = matchRepository;
         _ratingRepository = ratingRepository;
         _fighterRepository = fighterRepository;
+        _matchStageRepository = matchStageRepository;
     }
 
     private IEnumerable<Tournament> TournamentsCache => _tournamentsCache ??= _tournamentRepository.Query().ToList();
@@ -48,7 +52,7 @@ public class MatchHandlerFactory
         }
         else if (IsFirstTournament(match))
         {
-            handler = new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository);
+            handler = new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository, _matchStageRepository);
         }
         else if (IsGoldenHalatLeague(match))
         {

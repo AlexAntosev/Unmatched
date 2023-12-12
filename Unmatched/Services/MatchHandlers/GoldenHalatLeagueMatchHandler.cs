@@ -26,13 +26,11 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
     {
         var createdMatch = await _matchRepository.AddAsync(match);
 
-        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last());
+        var matchPoints = await _ratingCalculator.CalculateAsync(createdMatch.Fighters.First(), createdMatch.Fighters.Last());
 
-        foreach (var fighter in match.Fighters)
+        foreach (var fighter in createdMatch.Fighters)
         {
-            fighter.MatchId = createdMatch.Id;
-            fighter.MatchPoints = matchPoints.FirstOrDefault(h => h.HeroId == fighter.HeroId).Points;
-            await _fighterRepository.AddAsync(fighter);
+            UpdateFighterMatchPoints(fighter, matchPoints);
         }
 
         foreach (var heroMatchPoints in matchPoints)
@@ -44,7 +42,13 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
         await _fighterRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();
     }
-    
+
+    private void UpdateFighterMatchPoints(Fighter fighter, IEnumerable<HeroMatchPoints> matchPoints)
+    {
+        fighter.MatchPoints = matchPoints.FirstOrDefault(h => h.HeroId == fighter.HeroId).Points;
+        _fighterRepository.AddOrUpdate(fighter);
+    }
+
     private async Task UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
     {
         var heroRating = await _ratingRepository.GetByHeroIdAsync(heroMatchPoints.HeroId)

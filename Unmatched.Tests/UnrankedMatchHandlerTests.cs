@@ -89,9 +89,13 @@ public class UnrankedMatchHandlerTests
             {
                 Id = createdMatchId
             };
-        _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
-        _fighterRepository.Setup(r => r.AddAsync(fighter)).Verifiable();
-        _fighterRepository.Setup(r => r.AddAsync(opponent)).Verifiable();
+        _matchRepository.Setup(r => r.AddAsync(match)).Callback((Match match) =>
+            {
+                foreach (var fighter in match.Fighters)
+                {
+                    fighter.MatchId = createdMatch.Id;
+                }
+            }).ReturnsAsync(createdMatch).Verifiable();
         _fighterRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
 
         // Act

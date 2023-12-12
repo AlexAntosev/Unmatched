@@ -4,7 +4,6 @@ using System;
 
 using Moq;
 
-using Unmatched.DataInitialization;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services;
@@ -18,6 +17,7 @@ public class FirstTournamentMatchHandlerTests
     private readonly Mock<IMatchRepository> _matchRepository;
     private readonly Mock<IRatingRepository> _ratingRepository;
     private readonly Mock<IFighterRepository> _fighterRepository;
+    private readonly Mock<IMatchStageRepository> _matchStageRepository;
 
     private readonly FirstTournamentMatchHandler _handler;
 
@@ -27,7 +27,8 @@ public class FirstTournamentMatchHandlerTests
         _matchRepository = new Mock<IMatchRepository>();
         _ratingRepository = new Mock<IRatingRepository>();
         _fighterRepository = new Mock<IFighterRepository>();
-        _handler = new FirstTournamentMatchHandler(_ratingCalculator.Object, _matchRepository.Object, _ratingRepository.Object, _fighterRepository.Object);
+        _matchStageRepository = new Mock<IMatchStageRepository>();
+        _handler = new FirstTournamentMatchHandler(_ratingCalculator.Object, _matchRepository.Object, _ratingRepository.Object, _fighterRepository.Object, _matchStageRepository.Object);
     }
     
     [Fact]
@@ -64,21 +65,30 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
 
-        var matchLevel = MatchLevel.Finals;
+        var stage = Stage.Group;
         _ratingCalculator
-            .Setup(c => c.CalculateAsync(fighter, opponent, matchLevel))
+            .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
             .Verifiable();
 
         var createdMatchId = Guid.NewGuid();
         var createdMatch = new Match()
             {
+                Fighters = match.Fighters,
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch);
+
+        var matchStage = new MatchStage()
+            {
+                MatchId = createdMatch.Id,
+                Stage = stage
+            };
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
+        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
         
         // Act
-        await _handler.HandleAsync(match);
+        await _handler.HandleAsync(match, stage);
         
         // Assert
         _ratingCalculator.VerifyAll();
@@ -118,29 +128,38 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
         
-        var matchLevel = MatchLevel.Finals;
+        var stage = Stage.Group;
         _ratingCalculator
-            .Setup(c => c.CalculateAsync(fighter, opponent, matchLevel))
+            .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
             .Verifiable();
         
         var createdMatchId = Guid.NewGuid();
         var createdMatch = new Match()
             {
+                Fighters = match.Fighters,
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
         _matchRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
         
+        var matchStage = new MatchStage()
+            {
+                MatchId = createdMatch.Id,
+                Stage = stage
+            };
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
+        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
+        
         // Act
-        await _handler.HandleAsync(match);
+        await _handler.HandleAsync(match, stage);
         
         // Assert
         _matchRepository.VerifyAll();
     }
     
     [Fact]
-    public async Task HandleAsync_CreatesFightersEntities()
+    public async Task HandleAsync_UpdatesFightersMatchPoints()
     {
         // Arrange
         var fighterHeroId = Guid.NewGuid();
@@ -177,24 +196,39 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
         
-        var matchLevel = MatchLevel.Finals;
+        var stage = Stage.Group;
         _ratingCalculator
-            .Setup(c => c.CalculateAsync(fighter, opponent, matchLevel))
+            .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
             .Verifiable();
         
         var createdMatchId = Guid.NewGuid();
         var createdMatch = new Match()
             {
+                Fighters = match.Fighters,
                 Id = createdMatchId
             };
-        _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
-        _fighterRepository.Setup(r => r.AddAsync(fighter)).Verifiable();
-        _fighterRepository.Setup(r => r.AddAsync(opponent)).Verifiable();
+        _matchRepository.Setup(r => r.AddAsync(match)).Callback((Match match) =>
+            {
+                foreach (var fighter in match.Fighters)
+                {
+                    fighter.MatchId = createdMatch.Id;
+                }
+            }).ReturnsAsync(createdMatch).Verifiable();
+        _fighterRepository.Setup(r => r.AddOrUpdate(fighter)).Verifiable();
+        _fighterRepository.Setup(r => r.AddOrUpdate(opponent)).Verifiable();
         _fighterRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        
+        var matchStage = new MatchStage()
+            {
+                MatchId = createdMatch.Id,
+                Stage = stage
+            };
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
+        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
 
         // Act
-        await _handler.HandleAsync(match);
+        await _handler.HandleAsync(match, stage);
         
         // Assert
         Assert.Equal(createdMatchId, fighter.MatchId);
@@ -252,15 +286,16 @@ public class FirstTournamentMatchHandlerTests
                     }
             };
         
-        var matchLevel = MatchLevel.Finals;
+        var stage = Stage.Group;
         _ratingCalculator
-            .Setup(c => c.CalculateAsync(fighter, opponent, matchLevel))
+            .Setup(c => c.CalculateAsync(fighter, opponent, stage))
             .ReturnsAsync(matchPoints)
             .Verifiable();
         
         var createdMatchId = Guid.NewGuid();
         var createdMatch = new Match()
             {
+                Fighters = match.Fighters,
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch);
@@ -270,8 +305,16 @@ public class FirstTournamentMatchHandlerTests
         _ratingRepository.Setup(r => r.AddOrUpdate(opponentHeroRating)).Verifiable();
         _ratingRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
         
+        var matchStage = new MatchStage()
+            {
+                MatchId = createdMatch.Id,
+                Stage = stage
+            };
+        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId)));
+        _matchStageRepository.Setup(r => r.GetByMatchIdAsync(createdMatchId)).ReturnsAsync(matchStage);
+        
         // Act
-        await _handler.HandleAsync(match);
+        await _handler.HandleAsync(match, stage);
         
         // Assert
         _ratingRepository.VerifyAll();
