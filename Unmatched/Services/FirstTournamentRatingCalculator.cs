@@ -1,6 +1,5 @@
 ﻿namespace Unmatched.Services;
 
-using Unmatched.DataInitialization;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 
@@ -13,7 +12,7 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
         _heroRepository = heroRepository;
     }
 
-    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent, MatchLevel matchLevel)
+    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage)
     {
         var winnerHeroId = fighter.IsWinner
             ? fighter.HeroId
@@ -29,16 +28,17 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
 
         var winnerHeroMaxHp = (await _heroRepository.GetByIdAsync(winnerHeroId)).Hp;
         
-        var coeficient = matchLevel switch
+        var coefficient = stage switch
             {
-                MatchLevel.Group => 2,
-                MatchLevel.QuarterFinals => 8,
-                MatchLevel.SemiFinals => 8,
-                MatchLevel.ThirdPlaceFinals => 8,
-                MatchLevel.Finals => 4,
+                Stage.Group => 2,
+                Stage.QuarterFinals => 8,
+                Stage.SemiFinals => 8,
+                Stage.ThirdPlaceFinals => 8,
+                Stage.Finals => 4,
+                _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
             };
 
-        var winnerPoints = Convert.ToInt32(Math.Round(coeficient * (80 + 40 * ((double)winnerHp / winnerHeroMaxHp)), 0));
+        var winnerPoints = Convert.ToInt32(Math.Round(coefficient * (80 + 40 * ((double)winnerHp / winnerHeroMaxHp)), 0));
 
         return new List<HeroMatchPoints>()
             {

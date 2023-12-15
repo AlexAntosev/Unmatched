@@ -23,7 +23,7 @@ public class FighterRepository : IFighterRepository
 
     public void AddOrUpdate(Fighter model)
     {
-        throw new NotImplementedException();
+        _dbContext.Update(model);
     }
 
     public async Task AddRangeAsync(IEnumerable<Fighter> models)

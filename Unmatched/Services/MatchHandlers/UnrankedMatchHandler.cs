@@ -16,15 +16,8 @@ public class UnrankedMatchHandler : BaseMatchHandler
     }
     protected override async Task InnerHandleAsync(Match match)
     {
-        var createdMatch = await _matchRepository.AddAsync(match);
-
-        foreach (var fighter in match.Fighters)
-        {
-            fighter.MatchId = createdMatch.Id;
-            await _fighterRepository.AddAsync(fighter);
-        }
+        await _matchRepository.AddAsync(match);
 
         await _matchRepository.SaveChangesAsync();
-        await _fighterRepository.SaveChangesAsync();
     }
 }

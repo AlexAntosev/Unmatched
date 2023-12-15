@@ -17,5 +17,5 @@ public abstract class BaseMatchHandler : IMatchHandler
 
     protected abstract Task InnerHandleAsync(Match match);
 
-    private static bool IsNotEnoughFighters(ICollection<Fighter>? fighters) => fighters is null || fighters.Count < 2;
+    protected bool IsNotEnoughFighters(ICollection<Fighter>? fighters) => fighters is null || fighters.Count < 2;
 }
