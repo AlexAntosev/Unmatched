@@ -1,10 +1,4 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=00b0eabf_002Db2b4_002D451d_002D9b7c_002D8652d640701c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CheckCalculations #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::2C001D46-BC3B-4F94-9DD3-76BC76036AF2::net7.0::Unmatched.Tests.RatingCalculatorTests.CheckCalculations&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::2C001D46-BC3B-4F94-9DD3-76BC76036AF2::net7.0::Unmatched.Tests.RatingHandlerTests.Handle_NoFighters_ThrowException&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=97cc4d22_002D01d5_002D459b_002Da533_002D9a420b6a3d28/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CheckCalculations" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Project Location="C:\Users\Oleksandr_Antosiev\RiderProjects\Unmatched\Unmatched.Tests" Presentation="&amp;lt;Unmatched.Tests&amp;gt;" /&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7efc09ca_002D0cd4_002D4551_002Db4d5_002Dc6bf5d3d46e5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Unmatched.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="E:\Development\Repositories\Unmatched\Unmatched.Tests" Presentation="&amp;lt;Unmatched.Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

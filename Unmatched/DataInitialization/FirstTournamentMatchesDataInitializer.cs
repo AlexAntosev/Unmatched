@@ -3,18 +3,15 @@
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
-using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
+using Unmatched.Services.RatingCalculators;
 
 class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTournamentMatchesDataInitializer
 {
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
-
     private readonly IMatchStageRepository _matchStageRepository;
-
     private readonly IRatingRepository _ratingRepository;
     private readonly IFighterRepository _fighterRepository;
-
     private readonly IMatchRepository _matchRepository;
 
     public FirstTournamentMatchesDataInitializer(

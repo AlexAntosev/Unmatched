@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Services;
+﻿namespace Unmatched.Services.RatingCalculators;
 
 using Unmatched.Entities;
 

@@ -8,6 +8,7 @@ using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
+using Unmatched.Services.RatingCalculators;
 
 using Match = Unmatched.Entities.Match;
 

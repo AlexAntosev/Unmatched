@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Unmatched.DataInitialization;
 using Unmatched.Entities;
 using Unmatched.Services;
+using Unmatched.Services.RatingCalculators;
 
 public static class ServiceCollectionExtensions
 {

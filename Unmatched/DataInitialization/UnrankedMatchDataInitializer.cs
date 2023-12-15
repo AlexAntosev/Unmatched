@@ -3,20 +3,24 @@
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
+using Unmatched.Services.MatchHandlers;
 
 public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedMatchDataInitializer
 {
     private readonly IMatchRepository _matchRepository;
+    private readonly IFighterRepository _fighterRepository;
 
     public UnrankedMatchDataInitializer(
         IHeroRepository heroRepository,
         IPlayerRepository playerRepository,
         IMatchRepository matchRepository,
         IMapRepository mapRepository,
-        ITournamentRepository tournamentRepository)
+        ITournamentRepository tournamentRepository,
+        IFighterRepository fighterRepository)
         : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
         _matchRepository = matchRepository;
+        _fighterRepository = fighterRepository;
     }
 
     public IEnumerable<Match> GetEntities()
@@ -694,7 +698,12 @@ public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedM
     public async Task InitializeAsync()
     {
         var entities = GetEntities();
-        await _matchRepository.AddRangeAsync(entities);
-        await _matchRepository.SaveChangesAsync();
+
+        var handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository);
+
+        foreach (var match in entities)
+        {
+            await handler.HandleAsync(match);
+        }
     }
 }

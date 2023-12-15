@@ -2,6 +2,7 @@
 
 using Unmatched.Entities;
 using Unmatched.Repositories;
+using Unmatched.Services.RatingCalculators;
 
 public class FirstTournamentMatchHandler : BaseMatchHandler
 {

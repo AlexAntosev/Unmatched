@@ -7,6 +7,7 @@ using Match = Unmatched.Entities.Match;
 namespace Unmatched.Tests;
 
 using Unmatched.Repositories;
+using Unmatched.Services.RatingCalculators;
 
 public class GoldenHalatLeagueMatchHandlerTests
 {

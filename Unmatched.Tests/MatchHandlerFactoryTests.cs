@@ -9,6 +9,8 @@ using Match = Unmatched.Entities.Match;
 
 namespace Unmatched.Tests;
 
+using Unmatched.Services.RatingCalculators;
+
 public class MatchHandlerFactoryTests
 {
     private readonly Guid _firstTournamentId = Guid.NewGuid();

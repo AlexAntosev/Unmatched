@@ -7,6 +7,7 @@ using Unmatched.DataInitialization;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services;
+using Unmatched.Services.RatingCalculators;
 
 public class RatingCalculatorTests
 {

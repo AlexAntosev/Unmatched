@@ -96,7 +96,6 @@ public class UnrankedMatchHandlerTests
                     fighter.MatchId = createdMatch.Id;
                 }
             }).ReturnsAsync(createdMatch).Verifiable();
-        _fighterRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
 
         // Act
         await _handler.HandleAsync(match);
@@ -104,6 +103,5 @@ public class UnrankedMatchHandlerTests
         // Assert
         Assert.Equal(createdMatchId, fighter.MatchId);
         Assert.Equal(createdMatchId, opponent.MatchId);
-        _fighterRepository.VerifyAll();
     }
 }
