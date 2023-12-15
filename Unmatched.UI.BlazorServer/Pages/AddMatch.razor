@@ -3,6 +3,7 @@
 @using Unmatched.Services
 @using Unmatched.Constants
 @inject IUnmatchedService UnmatchedService
+@inject IMatchService MatchService
 @inject NavigationManager NavManager
 
 <PageTitle>Add match</PageTitle>
@@ -108,7 +109,7 @@ else
         var fighter = FighterComponent.BuildDto();
         var opponent = OpponentComponent.BuildDto();
 
-        await UnmatchedService.AddDuelMatchAsync(match, fighter, opponent);
+        await MatchService.AddAsync(match, fighter, opponent);
         
         //TODO: if successful 
         var url = "/duelMatchLog";

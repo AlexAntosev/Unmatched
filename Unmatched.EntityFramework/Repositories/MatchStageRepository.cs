@@ -46,6 +46,12 @@ public class MatchStageRepository : IMatchStageRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.MatchStages;
+        _dbContext.MatchStages.RemoveRange(entities);
+    }
+
     public async Task<MatchStage> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.MatchStages.FindAsync(id);

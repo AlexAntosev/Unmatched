@@ -42,6 +42,12 @@ public class TournamentRepository : ITournamentRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Tournaments;
+        _dbContext.Tournaments.RemoveRange(entities);
+    }
+
     public async Task<Tournament> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Tournaments.FindAsync(id);

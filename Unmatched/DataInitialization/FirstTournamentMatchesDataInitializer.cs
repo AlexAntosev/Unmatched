@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.DataInitialization;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -363,32 +365,56 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
         foreach (var match in groupStageMatches)
         {
-            match.Stage = Stage.Group;
-            await handler.HandleAsync(match);
+            await InsertMatchStage(match, Stage.Group);
         }
         
         foreach (var match in quarterFinalsMatches)
         {
-            match.Stage = Stage.QuarterFinals;
-            await handler.HandleAsync(match);
+            await InsertMatchStage(match, Stage.QuarterFinals);
         }
 
         foreach (var match in semiFinalsMatches)
         {
-            match.Stage = Stage.SemiFinals;
-            await handler.HandleAsync(match);
+            await InsertMatchStage(match, Stage.SemiFinals);
         }
         
         foreach (var match in thirdPlaceFinalsMatches)
         {
-            match.Stage = Stage.ThirdPlaceFinals;
-            await handler.HandleAsync(match);
+            await InsertMatchStage(match, Stage.ThirdPlaceFinals);
         }
         
         foreach (var match in finalsMatches)
         {
-            match.Stage = Stage.Finals;
-            await handler.HandleAsync(match);
+            await InsertMatchStage(match, Stage.Finals);
         }
+
+        await _matchStageRepository.SaveChangesAsync();
+    }
+
+    private async Task InsertMatchStage(MatchWithStage match, Stage stage)
+    {
+        var existingMatch = FindExistingMatch(match);
+        var matchStage = new MatchStage()
+            {
+                MatchId = existingMatch.Id,
+                Stage = stage
+            };
+        await _matchStageRepository.AddAsync(matchStage);
+    }
+
+    private Match FindExistingMatch(MatchWithStage match)
+    {
+        var existingMatch = _matchRepository.Query()
+            .Include(x => x.Fighters)
+            .Where(
+                x => x.TournamentId.Equals(match.TournamentId)
+                 && x.Date.Equals(match.Date)
+                 && x.MapId.Equals(match.MapId)).ToArray().SingleOrDefault(x => x.Fighters.First(f => f.IsWinner).HeroId.Equals(match.Fighters.First(f => f.IsWinner).HeroId));
+        if (existingMatch == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return existingMatch;
     }
 }

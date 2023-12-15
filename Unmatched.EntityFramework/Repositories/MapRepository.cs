@@ -42,6 +42,12 @@ public class MapRepository : IMapRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Maps;
+        _dbContext.Maps.RemoveRange(entities);
+    }
+
     public async Task<Map> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Maps.FindAsync(id);

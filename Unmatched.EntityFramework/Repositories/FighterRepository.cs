@@ -42,6 +42,12 @@ public class FighterRepository : IFighterRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Fighters;
+        _dbContext.Fighters.RemoveRange(entities);
+    }
+
     public async Task<Fighter> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Fighters.FindAsync(id);

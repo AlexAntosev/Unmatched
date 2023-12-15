@@ -5,7 +5,6 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 using Unmatched.Dtos;
-using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services.RatingCalculators;
 
@@ -23,8 +22,6 @@ public class UnmatchedService : IUnmatchedService
 
     private readonly IPlayerRepository _playerRepository;
 
-    private readonly IRatingCalculator _ratingCalculator;
-
     private readonly IRatingRepository _ratingRepository;
 
     private readonly ITournamentRepository _tournamentRepository;
@@ -33,7 +30,6 @@ public class UnmatchedService : IUnmatchedService
         IMapper mapper,
         IMatchRepository matchRepository,
         IFighterRepository fighterRepository,
-        IRatingCalculator ratingCalculator,
         IPlayerRepository playerRepository,
         IHeroRepository heroRepository,
         IMapRepository mapRepository,
@@ -43,49 +39,11 @@ public class UnmatchedService : IUnmatchedService
         _mapper = mapper;
         _matchRepository = matchRepository;
         _fighterRepository = fighterRepository;
-        _ratingCalculator = ratingCalculator;
         _playerRepository = playerRepository;
         _heroRepository = heroRepository;
         _mapRepository = mapRepository;
         _tournamentRepository = tournamentRepository;
         _ratingRepository = ratingRepository;
-    }
-
-    public async Task AddDuelMatchAsync(MatchDto matchDto, FighterDto firstFighterDto, FighterDto secondFighterDto)
-    {
-        var match = _mapper.Map<Match>(matchDto);
-        var firstFighter = _mapper.Map<Fighter>(firstFighterDto);
-        var secondFighter = _mapper.Map<Fighter>(secondFighterDto);
-
-        var createdMatch = await _matchRepository.AddAsync(match);
-
-        firstFighter.MatchId = createdMatch.Id;
-        secondFighter.MatchId = createdMatch.Id;
-
-        var heroMatchPoints = await _ratingCalculator.CalculateAsync(firstFighter, secondFighter);
-
-        await UpdateFighterRating(firstFighter, heroMatchPoints);
-        await UpdateFighterRating(secondFighter, heroMatchPoints);
-        
-        await _matchRepository.SaveChangesAsync();
-        await _fighterRepository.SaveChangesAsync();
-        await _ratingRepository.SaveChangesAsync();
-    }
-
-    private async Task UpdateFighterRating(Fighter fighter, IEnumerable<HeroMatchPoints> heroMatchPoints)
-    {
-        var fighterRating = await _ratingRepository.GetByHeroIdAsync(fighter.HeroId)
-         ?? new Rating
-                {
-                    HeroId = fighter.HeroId
-                };
-        
-        var fighterMatchPoints = heroMatchPoints.Where(x => x.HeroId == fighter.HeroId).Sum(x => x.Points);
-        fighterRating.Points += fighterMatchPoints;
-        fighter.MatchPoints = fighterMatchPoints;
-        
-        await _fighterRepository.AddAsync(fighter);
-        _ratingRepository.AddOrUpdate(fighterRating);
     }
 
     public async Task<HeroDto> GetHeroByIdAsync(Guid heroId)

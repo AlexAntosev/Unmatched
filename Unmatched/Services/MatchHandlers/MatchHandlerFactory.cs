@@ -6,7 +6,7 @@ using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services.RatingCalculators;
 
-public class MatchHandlerFactory
+public class MatchHandlerFactory : IMatchHandlerFactory
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ITournamentRepository _tournamentRepository;
@@ -55,7 +55,7 @@ public class MatchHandlerFactory
         {
             handler = new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository, _matchStageRepository);
         }
-        else if (IsGoldenHalatLeague(match))
+        else if (IsGoldenHalatLeague(match) || IsSilverhandTournament(match))
         {
             handler = new GoldenHalatLeagueMatchHandler(_ratingCalculator, _matchRepository, _ratingRepository, _fighterRepository);
         }
@@ -82,6 +82,18 @@ public class MatchHandlerFactory
         {
             var tournamentName = TournamentsCache.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
             result = tournamentName == TournamentNames.GoldenHalatLeague;
+        }
+
+        return result;
+    }
+    
+    private bool IsSilverhandTournament(Match match)
+    {
+        var result = false;
+        if (match.TournamentId is not null)
+        {
+            var tournamentName = TournamentsCache.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
+            result = tournamentName == TournamentNames.SilverhandTournament;
         }
 
         return result;

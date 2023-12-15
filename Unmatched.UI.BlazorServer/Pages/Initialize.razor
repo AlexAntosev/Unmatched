@@ -1,6 +1,7 @@
 ﻿@page "/initialize"
 @using Unmatched.Entities
 @using Unmatched.DataInitialization
+@using Unmatched.Services
 
 @inject IDataInitializer<Player> PlayersDataInitializer
 @inject IDataInitializer<Map> MapsDataInitializer
@@ -11,8 +12,10 @@
 @inject IRankedMatchDataInitializer RankedMatchDataInitializer
 @inject IFirstTournamentMatchesDataInitializer FirstTournamentMatchesDataInitializer
 @inject IHoudiniVsGenieDadaInitializer HoudiniVsGenieDadaInitializer
+@inject IRatingService RatingService
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
+<button class="btn btn-primary" @onclick="RecalculateRating">Rating Recalculation</button>
 
 @code {
 
@@ -26,9 +29,14 @@
         // await HeroesDataInitializer.InitializeAsync();
         //
         // await UnrankedMatchDataInitializer.InitializeAsync();
-        // await FirstTournamentMatchesDataInitializer.InitializeAsync();
+         await FirstTournamentMatchesDataInitializer.InitializeAsync();
         // await RankedMatchDataInitializer.InitializeAsync();
 
         //await HoudiniVsGenieDadaInitializer.InitializeAsync();
+    }
+    
+    private async Task RecalculateRating()
+    {
+        await RatingService.RecalculateAsync();
     }
 }

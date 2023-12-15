@@ -42,6 +42,12 @@ public class PlayerRepository : IPlayerRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Players;
+        _dbContext.Players.RemoveRange(entities);
+    }
+
     public async Task<Player> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Players.FindAsync(id);

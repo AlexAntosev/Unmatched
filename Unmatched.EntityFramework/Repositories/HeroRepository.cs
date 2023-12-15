@@ -42,6 +42,12 @@ public class HeroRepository : IHeroRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Heroes;
+        _dbContext.Heroes.RemoveRange(entities);
+    }
+
     public async Task<Hero> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Heroes.FindAsync(id);

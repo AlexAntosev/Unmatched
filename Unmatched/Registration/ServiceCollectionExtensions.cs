@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Unmatched.DataInitialization;
 using Unmatched.Entities;
 using Unmatched.Services;
+using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
 
 public static class ServiceCollectionExtensions
@@ -34,5 +35,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUnmatchedService, UnmatchedService>();
         services.AddTransient<IRatingCalculator, RatingCalculator>();
         services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
+        services.AddTransient<IMatchService, MatchService>();
+        services.AddTransient<IRatingService, RatingService>();
+        services.AddTransient<IMatchHandlerFactory, MatchHandlerFactory>();
     }
 }

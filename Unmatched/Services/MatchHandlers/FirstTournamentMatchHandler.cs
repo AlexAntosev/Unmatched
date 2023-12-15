@@ -26,12 +26,13 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         _fighterRepository = fighterRepository;
         _matchStageRepository = matchStageRepository;
     }
-
+    
     protected override async Task InnerHandleAsync(Match match)
     {
         var matchWithStage = (MatchWithStage)match;
         var createdMatch = await _matchRepository.AddAsync(match);
-
+        await _matchRepository.SaveChangesAsync();
+        
         var matchStage = await CreateMatchStage(matchWithStage.Stage, createdMatch);
         
         var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchStage.Stage);
@@ -46,7 +47,7 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
             await UpdateHeroRatingAsync(heroMatchPoints);
         }
 
-        await _matchRepository.SaveChangesAsync();
+        
         await _matchStageRepository.SaveChangesAsync();
         await _fighterRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();

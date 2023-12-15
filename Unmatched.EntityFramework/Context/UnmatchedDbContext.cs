@@ -10,6 +10,10 @@ public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDb
 {
     private readonly IConfiguration _configuration;
 
+    public UnmatchedDbContextFactory()
+    {
+    }
+
     public UnmatchedDbContextFactory(IConfiguration configuration)
     {
         _configuration = configuration;
@@ -17,8 +21,7 @@ public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDb
     public UnmatchedDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<UnmatchedDbContext>();
-        var connectionString = _configuration.GetConnectionString("DefaultConnection");
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Unmatched;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
 
         return new UnmatchedDbContext(optionsBuilder.Options);
     }

@@ -42,6 +42,12 @@ public class MatchRepository : IMatchRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Matches;
+        _dbContext.Matches.RemoveRange(entities);
+    }
+
     public async Task<Match> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Matches.FindAsync(id);

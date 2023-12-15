@@ -42,6 +42,12 @@ public class SidekickRepository : ISidekickRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Sidekicks;
+        _dbContext.Sidekicks.RemoveRange(entities);
+    }
+
     public async Task<Sidekick> GetByIdAsync(Guid id)
     {
         var entity = await _dbContext.Sidekicks.FindAsync(id);

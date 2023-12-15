@@ -44,6 +44,12 @@ public class RatingRepository : IRatingRepository
         _dbContext.Remove(entity);
     }
 
+    public void DeleteAll()
+    {
+        var entities = _dbContext.Ratings;
+        _dbContext.Ratings.RemoveRange(entities);
+    }
+
     public async Task<Rating> GetByHeroIdAsync(Guid heroId)
     {
         var entity = await _dbContext.Ratings.FirstOrDefaultAsync(r => r.HeroId == heroId);

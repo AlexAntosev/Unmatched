@@ -9,6 +9,8 @@ public interface IRepository<T>
     Task AddRangeAsync(IEnumerable<T> models);
 
     Task Delete(Guid id);
+    
+    void DeleteAll();
 
     Task<T> GetByIdAsync(Guid id);
 

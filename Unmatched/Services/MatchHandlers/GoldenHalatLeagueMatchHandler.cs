@@ -26,7 +26,7 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
     protected override async Task InnerHandleAsync(Match match)
     {
         var createdMatch = await _matchRepository.AddAsync(match);
-
+        await _matchRepository.SaveChangesAsync();
         var matchPoints = await _ratingCalculator.CalculateAsync(createdMatch.Fighters.First(), createdMatch.Fighters.Last());
 
         foreach (var fighter in createdMatch.Fighters)
@@ -39,7 +39,7 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
             await UpdateHeroRatingAsync(heroMatchPoints);
         }
 
-        await _matchRepository.SaveChangesAsync();
+
         await _fighterRepository.SaveChangesAsync();
         await _ratingRepository.SaveChangesAsync();
     }
