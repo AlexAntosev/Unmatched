@@ -41,7 +41,7 @@ public class RatingService : IRatingService
     
     private IEnumerable<Match> GetMatches()
     {
-        var matches = _matchRepository.Query().Include(m => m.Fighters).AsNoTracking().ToArray();
+        var matches = _matchRepository.Query().Include(m => m.Fighters).OrderBy(x => x.Date).AsNoTracking().ToArray();
         var matchStages = _matchStageRepository.Query().ToArray();
         foreach (var matchStage in matchStages)
         {
