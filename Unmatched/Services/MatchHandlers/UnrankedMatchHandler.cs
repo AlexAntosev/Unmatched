@@ -19,6 +19,5 @@ public class UnrankedMatchHandler : BaseMatchHandler
         await _matchRepository.AddAsync(match);
 
         await _matchRepository.SaveChangesAsync();
-        await _fighterRepository.SaveChangesAsync();
     }
 }
