@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Microsoft.Extensions.Logging;
+
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -8,17 +9,23 @@ using Unmatched.Services.RatingCalculators;
 
 public class MatchHandlerFactory : IMatchHandlerFactory
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ITournamentRepository _tournamentRepository;
-    private readonly IRatingCalculator _ratingCalculator;
+    private readonly IFighterRepository _fighterRepository;
 
     private readonly IFirstTournamentRatingCalculator _firstTournamentRatingCalculator;
 
+    private readonly ILoggerFactory _loggerFactory;
+
     private readonly IMatchRepository _matchRepository;
-    private readonly IRatingRepository _ratingRepository;
-    private readonly IFighterRepository _fighterRepository;
 
     private readonly IMatchStageRepository _matchStageRepository;
+
+    private readonly IRatingCalculator _ratingCalculator;
+
+    private readonly IRatingRepository _ratingRepository;
+
+    private readonly ITournamentRepository _tournamentRepository;
+
+    private readonly IUnrankedRatingCalculator _unrankedRatingCalculator;
 
     private IEnumerable<Tournament>? _tournamentsCache;
 
@@ -30,7 +37,8 @@ public class MatchHandlerFactory : IMatchHandlerFactory
         IMatchRepository matchRepository,
         IRatingRepository ratingRepository,
         IFighterRepository fighterRepository,
-        IMatchStageRepository matchStageRepository)
+        IMatchStageRepository matchStageRepository,
+        IUnrankedRatingCalculator unrankedRatingCalculator)
     {
         _loggerFactory = loggerFactory;
         _tournamentRepository = tournamentRepository;
@@ -40,6 +48,7 @@ public class MatchHandlerFactory : IMatchHandlerFactory
         _ratingRepository = ratingRepository;
         _fighterRepository = fighterRepository;
         _matchStageRepository = matchStageRepository;
+        _unrankedRatingCalculator = unrankedRatingCalculator;
     }
 
     private IEnumerable<Tournament> TournamentsCache => _tournamentsCache ??= _tournamentRepository.Query().ToList();
@@ -49,13 +58,14 @@ public class MatchHandlerFactory : IMatchHandlerFactory
         IMatchHandler handler = new EmptyMatchHandler(_loggerFactory);
         if (IsUnranked(match))
         {
-            handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository);
+            handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository, _unrankedRatingCalculator, _ratingRepository);
         }
         else if (IsFirstTournament(match))
         {
             handler = new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository, _matchStageRepository);
         }
-        else if (IsGoldenHalatLeague(match) || IsSilverhandTournament(match))
+        else if (IsGoldenHalatLeague(match)
+              || IsSilverhandTournament(match))
         {
             handler = new GoldenHalatLeagueMatchHandler(_ratingCalculator, _matchRepository, _ratingRepository, _fighterRepository);
         }
@@ -86,7 +96,7 @@ public class MatchHandlerFactory : IMatchHandlerFactory
 
         return result;
     }
-    
+
     private bool IsSilverhandTournament(Match match)
     {
         var result = false;

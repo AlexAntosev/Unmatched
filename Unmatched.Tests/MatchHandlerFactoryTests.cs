@@ -19,6 +19,7 @@ public class MatchHandlerFactoryTests
     private readonly Mock<ILoggerFactory> _loggerFactory = new();
     private readonly Mock<ITournamentRepository> _tournamentRepository = new();
     private readonly Mock<IRatingCalculator> _ratingCalculator = new();
+    private readonly Mock<IUnrankedRatingCalculator> _unrankedRatingCalculator = new();
     private readonly Mock<IFirstTournamentRatingCalculator> _firstTournamentRatingCalculator = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
@@ -53,7 +54,8 @@ public class MatchHandlerFactoryTests
             _matchRepository.Object,
             _ratingRepository.Object,
             _fighterRepository.Object,
-            _matchStageRepository.Object);
+            _matchStageRepository.Object,
+            _unrankedRatingCalculator.Object);
     }
 
     [Fact]

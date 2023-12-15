@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IUnmatchedService, UnmatchedService>();
         services.AddTransient<IRatingCalculator, RatingCalculator>();
+        services.AddTransient<IUnrankedRatingCalculator, UnrankedRatingCalculator>();
         services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();

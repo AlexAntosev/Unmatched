@@ -6,6 +6,7 @@ using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
+using Unmatched.Services.RatingCalculators;
 
 using Match = Unmatched.Entities.Match;
 
@@ -13,6 +14,8 @@ public class UnrankedMatchHandlerTests
 {
     private readonly Mock<IMatchRepository> _matchRepository;
     private readonly Mock<IFighterRepository> _fighterRepository;
+    private readonly Mock<IUnrankedRatingCalculator> _unrankedRatingCalculator = new();
+    private readonly Mock<IRatingRepository> _ratingRepository = new();
 
     private readonly UnrankedMatchHandler _handler;
 
@@ -20,7 +23,7 @@ public class UnrankedMatchHandlerTests
     {
         _matchRepository = new Mock<IMatchRepository>();
         _fighterRepository = new Mock<IFighterRepository>();
-        _handler = new UnrankedMatchHandler(_matchRepository.Object, _fighterRepository.Object);
+        _handler = new UnrankedMatchHandler(_matchRepository.Object, _fighterRepository.Object, _unrankedRatingCalculator.Object, _ratingRepository.Object);
     }
     
     [Fact]

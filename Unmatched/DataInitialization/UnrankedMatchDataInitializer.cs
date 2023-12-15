@@ -4,11 +4,16 @@ using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;
+using Unmatched.Services.RatingCalculators;
 
 public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedMatchDataInitializer
 {
     private readonly IMatchRepository _matchRepository;
     private readonly IFighterRepository _fighterRepository;
+
+    private readonly IUnrankedRatingCalculator _unrankedRatingCalculator;
+
+    private readonly IRatingRepository _ratingRepository;
 
     public UnrankedMatchDataInitializer(
         IHeroRepository heroRepository,
@@ -16,11 +21,14 @@ public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedM
         IMatchRepository matchRepository,
         IMapRepository mapRepository,
         ITournamentRepository tournamentRepository,
-        IFighterRepository fighterRepository)
+        IFighterRepository fighterRepository,
+        IUnrankedRatingCalculator unrankedRatingCalculator,IRatingRepository ratingRepository)
         : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
         _matchRepository = matchRepository;
         _fighterRepository = fighterRepository;
+        _unrankedRatingCalculator = unrankedRatingCalculator;
+        _ratingRepository = ratingRepository;
     }
 
     public IEnumerable<Match> GetEntities()
@@ -699,7 +707,7 @@ public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedM
     {
         var entities = GetEntities();
 
-        var handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository);
+        var handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository, _unrankedRatingCalculator, _ratingRepository);
 
         foreach (var match in entities)
         {

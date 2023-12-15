@@ -66,9 +66,7 @@ public class RatingCalculator : IRatingCalculator
                 1,
                 MidpointRounding.ToPositiveInfinity));
         var result = -(100 + forSidekickHp + forWinnerHpLeft);
-        return matchContext.LooserPointsBeforeMatch + result > 0
-            ? result
-            : -matchContext.LooserPointsBeforeMatch;
+        return result;
     }
 
     private int CalculateForWinner(MatchContext matchContext)
