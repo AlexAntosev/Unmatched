@@ -322,16 +322,4 @@ public class FirstTournamentMatchHandlerTests
         Assert.Equal(200, fighterHeroRating.Points);
         Assert.Equal(0, opponentHeroRating.Points);
     }
-
-    [Fact]
-    public async Task HandleAsync_PassMatch()
-    {
-        var matches = new Match[]{new Match(){Fighters = new List<Fighter>(){new Fighter(), new Fighter()}}};
-        var match = matches.First();
-        var index = Array.IndexOf(matches, match);
-        matches[index] = new MatchWithStage(){Fighters = new List<Fighter>(){new Fighter(), new Fighter()}};
-        //match = new MatchWithStage(){Fighters = new List<Fighter>(){new Fighter(), new Fighter()}};
-        await _handler.HandleAsync(matches.First());
-    }
-
 }

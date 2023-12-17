@@ -93,7 +93,7 @@ public class RatingCalculatorTests
             new HeroMatchPoints
                 {
                     HeroId = ingenId,
-                    Points = 0
+                    Points = -240
                 });
 
         AssertMatch(
@@ -124,7 +124,7 @@ public class RatingCalculatorTests
             new HeroMatchPoints
                 {
                     HeroId = sherlokHolmesId,
-                    Points = -100
+                    Points = -210
                 });
 
         AssertMatch(

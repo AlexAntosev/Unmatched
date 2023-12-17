@@ -52,6 +52,11 @@ public class UnrankedMatchHandlerTests
         var createdMatchId = Guid.NewGuid();
         var createdMatch = new Match()
             {
+                Fighters = new List<Fighter>
+                {
+                    fighter,
+                    opponent
+                },
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
@@ -90,6 +95,11 @@ public class UnrankedMatchHandlerTests
         var createdMatchId = Guid.NewGuid();
         var createdMatch = new Match()
             {
+                Fighters = new List<Fighter>
+                {
+                    fighter,
+                    opponent
+                },
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).Callback((Match match) =>
