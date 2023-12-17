@@ -15,8 +15,6 @@ public class MatchHandlerFactory : IMatchHandlerFactory
     private readonly IRatingCalculator _ratingCalculator;
     private readonly IUnrankedRatingCalculator _unrankedRatingCalculator;
 
-    private IEnumerable<Tournament>? _tournamentsCache;
-
     public MatchHandlerFactory(
         IUnitOfWork unitOfWork,
         ILoggerFactory loggerFactory,
@@ -41,7 +39,7 @@ public class MatchHandlerFactory : IMatchHandlerFactory
             new FirstTournamentMatchHandler(_unitOfWork, _firstTournamentRatingCalculator),
         _ when IsGoldenHalatLeague(match) || IsSilverhandTournament(match) => 
             new GoldenHalatLeagueMatchHandler(_unitOfWork, _ratingCalculator),
-        _ =>  new EmptyMatchHandler(_loggerFactory)
+        _ =>  new EmptyMatchHandler(_unitOfWork, _loggerFactory)
     };
 
     private static bool IsUnranked(Match match) 

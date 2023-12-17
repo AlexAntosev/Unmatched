@@ -21,8 +21,6 @@ public interface IUnitOfWork : IDisposable
     ISidekickRepository Sidekicks { get; }
     
     ITournamentRepository Tournaments { get; }
-
-    void SaveChanges();
     
     Task SaveChangesAsync();
 }

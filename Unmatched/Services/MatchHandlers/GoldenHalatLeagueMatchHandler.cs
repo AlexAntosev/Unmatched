@@ -6,54 +6,50 @@ using Unmatched.Services.RatingCalculators;
 
 public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IRatingCalculator _ratingCalculator;
 
     public GoldenHalatLeagueMatchHandler(
         IUnitOfWork unitOfWork,
         IRatingCalculator ratingCalculator)
+    : base(unitOfWork)
     {
-        _unitOfWork = unitOfWork;
         _ratingCalculator = ratingCalculator;
     }
     
     protected override async Task InnerHandleAsync(Match match)
     {
-        var createdMatch = await _unitOfWork.Matches.AddAsync(match);
-        await _unitOfWork.SaveChangesAsync();
+        var matchPoints = (await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last())).ToArray();
 
-        var matchPoints = await _ratingCalculator.CalculateAsync(createdMatch.Fighters.First(), createdMatch.Fighters.Last());
-
-        foreach (var fighter in createdMatch.Fighters)
+        foreach (var fighter in match.Fighters)
         {
-            UpdateFighterMatchPoints(fighter, matchPoints);
+            fighter.MatchPoints = GetFighterMatchPoints(matchPoints, fighter.HeroId);
         }
+        
+        await UnitOfWork.Matches.AddAsync(match);
 
-        foreach (var heroMatchPoints in matchPoints)
+        var tasks = matchPoints.Select(UpdateHeroRatingAsync);
+        var updatedHeroRatings = await Task.WhenAll(tasks);
+        foreach (var updatedHeroRating in updatedHeroRatings)
         {
-            await UpdateHeroRatingAsync(heroMatchPoints);
+            UnitOfWork.Ratings.AddOrUpdate(updatedHeroRating);
         }
-
-        await _unitOfWork.SaveChangesAsync();
+        
+        await UnitOfWork.SaveChangesAsync();
     }
 
-    private void UpdateFighterMatchPoints(Fighter fighter, IEnumerable<HeroMatchPoints> matchPoints)
-    {
-        fighter.MatchPoints = matchPoints.FirstOrDefault(h => h.HeroId == fighter.HeroId).Points;
-        _unitOfWork.Fighters.AddOrUpdate(fighter);
-    }
+    private static int GetFighterMatchPoints(IEnumerable<HeroMatchPoints> matchPoints, Guid heroId) 
+        => matchPoints.FirstOrDefault(h => h.HeroId == heroId).Points;
 
-    private async Task UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
+    private async Task<Rating> UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
     {
-        var heroRating = await _unitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
+        var heroRating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
          ?? new Rating
                 {
                     HeroId = heroMatchPoints.HeroId
                 };
         
-        var matchPoints = heroMatchPoints.Points;
-        heroRating.Points += matchPoints;
-        
-        _unitOfWork.Ratings.AddOrUpdate(heroRating);
+        heroRating.Points += heroMatchPoints.Points;
+
+        return heroRating;
     }
 }

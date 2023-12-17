@@ -2,7 +2,7 @@
 
 using Unmatched.Entities;
 
-public interface IMatchHandler
+public interface IMatchHandler : IDisposable
 {
     Task HandleAsync(Match match);
 }

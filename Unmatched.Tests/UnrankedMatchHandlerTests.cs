@@ -11,7 +11,6 @@ using Match = Unmatched.Entities.Match;
 public class UnrankedMatchHandlerTests
 {
     private readonly Mock<IMatchRepository> _matchRepository = new();
-    private readonly Mock<IFighterRepository> _fighterRepository = new();
     private readonly Mock<IUnrankedRatingCalculator> _unrankedRatingCalculator = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
@@ -20,7 +19,6 @@ public class UnrankedMatchHandlerTests
     public UnrankedMatchHandlerTests()
     {
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
-        _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
 
         _handler = new UnrankedMatchHandler(_unitOfWork.Object, _unrankedRatingCalculator.Object);
     }

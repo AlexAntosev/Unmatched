@@ -7,7 +7,6 @@ using Unmatched.Repositories;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
-
 using Match = Unmatched.Entities.Match;
 
 public class FirstTournamentMatchHandlerTests
@@ -15,7 +14,6 @@ public class FirstTournamentMatchHandlerTests
     private readonly Mock<IFirstTournamentRatingCalculator> _ratingCalculator = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
-    private readonly Mock<IFighterRepository> _fighterRepository = new();
     private readonly Mock<IMatchStageRepository> _matchStageRepository = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
@@ -24,7 +22,6 @@ public class FirstTournamentMatchHandlerTests
     public FirstTournamentMatchHandlerTests()
     {
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
-        _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
         _unitOfWork.Setup(uow => uow.MatchStages).Returns(_matchStageRepository.Object);
         
@@ -217,8 +214,6 @@ public class FirstTournamentMatchHandlerTests
                     fighter.MatchId = createdMatch.Id;
                 }
             }).ReturnsAsync(createdMatch).Verifiable();
-        _fighterRepository.Setup(r => r.AddOrUpdate(fighter)).Verifiable();
-        _fighterRepository.Setup(r => r.AddOrUpdate(opponent)).Verifiable();
         _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         var matchStage = new MatchStage()
@@ -236,7 +231,6 @@ public class FirstTournamentMatchHandlerTests
         Assert.Equal(createdMatchId, opponent.MatchId);
         Assert.Equal(fighterMatchPoints, fighter.MatchPoints);
         Assert.Equal(opponentMatchPoints, opponent.MatchPoints);
-        _fighterRepository.VerifyAll();
         _unitOfWork.VerifyAll();
     }
     

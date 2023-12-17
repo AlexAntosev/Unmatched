@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore.Storage;
+
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
 
@@ -39,18 +41,9 @@ public class UnitOfWork : IUnitOfWork
         Tournaments = new TournamentRepository(context);
     }
 
-    public void SaveChanges()
-    {
-        _context.SaveChanges();
-    }
+    public Task SaveChangesAsync() 
+        => _context.SaveChangesAsync();
 
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
-
-    public void Dispose()
-    {
-        _context.Dispose();
-    }
+    public void Dispose() 
+        => _context.Dispose();
 }

@@ -6,57 +6,54 @@ using Unmatched.Services.RatingCalculators;
 
 public class FirstTournamentMatchHandler : BaseMatchHandler
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
 
     public FirstTournamentMatchHandler(IUnitOfWork unitOfWork, IFirstTournamentRatingCalculator ratingCalculator)
+    : base(unitOfWork)
     {
-        _unitOfWork = unitOfWork;
         _ratingCalculator = ratingCalculator;
     }
     
     protected override async Task InnerHandleAsync(Match match)
     {
-        var matchWithStage = (MatchWithStage)match;
-        var createdMatch = await _unitOfWork.Matches.AddAsync(match);
-        await _unitOfWork.SaveChangesAsync();
+        if (match is not MatchWithStage matchWithStage)
+        {
+            throw new InvalidCastException($"{nameof(match)} is not of type {nameof(MatchWithStage)}");
+        }
         
-        var matchStage = await CreateMatchStage(matchWithStage.Stage, createdMatch);
+        var matchPoints = (await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchWithStage.Stage)).ToArray();
         
-        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchStage.Stage);
-
         foreach (var fighter in match.Fighters)
         {
-            UpdateFighterMatchPoints(fighter, matchPoints);
+            fighter.MatchPoints = GetFighterMatchPoints(matchPoints, fighter.HeroId);
         }
 
-        foreach (var heroMatchPoints in matchPoints)
-        {
-            await UpdateHeroRatingAsync(heroMatchPoints);
-        }
+        var createdMatch = await UnitOfWork.Matches.AddAsync(match);
         
-        await _unitOfWork.SaveChangesAsync();
+        await CreateMatchStageAsync(matchWithStage.Stage, createdMatch);
+
+        var tasks = matchPoints.Select(UpdateHeroRatingAsync);
+        await Task.WhenAll(tasks);
+        
+        await UnitOfWork.SaveChangesAsync();
     }
     
-    private async Task<MatchStage> CreateMatchStage(Stage stage, Match createdMatch)
+    private Task<MatchStage> CreateMatchStageAsync(Stage stage, Match createdMatch)
     {
         var matchStage = new MatchStage
             {
                 MatchId = createdMatch.Id,
                 Stage = stage
             };
-        return await _unitOfWork.MatchStages.AddAsync(matchStage);
+        return UnitOfWork.MatchStages.AddAsync(matchStage);
     }
 
-    private void UpdateFighterMatchPoints(Fighter fighter, IEnumerable<HeroMatchPoints> matchPoints)
-    {
-        fighter.MatchPoints = matchPoints.FirstOrDefault(h => h.HeroId == fighter.HeroId).Points;
-        _unitOfWork.Fighters.AddOrUpdate(fighter);
-    }
+    private static int GetFighterMatchPoints(IEnumerable<HeroMatchPoints> matchPoints, Guid heroId) 
+        => matchPoints.FirstOrDefault(h => h.HeroId == heroId).Points;
 
     private async Task UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
     {
-        var heroRating = await _unitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
+        var heroRating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
          ?? new Rating
                 {
                     HeroId = heroMatchPoints.HeroId
@@ -65,6 +62,6 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         var matchPoints = heroMatchPoints.Points;
         heroRating.Points += matchPoints;
         
-        _unitOfWork.Ratings.AddOrUpdate(heroRating);
+        UnitOfWork.Ratings.AddOrUpdate(heroRating);
     }
 }

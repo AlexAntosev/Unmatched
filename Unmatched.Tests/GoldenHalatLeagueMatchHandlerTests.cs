@@ -13,7 +13,6 @@ public class GoldenHalatLeagueMatchHandlerTests
     private readonly Mock<IRatingCalculator> _ratingCalculator = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
-    private readonly Mock<IFighterRepository> _fighterRepository = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly GoldenHalatLeagueMatchHandler _handler;
@@ -21,7 +20,6 @@ public class GoldenHalatLeagueMatchHandlerTests
     public GoldenHalatLeagueMatchHandlerTests()
     {
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
-        _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
         
         _handler = new GoldenHalatLeagueMatchHandler(_unitOfWork.Object, _ratingCalculator.Object);
@@ -201,7 +199,6 @@ public class GoldenHalatLeagueMatchHandlerTests
         Assert.Equal(createdMatchId, opponent.MatchId);
         Assert.Equal(fighterMatchPoints, fighter.MatchPoints);
         Assert.Equal(opponentMatchPoints, opponent.MatchPoints);
-        _fighterRepository.VerifyAll();
         _unitOfWork.VerifyAll();
     }
     
