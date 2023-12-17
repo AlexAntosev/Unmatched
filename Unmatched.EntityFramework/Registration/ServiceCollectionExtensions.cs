@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
 
     public static void RegisterRepositories(this IServiceCollection services)
     {
+        services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddTransient<IPlayerRepository, PlayerRepository>();
         services.AddTransient<IHeroRepository, HeroRepository>();
         services.AddTransient<ITournamentRepository, TournamentRepository>();

@@ -1,9 +1,7 @@
 ﻿namespace Unmatched.Tests;
 
 using System;
-
 using Moq;
-
 using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services;
@@ -14,22 +12,23 @@ using Match = Unmatched.Entities.Match;
 
 public class FirstTournamentMatchHandlerTests
 {
-    private readonly Mock<IFirstTournamentRatingCalculator> _ratingCalculator;
-    private readonly Mock<IMatchRepository> _matchRepository;
-    private readonly Mock<IRatingRepository> _ratingRepository;
-    private readonly Mock<IFighterRepository> _fighterRepository;
-    private readonly Mock<IMatchStageRepository> _matchStageRepository;
+    private readonly Mock<IFirstTournamentRatingCalculator> _ratingCalculator = new();
+    private readonly Mock<IMatchRepository> _matchRepository = new();
+    private readonly Mock<IRatingRepository> _ratingRepository = new();
+    private readonly Mock<IFighterRepository> _fighterRepository = new();
+    private readonly Mock<IMatchStageRepository> _matchStageRepository = new();
+    private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly FirstTournamentMatchHandler _handler;
 
     public FirstTournamentMatchHandlerTests()
     {
-        _ratingCalculator = new Mock<IFirstTournamentRatingCalculator>();
-        _matchRepository = new Mock<IMatchRepository>();
-        _ratingRepository = new Mock<IRatingRepository>();
-        _fighterRepository = new Mock<IFighterRepository>();
-        _matchStageRepository = new Mock<IMatchStageRepository>();
-        _handler = new FirstTournamentMatchHandler(_ratingCalculator.Object, _matchRepository.Object, _ratingRepository.Object, _fighterRepository.Object, _matchStageRepository.Object);
+        _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
+        _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
+        _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
+        _unitOfWork.Setup(uow => uow.MatchStages).Returns(_matchStageRepository.Object);
+        
+        _handler = new FirstTournamentMatchHandler(_unitOfWork.Object, _ratingCalculator.Object);
     }
     
     [Fact]
@@ -143,7 +142,7 @@ public class FirstTournamentMatchHandlerTests
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
-        _matchRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         var matchStage = new MatchStage()
             {
@@ -157,6 +156,7 @@ public class FirstTournamentMatchHandlerTests
         
         // Assert
         _matchRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
     }
     
     [Fact]
@@ -219,7 +219,7 @@ public class FirstTournamentMatchHandlerTests
             }).ReturnsAsync(createdMatch).Verifiable();
         _fighterRepository.Setup(r => r.AddOrUpdate(fighter)).Verifiable();
         _fighterRepository.Setup(r => r.AddOrUpdate(opponent)).Verifiable();
-        _fighterRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         var matchStage = new MatchStage()
             {
@@ -237,6 +237,7 @@ public class FirstTournamentMatchHandlerTests
         Assert.Equal(fighterMatchPoints, fighter.MatchPoints);
         Assert.Equal(opponentMatchPoints, opponent.MatchPoints);
         _fighterRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
     }
     
     [Fact]
@@ -305,7 +306,7 @@ public class FirstTournamentMatchHandlerTests
         _ratingRepository.Setup(r => r.GetByHeroIdAsync(opponentHeroId)).ReturnsAsync(opponentHeroRating).Verifiable();
         _ratingRepository.Setup(r => r.AddOrUpdate(fighterHeroRating)).Verifiable();
         _ratingRepository.Setup(r => r.AddOrUpdate(opponentHeroRating)).Verifiable();
-        _ratingRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         var matchStage = new MatchStage()
             {
@@ -319,6 +320,7 @@ public class FirstTournamentMatchHandlerTests
         
         // Assert
         _ratingRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
         Assert.Equal(200, fighterHeroRating.Points);
         Assert.Equal(0, opponentHeroRating.Points);
     }
