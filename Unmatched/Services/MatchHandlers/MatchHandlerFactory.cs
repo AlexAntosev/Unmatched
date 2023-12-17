@@ -51,66 +51,39 @@ public class MatchHandlerFactory : IMatchHandlerFactory
         _unrankedRatingCalculator = unrankedRatingCalculator;
     }
 
-    private IEnumerable<Tournament> TournamentsCache => _tournamentsCache ??= _tournamentRepository.Query().ToList();
+    private Lazy<IEnumerable<Tournament>> TournamentsCache => new(_tournamentRepository.Query().ToList());
 
-    public IMatchHandler Create(Match match)
+    public IMatchHandler Create(Match match) => match switch
     {
-        IMatchHandler handler = new EmptyMatchHandler(_loggerFactory);
-        if (IsUnranked(match))
-        {
-            handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository, _unrankedRatingCalculator, _ratingRepository);
-        }
-        else if (IsFirstTournament(match))
-        {
-            handler = new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository, _matchStageRepository);
-        }
-        else if (IsGoldenHalatLeague(match)
-              || IsSilverhandTournament(match))
-        {
-            handler = new GoldenHalatLeagueMatchHandler(_ratingCalculator, _matchRepository, _ratingRepository, _fighterRepository);
-        }
+        _ when IsUnranked(match) =>
+            new UnrankedMatchHandler(_matchRepository, _fighterRepository, _unrankedRatingCalculator, _ratingRepository),
+        _ when IsFirstTournament(match) =>
+            new FirstTournamentMatchHandler(_firstTournamentRatingCalculator, _matchRepository, _ratingRepository, _fighterRepository, _matchStageRepository),
+        _ when IsGoldenHalatLeague(match) || IsSilverhandTournament(match) => 
+            new GoldenHalatLeagueMatchHandler(_ratingCalculator, _matchRepository, _ratingRepository, _fighterRepository),
+        _ =>  new EmptyMatchHandler(_loggerFactory)
+    };
 
-        return handler;
-    }
-
+    private static bool IsUnranked(Match match) 
+        => match.TournamentId == null;
+    
     private bool IsFirstTournament(Match match)
-    {
-        var result = false;
-        if (match.TournamentId is not null)
-        {
-            var tournamentName = TournamentsCache.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
-            result = tournamentName == TournamentNames.UnmatchedFirstTournament;
-        }
-
-        return result;
-    }
+        => TournamentPredicateInternal(match, TournamentNames.UnmatchedFirstTournament);
 
     private bool IsGoldenHalatLeague(Match match)
+        => TournamentPredicateInternal(match, TournamentNames.GoldenHalatLeague);
+
+    private bool IsSilverhandTournament(Match match) 
+        => TournamentPredicateInternal(match, TournamentNames.SilverhandTournament);
+
+    private bool TournamentPredicateInternal(Match match, string targetTournamentName)
     {
-        var result = false;
-        if (match.TournamentId is not null)
+        if (match.TournamentId is null)
         {
-            var tournamentName = TournamentsCache.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
-            result = tournamentName == TournamentNames.GoldenHalatLeague;
+            return false;
         }
 
-        return result;
-    }
-
-    private bool IsSilverhandTournament(Match match)
-    {
-        var result = false;
-        if (match.TournamentId is not null)
-        {
-            var tournamentName = TournamentsCache.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
-            result = tournamentName == TournamentNames.SilverhandTournament;
-        }
-
-        return result;
-    }
-
-    private bool IsUnranked(Match match)
-    {
-        return match.TournamentId == null;
+        var tournamentName = TournamentsCache.Value.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
+        return tournamentName == targetTournamentName;
     }
 }
