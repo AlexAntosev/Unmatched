@@ -3,7 +3,6 @@ using Moq;
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
-using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Match = Unmatched.Entities.Match;
 
@@ -25,11 +24,19 @@ public class MatchHandlerFactoryTests
     private readonly Mock<IRatingRepository> _ratingRepository = new();
     private readonly Mock<IFighterRepository> _fighterRepository = new();
     private readonly Mock<IMatchStageRepository> _matchStageRepository = new();
+    private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly MatchHandlerFactory _factory;
 
     public MatchHandlerFactoryTests()
     {
+        
+        _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
+        _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
+        _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
+        _unitOfWork.Setup(uow => uow.MatchStages).Returns(_matchStageRepository.Object);
+        _unitOfWork.Setup(uow => uow.Tournaments).Returns(_tournamentRepository.Object);
+        
         _tournamentRepository.Setup(x => x.Query())
             .Returns(
                 new List<Tournament>()
@@ -47,14 +54,10 @@ public class MatchHandlerFactoryTests
                     }.AsQueryable());
         
         _factory = new MatchHandlerFactory(
+            _unitOfWork.Object,
             _loggerFactory.Object,
-            _tournamentRepository.Object,
             _ratingCalculator.Object,
             _firstTournamentRatingCalculator.Object,
-            _matchRepository.Object,
-            _ratingRepository.Object,
-            _fighterRepository.Object,
-            _matchStageRepository.Object,
             _unrankedRatingCalculator.Object);
     }
 

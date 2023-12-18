@@ -1,30 +1,28 @@
-﻿using Moq;
+﻿namespace Unmatched.Tests;
+
+using Moq;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Entities;
 using Match = Unmatched.Entities.Match;
-
-namespace Unmatched.Tests;
-
 using Unmatched.Repositories;
 using Unmatched.Services.RatingCalculators;
 
 public class GoldenHalatLeagueMatchHandlerTests
 {
-    private readonly Mock<IRatingCalculator> _ratingCalculator;
-    private readonly Mock<IMatchRepository> _matchRepository;
-    private readonly Mock<IRatingRepository> _ratingRepository;
-    private readonly Mock<IFighterRepository> _fighterRepository;
+    private readonly Mock<IRatingCalculator> _ratingCalculator = new();
+    private readonly Mock<IMatchRepository> _matchRepository = new();
+    private readonly Mock<IRatingRepository> _ratingRepository = new();
+    private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly GoldenHalatLeagueMatchHandler _handler;
 
     public GoldenHalatLeagueMatchHandlerTests()
     {
-        _ratingCalculator = new Mock<IRatingCalculator>();
-        _matchRepository = new Mock<IMatchRepository>();
-        _ratingRepository = new Mock<IRatingRepository>();
-        _fighterRepository = new Mock<IFighterRepository>();
-        _handler = new GoldenHalatLeagueMatchHandler(_ratingCalculator.Object, _matchRepository.Object, _ratingRepository.Object, _fighterRepository.Object);
+        _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
+        _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
+        
+        _handler = new GoldenHalatLeagueMatchHandler(_unitOfWork.Object, _ratingCalculator.Object);
     }
     
     [Fact]
@@ -126,13 +124,14 @@ public class GoldenHalatLeagueMatchHandlerTests
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
-        _matchRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         // Act
         await _handler.HandleAsync(match);
         
         // Assert
         _matchRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
     }
     
     [Fact]
@@ -190,7 +189,7 @@ public class GoldenHalatLeagueMatchHandlerTests
                     fighter.MatchId = createdMatch.Id;
                 }
             }).ReturnsAsync(createdMatch).Verifiable();
-        _fighterRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
 
         // Act
         await _handler.HandleAsync(match);
@@ -200,7 +199,7 @@ public class GoldenHalatLeagueMatchHandlerTests
         Assert.Equal(createdMatchId, opponent.MatchId);
         Assert.Equal(fighterMatchPoints, fighter.MatchPoints);
         Assert.Equal(opponentMatchPoints, opponent.MatchPoints);
-        _fighterRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
     }
     
     [Fact]
@@ -266,13 +265,14 @@ public class GoldenHalatLeagueMatchHandlerTests
         _ratingRepository.Setup(r => r.GetByHeroIdAsync(opponentHeroId)).ReturnsAsync(opponentHeroRating).Verifiable();
         _ratingRepository.Setup(r => r.AddOrUpdate(fighterHeroRating)).Verifiable();
         _ratingRepository.Setup(r => r.AddOrUpdate(opponentHeroRating)).Verifiable();
-        _ratingRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         // Act
         await _handler.HandleAsync(match);
         
         // Assert
         _ratingRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
         Assert.Equal(200, fighterHeroRating.Points);
         Assert.Equal(0, opponentHeroRating.Points);
     }

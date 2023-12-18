@@ -7,71 +7,53 @@ using Unmatched.Services.RatingCalculators;
 public class FirstTournamentMatchHandler : BaseMatchHandler
 {
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
-    private readonly IMatchRepository _matchRepository;
-    private readonly IRatingRepository _ratingRepository;
-    private readonly IFighterRepository _fighterRepository;
 
-    private readonly IMatchStageRepository _matchStageRepository;
-
-    public FirstTournamentMatchHandler(
-        IFirstTournamentRatingCalculator ratingCalculator,
-        IMatchRepository matchRepository,
-        IRatingRepository ratingRepository,
-        IFighterRepository fighterRepository,
-        IMatchStageRepository matchStageRepository)
+    public FirstTournamentMatchHandler(IUnitOfWork unitOfWork, IFirstTournamentRatingCalculator ratingCalculator)
+    : base(unitOfWork)
     {
         _ratingCalculator = ratingCalculator;
-        _matchRepository = matchRepository;
-        _ratingRepository = ratingRepository;
-        _fighterRepository = fighterRepository;
-        _matchStageRepository = matchStageRepository;
     }
     
     protected override async Task InnerHandleAsync(Match match)
     {
-        var matchWithStage = (MatchWithStage)match;
-        var createdMatch = await _matchRepository.AddAsync(match);
-        await _matchRepository.SaveChangesAsync();
+        if (match is not MatchWithStage matchWithStage)
+        {
+            throw new InvalidCastException($"{nameof(match)} is not of type {nameof(MatchWithStage)}");
+        }
         
-        var matchStage = await CreateMatchStage(matchWithStage.Stage, createdMatch);
+        var matchPoints = (await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchWithStage.Stage)).ToArray();
         
-        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchStage.Stage);
-
         foreach (var fighter in match.Fighters)
         {
-            UpdateFighterMatchPoints(fighter, matchPoints);
+            fighter.MatchPoints = GetFighterMatchPoints(matchPoints, fighter.HeroId);
         }
 
-        foreach (var heroMatchPoints in matchPoints)
-        {
-            await UpdateHeroRatingAsync(heroMatchPoints);
-        }
-
+        var createdMatch = await UnitOfWork.Matches.AddAsync(match);
         
-        await _matchStageRepository.SaveChangesAsync();
-        await _fighterRepository.SaveChangesAsync();
-        await _ratingRepository.SaveChangesAsync();
+        await CreateMatchStageAsync(matchWithStage.Stage, createdMatch);
+
+        var tasks = matchPoints.Select(UpdateHeroRatingAsync);
+        await Task.WhenAll(tasks);
+        
+        await UnitOfWork.SaveChangesAsync();
     }
     
-    private async Task<MatchStage> CreateMatchStage(Stage stage, Match createdMatch)
+    private Task<MatchStage> CreateMatchStageAsync(Stage stage, Match createdMatch)
     {
         var matchStage = new MatchStage
             {
                 MatchId = createdMatch.Id,
                 Stage = stage
             };
-        return await _matchStageRepository.AddAsync(matchStage);
+        return UnitOfWork.MatchStages.AddAsync(matchStage);
     }
 
-    private void UpdateFighterMatchPoints(Fighter fighter, IEnumerable<HeroMatchPoints> matchPoints)
-    {
-        fighter.MatchPoints = matchPoints.FirstOrDefault(h => h.HeroId == fighter.HeroId).Points;
-        _fighterRepository.AddOrUpdate(fighter);
-    }
+    private static int GetFighterMatchPoints(IEnumerable<HeroMatchPoints> matchPoints, Guid heroId) 
+        => matchPoints.FirstOrDefault(h => h.HeroId == heroId).Points;
 
     private async Task UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
     {
-        var heroRating = await _ratingRepository.GetByHeroIdAsync(heroMatchPoints.HeroId)
+        var heroRating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
          ?? new Rating
                 {
                     HeroId = heroMatchPoints.HeroId
@@ -80,6 +62,6 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         var matchPoints = heroMatchPoints.Points;
         heroRating.Points += matchPoints;
         
-        _ratingRepository.AddOrUpdate(heroRating);
+        UnitOfWork.Ratings.AddOrUpdate(heroRating);
     }
 }

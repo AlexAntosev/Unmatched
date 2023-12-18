@@ -12,24 +12,19 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 {
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
     private readonly IMatchStageRepository _matchStageRepository;
-    private readonly IRatingRepository _ratingRepository;
-    private readonly IFighterRepository _fighterRepository;
-    private readonly IMatchRepository _matchRepository;
+
+    private readonly IUnitOfWork _unitOfWork;
 
     public FirstTournamentMatchesDataInitializer(
+        IUnitOfWork unitOfWork,
         IHeroRepository heroRepository,
         IMapRepository mapRepository,
-        IRatingRepository ratingRepository,
-        IFighterRepository fighterRepository,
-        IMatchRepository matchRepository,
         ITournamentRepository tournamentRepository,
         IPlayerRepository playerRepository,
         IFirstTournamentRatingCalculator ratingCalculator,
         IMatchStageRepository matchStageRepository) : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
-        _ratingRepository = ratingRepository;
-        _matchRepository = matchRepository;
-        _fighterRepository = fighterRepository;
+        _unitOfWork = unitOfWork;
         _ratingCalculator = ratingCalculator;
         _matchStageRepository = matchStageRepository;
     }
@@ -361,7 +356,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
         
-        var handler = new FirstTournamentMatchHandler(_ratingCalculator, _matchRepository, _ratingRepository, _fighterRepository, _matchStageRepository);
+        var handler = new FirstTournamentMatchHandler(_unitOfWork, _ratingCalculator);
 
         foreach (var match in groupStageMatches)
         {
@@ -404,7 +399,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
     private Match FindExistingMatch(MatchWithStage match)
     {
-        var existingMatch = _matchRepository.Query()
+        var existingMatch = _unitOfWork.Matches.Query()
             .Include(x => x.Fighters)
             .Where(
                 x => x.TournamentId.Equals(match.TournamentId)

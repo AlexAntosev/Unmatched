@@ -4,26 +4,23 @@ using System;
 using Moq;
 using Unmatched.Entities;
 using Unmatched.Repositories;
-using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
-
 using Match = Unmatched.Entities.Match;
 
 public class UnrankedMatchHandlerTests
 {
-    private readonly Mock<IMatchRepository> _matchRepository;
-    private readonly Mock<IFighterRepository> _fighterRepository;
+    private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IUnrankedRatingCalculator> _unrankedRatingCalculator = new();
-    private readonly Mock<IRatingRepository> _ratingRepository = new();
+    private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly UnrankedMatchHandler _handler;
 
     public UnrankedMatchHandlerTests()
     {
-        _matchRepository = new Mock<IMatchRepository>();
-        _fighterRepository = new Mock<IFighterRepository>();
-        _handler = new UnrankedMatchHandler(_matchRepository.Object, _fighterRepository.Object, _unrankedRatingCalculator.Object, _ratingRepository.Object);
+        _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
+
+        _handler = new UnrankedMatchHandler(_unitOfWork.Object, _unrankedRatingCalculator.Object);
     }
     
     [Fact]
@@ -60,13 +57,14 @@ public class UnrankedMatchHandlerTests
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
-        _matchRepository.Setup(r => r.SaveChangesAsync()).Verifiable();
+        _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
         // Act
         await _handler.HandleAsync(match);
         
         // Assert
         _matchRepository.VerifyAll();
+        _unitOfWork.VerifyAll();
     }
     
      [Fact]

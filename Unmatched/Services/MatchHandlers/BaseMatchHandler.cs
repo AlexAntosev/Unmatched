@@ -1,21 +1,28 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Unmatched.Entities;
+using Unmatched.Repositories;
 
 public abstract class BaseMatchHandler : IMatchHandler
 {
-    public async Task HandleAsync(Match match)
-    {
-        var fighters = match.Fighters;
-        if (IsNotEnoughFighters(fighters))
-        {
-            throw new ArgumentException("NOT ENOUGH FIGHTERS!");
-        }
+    protected readonly IUnitOfWork UnitOfWork;
 
-        await InnerHandleAsync(match);
+    protected BaseMatchHandler(IUnitOfWork unitOfWork)
+    {
+        UnitOfWork = unitOfWork;
     }
+
+    public Task HandleAsync(Match match) 
+        => IsNotEnoughFighters(match.Fighters)
+        ? throw new ArgumentException("Not enough fighters.", nameof(match))
+        : InnerHandleAsync(match);
 
     protected abstract Task InnerHandleAsync(Match match);
 
-    protected bool IsNotEnoughFighters(ICollection<Fighter>? fighters) => fighters is null || fighters.Count < 2;
+    private static bool IsNotEnoughFighters(ICollection<Fighter>? fighters) 
+        => fighters is null || fighters.Count < 2;
+
+    public void Dispose() 
+        => UnitOfWork.Dispose();
 }
+

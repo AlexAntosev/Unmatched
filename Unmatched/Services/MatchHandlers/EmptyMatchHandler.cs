@@ -3,18 +3,23 @@
 using Microsoft.Extensions.Logging;
 
 using Unmatched.Entities;
+using Unmatched.Repositories;
 
 public class EmptyMatchHandler : BaseMatchHandler
 {
     private readonly ILogger<EmptyMatchHandler> _logger;
 
-    public EmptyMatchHandler(ILoggerFactory loggerFactory)
+    public EmptyMatchHandler(
+        IUnitOfWork unitOfWork,
+        ILoggerFactory loggerFactory) : base(unitOfWork)
     {
         _logger = loggerFactory.CreateLogger<EmptyMatchHandler>();
     }
 
-    protected override async Task InnerHandleAsync(Match match)
+    protected override Task InnerHandleAsync(Match match)
     {
         _logger.LogError("Match was not handled due to handler was not found.");
+        
+        return Task.CompletedTask;
     }
 }

@@ -19,13 +19,13 @@ public class MatchService : IMatchService
         _matchHandlerFactory = matchHandlerFactory;
         _mapper = mapper;
     }
-    public async Task AddAsync(Match match)
+    public Task AddAsync(Match match)
     {
         var handler = _matchHandlerFactory.Create(match);
-        await handler.HandleAsync(match);
+        return handler.HandleAsync(match);
     }
 
-    public async Task AddAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
+    public Task AddAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
     {
         var match = _mapper.Map<Match>(matchDto);
         var firstFighter = _mapper.Map<Fighter>(fighterDto);
@@ -37,6 +37,6 @@ public class MatchService : IMatchService
                 secondFighter
             };
 
-        await AddAsync(match);
+        return AddAsync(match);
     }
 }

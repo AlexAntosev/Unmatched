@@ -8,27 +8,20 @@ using Unmatched.Services.RatingCalculators;
 
 public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedMatchDataInitializer
 {
-    private readonly IMatchRepository _matchRepository;
-    private readonly IFighterRepository _fighterRepository;
-
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IUnrankedRatingCalculator _unrankedRatingCalculator;
 
-    private readonly IRatingRepository _ratingRepository;
-
     public UnrankedMatchDataInitializer(
+        IUnitOfWork unitOfWork,
         IHeroRepository heroRepository,
         IPlayerRepository playerRepository,
-        IMatchRepository matchRepository,
         IMapRepository mapRepository,
         ITournamentRepository tournamentRepository,
-        IFighterRepository fighterRepository,
-        IUnrankedRatingCalculator unrankedRatingCalculator,IRatingRepository ratingRepository)
+        IUnrankedRatingCalculator unrankedRatingCalculator)
         : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
-        _matchRepository = matchRepository;
-        _fighterRepository = fighterRepository;
+        _unitOfWork = unitOfWork;
         _unrankedRatingCalculator = unrankedRatingCalculator;
-        _ratingRepository = ratingRepository;
     }
 
     public IEnumerable<Match> GetEntities()
@@ -707,7 +700,7 @@ public class UnrankedMatchDataInitializer : BaseMatchDataInitializer, IUnrankedM
     {
         var entities = GetEntities();
 
-        var handler = new UnrankedMatchHandler(_matchRepository, _fighterRepository, _unrankedRatingCalculator, _ratingRepository);
+        var handler = new UnrankedMatchHandler(_unitOfWork, _unrankedRatingCalculator);
 
         foreach (var match in entities)
         {
