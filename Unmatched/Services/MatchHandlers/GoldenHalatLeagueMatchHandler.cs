@@ -27,8 +27,13 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
         
         await UnitOfWork.Matches.AddAsync(match);
 
-        var tasks = matchPoints.Select(UpdateHeroRatingAsync);
-        var updatedHeroRatings = await Task.WhenAll(tasks);
+        var updatedHeroRatings = new List<Rating>();
+        foreach (var heroMatchPoints in matchPoints)
+        {
+            var rating = await UpdateHeroRatingAsync(heroMatchPoints);
+            updatedHeroRatings.Add(rating);
+        }
+        
         foreach (var updatedHeroRating in updatedHeroRatings)
         {
             UnitOfWork.Ratings.AddOrUpdate(updatedHeroRating);
