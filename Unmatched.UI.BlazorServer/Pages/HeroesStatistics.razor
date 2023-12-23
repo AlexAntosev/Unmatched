@@ -1,8 +1,8 @@
 ﻿@page "/heroes-statistics"
 @using Unmatched.Dtos
-@using Unmatched.Services
-@inject IUnmatchedService UnmatchedService
+@using Unmatched.Services.Statistics
 @inject NavigationManager NavManager
+@inject IHeroStatisticsService HeroStatisticsService
 
 <PageTitle>Heroes Statistics</PageTitle>
 
@@ -19,6 +19,11 @@ else
     <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
+        <GridSortSettings>
+            <GridSortColumns>
+                <GridSortColumn Field="@nameof(HeroStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
+            </GridSortColumns>
+        </GridSortSettings>
         <GridColumns>
             <GridColumn Width="20">
                 <Template>
@@ -31,6 +36,7 @@ else
                 </Template>
             </GridColumn>
             <GridColumn Field=@nameof(HeroStatisticsDto.HeroName) HeaderText="Hero" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(HeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
             <GridColumn Field=@nameof(HeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
             <GridColumn Field=@nameof(HeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
             <GridColumn Field=@nameof(HeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
@@ -45,7 +51,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        heroes = (await UnmatchedService.GetHeroesStatisticsAsync()).OrderBy(x => x.HeroName).ToArray();
+        heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.HeroName).ToArray();
     }
     
     public void RecordClickHandler(RecordClickEventArgs<HeroStatisticsDto> args)

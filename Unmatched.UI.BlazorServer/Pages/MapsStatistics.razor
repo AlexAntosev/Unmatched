@@ -1,8 +1,8 @@
 ﻿@page "/maps-statistics"
 @using Unmatched.Dtos
-@using Unmatched.Services
-@inject IUnmatchedService UnmatchedService
+@using Unmatched.Services.Statistics
 @inject NavigationManager NavManager
+@inject IMapStatisticsService MapStatisticsService
 
 <PageTitle>Maps Statistics</PageTitle>
 
@@ -32,7 +32,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        maps = (await UnmatchedService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToArray();
+        maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToArray();
     }
     
     public void RecordClickHandler(RecordClickEventArgs<MapStatisticsDto> args)

@@ -1,58 +1,12 @@
 ﻿@page "/"
-@using Unmatched.Dtos
-@using Unmatched.Services
-@using Unmatched.Constants
-@inject IUnmatchedService UnmatchedService
 
-<PageTitle>Ranked rating</PageTitle>
+<PageTitle>Unmatched</PageTitle>
 
-<h1>Ranked rating</h1>
-
-@if (ratingHeroes == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <SfGrid DataSource="@ratingHeroes" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridColumns>
-            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.Place) HeaderText="Place" Width="20"></GridColumn>
-            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.HeroName) HeaderText="Hero" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            <GridColumn CustomAttributes="@(new Dictionary<string, object>(){ { "class", "winner-cell" }})" Field=@nameof(RankedRatingHeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-            <GridColumn CustomAttributes="@(new Dictionary<string, object>(){ { "class", "looser-cell" }})" Field=@nameof(RankedRatingHeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(RankedRatingHeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-}
+<h1>Unmatched</h1>
 
 @code {
-
-    private IEnumerable<RankedRatingHeroStatisticsDto> ratingHeroes;
-
     protected override async Task OnInitializedAsync()
     {
-        ratingHeroes = (await UnmatchedService.GetRankedRatingAsync()).OrderDescending().ToArray();
-
-        var place = 1;
-        foreach (var ratingHero in ratingHeroes)
-        {
-            ratingHero.Place = place;
-            place++;
-        }
+        
     }
 }
-
-<style>
-    .winner-cell {
-        background-color: @Colors.WinnerColor !important;
-    }
-    
-    .looser-cell {
-        background-color: @Colors.LooserColor !important;
-    }
-</style>

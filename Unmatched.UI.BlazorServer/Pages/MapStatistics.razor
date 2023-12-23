@@ -1,12 +1,11 @@
 ﻿@page "/maps-statistics/{id}"
-@using Unmatched.Services
 @using Unmatched.Dtos
-@inject IUnmatchedService UnmatchedService
+@using Unmatched.Services.Statistics
+@inject IMapStatisticsService MapStatisticsService
 
 <h3 align="center">@Map.MapName</h3>
 <img src="@imageSource" />
-<h4>Total Matches: @Map.TotalMatches</h4>
-<h4> Matches: </h4>
+<h4> Total Matches: @Map.TotalMatches</h4>
 <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 
 @code {
@@ -22,8 +21,8 @@
     protected override async Task OnInitializedAsync()
     {
         var mapId = Guid.Parse(id);
-        Map = await UnmatchedService.GetMapStatisticsAsync(mapId);
-        matchLogEntries = (await UnmatchedService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToArray();
+        Map = await MapStatisticsService.GetMapStatisticsAsync(mapId);
+        matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToArray();
         foreach (var matchLogEntry in matchLogEntries)
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);

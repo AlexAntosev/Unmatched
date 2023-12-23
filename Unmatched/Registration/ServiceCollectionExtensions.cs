@@ -9,6 +9,7 @@ using Unmatched.Entities;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
+using Unmatched.Services.Statistics;
 
 public static class ServiceCollectionExtensions
 {
@@ -32,12 +33,14 @@ public static class ServiceCollectionExtensions
 
     public static void RegisterServices(this IServiceCollection services)
     {
-        services.AddTransient<IUnmatchedService, UnmatchedService>();
         services.AddTransient<IRatingCalculator, RatingCalculator>();
         services.AddTransient<IUnrankedRatingCalculator, UnrankedRatingCalculator>();
         services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();
         services.AddTransient<IMatchHandlerFactory, MatchHandlerFactory>();
+        services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();
+        services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
+        services.AddTransient<IMapStatisticsService, MapStatisticsService>();
     }
 }

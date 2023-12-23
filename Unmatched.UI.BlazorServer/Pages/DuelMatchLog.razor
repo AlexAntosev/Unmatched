@@ -1,7 +1,7 @@
 ﻿@page "/duelMatchLog"
 @using Unmatched.Dtos
 @using Unmatched.Services
-@inject IUnmatchedService UnmatchedService
+@inject IMatchService MatchService
 
 <PageTitle>Duel Match log</PageTitle>
 
@@ -15,7 +15,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        matchLogEntries = (await UnmatchedService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
+        matchLogEntries = (await MatchService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
         foreach (var matchLogEntry in matchLogEntries)
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);

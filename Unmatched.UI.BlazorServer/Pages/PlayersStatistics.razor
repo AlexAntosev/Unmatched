@@ -1,8 +1,8 @@
 ﻿@page "/players-statistics"
 @using Unmatched.Dtos
-@using Unmatched.Services
-@inject IUnmatchedService UnmatchedService
+@using Unmatched.Services.Statistics
 @inject NavigationManager NavManager
+@inject IPlayerStatisticsService PlayerStatisticsService
 
 <PageTitle>Players Statistics</PageTitle>
 
@@ -35,7 +35,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        players = (await UnmatchedService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToArray();
+        players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToArray();
     }
     
     public void RecordClickHandler(RecordClickEventArgs<PlayerStatisticsDto> args)

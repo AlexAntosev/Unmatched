@@ -11,6 +11,8 @@ public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
             : 0;
 
     public int LastMatchPoints { get; set; }
+    
+    public int Points { get; set; }
 
     public int Place { get; set; }
 
@@ -25,6 +27,13 @@ public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
         if (other == null)
         {
             return 0;
+        }
+        
+        if (Points != other.Points)
+        {
+            return Points > other.Points
+                ? 1
+                : -1;
         }
 
         if (Kd != other.Kd)

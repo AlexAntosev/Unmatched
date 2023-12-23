@@ -2,7 +2,6 @@
 @using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Constants
-@inject IUnmatchedService UnmatchedService
 @inject IMatchService MatchService
 @inject NavigationManager NavManager
 
@@ -91,10 +90,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _players = await UnmatchedService.GetAllPlayersAsync();
-        _heroes = await UnmatchedService.GetAllHeroesAsync();
-        _maps = await UnmatchedService.GetAllMapsAsync();
-        _tournaments = await UnmatchedService.GetAllTournamentsAsync();
+        _players = await MatchService.GetAllPlayersAsync();
+        _heroes = await MatchService.GetAllHeroesAsync();
+        _maps = await MatchService.GetAllMapsAsync();
+        _tournaments = await MatchService.GetAllTournamentsAsync();
 
         var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.SilverhandTournament);
         if (defaultTournament != null)

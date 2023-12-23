@@ -1,14 +1,11 @@
 ﻿@page "/heroes-statistics/{id}"
-@using Unmatched.Services
 @using Unmatched.Dtos
-@inject IUnmatchedService UnmatchedService
+@using Unmatched.Services.Statistics
+@inject IHeroStatisticsService HeroStatisticsService
 
 <h3 align="center">@Hero.HeroName</h3>
 <img src="@imageSource" />
-<h4>Total Matches: @Hero.TotalMatches</h4>
-<h4>Total Wins: @Hero.TotalWins</h4>
-<h4>Total Looses: @Hero.TotalLooses</h4>
-<h4> Matches: </h4>
+<h4> Total Matches: @Hero.TotalMatches (@Hero.TotalWins / @Hero.TotalLooses) K\D : @Hero.Kd</h4>
 <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 
 @code {
@@ -24,8 +21,8 @@
     protected override async Task OnInitializedAsync()
     {
         var heroId = Guid.Parse(id);
-        Hero = await UnmatchedService.GetHeroStatisticsAsync(heroId);
-        matchLogEntries = (await UnmatchedService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToArray();
+        Hero = await HeroStatisticsService.GetHeroStatisticsAsync(heroId);
+        matchLogEntries = (await HeroStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToArray();
         foreach (var matchLogEntry in matchLogEntries)
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
