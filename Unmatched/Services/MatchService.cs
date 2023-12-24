@@ -43,28 +43,28 @@ public class MatchService : IMatchService
     
     public async Task<IEnumerable<HeroDto>> GetAllHeroesAsync()
     {
-        var entities = await _unitOfWork.Heroes.Query().Include(e => e.Sidekicks).ToListAsync();
+        var entities = await _unitOfWork.Heroes.Query().Include(e => e.Sidekicks).OrderBy(x => x.Name).ToListAsync();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
         return heroes;
     }
 
     public async Task<IEnumerable<MapDto>> GetAllMapsAsync()
     {
-        var entities = await _unitOfWork.Maps.Query().ToListAsync();
+        var entities = await _unitOfWork.Maps.Query().OrderBy(x => x.Name).ToListAsync();
         var maps = _mapper.Map<IEnumerable<MapDto>>(entities);
         return maps;
     }
 
     public async Task<IEnumerable<PlayerDto>> GetAllPlayersAsync()
     {
-        var entities = await _unitOfWork.Players.Query().ToListAsync();
+        var entities = await _unitOfWork.Players.Query().OrderBy(x => x.Name).ToListAsync();
         var players = _mapper.Map<IEnumerable<PlayerDto>>(entities);
         return players;
     }
 
     public async Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync()
     {
-        var entities = await _unitOfWork.Tournaments.Query().ToListAsync();
+        var entities = await _unitOfWork.Tournaments.Query().OrderBy(x => x.Name).ToListAsync();
         var tournaments = _mapper.Map<IEnumerable<TournamentDto>>(entities);
         return tournaments;
     }
