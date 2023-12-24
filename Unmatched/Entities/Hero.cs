@@ -20,5 +20,7 @@ public class Hero
 
     public string Name { get; set; }
 
-    public IEnumerable<Sidekick> Sidekicks { get; set; }
+    
+    // [ForeignKey(nameof(Sidekick.Id))]
+    public virtual ICollection<Sidekick> Sidekicks { get; set; }
 }

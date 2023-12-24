@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -50,7 +52,7 @@ public class HeroRepository : IHeroRepository
 
     public async Task<Hero> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Heroes.FindAsync(id);
+        var entity = await _dbContext.Heroes.Include(h => h.Sidekicks).FirstOrDefaultAsync(h => h.Id == id);
 
         return entity;
     }
