@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
-
 using Microsoft.EntityFrameworkCore;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -9,23 +8,14 @@ using Unmatched.Repositories;
 public class RatingService : IRatingService
 {
     private readonly IMatchService _matchService;
-    private readonly IMatchRepository _matchRepository;
-    private readonly IFighterRepository _fighterRepository;
-
-    private readonly IMatchStageRepository _matchStageRepository;
-
     private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
-    private readonly IRatingRepository _ratingRepository;
-
-    public RatingService(IMatchService matchService, IMatchRepository matchRepository, IFighterRepository fighterRepository, IMatchStageRepository matchStageRepository, IMapper mapper, IRatingRepository ratingRepository)
+    public RatingService(IMatchService matchService, IMapper mapper, IUnitOfWork unitOfWork)
     {
         _matchService = matchService;
-        _matchRepository = matchRepository;
-        _fighterRepository = fighterRepository;
-        _matchStageRepository = matchStageRepository;
         _mapper = mapper;
-        _ratingRepository = ratingRepository;
+        _unitOfWork = unitOfWork;
     }
     public async Task RecalculateAsync()
     {
@@ -41,8 +31,8 @@ public class RatingService : IRatingService
     
     private IEnumerable<Match> GetMatches()
     {
-        var matches = _matchRepository.Query().Include(m => m.Fighters).OrderBy(x => x.Date).AsNoTracking().ToArray();
-        var matchStages = _matchStageRepository.Query().ToArray();
+        var matches = _unitOfWork.Matches.Query().Include(m => m.Fighters).OrderBy(x => x.Date).AsNoTracking().ToArray();
+        var matchStages = _unitOfWork.MatchStages.Query().ToArray();
         foreach (var matchStage in matchStages)
         {
             var match = matches.First(x => x.Id.Equals(matchStage.MatchId));
@@ -56,16 +46,11 @@ public class RatingService : IRatingService
 
     private async Task ClearDataAsync()
     {
-        _matchRepository.DeleteAll();
-        _fighterRepository.DeleteAll();
-        _matchStageRepository.DeleteAll();
-        _ratingRepository.DeleteAll();
+        _unitOfWork.Matches.DeleteAll();
+        _unitOfWork.Fighters.DeleteAll();
+        _unitOfWork.MatchStages.DeleteAll();
+        _unitOfWork.Ratings.DeleteAll();
 
-        await _matchRepository.SaveChangesAsync();
-        await _fighterRepository.SaveChangesAsync();
-        await _matchStageRepository.SaveChangesAsync();
-        await _ratingRepository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
-
-    
 }

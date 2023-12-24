@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Unmatched.Entities;
+using Unmatched.Models;
 using Unmatched.Repositories;
 
 public abstract class BaseMatchHandler : IMatchHandler

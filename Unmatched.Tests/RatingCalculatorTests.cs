@@ -5,6 +5,7 @@ using Moq;
 using Unmatched.Constants;
 using Unmatched.DataInitialization;
 using Unmatched.Entities;
+using Unmatched.Models;
 using Unmatched.Repositories;
 using Unmatched.Services;
 using Unmatched.Services.RatingCalculators;

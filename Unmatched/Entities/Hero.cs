@@ -19,8 +19,6 @@ public class Hero
     public bool IsRanged { get; set; }
 
     public string Name { get; set; }
-
     
-    // [ForeignKey(nameof(Sidekick.Id))]
     public virtual ICollection<Sidekick> Sidekicks { get; set; }
 }

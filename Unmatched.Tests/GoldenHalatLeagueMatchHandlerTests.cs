@@ -4,6 +4,7 @@ using Moq;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Entities;
+using Unmatched.Models;
 using Match = Unmatched.Entities.Match;
 using Unmatched.Repositories;
 using Unmatched.Services.RatingCalculators;

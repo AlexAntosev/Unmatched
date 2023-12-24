@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Services;
+﻿namespace Unmatched.Models;
 
 using Unmatched.Entities;
 
