@@ -58,16 +58,16 @@ public class RatingCalculatorTests
                         Turn = 1,
                         IsWinner = false
                     }),
-            new HeroMatchPoints
-                {
-                    HeroId = drSatId,
-                    Points = 420
-                },
-            new HeroMatchPoints
-                {
-                    HeroId = daredevilId,
-                    Points = -225
-                });
+            new KeyValuePair<Guid, int>
+                (
+                    drSatId,
+                    420
+                ),
+            new KeyValuePair<Guid, int>
+                (
+                    daredevilId,
+                    -225
+                ));
 
         AssertMatch(
             await calculator.CalculateAsync(
@@ -89,16 +89,16 @@ public class RatingCalculatorTests
                         Turn = 1,
                         IsWinner = false
                     }),
-            new HeroMatchPoints
-                {
-                    HeroId = robinHoodId,
-                    Points = 336
-                },
-            new HeroMatchPoints
-                {
-                    HeroId = ingenId,
-                    Points = -240
-                });
+                new KeyValuePair<Guid, int>
+                    (
+                        robinHoodId,
+                        336
+                    ),
+                new KeyValuePair<Guid, int>
+                    (
+                        ingenId,
+                        -240
+                    ));
 
         AssertMatch(
             await calculator.CalculateAsync(
@@ -120,16 +120,16 @@ public class RatingCalculatorTests
                         Turn = 2,
                         IsWinner = false
                     }),
-            new HeroMatchPoints
-                {
-                    HeroId = rexId,
-                    Points = 316
-                },
-            new HeroMatchPoints
-                {
-                    HeroId = sherlokHolmesId,
-                    Points = -210
-                });
+            new KeyValuePair<Guid, int>
+            (
+                rexId,
+                316
+            ),
+            new KeyValuePair<Guid, int>
+            (
+                sherlokHolmesId,
+                -210
+            ));
 
         AssertMatch(
             await calculator.CalculateAsync(
@@ -151,16 +151,16 @@ public class RatingCalculatorTests
                         Turn = 1,
                         IsWinner = false
                     }),
-            new HeroMatchPoints
-                {
-                    HeroId = invisibleManId,
-                    Points = 360
-                },
-            new HeroMatchPoints
-                {
-                    HeroId = sindbadId,
-                    Points = -165
-                });
+            new KeyValuePair<Guid, int>
+            (
+                invisibleManId,
+                360
+            ),
+            new KeyValuePair<Guid, int>
+            (
+                sindbadId,
+                -165
+            ));
 
         AssertMatch(
             await calculator.CalculateAsync(
@@ -182,16 +182,16 @@ public class RatingCalculatorTests
                         Turn = 2,
                         IsWinner = false
                     }),
-            new HeroMatchPoints
-                {
-                    HeroId = raptorsId,
-                    Points = 496
-                },
-            new HeroMatchPoints
-                {
-                    HeroId = draculaId,
-                    Points = -190
-                });
+            new KeyValuePair<Guid, int>
+            (
+                raptorsId,
+                496
+            ),
+            new KeyValuePair<Guid, int>
+            (
+                draculaId,
+                -190
+            ));
 
         AssertMatch(
             await calculator.CalculateAsync(
@@ -213,25 +213,25 @@ public class RatingCalculatorTests
                         Turn = 2,
                         IsWinner = false
                     }),
-            new HeroMatchPoints
-                {
-                    HeroId = medusaId,
-                    Points = 272
-                },
-            new HeroMatchPoints
-                {
-                    HeroId = bloodyMaryId,
-                    Points = -195
-                });
+            new KeyValuePair<Guid, int>
+            (
+                medusaId,
+                272
+            ),
+            new KeyValuePair<Guid, int>
+            (
+                bloodyMaryId,
+                -195
+            ));
     }
 
-    private void AssertMatch(IEnumerable<HeroMatchPoints> matchPoints, HeroMatchPoints winnerExpectedPoints, HeroMatchPoints looserExpectedPoints)
+    private void AssertMatch(Dictionary<Guid, int> matchPoints, KeyValuePair<Guid, int> winnerExpectedPoints, KeyValuePair<Guid, int> looserExpectedPoints)
     {
-        var actualWinnerPoints = matchPoints.First(x => x.HeroId.Equals(winnerExpectedPoints.HeroId)).Points;
-        var actualLooserPoints = matchPoints.First(x => x.HeroId.Equals(looserExpectedPoints.HeroId)).Points;
+        var actualWinnerPoints = matchPoints[winnerExpectedPoints.Key];
+        var actualLooserPoints = matchPoints[looserExpectedPoints.Key];
 
-        Assert.Equal(winnerExpectedPoints.Points, actualWinnerPoints);
-        Assert.Equal(looserExpectedPoints.Points, actualLooserPoints);
+        Assert.Equal(winnerExpectedPoints.Value, actualWinnerPoints);
+        Assert.Equal(looserExpectedPoints.Value, actualLooserPoints);
     }
 
     private IHeroRepository CreateMockHeroRepository()

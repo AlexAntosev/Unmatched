@@ -11,6 +11,7 @@ using Match = Unmatched.Entities.Match;
 public class UnrankedMatchHandlerTests
 {
     private readonly Mock<IMatchRepository> _matchRepository = new();
+    private readonly Mock<IRatingRepository> _ratingRepository = new();
     private readonly Mock<IUnrankedRatingCalculator> _unrankedRatingCalculator = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
@@ -19,6 +20,7 @@ public class UnrankedMatchHandlerTests
     public UnrankedMatchHandlerTests()
     {
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
+        _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
 
         _handler = new UnrankedMatchHandler(_unitOfWork.Object, _unrankedRatingCalculator.Object);
     }
@@ -58,6 +60,18 @@ public class UnrankedMatchHandlerTests
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
         _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
+        
+        _unrankedRatingCalculator.Setup(c => c.CalculateAsync(fighter, opponent))
+            .ReturnsAsync(
+                new Dictionary<Guid, int>()
+                    {
+                        {
+                            fighterHeroId, 0
+                        },
+                        {
+                            opponentHeroId, 0
+                        }
+                    });
         
         // Act
         await _handler.HandleAsync(match);
@@ -107,6 +121,17 @@ public class UnrankedMatchHandlerTests
                     fighter.MatchId = createdMatch.Id;
                 }
             }).ReturnsAsync(createdMatch).Verifiable();
+        _unrankedRatingCalculator.Setup(c => c.CalculateAsync(fighter, opponent))
+            .ReturnsAsync(
+                new Dictionary<Guid, int>()
+                    {
+                        {
+                            fighterHeroId, 0
+                        },
+                        {
+                            opponentHeroId, 0
+                        }
+                    });
 
         // Act
         await _handler.HandleAsync(match);

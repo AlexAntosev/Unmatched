@@ -13,39 +13,31 @@ public class RatingCalculator : IRatingCalculator
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent)
+    public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent)
     {
-        var winnerFighter = fighter.IsWinner
+        var winner = fighter.IsWinner
             ? fighter
             : opponent;
-        var looserFighter = fighter.IsWinner
+        var looser = fighter.IsWinner
             ? opponent
             : fighter;
 
         var matchContext = new MatchContext(
-            await _unitOfWork.Heroes.GetByIdAsync(winnerFighter.HeroId),
-            await _unitOfWork.Heroes.GetByIdAsync(looserFighter.HeroId),
-            winnerFighter,
-            looserFighter,
-            (await _unitOfWork.Ratings.GetByHeroIdAsync(winnerFighter.HeroId))?.Points ?? 0,
-            (await _unitOfWork.Ratings.GetByHeroIdAsync(looserFighter.HeroId))?.Points ?? 0);
+            await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId),
+            await _unitOfWork.Heroes.GetByIdAsync(looser.HeroId),
+            winner,
+            looser,
+            (await _unitOfWork.Ratings.GetByHeroIdAsync(winner.HeroId))?.Points ?? 0,
+            (await _unitOfWork.Ratings.GetByHeroIdAsync(looser.HeroId))?.Points ?? 0);
 
-        var fighterMatchPoints = new HeroMatchPoints
+        return new Dictionary<Guid, int>
             {
-                HeroId = winnerFighter.HeroId,
-                Points = CalculateForWinner(matchContext)
-            };
-
-        var opponentMatchPoints = new HeroMatchPoints
-            {
-                HeroId = looserFighter.HeroId,
-                Points = CalculateForLooser(matchContext)
-            };
-
-        return new[]
-            {
-                fighterMatchPoints,
-                opponentMatchPoints
+                {
+                    winner.HeroId, CalculateForWinner(matchContext)
+                },
+                {
+                    looser.HeroId, CalculateForLooser(matchContext)
+                },
             };
     }
 

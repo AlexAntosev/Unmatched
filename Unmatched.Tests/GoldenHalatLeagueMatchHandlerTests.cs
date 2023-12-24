@@ -47,16 +47,10 @@ public class GoldenHalatLeagueMatchHandlerTests
                         opponent
                     }
             };
-        var matchPoints = new List<HeroMatchPoints>()
+        var matchPoints = new Dictionary<Guid, int>
             {
-                new()
-                    {
-                        HeroId = fighterHeroId
-                    },
-                new()
-                    {
-                        HeroId = opponentHeroId
-                    }
+                {fighterHeroId, 0},
+                {opponentHeroId, 0}
             };
         
         _ratingCalculator
@@ -101,16 +95,10 @@ public class GoldenHalatLeagueMatchHandlerTests
                         opponent
                     }
             };
-        var matchPoints = new List<HeroMatchPoints>()
+        var matchPoints = new Dictionary<Guid, int>
             {
-                new()
-                    {
-                        HeroId = fighterHeroId
-                    },
-                new()
-                    {
-                        HeroId = opponentHeroId
-                    }
+                {fighterHeroId, 0},
+                {opponentHeroId, 0}
             };
         
         _ratingCalculator
@@ -158,18 +146,10 @@ public class GoldenHalatLeagueMatchHandlerTests
             };
         var fighterMatchPoints = 100;
         var opponentMatchPoints = -100;
-        var matchPoints = new List<HeroMatchPoints>()
+        var matchPoints = new Dictionary<Guid, int>
             {
-                new()
-                    {
-                        HeroId = fighterHeroId,
-                        Points = fighterMatchPoints
-                    },
-                new()
-                    {
-                        HeroId = opponentHeroId,
-                        Points = opponentMatchPoints
-                    }
+                {fighterHeroId, fighterMatchPoints},
+                {opponentHeroId, opponentMatchPoints}
             };
         
         _ratingCalculator
@@ -236,18 +216,10 @@ public class GoldenHalatLeagueMatchHandlerTests
             };
         var fighterMatchPoints = 100;
         var opponentMatchPoints = -100;
-        var matchPoints = new List<HeroMatchPoints>()
+        var matchPoints = new Dictionary<Guid, int>
             {
-                new()
-                    {
-                        HeroId = fighterHeroId,
-                        Points = fighterMatchPoints
-                    },
-                new()
-                    {
-                        HeroId = opponentHeroId,
-                        Points = opponentMatchPoints
-                    }
+                {fighterHeroId, fighterMatchPoints},
+                {opponentHeroId, opponentMatchPoints}
             };
         
         _ratingCalculator

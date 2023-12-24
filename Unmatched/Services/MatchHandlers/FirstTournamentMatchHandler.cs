@@ -17,7 +17,7 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
     protected override async Task InnerHandleAsync(Match match)
     {
         var matchWithStage = (MatchWithStage)match;
-        var matchPoints = (await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchWithStage.Stage)).ToArray();
+        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchWithStage.Stage);
         
         var createdMatch = await CreateMatch(match, matchPoints);
 

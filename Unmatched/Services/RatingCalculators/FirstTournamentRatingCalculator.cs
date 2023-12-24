@@ -13,21 +13,16 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage)
+    public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage)
     {
-        var winnerHeroId = fighter.IsWinner
-            ? fighter.HeroId
-            : opponent.HeroId;
-        
-        var winnerHp = fighter.IsWinner
-            ? fighter.HpLeft
-            : opponent.HpLeft;
-        
-        var looserHeroId = fighter.IsWinner
-            ? opponent.HeroId
-            : fighter.HeroId;
+        var winner = fighter.IsWinner
+            ? fighter
+            : opponent;
+        var looser = fighter.IsWinner
+            ? opponent
+            : fighter;
 
-        var winnerHeroMaxHp = (await _unitOfWork.Heroes.GetByIdAsync(winnerHeroId)).Hp;
+        var winnerHeroMaxHp = (await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId)).Hp;
         
         var coefficient = stage switch
             {
@@ -39,20 +34,16 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
                 _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
             };
 
-        var winnerPoints = Convert.ToInt32(Math.Round(coefficient * (80 + 40 * ((double)winnerHp / winnerHeroMaxHp)), 0));
+        var winnerPoints = Convert.ToInt32(Math.Round(coefficient * (80 + 40 * ((double)winner.HpLeft / winnerHeroMaxHp)), 0));
 
-        return new List<HeroMatchPoints>()
+        return new Dictionary<Guid, int>
             {
-                new()
-                    {
-                        HeroId = looserHeroId,
-                        Points = 0
-                    },
-                new()
-                    {
-                        HeroId = winnerHeroId,
-                        Points = winnerPoints
-                    },
+                {
+                    winner.HeroId, winnerPoints
+                },
+                {
+                    looser.HeroId, 0
+                },
             };
     }
 }

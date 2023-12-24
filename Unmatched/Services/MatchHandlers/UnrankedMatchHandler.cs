@@ -16,7 +16,7 @@ public class UnrankedMatchHandler : BaseMatchHandler
 
     protected override async Task InnerHandleAsync(Match match)
     {
-        var matchPoints = (await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last())).ToArray();
+        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last());
         
         await CreateMatch(match, matchPoints);
         

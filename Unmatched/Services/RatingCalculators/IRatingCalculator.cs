@@ -5,5 +5,5 @@ using Unmatched.Models;
 
 public interface IRatingCalculator
 {
-    Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent);
+    Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent);
 }

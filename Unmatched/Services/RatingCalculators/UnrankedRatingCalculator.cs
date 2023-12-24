@@ -5,32 +5,23 @@ using Unmatched.Models;
 
 public class UnrankedRatingCalculator : IUnrankedRatingCalculator
 {
-    public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent)
+    public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent)
     {
-        var winnerFighter = fighter.IsWinner
+        var winner = fighter.IsWinner
             ? fighter
             : opponent;
-        var looserFighter = fighter.IsWinner
+        var looser = fighter.IsWinner
             ? opponent
             : fighter;
-        
-        var fighterMatchPoints = new HeroMatchPoints
-            {
-                HeroId = winnerFighter.HeroId,
-                Points = 250
-            };
 
-        var opponentMatchPoints = new HeroMatchPoints
+        return new Dictionary<Guid, int>
             {
-                HeroId = looserFighter.HeroId,
-                Points = -150
-            };
-
-        return 
-            new[]
                 {
-                    fighterMatchPoints,
-                    opponentMatchPoints
-                };
+                    winner.HeroId, 250
+                },
+                {
+                    looser.HeroId, -150
+                },
+            };
     }
 }

@@ -23,11 +23,11 @@ public abstract class BaseMatchHandler : IMatchHandler
     
     protected abstract void InnerValidate(Match match);
 
-    protected async Task<Match> CreateMatch(Match match, HeroMatchPoints[] matchPoints)
+    protected async Task<Match> CreateMatch(Match match, Dictionary<Guid, int> matchPoints)
     {
         foreach (var fighter in match.Fighters)
         {
-            fighter.MatchPoints = GetFighterMatchPoints(matchPoints, fighter.HeroId);
+            fighter.MatchPoints = matchPoints[fighter.HeroId];
         }
 
         var createdMatch = await UnitOfWork.Matches.AddAsync(match);
@@ -35,7 +35,7 @@ public abstract class BaseMatchHandler : IMatchHandler
         var updatedHeroRatings = new List<Rating>();
         foreach (var heroMatchPoints in matchPoints)
         {
-            var rating = await UpdateHeroRatingAsync(heroMatchPoints);
+            var rating = await UpdateHeroRatingAsync(heroMatchPoints.Key, heroMatchPoints.Value);
             updatedHeroRatings.Add(rating);
         }
 
@@ -59,19 +59,16 @@ public abstract class BaseMatchHandler : IMatchHandler
     
     private static bool IsNotEnoughFighters(ICollection<Fighter>? fighters) 
         => fighters is null || fighters.Count < 2;
-    
-    private static int GetFighterMatchPoints(IEnumerable<HeroMatchPoints> matchPoints, Guid heroId) 
-        => matchPoints.FirstOrDefault(h => h.HeroId == heroId).Points;
 
-    private async Task<Rating> UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
+    private async Task<Rating> UpdateHeroRatingAsync(Guid heroId, int matchPoint)
     {
-        var rating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
+        var rating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroId)
          ?? new Rating
                 {
-                    HeroId = heroMatchPoints.HeroId
+                    HeroId = heroId
                 };
         
-        rating.Points += heroMatchPoints.Points;
+        rating.Points += matchPoint;
         
         return rating;
     }

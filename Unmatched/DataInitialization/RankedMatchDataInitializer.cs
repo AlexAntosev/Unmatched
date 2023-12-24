@@ -358,8 +358,8 @@ public class RankedMatchDataInitializer : BaseMatchDataInitializer, IRankedMatch
 
             var heroPoints = await _ratingCalculator.CalculateAsync(fighterA, fighterB);
 
-            var fighterAPoints = heroPoints.First(x => x.HeroId == fighterA.HeroId).Points;
-            var fighterBPoints = heroPoints.First(x => x.HeroId == fighterB.HeroId).Points;
+            var fighterAPoints = heroPoints[fighterA.HeroId];
+            var fighterBPoints = heroPoints[fighterB.HeroId];
 
             fighterA.MatchPoints = fighterAPoints;
             fighterB.MatchPoints = fighterBPoints;
