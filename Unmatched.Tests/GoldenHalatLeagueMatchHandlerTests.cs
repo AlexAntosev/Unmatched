@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Tests;
 
 using Moq;
-using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Entities;
 using Unmatched.Models;

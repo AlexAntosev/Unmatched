@@ -6,11 +6,11 @@ using Unmatched.Repositories;
 
 public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
 {
-    private readonly IHeroRepository _heroRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public FirstTournamentRatingCalculator(IHeroRepository heroRepository)
+    public FirstTournamentRatingCalculator(IUnitOfWork unitOfWork)
     {
-        _heroRepository = heroRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage)
@@ -27,7 +27,7 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
             ? opponent.HeroId
             : fighter.HeroId;
 
-        var winnerHeroMaxHp = (await _heroRepository.GetByIdAsync(winnerHeroId)).Hp;
+        var winnerHeroMaxHp = (await _unitOfWork.Heroes.GetByIdAsync(winnerHeroId)).Hp;
         
         var coefficient = stage switch
             {

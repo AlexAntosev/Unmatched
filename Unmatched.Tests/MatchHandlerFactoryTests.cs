@@ -1,13 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿namespace Unmatched.Tests;
+
+using Microsoft.Extensions.Logging;
 using Moq;
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;
 using Match = Unmatched.Entities.Match;
-
-namespace Unmatched.Tests;
-
 using Unmatched.Services.RatingCalculators;
 
 public class MatchHandlerFactoryTests

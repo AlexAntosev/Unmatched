@@ -7,20 +7,23 @@ using Unmatched.DataInitialization;
 using Unmatched.Entities;
 using Unmatched.Models;
 using Unmatched.Repositories;
-using Unmatched.Services;
 using Unmatched.Services.RatingCalculators;
 
 public class RatingCalculatorTests
 {
+    private readonly Mock<IUnitOfWork> _unitOfWork = new();
+    
     [Fact]
     public async void CheckCalculations()
     {
         var heroRepository = CreateMockHeroRepository();
         var heroes = heroRepository.Query().ToList();
-
         var ratingRepository = CreateMockRatingRepository(heroes);
+        
+        _unitOfWork.Setup(uow => uow.Ratings).Returns(ratingRepository);
+        _unitOfWork.Setup(uow => uow.Heroes).Returns(heroRepository);
 
-        var calculator = new RatingCalculator(ratingRepository, heroRepository);
+        var calculator = new RatingCalculator(_unitOfWork.Object);
 
         var drSatId = heroes.First(x => x.Name.Equals(HeroNames.DrSattler)).Id;
         var daredevilId = heroes.First(x => x.Name.Equals(HeroNames.Daredevil)).Id;

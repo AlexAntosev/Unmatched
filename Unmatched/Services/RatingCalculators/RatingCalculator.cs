@@ -6,14 +6,11 @@ using Unmatched.Repositories;
 
 public class RatingCalculator : IRatingCalculator
 {
-    private readonly IHeroRepository _heroRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    private readonly IRatingRepository _ratingRepository;
-
-    public RatingCalculator(IRatingRepository ratingRepository, IHeroRepository heroRepository)
+    public RatingCalculator(IUnitOfWork unitOfWork)
     {
-        _ratingRepository = ratingRepository;
-        _heroRepository = heroRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<HeroMatchPoints>> CalculateAsync(Fighter fighter, Fighter opponent)
@@ -26,12 +23,12 @@ public class RatingCalculator : IRatingCalculator
             : fighter;
 
         var matchContext = new MatchContext(
-            await _heroRepository.GetByIdAsync(winnerFighter.HeroId),
-            await _heroRepository.GetByIdAsync(looserFighter.HeroId),
+            await _unitOfWork.Heroes.GetByIdAsync(winnerFighter.HeroId),
+            await _unitOfWork.Heroes.GetByIdAsync(looserFighter.HeroId),
             winnerFighter,
             looserFighter,
-            (await _ratingRepository.GetByHeroIdAsync(winnerFighter.HeroId))?.Points ?? 0,
-            (await _ratingRepository.GetByHeroIdAsync(looserFighter.HeroId))?.Points ?? 0);
+            (await _unitOfWork.Ratings.GetByHeroIdAsync(winnerFighter.HeroId))?.Points ?? 0,
+            (await _unitOfWork.Ratings.GetByHeroIdAsync(looserFighter.HeroId))?.Points ?? 0);
 
         var fighterMatchPoints = new HeroMatchPoints
             {
