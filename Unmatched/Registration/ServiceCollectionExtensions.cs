@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 using Unmatched.DataInitialization;
+using Unmatched.DataInitialization.Matches;
 using Unmatched.Entities;
 using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;

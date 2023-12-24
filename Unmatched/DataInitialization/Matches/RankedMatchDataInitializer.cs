@@ -1,11 +1,10 @@
-﻿namespace Unmatched.DataInitialization;
+﻿namespace Unmatched.DataInitialization.Matches;
 
 using Microsoft.EntityFrameworkCore;
 
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
-using Unmatched.Services;
 using Unmatched.Services.RatingCalculators;
 
 public class RankedMatchDataInitializer : BaseMatchDataInitializer, IRankedMatchDataInitializer

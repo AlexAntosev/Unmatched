@@ -1,4 +1,4 @@
-﻿namespace Unmatched.DataInitialization;
+﻿namespace Unmatched.DataInitialization.Matches;
 
 using Unmatched.Constants;
 using Unmatched.Entities;
