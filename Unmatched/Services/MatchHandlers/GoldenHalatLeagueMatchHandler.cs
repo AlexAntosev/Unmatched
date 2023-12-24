@@ -8,9 +8,7 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
 {
     private readonly IRatingCalculator _ratingCalculator;
 
-    public GoldenHalatLeagueMatchHandler(
-        IUnitOfWork unitOfWork,
-        IRatingCalculator ratingCalculator)
+    public GoldenHalatLeagueMatchHandler(IUnitOfWork unitOfWork, IRatingCalculator ratingCalculator)
     : base(unitOfWork)
     {
         _ratingCalculator = ratingCalculator;
@@ -19,42 +17,13 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
     protected override async Task InnerHandleAsync(Match match)
     {
         var matchPoints = (await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last())).ToArray();
-
-        foreach (var fighter in match.Fighters)
-        {
-            fighter.MatchPoints = GetFighterMatchPoints(matchPoints, fighter.HeroId);
-        }
         
-        await UnitOfWork.Matches.AddAsync(match);
-
-        var updatedHeroRatings = new List<Rating>();
-        foreach (var heroMatchPoints in matchPoints)
-        {
-            var rating = await UpdateHeroRatingAsync(heroMatchPoints);
-            updatedHeroRatings.Add(rating);
-        }
-        
-        foreach (var updatedHeroRating in updatedHeroRatings)
-        {
-            UnitOfWork.Ratings.AddOrUpdate(updatedHeroRating);
-        }
+        await CreateMatch(match, matchPoints);
         
         await UnitOfWork.SaveChangesAsync();
     }
 
-    private static int GetFighterMatchPoints(IEnumerable<HeroMatchPoints> matchPoints, Guid heroId) 
-        => matchPoints.FirstOrDefault(h => h.HeroId == heroId).Points;
-
-    private async Task<Rating> UpdateHeroRatingAsync(HeroMatchPoints heroMatchPoints)
+    protected override void InnerValidate(Match match)
     {
-        var heroRating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroMatchPoints.HeroId)
-         ?? new Rating
-                {
-                    HeroId = heroMatchPoints.HeroId
-                };
-        
-        heroRating.Points += heroMatchPoints.Points;
-
-        return heroRating;
     }
 }

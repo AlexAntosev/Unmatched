@@ -38,5 +38,6 @@
     private async Task RecalculateRating()
     {
         await RatingService.RecalculateAsync();
+        Console.WriteLine("Recalculation is done!");
     }
 }

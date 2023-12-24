@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Microsoft.Extensions.Logging;
-
 using Unmatched.Entities;
 using Unmatched.Repositories;
 
@@ -21,5 +20,9 @@ public class EmptyMatchHandler : BaseMatchHandler
         _logger.LogError("Match was not handled due to handler was not found.");
         
         return Task.CompletedTask;
+    }
+
+    protected override void InnerValidate(Match match)
+    {
     }
 }

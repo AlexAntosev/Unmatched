@@ -43,6 +43,10 @@ public class TestMatchHandler : BaseMatchHandler
     {
     }
 
+    protected override void InnerValidate(Match match)
+    {
+    }
+
     public TestMatchHandler(IUnitOfWork unitOfWork)
         : base(unitOfWork)
     {
