@@ -8,6 +8,7 @@
     <HeroSummary Hero="Hero"></HeroSummary>
 </div>
 <div>
+    <h4> Antagonist: @_antagonist (@_winsAgainstAntagonist wins / @_loosesAgainstAntagonist looses)</h4>
     <h4> Total Matches: @Hero.TotalMatches (@Hero.TotalWins / @Hero.TotalLooses) K\D : @Hero.Kd</h4>
     <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 </div>
@@ -23,6 +24,11 @@
             Hero = new()
         };
     
+    
+    private string? _antagonist;
+    private int? _winsAgainstAntagonist;
+    private int? _loosesAgainstAntagonist;
+    
     protected override async Task OnInitializedAsync()
     {
         var heroId = Guid.Parse(id);
@@ -32,5 +38,18 @@
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
         }
+        
+        var antagonist = matchLogEntries
+            .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
+            .GroupBy(f => f.HeroName)
+            .OrderByDescending(g => g.Count(f => f.IsWinner))
+            .ThenBy(g => g.Count(f => !f.IsWinner))
+            .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+            .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+            .FirstOrDefault();
+
+        _antagonist = antagonist?.Key;
+        _winsAgainstAntagonist = antagonist?.Where(f => !f.IsWinner).Count();
+        _loosesAgainstAntagonist = antagonist?.Where(f => f.IsWinner).Count();
     }
 }
