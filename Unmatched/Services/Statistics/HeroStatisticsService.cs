@@ -38,7 +38,8 @@ public class HeroStatisticsService : IHeroStatisticsService
                     TotalMatches = fights.Length,
                     TotalWins = fights.Count(x => x.IsWinner),
                     TotalLooses = fights.Count(x => x.IsWinner == false),
-                    LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0
+                    LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0,
+                    IsRanged = hero.IsRanged
                 };
 
             statistics.Add(heroStatistics);

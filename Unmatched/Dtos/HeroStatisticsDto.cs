@@ -21,6 +21,8 @@ public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
     public int TotalMatches { get; set; }
 
     public int TotalWins { get; set; }
+    
+    public bool IsRanged { get; set; }
 
     public int CompareTo(HeroStatisticsDto? other)
     {
