@@ -2,6 +2,7 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
 @inject IPlayerStatisticsService PlayerStatisticsService
+@using BlazorBootstrap
 
 <h3 align="center">@Player.PlayerName</h3>
 <div style="margin-bottom: 16px">
@@ -13,6 +14,10 @@
 
 <h4> Total Matches: @Player.TotalMatches (@Player.TotalWins / @Player.TotalLooses) K\D : @Player.Kd</h4>
 <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+
+<div>
+    <PieChart @ref="pieChart" Width="500" Class="mb-5"/>
+</div>
 
 @code {
     [Parameter]
@@ -33,6 +38,12 @@
     private int? _weakestHeroWins;
     private int? _weakestHeroLooses;
     
+    private PieChart pieChart = default!;
+    private PieChartOptions pieChartOptions = default!;
+    private ChartData chartData = default!;
+    private string[]? backgroundColors;
+    private int dataCount;
+
     protected override async Task OnInitializedAsync()
     {
         var playerId = Guid.Parse(id);
@@ -77,5 +88,86 @@
         _weakestHero = weakestHero?.Key;
         _weakestHeroWins = weakestHero?.Where(f => f.IsWinner).Count();
         _weakestHeroLooses = weakestHero?.Where(f => !f.IsWinner).Count();
+        
+        backgroundColors = ColorBuilder.CategoricalTwelveColors;
+        var heroesFights = matchLogEntries
+            .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
+            .GroupBy(f => f.HeroName)
+            .OrderByDescending(g => g.Count())
+            .Take(12);
+        
+        chartData = new ChartData { Labels = GetDataLabels(heroesFights), Datasets = GetDataSets(heroesFights) };
+
+        pieChartOptions = new();
+        pieChartOptions.Responsive = true;
+        pieChartOptions.Plugins.Title.Text = "Favorites";
+        pieChartOptions.Plugins.Title.Display = true;
+        
+        await pieChart.UpdateAsync(chartData, pieChartOptions);
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            chartData = new ChartData { Labels = new List<string>(), Datasets = new List<IChartDataset>() };
+            pieChartOptions = new();
+            await pieChart.InitializeAsync(chartData, pieChartOptions, plugins: new [] { "ChartDataLabels" });
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    
+    private List<string> GetDataLabels(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    {
+        var labels = new List<string>();
+        foreach (var heroFights in heroesFights)
+        {
+            labels.Add(heroFights.Key);
+        }
+
+        return labels;
+    }
+    
+    private List<IChartDataset> GetDataSets(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    {
+        var datasets = new List<IChartDataset>
+            {
+                GetDataset(heroesFights)
+            };
+
+        return datasets;
+    }
+    
+    private PieChartDataset GetDataset(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    {
+        var data = new List<double>();
+        foreach (var heroFights in heroesFights)
+        {
+            dataCount += 1;
+
+            data.Add(heroFights.Count());
+        }
+        var dataset = new PieChartDataset()
+            {
+                Label = "Fights",
+                Data = data,
+                BackgroundColor = GetRandomBackgroundColors(),
+                Datalabels = new PieChartDatasetDataLabels()
+                    {
+                        Anchor =  "center"
+                    }
+            };
+        return dataset;
+    }
+
+    private List<string> GetRandomBackgroundColors()
+    {
+        var colors = new List<string>();
+        for (var index = 0; index < dataCount; index++)
+        {
+            colors.Add(backgroundColors![index]);
+        }
+
+        return colors;
     }
 }
