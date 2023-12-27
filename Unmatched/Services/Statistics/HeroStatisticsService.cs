@@ -27,11 +27,13 @@ public class HeroStatisticsService : IHeroStatisticsService
 
         foreach (var hero in heroes)
         {
+            var heroDto = _mapper.Map<HeroDto>(hero);
             var points = ratings.FirstOrDefault(x => x.HeroId.Equals(hero.Id))?.Points ?? 0;
             var fights = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
 
             var heroStatistics = new HeroStatisticsDto 
                 {
+                    Hero = heroDto,
                     HeroId = hero.Id,
                     HeroName = hero.Name,
                     Points = points,
@@ -51,21 +53,27 @@ public class HeroStatisticsService : IHeroStatisticsService
     public async Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
     {
         var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
+        var heroDto = _mapper.Map<HeroDto>(hero);
         var fights = await _unitOfWork.Fighters
             .Query()
             .Include(x => x.Match)
             .Where(x => x.HeroId.Equals(hero.Id))
             .OrderByDescending(x => x.Match.Date)
             .ToListAsync();
+        var rating = await _unitOfWork.Ratings.GetByHeroIdAsync(hero.Id);
+        var points = rating?.Points ?? 0;
         
         var statistics = new HeroStatisticsDto
             {
+                Hero = heroDto,
                 HeroId = hero.Id,
                 HeroName = hero.Name,
+                Points = points,
                 TotalMatches = fights.Count,
                 TotalWins = fights.Count(x => x.IsWinner),
                 TotalLooses = fights.Count(x => x.IsWinner == false),
-                LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0
+                LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0,
+                IsRanged = hero.IsRanged
             };
         
         return statistics;

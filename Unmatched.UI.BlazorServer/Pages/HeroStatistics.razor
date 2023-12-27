@@ -4,9 +4,13 @@
 @inject IHeroStatisticsService HeroStatisticsService
 
 <h3 align="center">@Hero.HeroName</h3>
-<img src="@imageSource" />
-<h4> Total Matches: @Hero.TotalMatches (@Hero.TotalWins / @Hero.TotalLooses) K\D : @Hero.Kd</h4>
-<DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+<div style="margin-bottom: 16px">
+    <HeroSummary Hero="Hero"></HeroSummary>
+</div>
+<div>
+    <h4> Total Matches: @Hero.TotalMatches (@Hero.TotalWins / @Hero.TotalLooses) K\D : @Hero.Kd</h4>
+    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+</div>
 
 @code {
     [Parameter]
@@ -14,9 +18,10 @@
     
     private IEnumerable<MatchLogDto> matchLogEntries;
 
-    public HeroStatisticsDto Hero { get; set; } = new ();
-
-    private string? imageSource;
+    public HeroStatisticsDto Hero { get; set; } = new ()
+        {
+            Hero = new()
+        };
     
     protected override async Task OnInitializedAsync()
     {
@@ -27,6 +32,5 @@
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
         }
-        imageSource = $"/{Hero.HeroName}.png";
     }
 }
