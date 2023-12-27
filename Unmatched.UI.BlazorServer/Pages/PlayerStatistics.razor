@@ -4,7 +4,13 @@
 @inject IPlayerStatisticsService PlayerStatisticsService
 
 <h3 align="center">@Player.PlayerName</h3>
-<img src="@imageSource" />
+<div style="margin-bottom: 16px">
+    <img src="@imageSource" />
+    <h4> Favorite: @_favorite (@_favoriteWins wins / @_favoriteLooses looses)</h4>
+    <h4> Strongest hero: @_strongestHero (@_strongestHeroWins wins / @_strongestHeroLooses looses)</h4>
+    <h4> Weakest hero: @_weakestHero (@_weakestHeroWins wins / @_weakestHeroLooses looses)</h4>
+</div>
+
 <h4> Total Matches: @Player.TotalMatches (@Player.TotalWins / @Player.TotalLooses) K\D : @Player.Kd</h4>
 <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 
@@ -17,6 +23,15 @@
     public PlayerStatisticsDto Player { get; set; } = new ();
 
     private string? imageSource;
+    private string? _favorite;
+    private int? _favoriteWins;
+    private int? _favoriteLooses;
+    private string? _strongestHero;
+    private int? _strongestHeroWins;
+    private int? _strongestHeroLooses;
+    private string? _weakestHero;
+    private int? _weakestHeroWins;
+    private int? _weakestHeroLooses;
     
     protected override async Task OnInitializedAsync()
     {
@@ -28,5 +43,39 @@
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == playerId);
         }
         imageSource = $"/{Player.PlayerName}.png";
+        
+        
+        var favorite = matchLogEntries
+            .SelectMany(m => m.Fighters.Where(f => f.PlayerId == playerId))
+            .GroupBy(f => f.HeroName)
+            .MaxBy(g => g.Count());
+
+        _favorite = favorite?.Key;
+        _favoriteWins = favorite?.Where(f => f.IsWinner).Count();
+        _favoriteLooses = favorite?.Where(f => !f.IsWinner).Count();
+
+        var strongestHero = matchLogEntries
+            .SelectMany(m => m.Fighters.Where(f => f.PlayerId == playerId))
+            .GroupBy(f => f.HeroName)
+            .OrderByDescending(g => g.Count(f => f.IsWinner))
+            .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+            .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+            .FirstOrDefault();
+
+        _strongestHero = strongestHero?.Key;
+        _strongestHeroWins = strongestHero?.Where(f => f.IsWinner).Count();
+        _strongestHeroLooses = strongestHero?.Where(f => !f.IsWinner).Count();
+        
+        var weakestHero = matchLogEntries
+            .SelectMany(m => m.Fighters.Where(f => f.PlayerId == playerId))
+            .GroupBy(f => f.HeroName)
+            .OrderByDescending(g => g.Count(f => !f.IsWinner))
+            .ThenBy(g => g.Select(f => f.HpLeft ?? 0).Sum())
+            .ThenBy(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+            .FirstOrDefault();
+
+        _weakestHero = weakestHero?.Key;
+        _weakestHeroWins = weakestHero?.Where(f => f.IsWinner).Count();
+        _weakestHeroLooses = weakestHero?.Where(f => !f.IsWinner).Count();
     }
 }
