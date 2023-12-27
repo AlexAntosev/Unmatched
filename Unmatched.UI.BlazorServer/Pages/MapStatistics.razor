@@ -6,6 +6,7 @@
 <h3 align="center">@Map.MapName</h3>
 <img src="@imageSource" />
 <h4> Total Matches: @Map.TotalMatches</h4>
+<h4> Map champ: @_mapChamp (@_mapChampWins wins)</h4>
 <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 
 @code {
@@ -17,6 +18,8 @@
     public MapStatisticsDto Map { get; set; } = new ();
 
     private string? imageSource;
+    private string? _mapChamp;
+    private int? _mapChampWins;
     
     protected override async Task OnInitializedAsync()
     {
@@ -28,5 +31,16 @@
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);
         }
         imageSource = $"/{Map.MapName}.png";
+        
+        var champ = matchLogEntries
+            .SelectMany(m => m.Fighters.Where(f => f.IsWinner))
+            .GroupBy(f => f.HeroName)
+            .OrderByDescending(g => g.Count())
+            .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+            .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+            .FirstOrDefault();
+
+        _mapChamp = champ?.Key;
+        _mapChampWins = champ?.Count();
     }
 }
