@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.Services.Statistics;
 
+using System.Globalization;
+
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
@@ -108,5 +110,39 @@ public class HeroStatisticsService : IHeroStatisticsService
         }
 
         return matchLogs;
+    }
+
+    public async Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId)
+    {
+        var ratingChanges = new List<RatingChangeDto>();
+        var currentRating = await _unitOfWork.Ratings.GetByHeroIdAsync(heroId);
+        ratingChanges.Add(new RatingChangeDto
+            {
+                Date = "Current",
+                Rating = currentRating?.Points ?? 0
+            });
+
+        var points = currentRating?.Points ?? 0;
+
+        var heroMatches = await _unitOfWork.Matches
+            .Query()
+            .Where(m => m.Fighters.Any(f => f.HeroId == heroId))
+            .OrderByDescending(m => m.Date)
+            .ToListAsync();
+        
+        foreach (var heroMatch in heroMatches)
+        {
+            var matchPoints = heroMatch.Fighters.FirstOrDefault(f => f.HeroId == heroId)?.MatchPoints ?? 0;
+            points -= matchPoints;
+            ratingChanges.Add(new RatingChangeDto
+                {
+                    Date = heroMatch.Date.ToShortDateString(),
+                    Rating = points
+                });
+        }
+
+        ratingChanges.Reverse();
+        
+        return ratingChanges;
     }
 }
