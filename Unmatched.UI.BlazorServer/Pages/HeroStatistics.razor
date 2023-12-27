@@ -2,6 +2,7 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
 @inject IHeroStatisticsService HeroStatisticsService
+@using BlazorBootstrap
 
 <h3 align="center">@Hero.HeroName</h3>
 <div style="margin-bottom: 16px">
@@ -15,6 +16,7 @@
 <div>
     <h4> Rating: </h4>
     <h5>Current Place: @Hero.Place (@Hero.Points points)</h5>
+    <LineChart @ref="lineChart" />
 </div>
 
 @code {
@@ -27,7 +29,7 @@
         {
             Hero = new()
         };
-    
+    private LineChart lineChart;
     
     private string? _antagonist;
     private int? _winsAgainstAntagonist;
@@ -59,5 +61,64 @@
         _loosesAgainstAntagonist = antagonist?.Where(f => f.IsWinner).Count();
 
         RatingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
+        await UpdateChart();
+    }
+
+    private async Task UpdateChart()
+    {
+        var data = new ChartData
+            {
+                Labels = RatingChanges.Select(c => c.Date).ToList(),
+                Datasets = new List<IChartDataset>
+                    {
+                        new LineChartDataset
+                            {
+                                Label = Hero.HeroName,
+                                Data = RatingChanges.Select(c => (double)c.Rating).ToList(),
+                                BackgroundColor = new List<string>{"rgb(88, 80, 141)"},
+                                BorderColor = new List<string>{"rgb(88, 80, 141)"},
+                                BorderWidth = new List<double>{2},
+                                HoverBorderWidth = new List<double>{4},
+                                PointBackgroundColor = new List<string>{"rgb(88, 80, 141)"},
+                                PointBorderColor = new List<string>{"rgb(88, 80, 141)"},
+                                PointRadius = new List<int>{4},
+                                PointHoverRadius = new List<int>{4}
+                            }
+                    }
+            };
+        var options = new LineChartOptions();
+
+        options.Interaction.Mode = InteractionMode.Index;
+
+        options.Plugins.Title.Text = "Rating changes";
+        options.Plugins.Title.Display = true;
+        options.Plugins.Title.Font.Size = 20;
+
+        options.Responsive = true;
+
+        options.Scales.X.Title.Text = "Date";
+        options.Scales.X.Title.Display = true;
+
+        options.Scales.Y.Title.Text = "Rating";
+        options.Scales.Y.Title.Display = true;
+        await lineChart.UpdateAsync(data, options);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var data = new ChartData
+                {
+                    Labels = RatingChanges.Select(c => c.Date).ToList(),
+                    Datasets = new List<IChartDataset>()
+                };
+
+            var options = new LineChartOptions();
+
+            await lineChart.InitializeAsync(data, options);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
     }
 }

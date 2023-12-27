@@ -14,6 +14,7 @@ builder.Services.RegisterDataInitializers();
 builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();
 builder.Services.AddSyncfusionBlazor();
+builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
