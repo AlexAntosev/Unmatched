@@ -66,6 +66,10 @@
 
     private async Task UpdateChart()
     {
+        var heroColor = new List<string>
+            {
+                Hero.Hero.Color
+            };
         var data = new ChartData
             {
                 Labels = RatingChanges.Select(c => c.Date).ToList(),
@@ -75,12 +79,12 @@
                             {
                                 Label = Hero.HeroName,
                                 Data = RatingChanges.Select(c => (double)c.Rating).ToList(),
-                                BackgroundColor = new List<string>{"rgb(88, 80, 141)"},
-                                BorderColor = new List<string>{"rgb(88, 80, 141)"},
+                                BackgroundColor = heroColor,
+                                BorderColor = heroColor,
                                 BorderWidth = new List<double>{2},
                                 HoverBorderWidth = new List<double>{4},
-                                PointBackgroundColor = new List<string>{"rgb(88, 80, 141)"},
-                                PointBorderColor = new List<string>{"rgb(88, 80, 141)"},
+                                PointBackgroundColor = heroColor,
+                                PointBorderColor = heroColor,
                                 PointRadius = new List<int>{4},
                                 PointHoverRadius = new List<int>{4}
                             }
