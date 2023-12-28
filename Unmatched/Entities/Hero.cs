@@ -21,4 +21,6 @@ public class Hero
     public string Name { get; set; }
     
     public virtual ICollection<Sidekick> Sidekicks { get; set; }
+    
+    public string Color { get; set; }
 }

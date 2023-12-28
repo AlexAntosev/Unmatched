@@ -41,7 +41,7 @@
     private PieChart pieChart = default!;
     private PieChartOptions pieChartOptions = default!;
     private ChartData chartData = default!;
-    private string[]? backgroundColors;
+    private List<string>? backgroundColors = new();
     private int dataCount;
 
     protected override async Task OnInitializedAsync()
@@ -89,7 +89,6 @@
         _weakestHeroWins = weakestHero?.Where(f => f.IsWinner).Count();
         _weakestHeroLooses = weakestHero?.Where(f => !f.IsWinner).Count();
         
-        backgroundColors = ColorBuilder.CategoricalTwelveColors;
         var heroesFights = matchLogEntries
             .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
             .GroupBy(f => f.HeroName)
@@ -144,7 +143,7 @@
         foreach (var heroFights in heroesFights)
         {
             dataCount += 1;
-
+            backgroundColors.Add(heroFights.First().HeroColor);
             data.Add(heroFights.Count());
         }
         var dataset = new PieChartDataset()

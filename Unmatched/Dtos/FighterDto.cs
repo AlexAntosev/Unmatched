@@ -7,6 +7,8 @@ public class FighterDto
     public Guid HeroId { get; set; }
 
     public string HeroName { get; set; }
+
+    public string HeroColor { get; set; }
     
     public int? MatchPoints { get; set; }
 
