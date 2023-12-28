@@ -4,16 +4,15 @@
 @inject IHeroStatisticsService HeroStatisticsService
 @using BlazorBootstrap
 
-<h3 align="center">@Hero.HeroName</h3>
 <div style="margin-bottom: 16px">
     <HeroSummary Hero="Hero"></HeroSummary>
 </div>
-<div>
+<div class="page-content">
     <h4> Antagonist: @_antagonist (@_winsAgainstAntagonist wins / @_loosesAgainstAntagonist looses)</h4>
     <h4> Total Matches: @Hero.TotalMatches (@Hero.TotalWins / @Hero.TotalLooses) K\D : @Hero.Kd</h4>
     <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 </div>
-<div>
+<div class="page-content">
     <h4> Rating: </h4>
     <h5>Current Place: @Hero.Place (@Hero.Points points)</h5>
     <LineChart @ref="lineChart" />

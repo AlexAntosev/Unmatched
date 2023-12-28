@@ -4,19 +4,21 @@
 @inject IPlayerStatisticsService PlayerStatisticsService
 @using BlazorBootstrap
 
-<h3 align="center">@Player.PlayerName</h3>
-<div style="margin-bottom: 16px">
-    <img src="@imageSource" />
-    <h4> Favorite: @_favorite (@_favoriteWins wins / @_favoriteLooses looses)</h4>
-    <h4> Strongest hero: @_strongestHero (@_strongestHeroWins wins / @_strongestHeroLooses looses)</h4>
-    <h4> Weakest hero: @_weakestHero (@_weakestHeroWins wins / @_weakestHeroLooses looses)</h4>
-</div>
-
-<h4> Total Matches: @Player.TotalMatches (@Player.TotalWins / @Player.TotalLooses) K\D : @Player.Kd</h4>
-<DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
-
-<div>
-    <PieChart @ref="pieChart" Width="500" Class="mb-5"/>
+<div class="page-content">
+    <h1 align="center" class="page-title">@Player.PlayerName</h1>
+    <div style="margin-bottom: 16px">
+        <img src="@imageSource" />
+        <h4> Favorite: @_favorite (@_favoriteWins wins / @_favoriteLooses looses)</h4>
+        <h4> Strongest hero: @_strongestHero (@_strongestHeroWins wins / @_strongestHeroLooses looses)</h4>
+        <h4> Weakest hero: @_weakestHero (@_weakestHeroWins wins / @_weakestHeroLooses looses)</h4>
+    </div>
+    
+    <h4> Total Matches: @Player.TotalMatches (@Player.TotalWins / @Player.TotalLooses) K\D : @Player.Kd</h4>
+    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+    
+    <div>
+        <PieChart @ref="pieChart" Width="500" Class="mb-5"/>
+    </div>
 </div>
 
 @code {

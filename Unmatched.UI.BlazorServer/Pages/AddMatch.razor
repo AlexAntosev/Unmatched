@@ -5,69 +5,72 @@
 @inject IMatchService MatchService
 @inject NavigationManager NavManager
 
-<PageTitle>Add match</PageTitle>
+<div class="page-content">
+    <PageTitle>Add match</PageTitle>
+    <h1 class="page-title"></h1>
 
-@if (_maps == null
-    || _players == null
-    || _heroes == null
-    || _tournaments == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <div class="row">
-        <div class="column center">
-            <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes"></FighterInfo>
+    @if (_maps == null
+        || _players == null
+        || _heroes == null
+        || _tournaments == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="column center">
+                <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes"></FighterInfo>
+            </div>
+            <div class="column center">
+                <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes"></FighterInfo>
+            </div>
         </div>
-        <div class="column center">
-            <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes"></FighterInfo>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="triple-column"></div>
-        <div class="triple-column center">
-            <EditForm Model=@Match>
-                <div>
-                    <label for="Map">Map:</label>
-                    <div style=" display: flex; flex-direction: row;">
-                        <InputSelect @bind-Value=Match.MapId name="Map" id="maps" class="form-select">
-                            @foreach (var map in _maps)
+        <div class="row">
+            <div class="triple-column"></div>
+            <div class="triple-column center">
+                <EditForm Model=@Match>
+                    <div>
+                        <label for="Map">Map:</label>
+                        <div style=" display: flex; flex-direction: row;">
+                            <InputSelect @bind-Value=Match.MapId name="Map" id="maps" class="form-select">
+                                @foreach (var map in _maps)
+                                {
+                                    <option value="@map.Id"> @map.Name</option>
+                                }
+                            </InputSelect >
+                            <button style="border-width: 0" @onclick="RandomizeMap">🎲</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="Tournament">Tournament:</label>
+                        <InputSelect @bind-Value=Match.TournamentId name="Tournament" id="tournaments" class="form-select">
+                            @foreach (var tournament in _tournaments)
                             {
-                                <option value="@map.Id"> @map.Name</option>
+                                <option value="@tournament.Id"> @tournament.Name</option>
                             }
                         </InputSelect >
-                        <button style="border-width: 0" @onclick="RandomizeMap">🎲</button>
                     </div>
-                </div>
-                <div>
-                    <label for="Tournament">Tournament:</label>
-                    <InputSelect @bind-Value=Match.TournamentId name="Tournament" id="tournaments" class="form-select">
-                        @foreach (var tournament in _tournaments)
-                        {
-                            <option value="@tournament.Id"> @tournament.Name</option>
-                        }
-                    </InputSelect >
-                </div>
-                <div>
-                    <label for="Date">Date:</label>
-                    <InputDate @bind-Value=Match.Date name="Date" class="form-control"/>
-                </div>
-                <div>
-                    <label for="Comment">Comment:</label>
-                    <InputText @bind-Value=Match.Comment name="Comment" class="form-control"/>
-                </div>
-                <p></p>
-                <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
-                <button class="btn btn-secondary" @onclick="Randomize">Randomize</button>
-            </EditForm>
+                    <div>
+                        <label for="Date">Date:</label>
+                        <InputDate @bind-Value=Match.Date name="Date" class="form-control"/>
+                    </div>
+                    <div>
+                        <label for="Comment">Comment:</label>
+                        <InputText @bind-Value=Match.Comment name="Comment" class="form-control"/>
+                    </div>
+                    <p></p>
+                    <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
+                    <button class="btn btn-secondary" @onclick="Randomize">Randomize</button>
+                </EditForm>
+            </div>
+            <div class="triple-column"></div>
         </div>
-        <div class="triple-column"></div>
-    </div>
-}
+    }
+</div>
 
 @code {
 

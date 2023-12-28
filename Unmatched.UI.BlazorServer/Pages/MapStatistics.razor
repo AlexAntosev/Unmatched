@@ -3,11 +3,13 @@
 @using Unmatched.Services.Statistics
 @inject IMapStatisticsService MapStatisticsService
 
-<h3 align="center">@Map.MapName</h3>
-<img src="@imageSource" />
-<h4> Total Matches: @Map.TotalMatches</h4>
-<h4> Map champ: @_mapChamp (@_mapChampWins wins)</h4>
-<DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+<div class="page-content">
+    <h3 align="center" class="page-title">@Map.MapName</h3>
+    <img src="@imageSource" />
+    <h4> Total Matches: @Map.TotalMatches</h4>
+    <h4> Map champ: @_mapChamp (@_mapChampWins wins)</h4>
+    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+</div>
 
 @code {
     [Parameter]

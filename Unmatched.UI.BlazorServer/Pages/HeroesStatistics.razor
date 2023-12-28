@@ -4,56 +4,58 @@
 @inject NavigationManager NavManager
 @inject IHeroStatisticsService HeroStatisticsService
 
-<PageTitle>Heroes Statistics</PageTitle>
+<div class="page-content">
+    <PageTitle>Heroes Statistics</PageTitle>
 
-<h1>Heroes Statistics</h1>
+    <h1 class="page-title">Heroes Statistics</h1>
 
-@if (heroes == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
-        <GridSortSettings>
-            <GridSortColumns>
-                <GridSortColumn Field="@nameof(HeroStatisticsDto.Points)" Direction="Syncfusion.Blazor.Grids.SortDirection.Descending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
-        <GridColumns>
-            <GridColumn Width="20">
-                <Template>
-                    @{
-                        var hero = (context as HeroStatisticsDto);
-                        <div class="image">
-                            <img src="@($"/{hero?.HeroName}.png")" alt="@hero.HeroId" width="100%" height="auto"/>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.HeroName) HeaderText="Hero" Width="120"></GridColumn>
-             <GridColumn Width="20">
-                <Template>
-                    @{
-                        var hero = context as HeroStatisticsDto;
-                        <div class="image">
-                            <img src="@($"/{(hero.IsRanged ? "Ranged" : "Melee")}.png")" alt="@hero.HeroId" width="100%" height="auto"/>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-}
+    @if (heroes == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true">
+            <GridPageSettings PageSize="40"></GridPageSettings>
+            <GridEvents OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
+            <GridSortSettings>
+                <GridSortColumns>
+                    <GridSortColumn Field="@nameof(HeroStatisticsDto.Points)" Direction="Syncfusion.Blazor.Grids.SortDirection.Descending"></GridSortColumn>
+                </GridSortColumns>
+            </GridSortSettings>
+            <GridColumns>
+                <GridColumn Width="20">
+                    <Template>
+                        @{
+                            var hero = (context as HeroStatisticsDto);
+                            <div class="image">
+                                <img src="@($"/{hero?.HeroName}.png")" alt="@hero.HeroId" width="100%" height="auto"/>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(HeroStatisticsDto.HeroName) HeaderText="Hero" Width="120"></GridColumn>
+                <GridColumn Width="20">
+                    <Template>
+                        @{
+                            var hero = context as HeroStatisticsDto;
+                            <div class="image">
+                                <img src="@($"/{(hero.IsRanged ? "Ranged" : "Melee")}.png")" alt="@hero.HeroId" width="100%" height="auto"/>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(HeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(HeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+                <GridColumn Field=@nameof(HeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+                <GridColumn Field=@nameof(HeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+                <GridColumn Field=@nameof(HeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
 
 @code {
 

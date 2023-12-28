@@ -4,27 +4,29 @@
 @inject NavigationManager NavManager
 @inject IMapStatisticsService MapStatisticsService
 
-<PageTitle>Maps Statistics</PageTitle>
+<div class="page-content">
+    <PageTitle>Maps Statistics</PageTitle>
 
-<h1>Maps Statistics</h1>
+    <h1 class="page-title">Maps Statistics</h1>
 
-@if (maps == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <SfGrid DataSource="@maps" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="20"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
-        <GridColumns>
-            <GridColumn Field=@nameof(MapStatisticsDto.MapName) HeaderText="Map" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(MapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-}
+    @if (maps == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <SfGrid DataSource="@maps" AllowPaging="true" AllowSorting="true">
+            <GridPageSettings PageSize="20"></GridPageSettings>
+            <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(MapStatisticsDto.MapName) HeaderText="Map" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(MapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
 
 @code {
 

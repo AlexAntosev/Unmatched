@@ -3,11 +3,14 @@
 @using Unmatched.Services
 @inject IMatchService MatchService
 
-<PageTitle>Duel Match log</PageTitle>
+<div class="page-content">
+    <PageTitle>Duel Match log</PageTitle>
 
-<h1>Duel Match log</h1>
+    <h1 class="page-title">Duel Match log</h1>
 
-<DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+</div>
+
 
 @code {
 

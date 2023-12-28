@@ -15,3 +15,12 @@
     justify-content: center;
     align-items: center;
 }
+
+.page-content {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.page-title {
+    padding-top: 16px;
+}
