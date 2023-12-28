@@ -33,5 +33,5 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
+app.Services.Migrate();
 app.Run();

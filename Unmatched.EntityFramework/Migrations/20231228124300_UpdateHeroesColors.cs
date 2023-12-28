@@ -10,7 +10,7 @@ namespace Unmatched.EntityFramework.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var sqlFile = Path.Combine("Scripts", "20231228124300_UpdateHeroesColors.sql");
+            var sqlFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Scripts", "20231228124300_UpdateHeroesColors.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
         }
 
