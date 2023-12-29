@@ -1,0 +1,40 @@
+﻿@using Unmatched.Dtos
+
+<h4> @Title: @_hero - @_total matches (@_wins wins / @_looses looses) - K/D: @_kd</h4>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+    
+    [Parameter]
+    public bool IsAgainst { get; set; }
+    
+    [Parameter]
+    public IGrouping<string, FighterDto>? HeroMatches {
+        get => _heroMatches;
+        set
+        {
+            _heroMatches = value;
+            if (value is not null)
+            {
+                _hero = value.Key;
+                _total = value.Count();
+                _wins = value.Count(f => IsAgainst ? !f.IsWinner : f.IsWinner);
+                _looses = value.Count(f => IsAgainst ? f.IsWinner : !f.IsWinner);
+                _kd = CalculateKd();
+            }
+
+        }
+    }
+
+    private double CalculateKd() => _total > 0
+        ? Math.Round((double)_wins / _total, 2)
+        : 0;
+
+    private string _hero = "";
+    private int _total;
+    private int _wins;
+    private int _looses;
+    private double? _kd = 0;
+    private IGrouping<string, FighterDto>? _heroMatches;
+}

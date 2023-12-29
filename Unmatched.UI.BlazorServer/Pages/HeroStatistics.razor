@@ -8,8 +8,8 @@
     <HeroSummary Hero="Hero"></HeroSummary>
 </div>
 <div class="page-content">
-    <h4> Antagonist: @_antagonist (@_winsAgainstAntagonist wins / @_loosesAgainstAntagonist looses)</h4>
-    <h4> Total Matches: @Hero.TotalMatches (@Hero.TotalWins / @Hero.TotalLooses) K\D : @Hero.Kd</h4>
+    <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
+    <TotalMatchesRecord Total="Hero.TotalMatches" Wins="Hero.TotalWins" Looses="Hero.TotalLooses" Kd="Hero.Kd"></TotalMatchesRecord>
     <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
 </div>
 <div class="page-content">
@@ -30,9 +30,7 @@
         };
     private LineChart lineChart;
     
-    private string? _antagonist;
-    private int? _winsAgainstAntagonist;
-    private int? _loosesAgainstAntagonist;
+    private IGrouping<string, FighterDto> _againstAntagonistMatches;
 
     public List<RatingChangeDto> RatingChanges = new();
     
@@ -45,8 +43,8 @@
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
         }
-        
-        var antagonist = matchLogEntries
+
+        _againstAntagonistMatches = matchLogEntries
             .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
             .GroupBy(f => f.HeroName)
             .OrderByDescending(g => g.Count(f => f.IsWinner))
@@ -54,10 +52,6 @@
             .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
             .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
             .FirstOrDefault();
-
-        _antagonist = antagonist?.Key;
-        _winsAgainstAntagonist = antagonist?.Where(f => !f.IsWinner).Count();
-        _loosesAgainstAntagonist = antagonist?.Where(f => f.IsWinner).Count();
 
         RatingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
         await UpdateChart();

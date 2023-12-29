@@ -1,0 +1,22 @@
+﻿@if (Wins is not null && Looses is not null && Kd is not null)
+{
+    <h4> Total Matches: @Total (@Wins wins / @Looses looses) - K/D: @Kd</h4>
+}
+else
+{
+    <h4> Total Matches: @Total</h4>
+}
+
+@code {
+    [Parameter]
+    public int Total { get; set; }
+    
+    [Parameter]
+    public int? Wins { get; set; }
+    
+    [Parameter]
+    public int? Looses { get; set; }
+    
+    [Parameter]
+    public double? Kd { get; set; }
+}
