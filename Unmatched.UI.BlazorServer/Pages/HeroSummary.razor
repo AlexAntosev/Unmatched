@@ -3,7 +3,7 @@
 <div style="background: linear-gradient(180deg, @Hero.Hero.Color 0%, rgba(255,255,255,1) 100%);">
     <h3 align="center" class="page-title">@Hero.HeroName</h3>
     <div class="wrapper page-content">
-        <div>
+        <div class="image-container">
             @if (_imageSource is not null)
             {
                 <img src="@_imageSource"/>
@@ -66,5 +66,17 @@
       grid-template-columns: repeat(3, 1fr);
       column-gap: 32px;
       row-gap: 4px;
-    }                
+    }
+    
+    .image-container {
+        width: 250px;
+        height: 200px;
+        text-align: center;
+        display: block;
+    }
+    
+    .container img {
+        margin: auto;
+        display: block;
+    }             
 </style>
