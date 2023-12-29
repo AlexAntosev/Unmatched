@@ -9,7 +9,6 @@
 <div class="page-content">
     <TotalMatchesRecord Total="Player.TotalMatches" Wins="Player.TotalWins" Looses="Player.TotalLooses" Kd="Player.Kd"></TotalMatchesRecord>
     <DuelMatches matchLogEntries="matchLogEntries" PageSize="10"></DuelMatches>
-    <HeroesMatchesPieChart HeroesMatches="_favoritesMatches"></HeroesMatchesPieChart>
 </div>
 
 @code {
@@ -21,7 +20,6 @@
     public PlayerStatisticsDto Player { get; set; } = new ();
 
     private IEnumerable<IGrouping<string, FighterDto>> _matches;
-    private IEnumerable<IGrouping<string, FighterDto>> _favoritesMatches;
     private string? _favoriteColor { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -38,7 +36,6 @@
             .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
             .GroupBy(f => f.HeroName);
         
-        _favoritesMatches = _matches.OrderByDescending(g => g.Count()).Take(10);
         
         var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
         var favoriteMatch = matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.HeroName == favoriteName));

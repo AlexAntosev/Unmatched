@@ -3,7 +3,7 @@
 <div style="background: linear-gradient(180deg, @FavoriteColor 0%, rgba(255,255,255,1) 100%);">
     <h3 align="center" class="page-title">@Player.PlayerName</h3>
     <div class="wrapper page-content">
-        <div>
+        <div class="image-container">
             @if (_imageSource is not null)
             {
                 <img src="@_imageSource"/>
@@ -14,6 +14,9 @@
             <StatisticsRecord Title="Strongest hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
             <StatisticsRecord Title="Weakest hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
             <h4>Titles:</h4>
+        </div>
+        <div>
+            <HeroesMatchesPieChart HeroesMatches="_favoritesMatches"></HeroesMatchesPieChart>
         </div>
     </div>
 </div>
@@ -50,6 +53,7 @@
                     .ThenBy(g => g.Select(f => f.HpLeft ?? 0).Sum())
                     .ThenBy(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
                     .FirstOrDefault();
+                _favoritesMatches = _matches.OrderByDescending(g => g.Count()).Take(10);
             }
         }
     }
@@ -63,17 +67,26 @@
     private IGrouping<string, FighterDto> _favoriteMatches;
     private IGrouping<string, FighterDto> _strongestHeroMatches;
     private IGrouping<string, FighterDto> _weakestHeroMatches;
-    
-    protected override async Task OnInitializedAsync()
-    {
-    }
+    private IEnumerable<IGrouping<string, FighterDto>> _favoritesMatches;
 }
 
 <style>
     .wrapper {
       display: grid;
-      grid-template-columns: 1fr 4fr;
+      grid-template-columns: 1fr 3fr 1fr;
       column-gap: 32px;
       row-gap: 4px;
-    }                
+    } 
+    
+    .image-container {
+        width: 250px;
+        height: 200px;
+        text-align: center;
+        display: block;
+    }
+    
+    .container img {
+        margin: auto;
+        display: block;
+    }          
 </style>
