@@ -1,7 +1,5 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
-using Microsoft.EntityFrameworkCore.Storage;
-
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
 
@@ -27,6 +25,8 @@ public class UnitOfWork : IUnitOfWork
 
     public ITournamentRepository Tournaments { get; }
     
+    public ITitleRepository Titles { get; }
+    
     public UnitOfWork(UnmatchedDbContext context)
     {
         _context = context;
@@ -39,6 +39,7 @@ public class UnitOfWork : IUnitOfWork
         Ratings = new RatingRepository(context);
         Sidekicks = new SidekickRepository(context);
         Tournaments = new TournamentRepository(context);
+        Titles = new TitleRepository(context);
     }
 
     public Task SaveChangesAsync() 

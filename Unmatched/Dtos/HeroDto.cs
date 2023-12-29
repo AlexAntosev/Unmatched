@@ -13,4 +13,6 @@ public class HeroDto
     public IEnumerable<SidekickDto> Sidekicks { get; set; }
     
     public string Color { get; set; }
+    
+    public IEnumerable<TitleDto> Titles { get; set; }
 }

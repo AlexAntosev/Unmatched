@@ -1,0 +1,28 @@
+﻿@page "/titles"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@inject ITitleService TitleService
+
+<h3>Titles</h3>
+
+<EditForm Model=@Title>
+    <div>
+        <label for="Name">Name:</label>
+        <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
+    </div>
+    <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
+</EditForm>
+
+@code {
+    readonly TitleDto Title = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    public async Task AddAsync()
+    {
+        var title = Title;
+        await TitleService.AddAsync(title);
+    }
+}

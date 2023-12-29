@@ -22,5 +22,7 @@ public interface IUnitOfWork : IDisposable
     
     ITournamentRepository Tournaments { get; }
     
+    ITitleRepository Titles { get; }
+    
     Task SaveChangesAsync();
 }

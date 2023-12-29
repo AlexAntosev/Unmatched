@@ -55,4 +55,6 @@ public class UnmatchedDbContext : DbContext
     public DbSet<Sidekick> Sidekicks { get; set; }
 
     public DbSet<Tournament> Tournaments { get; set; }
+    
+    public DbSet<Title> Titles { get; set; }
 }

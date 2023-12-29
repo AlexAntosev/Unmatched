@@ -4,17 +4,12 @@ using System.ComponentModel.DataAnnotations;
 
 public class Hero
 {
-    public Hero()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public int DeckSize { get; set; }
 
     public int Hp { get; set; }
 
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public bool IsRanged { get; set; }
 
@@ -23,4 +18,6 @@ public class Hero
     public virtual ICollection<Sidekick> Sidekicks { get; set; }
     
     public string Color { get; set; }
+    
+    public virtual ICollection<Title> Titles { get; set; }
 }
