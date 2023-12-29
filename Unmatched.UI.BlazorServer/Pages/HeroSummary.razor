@@ -2,19 +2,19 @@
 
 <div style="background: linear-gradient(180deg, @Hero.Hero.Color 0%, rgba(255,255,255,1) 100%);">
     <h3 align="center" class="page-title">@Hero.HeroName</h3>
-    <div class="wrapper page-content" >
+    <div class="wrapper page-content">
         <div>
             @if (_imageSource is not null)
             {
                 <img src="@_imageSource"/>
             }
-            <h5>Titles: -</h5>
         </div>
         <div>
            <h5>Current Place: @_hero.Place (@_hero.Points points)</h5>
            <img src="@($"/{(_hero.IsRanged ? "Ranged" : "Melee")}.png")" alt="@_hero.HeroId" width="64px" height="auto"/>
            <h5>Hp: @_hero.Hero.Hp</h5>
            <h5>Deck size: @_hero.Hero.DeckSize</h5> 
+           <h5>Titles:</h5>
         </div>
         <div>
            @if (_hero.Hero.Sidekicks is not null && _hero.Hero.Sidekicks.Any())

@@ -10,7 +10,7 @@
 else
 {
     <SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">
-        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridPageSettings PageSize="@PageSize"></GridPageSettings>
         <GridEvents QueryCellInfo="CustomizeCell" TValue="ExpandoObject"></GridEvents>
         <GridColumns>
             <GridColumn Field="Date" Format="d" Type="ColumnType.Date" HeaderText="Date" Width="40" HeaderTextAlign="TextAlign.Center"></GridColumn>
@@ -79,6 +79,9 @@ else
             }
             
         } }
+
+    [Parameter]
+    public int PageSize { get; set; } = 20;
     
     public List<ExpandoObject> GridData { get; set; } = new();
 

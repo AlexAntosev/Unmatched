@@ -2,22 +2,14 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
 @inject IPlayerStatisticsService PlayerStatisticsService
-@using BlazorBootstrap
 
+<div style="margin-bottom: 16px">
+    <PlayerSummary Player="Player" Matches="_matches" FavoriteColor="@_favoriteColor"></PlayerSummary>
+</div>
 <div class="page-content">
-    <h1 align="center" class="page-title">@Player.PlayerName</h1>
-    <div style="margin-bottom: 16px">
-        <img src="@imageSource" />
-        <StatisticsRecord Title="Favorite" HeroMatches="_favoriteMatches"></StatisticsRecord>
-        <StatisticsRecord Title="Strongest hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
-        <StatisticsRecord Title="Weakest hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
-    </div>
     <TotalMatchesRecord Total="Player.TotalMatches" Wins="Player.TotalWins" Looses="Player.TotalLooses" Kd="Player.Kd"></TotalMatchesRecord>
-    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
-    
-    <div>
-        <PieChart @ref="pieChart" Width="500" Class="mb-5"/>
-    </div>
+    <DuelMatches matchLogEntries="matchLogEntries" PageSize="10"></DuelMatches>
+    <HeroesMatchesPieChart HeroesMatches="_favoritesMatches"></HeroesMatchesPieChart>
 </div>
 
 @code {
@@ -28,16 +20,9 @@
 
     public PlayerStatisticsDto Player { get; set; } = new ();
 
-    private string? imageSource;
-    private IGrouping<string, FighterDto> _favoriteMatches;
-    private IGrouping<string, FighterDto> _strongestHeroMatches;
-    private IGrouping<string, FighterDto> _weakestHeroMatches;
-    
-    private PieChart pieChart = default!;
-    private PieChartOptions pieChartOptions = default!;
-    private ChartData chartData = default!;
-    private List<string>? backgroundColors = new();
-    private int dataCount;
+    private IEnumerable<IGrouping<string, FighterDto>> _matches;
+    private IEnumerable<IGrouping<string, FighterDto>> _favoritesMatches;
+    private string? _favoriteColor { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,98 +33,15 @@
         {
             matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == playerId);
         }
-        imageSource = $"/{Player.PlayerName}.png";
 
-        var heroesFights = matchLogEntries
+        _matches = matchLogEntries
             .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
             .GroupBy(f => f.HeroName);
         
-        var favoritesMatches = heroesFights.OrderByDescending(g => g.Count()).Take(10);
-
-        _favoriteMatches = favoritesMatches.FirstOrDefault();
-        _strongestHeroMatches = heroesFights
-            .OrderByDescending(g => g.Count(f => f.IsWinner))
-            .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
-            .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-            .FirstOrDefault();
-        _weakestHeroMatches = heroesFights
-            .OrderByDescending(g => g.Count(f => !f.IsWinner))
-            .ThenBy(g => g.Select(f => f.HpLeft ?? 0).Sum())
-            .ThenBy(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-            .FirstOrDefault();
+        _favoritesMatches = _matches.OrderByDescending(g => g.Count()).Take(10);
         
-        chartData = new ChartData { Labels = GetDataLabels(favoritesMatches), Datasets = GetDataSets(favoritesMatches) };
-
-        pieChartOptions = new();
-        pieChartOptions.Responsive = true;
-        pieChartOptions.Plugins.Title.Text = "Favorites";
-        pieChartOptions.Plugins.Title.Display = true;
-        
-        await pieChart.UpdateAsync(chartData, pieChartOptions);
-    }
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            chartData = new ChartData { Labels = new List<string>(), Datasets = new List<IChartDataset>() };
-            pieChartOptions = new();
-            await pieChart.InitializeAsync(chartData, pieChartOptions, plugins: new [] { "ChartDataLabels" });
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-    
-    private List<string> GetDataLabels(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
-    {
-        var labels = new List<string>();
-        foreach (var heroFights in heroesFights)
-        {
-            labels.Add(heroFights.Key);
-        }
-
-        return labels;
-    }
-    
-    private List<IChartDataset> GetDataSets(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
-    {
-        var datasets = new List<IChartDataset>
-            {
-                GetDataset(heroesFights)
-            };
-
-        return datasets;
-    }
-    
-    private PieChartDataset GetDataset(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
-    {
-        var data = new List<double>();
-        foreach (var heroFights in heroesFights)
-        {
-            dataCount += 1;
-            backgroundColors.Add(heroFights.First().HeroColor);
-            data.Add(heroFights.Count());
-        }
-        var dataset = new PieChartDataset()
-            {
-                Label = "Fights",
-                Data = data,
-                BackgroundColor = GetRandomBackgroundColors(),
-                Datalabels = new PieChartDatasetDataLabels()
-                    {
-                        Anchor =  "center"
-                    }
-            };
-        return dataset;
-    }
-
-    private List<string> GetRandomBackgroundColors()
-    {
-        var colors = new List<string>();
-        for (var index = 0; index < dataCount; index++)
-        {
-            colors.Add(backgroundColors![index]);
-        }
-
-        return colors;
+        var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
+        var favoriteMatch = matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.HeroName == favoriteName));
+        _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.HeroName == favoriteName)?.HeroColor;
     }
 }

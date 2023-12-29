@@ -1,0 +1,104 @@
+﻿@using BlazorBootstrap
+@using Unmatched.Dtos
+
+<PieChart @ref="pieChart" Width="500" Class="mb-5"/>
+
+@code {
+    [Parameter]
+    public IEnumerable<IGrouping<string, FighterDto>>? HeroesMatches
+    {
+        get => _heroesMatches;
+        set
+        {
+            _heroesMatches = value;
+            if (_heroesMatches is not null)
+            {
+                chartData = new ChartData { Labels = GetDataLabels(_heroesMatches), Datasets = GetDataSets(_heroesMatches) };
+                pieChart.UpdateAsync(chartData, pieChartOptions);
+            }
+        } 
+    }
+    
+    private PieChart pieChart = default!;
+    private PieChartOptions pieChartOptions = default!;
+    private ChartData chartData = default!;
+    private List<string>? backgroundColors = new();
+    private int dataCount;
+
+    private IEnumerable<IGrouping<string, FighterDto>>? _heroesMatches;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        pieChartOptions = new PieChartOptions
+            {
+                Responsive = true
+            };
+        pieChartOptions.Plugins.Title.Text = "Favorites";
+        pieChartOptions.Plugins.Title.Display = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            chartData = new ChartData { Labels = new List<string>(), Datasets = new List<IChartDataset>() };
+            pieChartOptions = new();
+            await pieChart.InitializeAsync(chartData, pieChartOptions, plugins: new [] { "ChartDataLabels" });
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    
+    private List<string> GetDataLabels(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    {
+        var labels = new List<string>();
+        foreach (var heroFights in heroesFights)
+        {
+            labels.Add(heroFights.Key);
+        }
+
+        return labels;
+    }
+    
+    private List<IChartDataset> GetDataSets(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    {
+        var datasets = new List<IChartDataset>
+            {
+                GetDataset(heroesFights)
+            };
+
+        return datasets;
+    }
+    
+    private PieChartDataset GetDataset(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    {
+        var data = new List<double>();
+        foreach (var heroFights in heroesFights)
+        {
+            dataCount += 1;
+            backgroundColors.Add(heroFights.First().HeroColor);
+            data.Add(heroFights.Count());
+        }
+        var dataset = new PieChartDataset()
+            {
+                Label = "Fights",
+                Data = data,
+                BackgroundColor = GetRandomBackgroundColors(),
+                Datalabels = new PieChartDatasetDataLabels()
+                    {
+                        Anchor =  "center"
+                    }
+            };
+        return dataset;
+    }
+
+    private List<string> GetRandomBackgroundColors()
+    {
+        var colors = new List<string>();
+        for (var index = 0; index < dataCount; index++)
+        {
+            colors.Add(backgroundColors![index]);
+        }
+
+        return colors;
+    }
+}

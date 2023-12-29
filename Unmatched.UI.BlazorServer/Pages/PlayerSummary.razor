@@ -1,0 +1,79 @@
+﻿@using Unmatched.Dtos
+
+<div style="background: linear-gradient(180deg, @FavoriteColor 0%, rgba(255,255,255,1) 100%);">
+    <h3 align="center" class="page-title">@Player.PlayerName</h3>
+    <div class="wrapper page-content">
+        <div>
+            @if (_imageSource is not null)
+            {
+                <img src="@_imageSource"/>
+            }
+        </div>
+        <div>
+            <StatisticsRecord Title="Favorite" HeroMatches="_favoriteMatches"></StatisticsRecord>
+            <StatisticsRecord Title="Strongest hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
+            <StatisticsRecord Title="Weakest hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
+            <h4>Titles:</h4>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PlayerStatisticsDto Player
+    {
+        get => _player;
+        set
+        {
+            _player = value;
+            _imageSource = $"/{value.PlayerName}.png";
+        }
+    }
+    
+    [Parameter]
+    public IEnumerable<IGrouping<string, FighterDto>> Matches
+    {
+        get => _matches;
+        set
+        {
+            _matches = value;
+            if (value is not null)
+            {
+                _favoriteMatches = _matches.OrderByDescending(g => g.Count()).FirstOrDefault();
+                _strongestHeroMatches = _matches
+                    .OrderByDescending(g => g.Count(f => f.IsWinner))
+                    .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+                    .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+                    .FirstOrDefault();
+                _weakestHeroMatches = _matches
+                    .OrderByDescending(g => g.Count(f => !f.IsWinner))
+                    .ThenBy(g => g.Select(f => f.HpLeft ?? 0).Sum())
+                    .ThenBy(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+                    .FirstOrDefault();
+            }
+        }
+    }
+
+    [Parameter]
+    public string? FavoriteColor { get; set; } = "rgba(255,255,255,1)";
+
+    private PlayerStatisticsDto? _player;
+    private IEnumerable<IGrouping<string, FighterDto>> _matches;
+    private string? _imageSource;
+    private IGrouping<string, FighterDto> _favoriteMatches;
+    private IGrouping<string, FighterDto> _strongestHeroMatches;
+    private IGrouping<string, FighterDto> _weakestHeroMatches;
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}
+
+<style>
+    .wrapper {
+      display: grid;
+      grid-template-columns: 1fr 4fr;
+      column-gap: 32px;
+      row-gap: 4px;
+    }                
+</style>
