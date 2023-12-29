@@ -24,7 +24,7 @@ public class TitleRepository : ITitleRepository
 
     public void AddOrUpdate(Title model)
     {
-        throw new NotImplementedException();
+        _dbContext.Update(model);
     }
 
     public async Task AddRangeAsync(IEnumerable<Title> models)
