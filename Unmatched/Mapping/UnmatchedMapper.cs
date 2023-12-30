@@ -33,6 +33,7 @@ public class UnmatchedMapper : Profile
         CreateMap<Tournament, TournamentDto>().ReverseMap();
         CreateMap<Match, MatchWithStage>().ForMember(x => x.Stage, o => o.Ignore()).ReverseMap();
         CreateMap<Title, TitleDto>().ReverseMap();
+        CreateMap<Hero, HeroTitleAssignDto>();
     }
 
     private string TryGetMapName(Map? map)

@@ -23,4 +23,22 @@ public class HeroService : IHeroService
 
         return heroes;
     }
+
+    public async Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId)
+    {
+        var entities = await _unitOfWork.Heroes.Query().ToListAsync();
+        var title = await _unitOfWork.Titles.Query().Include(t => t.Heroes).FirstOrDefaultAsync(t => t.Id == titleId);
+
+        var heroes = _mapper.Map<IEnumerable<HeroTitleAssignDto>>(entities);
+
+        foreach (var hero in heroes)
+        {
+            if (title is not null)
+            {
+                hero.IsAssigned = title.Heroes.Any(h => h.Id == hero.Id);
+            }
+        }
+
+        return heroes;
+    }
 }

@@ -25,7 +25,7 @@ public class TitleService : ITitleService
     
     public async Task<IEnumerable<TitleDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Titles.Query().ToListAsync();
+        var entities = await _unitOfWork.Titles.Query().Include(t => t.Heroes).ToListAsync();
         var titles = _mapper.Map<IEnumerable<TitleDto>>(entities);
 
         return titles;
@@ -48,5 +48,47 @@ public class TitleService : ITitleService
             _unitOfWork.Titles.AddOrUpdate(title);
             await _unitOfWork.SaveChangesAsync();
         }
+    }
+
+    public async Task UnassignAsync(Guid titleId, Guid heroId)
+    {
+        var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
+        var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
+        
+        if (title.Heroes.Any(h => h.Id == hero.Id))
+        {
+            title.Heroes.Remove(hero);
+            _unitOfWork.Titles.AddOrUpdate(title);
+            await _unitOfWork.SaveChangesAsync();
+        }
+    }
+
+    public async Task MergeAsync(Guid titleId, IEnumerable<Guid> heroesIds)
+    {
+        var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
+
+        foreach (var titleHero in title.Heroes)
+        {
+            if (heroesIds.All(id => id != titleHero.Id))
+            {
+                title.Heroes.Remove(titleHero);
+            }
+        }
+
+        foreach (var heroId in heroesIds)
+        {
+            if (title.Heroes.Any(h => h.Id == heroId))
+            {
+                continue;
+            }
+
+            if (title.Heroes.All(h => h.Id != heroId))
+            {
+                var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
+                title.Heroes.Add(hero);
+            }
+        }
+
+        await _unitOfWork.SaveChangesAsync();
     }
 }

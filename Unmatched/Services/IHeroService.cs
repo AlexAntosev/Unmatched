@@ -5,4 +5,6 @@ using Unmatched.Dtos;
 public interface IHeroService
 {
     Task<IEnumerable<HeroDto>> GetAsync();
+
+    Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId);
 }

@@ -11,4 +11,8 @@ public interface ITitleService
     Task DeleteAsync(Guid id);
 
     Task AssignAsync(Guid titleId, Guid heroId);
+    
+    Task UnassignAsync(Guid titleId, Guid heroId);
+    
+    Task MergeAsync(Guid titleId, IEnumerable<Guid> heroesIds);
 }
