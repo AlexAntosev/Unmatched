@@ -7,7 +7,7 @@
 <div class="page-content">
     <h1 class="page-title">Titles</h1>
     <div style="margin-bottom: 16px">
-        <SfGrid DataSource="@titles" AllowPaging="true" AllowSorting="true">
+        <SfGrid DataSource="@_titles" AllowPaging="true" AllowSorting="true">
             <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
             <GridPageSettings PageSize="20"></GridPageSettings>
             <GridColumns>
@@ -22,19 +22,19 @@
         </SfGrid>
     </div>
     <div>
-        <EditForm Model=@Title>
+        <EditForm Model=@_addTitleForm>
             <div style="width: 256px; margin-bottom: 8px">
-                <label for="Name">Name:</label>
-                <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
+                <label>Name:</label>
+                <InputText @bind-Value=_addTitleForm.Name name="Name" class="form-control"/>
             </div>
             <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
         </EditForm>
     </div>
     
     <div>
-        <BlazorBootstrap.Modal @ref="modal" Title="Heroes">
+        <BlazorBootstrap.Modal @ref="_heroesDialog" Title="Heroes">
             <BodyTemplate>
-                <SfGrid @ref="HeroesGrid" DataSource="@heroes" AllowSorting="true" AllowSelection="true">
+                <SfGrid @ref="_heroesGrid" DataSource="@_heroes" AllowSorting="true" AllowSelection="true">
                     <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple"></GridSelectionSettings>
                     <GridPageSettings PageSize="10"></GridPageSettings>
                     <GridEvents RowDataBound="OnRowDataBound" DataBound="OnDataBound" TValue="HeroTitleAssignDto"></GridEvents>
@@ -53,13 +53,15 @@
 </div>
 
 @code {
-    private IEnumerable<TitleDto> titles;
-    private IEnumerable<HeroTitleAssignDto> heroes;
-    readonly TitleDto Title = new();
-    private Guid SelectedTitleId = Guid.Empty;
-    SfGrid<HeroTitleAssignDto> HeroesGrid;
-    public List<int> SelectedIndexes = new();
-    private BlazorBootstrap.Modal modal = default!;
+    private List<TitleDto> _titles = new ();
+    private List<HeroTitleAssignDto> _heroes = new();
+    private readonly TitleDto _addTitleForm = new();
+    private Guid _selectedTitleId = Guid.Empty;
+    private List<int> _selectedHeroesIndexes = new();
+
+    SfGrid<HeroTitleAssignDto> _heroesGrid;
+    private BlazorBootstrap.Modal _heroesDialog = default!;
+    
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -67,7 +69,7 @@
         try
         {
             PreloadService.Show();
-            titles = await TitleService.GetAsync();
+            _titles = (await TitleService.GetAsync()).ToList();
         }
         finally
         {
@@ -75,58 +77,75 @@
         }
     }
 
-    public async Task AddAsync()
+    private async Task AddAsync()
     {
-        var title = Title;
-        await TitleService.AddAsync(title);
-        titles = await TitleService.GetAsync();
-    }
-    
-    public async Task OnCommandClicked(CommandClickEventArgs<TitleDto> args)
-    {
-        if (args.CommandColumn.Type is CommandButtonType.Delete)
+        if (_addTitleForm.Name is null)
         {
-            await TitleService.DeleteAsync(args.RowData.Id);
-            titles = await TitleService.GetAsync();
+            return;
         }
         
-        if (args.CommandColumn.Type is CommandButtonType.Edit)
+        if (_addTitleForm.Name == string.Empty)
         {
-            SelectedIndexes = new();
-            SelectedTitleId = args.RowData.Id;
-            heroes = await HeroService.GetHeroesForTitleAssign(SelectedTitleId);
-            await modal.ShowAsync();
+            return;
+        }
+        
+        if (_titles.Any(t => t.Name ==_addTitleForm.Name))
+        {
+            return;
+        }
+        
+        var title = _addTitleForm;
+        await TitleService.AddAsync(title);
+        _titles = (await TitleService.GetAsync()).ToList();
+    }
+
+    private async Task OnCommandClicked(CommandClickEventArgs<TitleDto> args)
+    {
+        switch (args.CommandColumn.Type)
+        {
+            case CommandButtonType.Delete:
+                await TitleService.DeleteAsync(args.RowData.Id);
+                _titles = (await TitleService.GetAsync()).ToList();
+                break;
+            case CommandButtonType.Edit:
+                _selectedHeroesIndexes = new();
+                _selectedTitleId = args.RowData.Id;
+                _heroes = (await HeroService.GetHeroesForTitleAssign(_selectedTitleId)).ToList();
+                await _heroesDialog.ShowAsync();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
     
     private async Task OnHideClick()
     {
-        await modal.HideAsync();
+        await _heroesDialog.HideAsync();
     }
     
     private async Task OnAssignClick()
     {
-        await TitleService.MergeAsync(SelectedTitleId, HeroesGrid.SelectedRecords.Select(h => h.Id));
-        await modal.HideAsync();
-        titles = await TitleService.GetAsync();
-    }
-    
-    public async Task  OnDataBound(object args)
-    {
-        await HeroesGrid.SelectRowsAsync(SelectedIndexes.ToArray());
+        await TitleService.MergeAsync(_selectedTitleId, _heroesGrid.SelectedRecords.Select(h => h.Id));
+        await _heroesDialog.HideAsync();
+        _titles = (await TitleService.GetAsync()).ToList();
     }
 
-    public void OnRowDataBound(RowDataBoundEventArgs<HeroTitleAssignDto> args)
+    private async Task  OnDataBound(object args)
+    {
+        await _heroesGrid.SelectRowsAsync(_selectedHeroesIndexes.ToArray());
+    }
+
+    private void OnRowDataBound(RowDataBoundEventArgs<HeroTitleAssignDto> args)
     {
         if (args.Data.IsAssigned)
         {
-            var dataSource = HeroesGrid.DataSource;
+            var dataSource = _heroesGrid.DataSource;
             var index = 0;
             foreach (var data in dataSource)
             {
                 if (data.Id == args.Data.Id)
                 {
-                    SelectedIndexes.Add(index);
+                    _selectedHeroesIndexes.Add(index);
                     break;
                 }
                 index++;
