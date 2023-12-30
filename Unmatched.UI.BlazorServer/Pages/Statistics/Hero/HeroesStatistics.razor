@@ -5,10 +5,7 @@
 @inject IHeroStatisticsService HeroStatisticsService
 
 <div class="page-content">
-    <PageTitle>Heroes Statistics</PageTitle>
-
     <h1 class="page-title">Heroes Statistics</h1>
-
     <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>

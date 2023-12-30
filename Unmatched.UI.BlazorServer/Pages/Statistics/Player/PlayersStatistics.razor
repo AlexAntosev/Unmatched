@@ -5,10 +5,7 @@
 @inject IPlayerStatisticsService PlayerStatisticsService
 
 <div class="page-content">
-    <PageTitle>Players Statistics</PageTitle>
-
     <h1 class="page-title">Players Statistics</h1>
-    
     <SfGrid DataSource="@players" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>

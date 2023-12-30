@@ -5,10 +5,7 @@
 @inject IMapStatisticsService MapStatisticsService
 
 <div class="page-content">
-    <PageTitle>Maps Statistics</PageTitle>
-
     <h1 class="page-title">Maps Statistics</h1>
-    
     <SfGrid DataSource="@maps" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>

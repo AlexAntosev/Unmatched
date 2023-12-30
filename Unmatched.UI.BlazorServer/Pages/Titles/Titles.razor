@@ -5,10 +5,7 @@
 @inject IHeroService HeroService
 
 <div class="page-content">
-    <PageTitle>Titles</PageTitle>
-
     <h1 class="page-title">Titles</h1>
-    
     <div style="margin-bottom: 16px">
         <SfGrid DataSource="@titles" AllowPaging="true" AllowSorting="true">
             <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
