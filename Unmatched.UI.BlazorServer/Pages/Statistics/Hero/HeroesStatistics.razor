@@ -47,6 +47,7 @@
 
 @code {
     private List<HeroStatisticsDto> _heroes = new();
+    
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()

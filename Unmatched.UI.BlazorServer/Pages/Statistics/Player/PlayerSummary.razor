@@ -4,10 +4,7 @@
     <h3 align="center" class="page-title">@Player.PlayerName</h3>
     <div class="wrapper page-content">
         <div class="image-container">
-            @if (_imageSource is not null)
-            {
-                <img src="@_imageSource"/>
-            }
+            <img src="@_imageSource"/>
         </div>
         <div>
             <StatisticsRecord Title="Favorite" HeroMatches="_favoriteMatches"></StatisticsRecord>
@@ -34,40 +31,37 @@
     }
     
     [Parameter]
-    public IEnumerable<IGrouping<string, FighterDto>> Matches
+    public List<IGrouping<string, FighterDto>> Matches
     {
         get => _matches;
         set
         {
             _matches = value;
-            if (value is not null)
-            {
-                _favoriteMatches = _matches.OrderByDescending(g => g.Count()).FirstOrDefault();
-                _strongestHeroMatches = _matches
-                    .OrderByDescending(g => g.Count(f => f.IsWinner))
-                    .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
-                    .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-                    .FirstOrDefault();
-                _weakestHeroMatches = _matches
-                    .OrderByDescending(g => g.Count(f => !f.IsWinner))
-                    .ThenBy(g => g.Select(f => f.HpLeft ?? 0).Sum())
-                    .ThenBy(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-                    .FirstOrDefault();
-                _favoritesMatches = _matches.OrderByDescending(g => g.Count()).Take(10);
-            }
+            _favoriteMatches = _matches.OrderByDescending(g => g.Count()).FirstOrDefault();
+            _strongestHeroMatches = _matches
+                .OrderByDescending(g => g.Count(f => f.IsWinner))
+                .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+                .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+                .FirstOrDefault();
+            _weakestHeroMatches = _matches
+                .OrderByDescending(g => g.Count(f => !f.IsWinner))
+                .ThenBy(g => g.Select(f => f.HpLeft ?? 0).Sum())
+                .ThenBy(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+                .FirstOrDefault();
+            _favoritesMatches = _matches.OrderByDescending(g => g.Count()).Take(10).ToList();
         }
     }
 
     [Parameter]
-    public string? FavoriteColor { get; set; } = "rgba(255,255,255,1)";
+    public string FavoriteColor { get; set; } = "rgba(255,255,255,1)";
 
-    private PlayerStatisticsDto? _player;
-    private IEnumerable<IGrouping<string, FighterDto>> _matches;
-    private string? _imageSource;
+    private PlayerStatisticsDto _player = new();
+    private List<IGrouping<string, FighterDto>> _matches = new();
+    private string _imageSource = "";
     private IGrouping<string, FighterDto> _favoriteMatches;
     private IGrouping<string, FighterDto> _strongestHeroMatches;
     private IGrouping<string, FighterDto> _weakestHeroMatches;
-    private IEnumerable<IGrouping<string, FighterDto>> _favoritesMatches;
+    private List<IGrouping<string, FighterDto>> _favoritesMatches = new();
 }
 
 <style>

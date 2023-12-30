@@ -6,13 +6,13 @@
 <div class="page-content">
     <h1 class="page-title">Duel Match log</h1>
 
-    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
 </div>
 
 
 @code {
-
-    private IEnumerable<MatchLogDto> matchLogEntries;
+    private List<MatchLogDto> _matchLogEntries = new();
+    
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -20,8 +20,8 @@
         try
         {
             PreloadService.Show();
-            matchLogEntries = (await MatchService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
-            foreach (var matchLogEntry in matchLogEntries)
+            _matchLogEntries = (await MatchService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToList();
+            foreach (var matchLogEntry in _matchLogEntries)
             {
                 matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
             }

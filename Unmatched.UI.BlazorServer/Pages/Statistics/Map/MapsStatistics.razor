@@ -6,7 +6,7 @@
 
 <div class="page-content">
     <h1 class="page-title">Maps Statistics</h1>
-    <SfGrid DataSource="@maps" AllowPaging="true" AllowSorting="true">
+    <SfGrid DataSource="@_maps" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
         <GridColumns>
@@ -17,8 +17,8 @@
 </div>
 
 @code {
+    private List<MapStatisticsDto> _maps = new();
 
-    private IEnumerable<MapStatisticsDto> maps;
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -26,15 +26,15 @@
         try
         {
             PreloadService.Show();
-            maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToArray();
+            _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToList();
         }
         finally
         {
             PreloadService.Hide();
         }
     }
-    
-    public void RecordClickHandler(RecordClickEventArgs<MapStatisticsDto> args)
+
+    private void RecordClickHandler(RecordClickEventArgs<MapStatisticsDto> args)
     {
         var mapId = args.RowData.MapId;
         var url = $"/maps-statistics/{mapId}";

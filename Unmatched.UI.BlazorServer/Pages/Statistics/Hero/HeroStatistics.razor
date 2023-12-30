@@ -10,29 +10,24 @@
 <div class="page-content">
     <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
     <TotalMatchesRecord Total="Hero.TotalMatches" Wins="Hero.TotalWins" Looses="Hero.TotalLooses" Kd="Hero.Kd"></TotalMatchesRecord>
-    <DuelMatches matchLogEntries="matchLogEntries"></DuelMatches>
+    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
 </div>
 <div class="page-content">
     <h4> Rating: </h4>
     <h5>Current Place: @Hero.Place (@Hero.Points points)</h5>
-    <LineChart @ref="lineChart" />
+    <LineChart @ref="_lineChart" />
 </div>
 
 @code {
     [Parameter]
-    public string id { get; set; }
+    public string Id { get; set; } = "";
     
-    private IEnumerable<MatchLogDto> matchLogEntries;
+    private List<MatchLogDto> _matchLogEntries = new();
+    private List<RatingChangeDto> _ratingChanges = new();
+    private IGrouping<string, FighterDto>? _againstAntagonistMatches;
+    private HeroStatisticsDto Hero { get; set; } = new () { Hero = new() };
+    private LineChart _lineChart;
 
-    public HeroStatisticsDto Hero { get; set; } = new ()
-        {
-            Hero = new()
-        };
-    private LineChart lineChart;
-    
-    private IGrouping<string, FighterDto> _againstAntagonistMatches;
-
-    public List<RatingChangeDto> RatingChanges = new();
     [Inject] protected PreloadService PreloadService { get; set; }
     
     protected override async Task OnInitializedAsync()
@@ -40,15 +35,20 @@
         try
         {
             PreloadService.Show();
-            var heroId = Guid.Parse(id);
+            Guid.TryParse(Id, out var heroId);
+            if (heroId == Guid.Empty)
+            {
+                return;
+            }
+            
             Hero = await HeroStatisticsService.GetHeroStatisticsAsync(heroId);
-            matchLogEntries = (await HeroStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToArray();
-            foreach (var matchLogEntry in matchLogEntries)
+            _matchLogEntries = (await HeroStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToList();
+            foreach (var matchLogEntry in _matchLogEntries)
             {
                 matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
             }
 
-            _againstAntagonistMatches = matchLogEntries
+            _againstAntagonistMatches = _matchLogEntries
                 .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
                 .GroupBy(f => f.HeroName)
                 .OrderByDescending(g => g.Count(f => f.IsWinner))
@@ -57,7 +57,7 @@
                 .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
                 .FirstOrDefault();
 
-            RatingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
+            _ratingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
             await UpdateChart();
         }
         finally
@@ -74,13 +74,13 @@
             };
         var data = new ChartData
             {
-                Labels = RatingChanges.Select(c => c.Date).ToList(),
+                Labels = _ratingChanges.Select(c => c.Date).ToList(),
                 Datasets = new List<IChartDataset>
                     {
                         new LineChartDataset
                             {
                                 Label = Hero.HeroName,
-                                Data = RatingChanges.Select(c => (double)c.Rating).ToList(),
+                                Data = _ratingChanges.Select(c => (double)c.Rating).ToList(),
                                 BackgroundColor = heroColor,
                                 BorderColor = heroColor,
                                 BorderWidth = new List<double>{2},
@@ -92,22 +92,27 @@
                             }
                     }
             };
-        var options = new LineChartOptions();
+        var options = new LineChartOptions
+            {
+                Interaction =
+                    {
+                        Mode = InteractionMode.Index
+                    }
+            };
 
-        options.Interaction.Mode = InteractionMode.Index;
-
-        options.Plugins.Title.Text = "Rating changes";
+        options.Plugins.Title!.Text = "Rating changes";
         options.Plugins.Title.Display = true;
-        options.Plugins.Title.Font.Size = 20;
+        options.Plugins.Title!.Font!.Size = 20;
 
         options.Responsive = true;
 
-        options.Scales.X.Title.Text = "Date";
+        options.Scales.X!.Title!.Text = "Date";
         options.Scales.X.Title.Display = true;
 
-        options.Scales.Y.Title.Text = "Rating";
+        options.Scales.Y!.Title!.Text = "Rating";
         options.Scales.Y.Title.Display = true;
-        await lineChart.UpdateAsync(data, options);
+
+        await _lineChart.UpdateAsync(data, options);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -116,13 +121,13 @@
         {
             var data = new ChartData
                 {
-                    Labels = RatingChanges.Select(c => c.Date).ToList(),
+                    Labels = _ratingChanges.Select(c => c.Date).ToList(),
                     Datasets = new List<IChartDataset>()
                 };
 
             var options = new LineChartOptions();
 
-            await lineChart.InitializeAsync(data, options);
+            await _lineChart.InitializeAsync(data, options);
         }
 
         await base.OnAfterRenderAsync(firstRender);

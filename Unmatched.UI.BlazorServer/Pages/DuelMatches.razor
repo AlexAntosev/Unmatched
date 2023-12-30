@@ -34,50 +34,47 @@
 </SfGrid>
 
 @code {
-    private IEnumerable<MatchLogDto> _matchLogEntries;
+    private List<MatchLogDto> _matchLogEntries = new();
+    
     [Parameter]
-    public IEnumerable<MatchLogDto> matchLogEntries {
+    public List<MatchLogDto> MatchLogEntries {
         get => _matchLogEntries;
         set
         {
             _matchLogEntries = value;
-            if (value is not null)
-            {
-                GridData = _matchLogEntries.Select(e =>
-                    {
-                        dynamic d = new ExpandoObject();
-                        d.Date = e.Date;
-                        d.Tournament = e.TournamentName;
-                        d.Map = e.MapName;
-                        var fighter = e.Fighters.First();
-                        d.FighterPlayer = fighter.PlayerName;
-                        d.FighterHero = fighter.HeroName;
-                        d.FighterHp = fighter.HpLeft;
-                        d.FighterSidekickHp = fighter.SidekickHpLeft;
-                        d.FighterCardsLeft = fighter.CardsLeft;
-                        d.FighterPoints = fighter.MatchPoints;
-                        d.IsFighterWinner = fighter.IsWinner;
-                        var opponent = e.Fighters.Last();
-                        d.OpponentPlayer = opponent.PlayerName;
-                        d.OpponentHero = opponent.HeroName;
-                        d.OpponentHp = opponent.HpLeft;
-                        d.OpponentSidekickHp = opponent.SidekickHpLeft;
-                        d.OpponentCardsLeft = opponent.CardsLeft;
-                        d.OpponentPoints = opponent.MatchPoints;
-                        d.IsOpponentWinner = opponent.IsWinner;
-                        d.Comment = e.Comment;
-                        return d;
-                    }).Cast<ExpandoObject>().ToList();
-            }
-            
+            GridData = _matchLogEntries.Select(e =>
+                {
+                    dynamic d = new ExpandoObject();
+                    d.Date = e.Date;
+                    d.Tournament = e.TournamentName;
+                    d.Map = e.MapName;
+                    var fighter = e.Fighters.First();
+                    d.FighterPlayer = fighter.PlayerName;
+                    d.FighterHero = fighter.HeroName;
+                    d.FighterHp = fighter.HpLeft;
+                    d.FighterSidekickHp = fighter.SidekickHpLeft;
+                    d.FighterCardsLeft = fighter.CardsLeft;
+                    d.FighterPoints = fighter.MatchPoints;
+                    d.IsFighterWinner = fighter.IsWinner;
+                    var opponent = e.Fighters.Last();
+                    d.OpponentPlayer = opponent.PlayerName;
+                    d.OpponentHero = opponent.HeroName;
+                    d.OpponentHp = opponent.HpLeft;
+                    d.OpponentSidekickHp = opponent.SidekickHpLeft;
+                    d.OpponentCardsLeft = opponent.CardsLeft;
+                    d.OpponentPoints = opponent.MatchPoints;
+                    d.IsOpponentWinner = opponent.IsWinner;
+                    d.Comment = e.Comment;
+                    return d;
+                }).Cast<ExpandoObject>().ToList();
         } }
 
     [Parameter]
     public int PageSize { get; set; } = 20;
-    
-    public List<ExpandoObject> GridData { get; set; } = new();
-    
-    public void CustomizeCell(QueryCellInfoEventArgs<ExpandoObject> args)
+
+    private List<ExpandoObject> GridData { get; set; } = new();
+
+    private void CustomizeCell(QueryCellInfoEventArgs<ExpandoObject> args)
     {
         var isFighterWinner = ((dynamic)args.Data).IsFighterWinner;
         var isOpponentWinner = ((dynamic)args.Data).IsOpponentWinner;
