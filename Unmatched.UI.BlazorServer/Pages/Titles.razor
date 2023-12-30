@@ -9,7 +9,7 @@
 
     <h1 class="page-title">Titles</h1>
 
-    @if (titles is null || heroes is null)
+    @if (titles is null)
     {
         <p>
             <em>Loading...</em>
@@ -23,7 +23,6 @@
                 <GridPageSettings PageSize="20"></GridPageSettings>
                 <GridColumns>
                     <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
-                    <GridColumn Field="Hero" HeaderText="Hero" Width="80"></GridColumn>
                     <GridColumn HeaderText="Manage Records" Width="150">
                         <GridCommandColumns>
                             <GridCommandColumn Type="CommandButtonType.Edit" Title="Assign" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
@@ -46,13 +45,12 @@
         <div>
             <BlazorBootstrap.Modal @ref="modal" Title="Heroes">
                 <BodyTemplate>
-                    <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true" AllowSelection="true">
-                        <GridEvents TValue="HeroDto" RowSelected="OnHeroSelected" />
-                        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                    <SfGrid @ref="HeroesGrid" DataSource="@heroes" AllowPaging="true" AllowSorting="true" AllowSelection="true">
+                        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple"></GridSelectionSettings>
                         <GridPageSettings PageSize="10"></GridPageSettings>
                         <GridColumns>
-                            <GridColumn Field=@nameof(HeroDto.Id) Type="ColumnType.CheckBox" Width="50"></GridColumn>
-                            <GridColumn Field=@nameof(HeroDto.Name) HeaderText="Hero" Width="120"></GridColumn>
+                            <GridColumn Field=@nameof(HeroTitleAssignDto.IsAssigned) Type="ColumnType.CheckBox" Width="50"></GridColumn>
+                            <GridColumn Field=@nameof(HeroTitleAssignDto.Name) HeaderText="Hero" Width="120"></GridColumn>
                         </GridColumns>
                     </SfGrid>
                 </BodyTemplate>
@@ -67,17 +65,16 @@
 
 @code {
     private IEnumerable<TitleDto> titles;
-    private IEnumerable<HeroDto> heroes;
+    private IEnumerable<HeroTitleAssignDto> heroes;
     readonly TitleDto Title = new();
     private Guid SelectedTitleId = Guid.Empty;
-    private Guid SelectedHeroId = Guid.Empty;
+    SfGrid<HeroTitleAssignDto> HeroesGrid;
     
     private BlazorBootstrap.Modal modal = default!;
 
     protected override async Task OnInitializedAsync()
     {
         titles = await TitleService.GetAsync();
-        heroes = await HeroService.GetAsync();
     }
 
     public async Task AddAsync()
@@ -98,6 +95,7 @@
         if (args.CommandColumn.Type is CommandButtonType.Edit)
         {
             SelectedTitleId = args.RowData.Id;
+            heroes = await HeroService.GetHeroesForTitleAssign(SelectedTitleId);
             await modal.ShowAsync();
         }
     }
@@ -109,13 +107,8 @@
     
     private async Task OnAssignClick()
     {
-        await TitleService.AssignAsync(SelectedTitleId, SelectedHeroId);
+        await TitleService.MergeAsync(SelectedTitleId, HeroesGrid.SelectedRecords.Select(h => h.Id));
         await modal.HideAsync();
         titles = await TitleService.GetAsync();
-    }
-
-    private void OnHeroSelected(RowSelectEventArgs<HeroDto> args)
-    {
-        SelectedHeroId = args.Data.Id;
     }
 }
