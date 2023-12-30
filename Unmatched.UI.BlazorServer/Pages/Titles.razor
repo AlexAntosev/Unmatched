@@ -17,13 +17,13 @@
     }
     else
     {
-        <div>
+        <div style="margin-bottom: 16px">
             <SfGrid DataSource="@titles" AllowPaging="true" AllowSorting="true">
                 <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
                 <GridPageSettings PageSize="20"></GridPageSettings>
                 <GridColumns>
                     <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
-                    <GridColumn HeaderText="Manage Records" Width="150">
+                    <GridColumn Width="150">
                         <GridCommandColumns>
                             <GridCommandColumn Type="CommandButtonType.Edit" Title="Assign" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
                             <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
@@ -34,7 +34,7 @@
         </div>
         <div>
             <EditForm Model=@Title>
-                <div>
+                <div style="width: 256px; margin-bottom: 8px">
                     <label for="Name">Name:</label>
                     <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
                 </div>
@@ -56,8 +56,8 @@
                     </SfGrid>
                 </BodyTemplate>
                 <FooterTemplate>
-                    <Button Color="ButtonColor.Secondary" @onclick="OnHideClick">Close</Button>
-                    <Button Color="ButtonColor.Primary" @onclick="OnAssignClick">Assign</Button>
+                    <button class="btn btn-secondary" @onclick="OnHideClick">Close</button>
+                    <button class="btn btn-primary" @onclick="OnAssignClick">Assign</button>
                 </FooterTemplate>
             </BlazorBootstrap.Modal>
         </div>
