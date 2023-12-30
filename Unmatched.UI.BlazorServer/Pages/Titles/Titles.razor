@@ -8,7 +8,7 @@
     <h1 class="page-title">Titles</h1>
     <div style="margin-bottom: 16px">
         <SfGrid DataSource="@_titles" AllowPaging="true" AllowSorting="true">
-            <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
+            <GridEvents CommandClicked="OnCommandClick" TValue="TitleDto"></GridEvents>
             <GridPageSettings PageSize="20"></GridPageSettings>
             <GridColumns>
                 <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
@@ -27,7 +27,7 @@
                 <label>Name:</label>
                 <InputText @bind-Value=_addTitleForm.Name name="Name" class="form-control"/>
             </div>
-            <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
+            <button class="btn btn-primary" @onclick="OnAddTitleClick">Add title</button>
         </EditForm>
     </div>
     
@@ -45,8 +45,8 @@
                 </SfGrid>
             </BodyTemplate>
             <FooterTemplate>
-                <button class="btn btn-secondary" @onclick="OnHideClick">Close</button>
-                <button class="btn btn-primary" @onclick="OnAssignClick">Assign</button>
+                <button class="btn btn-secondary" @onclick="OnCancelClick">Cancel</button>
+                <button class="btn btn-primary" @onclick="OnSaveClick">Save</button>
             </FooterTemplate>
         </BlazorBootstrap.Modal>
     </div>
@@ -66,9 +66,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await RefreshTitlesAsync();
+    }
+
+    private async Task RefreshTitlesAsync()
+    {
         try
         {
             PreloadService.Show();
+            
             _titles = (await TitleService.GetAsync()).ToList();
         }
         finally
@@ -77,57 +83,93 @@
         }
     }
 
-    private async Task AddAsync()
+    private async Task OnAddTitleClick()
     {
-        if (_addTitleForm.Name is null)
+        if (IsInvalidTitleName(_addTitleForm.Name))
         {
             return;
         }
         
-        if (_addTitleForm.Name == string.Empty)
-        {
-            return;
-        }
-        
-        if (_titles.Any(t => t.Name ==_addTitleForm.Name))
-        {
-            return;
-        }
-        
-        var title = _addTitleForm;
-        await TitleService.AddAsync(title);
-        _titles = (await TitleService.GetAsync()).ToList();
+        await AddTitleAsync(_addTitleForm);
     }
 
-    private async Task OnCommandClicked(CommandClickEventArgs<TitleDto> args)
+    private bool IsInvalidTitleName(string? titleName)
+    {
+        return titleName is null || titleName == string.Empty || _titles.Any(t => t.Name == titleName);
+    }
+    
+    private async Task AddTitleAsync(TitleDto title)
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            await TitleService.AddAsync(title);
+            _titles = (await TitleService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task OnCommandClick(CommandClickEventArgs<TitleDto> args)
     {
         switch (args.CommandColumn.Type)
         {
             case CommandButtonType.Delete:
-                await TitleService.DeleteAsync(args.RowData.Id);
-                _titles = (await TitleService.GetAsync()).ToList();
+                await DeleteTitleAsync(args.RowData.Id);
                 break;
             case CommandButtonType.Edit:
-                _selectedHeroesIndexes = new();
-                _selectedTitleId = args.RowData.Id;
-                _heroes = (await HeroService.GetHeroesForTitleAssign(_selectedTitleId)).ToList();
-                await _heroesDialog.ShowAsync();
+                await OnAssignClick(args);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
+
+    private async Task OnAssignClick(CommandClickEventArgs<TitleDto> args)
+    {
+        _selectedHeroesIndexes = new List<int>();
+        _selectedTitleId = args.RowData.Id;
+        _heroes = (await HeroService.GetHeroesForTitleAssign(_selectedTitleId)).ToList();
+        await _heroesDialog.ShowAsync();
+    }
+
+    private async Task DeleteTitleAsync(Guid id)
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            await TitleService.DeleteAsync(id);
+            _titles = (await TitleService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
     
-    private async Task OnHideClick()
+    private async Task OnCancelClick()
     {
         await _heroesDialog.HideAsync();
     }
     
-    private async Task OnAssignClick()
+    private async Task OnSaveClick()
     {
-        await TitleService.MergeAsync(_selectedTitleId, _heroesGrid.SelectedRecords.Select(h => h.Id));
-        await _heroesDialog.HideAsync();
-        _titles = (await TitleService.GetAsync()).ToList();
+        try
+        {
+            PreloadService.Show();
+            
+            await TitleService.MergeAsync(_selectedTitleId, _heroesGrid.SelectedRecords.Select(h => h.Id));
+            _titles = (await TitleService.GetAsync()).ToList();
+            await _heroesDialog.HideAsync();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
 
     private async Task  OnDataBound(object args)

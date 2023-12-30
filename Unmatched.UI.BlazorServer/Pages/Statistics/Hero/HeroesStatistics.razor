@@ -6,7 +6,7 @@
 
 <div class="page-content">
     <h1 class="page-title">Heroes Statistics</h1>
-    <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true">
+    <SfGrid DataSource="@_heroes" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
         <GridSortSettings>
@@ -46,7 +46,7 @@
 </div>
 
 @code {
-    private IEnumerable<HeroStatisticsDto> heroes;
+    private List<HeroStatisticsDto> _heroes = new();
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -54,15 +54,15 @@
         try
         {
             PreloadService.Show();
-            heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.HeroName).ToArray();
+            _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.HeroName).ToList();
         }
         finally
         {
             PreloadService.Hide();
         }
     }
-    
-    public void RecordClickHandler(RecordClickEventArgs<HeroStatisticsDto> args)
+
+    private void RecordClickHandler(RecordClickEventArgs<HeroStatisticsDto> args)
     {
         var heroId = args.RowData.HeroId;
         var url = $"/heroes-statistics/{heroId}";
