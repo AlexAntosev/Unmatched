@@ -1,45 +1,37 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Constants
 @using System.Dynamic
-@if (matchLogEntries == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">
-        <GridPageSettings PageSize="@PageSize"></GridPageSettings>
-        <GridEvents QueryCellInfo="CustomizeCell" TValue="ExpandoObject"></GridEvents>
-        <GridColumns>
-            <GridColumn Field="Date" Format="d" Type="ColumnType.Date" HeaderText="Date" Width="40" HeaderTextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="Tournament" HeaderText="Tournament" Width="70" HeaderTextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="Map" HeaderText="Map" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn HeaderText="Fighter" HeaderTextAlign="TextAlign.Center" Width="300">
-                <GridColumns>
-                    <GridColumn Field="FighterPlayer" HeaderText="Player" Width="40"></GridColumn>
-                    <GridColumn Field="FighterHero" HeaderText="Hero" Width="60"></GridColumn>
-                    <GridColumn Field="FighterHp" HeaderText="Hp" Width="30"></GridColumn>
-                    <GridColumn Field="FighterSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
-                    <GridColumn Field="FighterCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
-                    <GridColumn Field="FighterPoints" HeaderText="Points" Width="40"></GridColumn>
-                </GridColumns>
-            </GridColumn>
-            <GridColumn HeaderText="Opponent" HeaderTextAlign="TextAlign.Center" Width="300">
-                <GridColumns>
-                    <GridColumn Field="OpponentPlayer" HeaderText="Player" Width="40"></GridColumn>
-                    <GridColumn Field="OpponentHero" HeaderText="Hero" Width="60"></GridColumn>
-                    <GridColumn Field="OpponentHp" HeaderText="Hp" Width="30"></GridColumn>
-                    <GridColumn Field="OpponentSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
-                    <GridColumn Field="OpponentCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
-                    <GridColumn Field="OpponentPoints" HeaderText="Points" Width="40"></GridColumn>
-                </GridColumns>
-            </GridColumn>
-            <GridColumn Field="Comment" HeaderText="Comment" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-}
+
+<SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">
+    <GridPageSettings PageSize="@PageSize"></GridPageSettings>
+    <GridEvents QueryCellInfo="CustomizeCell" TValue="ExpandoObject"></GridEvents>
+    <GridColumns>
+        <GridColumn Field="Date" Format="d" Type="ColumnType.Date" HeaderText="Date" Width="40" HeaderTextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Tournament" HeaderText="Tournament" Width="70" HeaderTextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Map" HeaderText="Map" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn HeaderText="Fighter" HeaderTextAlign="TextAlign.Center" Width="300">
+            <GridColumns>
+                <GridColumn Field="FighterPlayer" HeaderText="Player" Width="40"></GridColumn>
+                <GridColumn Field="FighterHero" HeaderText="Hero" Width="60"></GridColumn>
+                <GridColumn Field="FighterHp" HeaderText="Hp" Width="30"></GridColumn>
+                <GridColumn Field="FighterSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
+                <GridColumn Field="FighterCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
+                <GridColumn Field="FighterPoints" HeaderText="Points" Width="40"></GridColumn>
+            </GridColumns>
+        </GridColumn>
+        <GridColumn HeaderText="Opponent" HeaderTextAlign="TextAlign.Center" Width="300">
+            <GridColumns>
+                <GridColumn Field="OpponentPlayer" HeaderText="Player" Width="40"></GridColumn>
+                <GridColumn Field="OpponentHero" HeaderText="Hero" Width="60"></GridColumn>
+                <GridColumn Field="OpponentHp" HeaderText="Hp" Width="30"></GridColumn>
+                <GridColumn Field="OpponentSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
+                <GridColumn Field="OpponentCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
+                <GridColumn Field="OpponentPoints" HeaderText="Points" Width="40"></GridColumn>
+            </GridColumns>
+        </GridColumn>
+        <GridColumn Field="Comment" HeaderText="Comment" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
+    </GridColumns>
+</SfGrid>
 
 @code {
     private IEnumerable<MatchLogDto> _matchLogEntries;
@@ -84,15 +76,6 @@ else
     public int PageSize { get; set; } = 20;
     
     public List<ExpandoObject> GridData { get; set; } = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        // matchLogEntries = (await UnmatchedService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
-        // foreach (var matchLogEntry in matchLogEntries)
-        // {
-        //     matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
-        // }
-    }
     
     public void CustomizeCell(QueryCellInfoEventArgs<ExpandoObject> args)
     {

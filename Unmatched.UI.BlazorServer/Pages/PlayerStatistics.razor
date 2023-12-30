@@ -21,24 +21,34 @@
 
     private IEnumerable<IGrouping<string, FighterDto>> _matches;
     private string? _favoriteColor { get; set; }
+    
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var playerId = Guid.Parse(id);
-        Player = await PlayerStatisticsService.GetPlayerStatisticsAsync(playerId);
-        matchLogEntries = (await PlayerStatisticsService.GetPlayerMatchesAsync(playerId)).OrderByDescending(x => x.Date).ToArray();
-        foreach (var matchLogEntry in matchLogEntries)
+        try
         {
-            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == playerId);
-        }
+            PreloadService.Show();
+            var playerId = Guid.Parse(id);
+            Player = await PlayerStatisticsService.GetPlayerStatisticsAsync(playerId);
+            matchLogEntries = (await PlayerStatisticsService.GetPlayerMatchesAsync(playerId)).OrderByDescending(x => x.Date).ToArray();
+            foreach (var matchLogEntry in matchLogEntries)
+            {
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == playerId);
+            }
 
-        _matches = matchLogEntries
-            .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
-            .GroupBy(f => f.HeroName);
+            _matches = matchLogEntries
+                .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
+                .GroupBy(f => f.HeroName);
         
         
-        var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
-        var favoriteMatch = matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.HeroName == favoriteName));
-        _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.HeroName == favoriteName)?.HeroColor;
+            var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
+            var favoriteMatch = matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.HeroName == favoriteName));
+            _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.HeroName == favoriteName)?.HeroColor;
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
 }

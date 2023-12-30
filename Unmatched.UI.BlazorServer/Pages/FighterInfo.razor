@@ -2,8 +2,8 @@
 <EditForm Model=@Fighter>
     <fieldset class="wrapper">
         <legend class="title">@Title</legend>
-        <img class="image" src="@playerImageSource"/>
-        <img class="image" src="@heroImageSource"/>
+        <img class="image" src="@PlayerImageSource"/>
+        <img class="image" src="@HeroImageSource"/>
         <div>
             <label for="players">Player:</label>
             <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
@@ -63,7 +63,7 @@
     [Parameter]
     public string Title { get; set; }
 
-    private string? playerImageSource
+    private string PlayerImageSource
     {
         get
         {
@@ -72,7 +72,7 @@
         }
     }
 
-    private string? heroImageSource
+    private string HeroImageSource
     {
         get
         {
@@ -82,10 +82,10 @@
     }
 
     [Parameter]
-    public IEnumerable<HeroDto> Heroes { get; set; }
+    public List<HeroDto> Heroes { get; set; } = new();
 
     [Parameter]
-    public IEnumerable<PlayerDto> Players { get; set; }
+    public List<PlayerDto> Players { get; set; } = new();
 
     public FighterDto Fighter = new();
 

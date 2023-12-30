@@ -8,33 +8,33 @@
     <PageTitle>Maps Statistics</PageTitle>
 
     <h1 class="page-title">Maps Statistics</h1>
-
-    @if (maps == null)
-    {
-        <p>
-            <em>Loading...</em>
-        </p>
-    }
-    else
-    {
-        <SfGrid DataSource="@maps" AllowPaging="true" AllowSorting="true">
-            <GridPageSettings PageSize="20"></GridPageSettings>
-            <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
-            <GridColumns>
-                <GridColumn Field=@nameof(MapStatisticsDto.MapName) HeaderText="Map" Width="120"></GridColumn>
-                <GridColumn Field=@nameof(MapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            </GridColumns>
-        </SfGrid>
-    }
+    
+    <SfGrid DataSource="@maps" AllowPaging="true" AllowSorting="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
+        <GridColumns>
+            <GridColumn Field=@nameof(MapStatisticsDto.MapName) HeaderText="Map" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(MapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 </div>
 
 @code {
 
     private IEnumerable<MapStatisticsDto> maps;
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToArray();
+        try
+        {
+            PreloadService.Show();
+            maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToArray();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
     
     public void RecordClickHandler(RecordClickEventArgs<MapStatisticsDto> args)

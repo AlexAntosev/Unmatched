@@ -8,36 +8,36 @@
     <PageTitle>Players Statistics</PageTitle>
 
     <h1 class="page-title">Players Statistics</h1>
-
-    @if (players == null)
-    {
-        <p>
-            <em>Loading...</em>
-        </p>
-    }
-    else
-    {
-        <SfGrid DataSource="@players" AllowPaging="true" AllowSorting="true">
-            <GridPageSettings PageSize="20"></GridPageSettings>
-            <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>
-            <GridColumns>
-                <GridColumn Field=@nameof(PlayerStatisticsDto.PlayerName) HeaderText="Player" Width="120"></GridColumn>
-                <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-                <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-                <GridColumn Field=@nameof(PlayerStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-                <GridColumn Field=@nameof(PlayerStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
-            </GridColumns>
-        </SfGrid>
-    }
+    
+    <SfGrid DataSource="@players" AllowPaging="true" AllowSorting="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>
+        <GridColumns>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.PlayerName) HeaderText="Player" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 </div>
 
 @code {
 
     private IEnumerable<PlayerStatisticsDto> players;
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToArray();
+        try
+        {
+            PreloadService.Show();
+            players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToArray();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
     
     public void RecordClickHandler(RecordClickEventArgs<PlayerStatisticsDto> args)

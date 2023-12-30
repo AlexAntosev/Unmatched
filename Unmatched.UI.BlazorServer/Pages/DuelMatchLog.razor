@@ -15,13 +15,22 @@
 @code {
 
     private IEnumerable<MatchLogDto> matchLogEntries;
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        matchLogEntries = (await MatchService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
-        foreach (var matchLogEntry in matchLogEntries)
+        try
         {
-            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
+            PreloadService.Show();
+            matchLogEntries = (await MatchService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToArray();
+            foreach (var matchLogEntry in matchLogEntries)
+            {
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
+            }
+        }
+        finally
+        {
+            PreloadService.Hide();
         }
     }
 }

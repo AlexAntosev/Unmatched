@@ -22,24 +22,33 @@
     private string? imageSource;
     
     private IGrouping<string, FighterDto> _mapChampMatches;
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
-        var mapId = Guid.Parse(id);
-        Map = await MapStatisticsService.GetMapStatisticsAsync(mapId);
-        matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToArray();
-        foreach (var matchLogEntry in matchLogEntries)
+        try
         {
-            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);
-        }
-        imageSource = $"/{Map.MapName}.png";
+            PreloadService.Show();
+            var mapId = Guid.Parse(id);
+            Map = await MapStatisticsService.GetMapStatisticsAsync(mapId);
+            matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToArray();
+            foreach (var matchLogEntry in matchLogEntries)
+            {
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);
+            }
+            imageSource = $"/{Map.MapName}.png";
         
-        _mapChampMatches = matchLogEntries
-            .SelectMany(m => m.Fighters.Where(f => f.IsWinner))
-            .GroupBy(f => f.HeroName)
-            .OrderByDescending(g => g.Count())
-            .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
-            .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-            .FirstOrDefault();
+            _mapChampMatches = matchLogEntries
+                .SelectMany(m => m.Fighters.Where(f => f.IsWinner))
+                .GroupBy(f => f.HeroName)
+                .OrderByDescending(g => g.Count())
+                .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+                .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+                .FirstOrDefault();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
 }

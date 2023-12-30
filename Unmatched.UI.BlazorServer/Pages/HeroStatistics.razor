@@ -33,28 +33,37 @@
     private IGrouping<string, FighterDto> _againstAntagonistMatches;
 
     public List<RatingChangeDto> RatingChanges = new();
+    [Inject] protected PreloadService PreloadService { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
-        var heroId = Guid.Parse(id);
-        Hero = await HeroStatisticsService.GetHeroStatisticsAsync(heroId);
-        matchLogEntries = (await HeroStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToArray();
-        foreach (var matchLogEntry in matchLogEntries)
+        try
         {
-            matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
+            PreloadService.Show();
+            var heroId = Guid.Parse(id);
+            Hero = await HeroStatisticsService.GetHeroStatisticsAsync(heroId);
+            matchLogEntries = (await HeroStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToArray();
+            foreach (var matchLogEntry in matchLogEntries)
+            {
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
+            }
+
+            _againstAntagonistMatches = matchLogEntries
+                .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
+                .GroupBy(f => f.HeroName)
+                .OrderByDescending(g => g.Count(f => f.IsWinner))
+                .ThenBy(g => g.Count(f => !f.IsWinner))
+                .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+                .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+                .FirstOrDefault();
+
+            RatingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
+            await UpdateChart();
         }
-
-        _againstAntagonistMatches = matchLogEntries
-            .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
-            .GroupBy(f => f.HeroName)
-            .OrderByDescending(g => g.Count(f => f.IsWinner))
-            .ThenBy(g => g.Count(f => !f.IsWinner))
-            .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
-            .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-            .FirstOrDefault();
-
-        RatingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
-        await UpdateChart();
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
 
     private async Task UpdateChart()

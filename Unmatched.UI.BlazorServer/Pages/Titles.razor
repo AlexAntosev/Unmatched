@@ -8,60 +8,51 @@
     <PageTitle>Titles</PageTitle>
 
     <h1 class="page-title">Titles</h1>
-
-    @if (titles is null)
-    {
-        <p>
-            <em>Loading...</em>
-        </p>
-    }
-    else
-    {
-        <div style="margin-bottom: 16px">
-            <SfGrid DataSource="@titles" AllowPaging="true" AllowSorting="true">
-                <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
-                <GridPageSettings PageSize="20"></GridPageSettings>
-                <GridColumns>
-                    <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
-                    <GridColumn Width="150">
-                        <GridCommandColumns>
-                            <GridCommandColumn Type="CommandButtonType.Edit" Title="Assign" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                        </GridCommandColumns>
-                    </GridColumn>
-                </GridColumns>
-            </SfGrid>
-        </div>
-        <div>
-            <EditForm Model=@Title>
-                <div style="width: 256px; margin-bottom: 8px">
-                    <label for="Name">Name:</label>
-                    <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
-                </div>
-                <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
-            </EditForm>
-        </div>
-        
-        <div>
-            <BlazorBootstrap.Modal @ref="modal" Title="Heroes">
-                <BodyTemplate>
-                    <SfGrid @ref="HeroesGrid" DataSource="@heroes" AllowSorting="true" AllowSelection="true">
-                        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple"></GridSelectionSettings>
-                        <GridPageSettings PageSize="10"></GridPageSettings>
-                        <GridEvents RowDataBound="OnRowDataBound" DataBound="OnDataBound" TValue="HeroTitleAssignDto"></GridEvents>
-                        <GridColumns>
-                            <GridColumn Field=@nameof(HeroTitleAssignDto.IsAssigned) Type="ColumnType.CheckBox" Width="50"></GridColumn>
-                            <GridColumn Field=@nameof(HeroTitleAssignDto.Name) HeaderText="Hero" Width="120"></GridColumn>
-                        </GridColumns>
-                    </SfGrid>
-                </BodyTemplate>
-                <FooterTemplate>
-                    <button class="btn btn-secondary" @onclick="OnHideClick">Close</button>
-                    <button class="btn btn-primary" @onclick="OnAssignClick">Assign</button>
-                </FooterTemplate>
-            </BlazorBootstrap.Modal>
-        </div>
-    }
+    
+    <div style="margin-bottom: 16px">
+        <SfGrid DataSource="@titles" AllowPaging="true" AllowSorting="true">
+            <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
+            <GridPageSettings PageSize="20"></GridPageSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
+                <GridColumn Width="150">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Edit" Title="Assign" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+    <div>
+        <EditForm Model=@Title>
+            <div style="width: 256px; margin-bottom: 8px">
+                <label for="Name">Name:</label>
+                <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
+            </div>
+            <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
+        </EditForm>
+    </div>
+    
+    <div>
+        <BlazorBootstrap.Modal @ref="modal" Title="Heroes">
+            <BodyTemplate>
+                <SfGrid @ref="HeroesGrid" DataSource="@heroes" AllowSorting="true" AllowSelection="true">
+                    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple"></GridSelectionSettings>
+                    <GridPageSettings PageSize="10"></GridPageSettings>
+                    <GridEvents RowDataBound="OnRowDataBound" DataBound="OnDataBound" TValue="HeroTitleAssignDto"></GridEvents>
+                    <GridColumns>
+                        <GridColumn Field=@nameof(HeroTitleAssignDto.IsAssigned) Type="ColumnType.CheckBox" Width="50"></GridColumn>
+                        <GridColumn Field=@nameof(HeroTitleAssignDto.Name) HeaderText="Hero" Width="120"></GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </BodyTemplate>
+            <FooterTemplate>
+                <button class="btn btn-secondary" @onclick="OnHideClick">Close</button>
+                <button class="btn btn-primary" @onclick="OnAssignClick">Assign</button>
+            </FooterTemplate>
+        </BlazorBootstrap.Modal>
+    </div>
 </div>
 
 @code {
@@ -72,10 +63,19 @@
     SfGrid<HeroTitleAssignDto> HeroesGrid;
     public List<int> SelectedIndexes = new();
     private BlazorBootstrap.Modal modal = default!;
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        titles = await TitleService.GetAsync();
+        try
+        {
+            PreloadService.Show();
+            titles = await TitleService.GetAsync();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
 
     public async Task AddAsync()
