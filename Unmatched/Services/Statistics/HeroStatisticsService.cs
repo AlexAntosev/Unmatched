@@ -64,6 +64,8 @@ public class HeroStatisticsService : IHeroStatisticsService
             .ToListAsync();
         var rating = await _unitOfWork.Ratings.GetByHeroIdAsync(hero.Id);
         var points = rating?.Points ?? 0;
+        var titles = await _unitOfWork.Titles.GetByHeroId(heroId);
+        var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
         
         var statistics = new HeroStatisticsDto
             {
@@ -75,7 +77,8 @@ public class HeroStatisticsService : IHeroStatisticsService
                 TotalWins = fights.Count(x => x.IsWinner),
                 TotalLooses = fights.Count(x => x.IsWinner == false),
                 LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0,
-                IsRanged = hero.IsRanged
+                IsRanged = hero.IsRanged,
+                Titles = titlesDto
             };
         
         return statistics;

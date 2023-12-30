@@ -2,27 +2,120 @@
 @using Unmatched.Services
 @using Unmatched.Dtos
 @inject ITitleService TitleService
+@inject IHeroService HeroService
 
-<h3>Titles</h3>
+<div class="page-content">
+    <PageTitle>Titles</PageTitle>
 
-<EditForm Model=@Title>
-    <div>
-        <label for="Name">Name:</label>
-        <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
-    </div>
-    <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
-</EditForm>
+    <h1 class="page-title">Titles</h1>
+
+    @if (titles is null || heroes is null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <div>
+            <SfGrid DataSource="@titles" AllowPaging="true" AllowSorting="true">
+                <GridEvents CommandClicked="OnCommandClicked" TValue="TitleDto"></GridEvents>
+                <GridPageSettings PageSize="20"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
+                    <GridColumn Field="Hero" HeaderText="Hero" Width="80"></GridColumn>
+                    <GridColumn HeaderText="Manage Records" Width="150">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Edit" Title="Assign" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+        <div>
+            <EditForm Model=@Title>
+                <div>
+                    <label for="Name">Name:</label>
+                    <InputText @bind-Value=Title.Name name="Name" class="form-control"/>
+                </div>
+                <button class="btn btn-primary" @onclick="AddAsync">Add title</button>
+            </EditForm>
+        </div>
+        
+        <div>
+            <BlazorBootstrap.Modal @ref="modal" Title="Heroes">
+                <BodyTemplate>
+                    <SfGrid DataSource="@heroes" AllowPaging="true" AllowSorting="true" AllowSelection="true">
+                        <GridEvents TValue="HeroDto" RowSelected="OnHeroSelected" />
+                        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                        <GridPageSettings PageSize="10"></GridPageSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(HeroDto.Id) Type="ColumnType.CheckBox" Width="50"></GridColumn>
+                            <GridColumn Field=@nameof(HeroDto.Name) HeaderText="Hero" Width="120"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </BodyTemplate>
+                <FooterTemplate>
+                    <Button Color="ButtonColor.Secondary" @onclick="OnHideClick">Close</Button>
+                    <Button Color="ButtonColor.Primary" @onclick="OnAssignClick">Assign</Button>
+                </FooterTemplate>
+            </BlazorBootstrap.Modal>
+        </div>
+    }
+</div>
 
 @code {
+    private IEnumerable<TitleDto> titles;
+    private IEnumerable<HeroDto> heroes;
     readonly TitleDto Title = new();
+    private Guid SelectedTitleId = Guid.Empty;
+    private Guid SelectedHeroId = Guid.Empty;
     
+    private BlazorBootstrap.Modal modal = default!;
+
     protected override async Task OnInitializedAsync()
     {
+        titles = await TitleService.GetAsync();
+        heroes = await HeroService.GetAsync();
     }
 
     public async Task AddAsync()
     {
         var title = Title;
         await TitleService.AddAsync(title);
+        titles = await TitleService.GetAsync();
+    }
+    
+    public async Task OnCommandClicked(CommandClickEventArgs<TitleDto> args)
+    {
+        if (args.CommandColumn.Type is CommandButtonType.Delete)
+        {
+            await TitleService.DeleteAsync(args.RowData.Id);
+            titles = await TitleService.GetAsync();
+        }
+        
+        if (args.CommandColumn.Type is CommandButtonType.Edit)
+        {
+            SelectedTitleId = args.RowData.Id;
+            await modal.ShowAsync();
+        }
+    }
+    
+    private async Task OnHideClick()
+    {
+        await modal.HideAsync();
+    }
+    
+    private async Task OnAssignClick()
+    {
+        await TitleService.AssignAsync(SelectedTitleId, SelectedHeroId);
+        await modal.HideAsync();
+        titles = await TitleService.GetAsync();
+    }
+
+    private void OnHeroSelected(RowSelectEventArgs<HeroDto> args)
+    {
+        SelectedHeroId = args.Data.Id;
     }
 }

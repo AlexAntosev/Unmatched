@@ -14,7 +14,7 @@
            <img src="@($"/{(_hero.IsRanged ? "Ranged" : "Melee")}.png")" alt="@_hero.HeroId" width="64px" height="auto"/>
            <h5>Hp: @_hero.Hero.Hp</h5>
            <h5>Deck size: @_hero.Hero.DeckSize</h5> 
-           <h5>Titles:</h5>
+           <h5>Titles: @ShowTitles() </h5>
         </div>
         <div>
            @if (_hero.Hero.Sidekicks is not null && _hero.Hero.Sidekicks.Any())
@@ -46,7 +46,6 @@
                     ? $"(x {value.Hero.Sidekicks.First().Count})"
                     : "";
             }
-
         }
     }
     
@@ -57,6 +56,16 @@
     
     protected override async Task OnInitializedAsync()
     {
+    }
+
+    public string ShowTitles()
+    {
+        if (_hero is not null && _hero.Titles is not null && _hero.Titles.Count() > 0)
+        {
+            return String.Join(", ", _hero.Titles.Select(t => t.Name).ToArray());
+        }
+
+        return "";
     }
 }
 

@@ -1,6 +1,9 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
 using System;
+
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -51,7 +54,7 @@ public class TitleRepository : ITitleRepository
 
     public async Task<Title> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Titles.FindAsync(id);
+        var entity = await _dbContext.Titles.Include(t => t.Heroes).FirstOrDefaultAsync(t => t.Id == id);
 
         return entity;
     }
@@ -64,5 +67,12 @@ public class TitleRepository : ITitleRepository
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Title>> GetByHeroId(Guid heroId)
+    {
+        var entities = await _dbContext.Titles.Include(t => t.Heroes).Where(t => t.Heroes.Any(h => h.Id == heroId)).ToListAsync();
+
+        return entities;
     }
 }
