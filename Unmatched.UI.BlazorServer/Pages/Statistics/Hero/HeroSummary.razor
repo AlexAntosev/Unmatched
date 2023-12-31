@@ -58,7 +58,7 @@
     {
         if (_hero is not null && _hero.Titles is not null && _hero.Titles.Any())
         {
-            return string.Join(", ", _hero.Titles.Select(t => t.Name).ToArray());
+            return string.Join(", ", _hero.Titles.Select(t => string.Concat(t.Name, " ", t.Comment)).ToArray());
         }
 
         return "";

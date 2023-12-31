@@ -9,4 +9,6 @@ public class TitleDto
     public string? Name { get; set; }
     
     public IEnumerable<HeroDto> Heroes { get; set; }
+    
+    public string Comment { get; set; }
 }

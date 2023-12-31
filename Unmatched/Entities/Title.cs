@@ -11,4 +11,6 @@ public class Title
     public string Name { get; set; }
     
     public virtual ICollection<Hero> Heroes { get; set; }
+    
+    public string Comment { get; set; }
 }
