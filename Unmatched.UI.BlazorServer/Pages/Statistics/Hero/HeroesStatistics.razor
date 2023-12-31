@@ -6,15 +6,16 @@
 
 <div class="page-content">
     <h1 class="page-title">Heroes Statistics</h1>
-    <SfGrid DataSource="@_heroes" AllowPaging="true" AllowSorting="true">
+    <SfGrid @ref="_grid" DataSource="@_heroes" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
+        <GridEvents OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
         <GridSortSettings>
             <GridSortColumns>
                 <GridSortColumn Field="@nameof(HeroStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
             </GridSortColumns>
         </GridSortSettings>
         <GridColumns>
+            <GridColumn Field=@nameof(HeroStatisticsDto.Place) HeaderText="Place" Width="25" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center"></GridColumn>
             <GridColumn Width="20">
                 <Template>
                     @{
@@ -47,6 +48,7 @@
 
 @code {
     private List<HeroStatisticsDto> _heroes = new();
+    SfGrid<HeroStatisticsDto> _grid;
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
@@ -69,4 +71,29 @@
         var url = $"/heroes-statistics/{heroId}";
         NavManager.NavigateTo(url);
     }
+
+    private void OnDataBoundHandler()
+    {
+        SetPlaces();
+    }
+
+    private void SetPlaces()
+    {
+        if (_grid.CurrentViewData is null)
+        {
+            return;
+        }
+        
+        var dataSource = _grid.CurrentViewData;
+        var place = 1;
+        foreach (var data in dataSource)
+        {
+            if (data is HeroStatisticsDto hero)
+            {
+                hero.Place = place;
+                place++;
+            }
+        }
+    }
+
 }
