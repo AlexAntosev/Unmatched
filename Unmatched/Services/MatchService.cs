@@ -6,6 +6,7 @@ using Unmatched.Dtos;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;
+using Unmatched.Services.TitleHandlers;
 
 public class MatchService : IMatchService
 {
@@ -13,17 +14,25 @@ public class MatchService : IMatchService
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public MatchService(IMatchHandlerFactory matchHandlerFactory, IMapper mapper, IUnitOfWork unitOfWork)
+    private readonly IStreakTitleHandler _streakTitleHandler;
+
+    public MatchService(
+        IMatchHandlerFactory matchHandlerFactory,
+        IMapper mapper,
+        IUnitOfWork unitOfWork,
+        IStreakTitleHandler streakTitleHandler)
     {
         _matchHandlerFactory = matchHandlerFactory;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
+        _streakTitleHandler = streakTitleHandler;
     }
     
-    public Task AddAsync(Match match)
+    public async Task AddAsync(Match match)
     {
         var handler = _matchHandlerFactory.Create(match);
-        return handler.HandleAsync(match);
+        await handler.HandleAsync(match);
+        await _streakTitleHandler.HandleAsync();
     }
 
     public Task AddAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)

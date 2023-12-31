@@ -11,6 +11,7 @@ using Unmatched.Services;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
 using Unmatched.Services.Statistics;
+using Unmatched.Services.TitleHandlers;
 
 public static class ServiceCollectionExtensions
 {
@@ -45,5 +46,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMapStatisticsService, MapStatisticsService>();
         services.AddTransient<ITitleService, TitleService>();
         services.AddTransient<IHeroService, HeroService>();
+        services.AddTransient<IStreakTitleHandler, StreakTitleHandler>();
     }
 }

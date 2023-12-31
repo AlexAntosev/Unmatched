@@ -75,4 +75,11 @@ public class TitleRepository : ITitleRepository
 
         return entities;
     }
+
+    public async Task<Title?> GetByNameAsync(string name)
+    {
+        var entity = await _dbContext.Titles.Include(t => t.Heroes).FirstOrDefaultAsync(t => t.Name.Equals(name));
+
+        return entity;
+    }
 }

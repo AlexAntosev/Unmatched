@@ -7,14 +7,12 @@
 <div style="margin-bottom: 16px">
     <HeroSummary Hero="Hero"></HeroSummary>
 </div>
-<div class="page-content">
+<div class="page-content" style="margin-bottom: 16px">
     <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
     <TotalMatchesRecord Total="Hero.TotalMatches" Wins="Hero.TotalWins" Looses="Hero.TotalLooses" Kd="Hero.Kd"></TotalMatchesRecord>
     <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
 </div>
 <div class="page-content">
-    <h4> Rating: </h4>
-    <h5>Current Place: @Hero.Place (@Hero.Points points)</h5>
     <LineChart @ref="_lineChart" />
 </div>
 

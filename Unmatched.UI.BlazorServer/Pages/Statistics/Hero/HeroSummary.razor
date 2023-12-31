@@ -11,7 +11,7 @@
         </div>
         <div>
            <h5>Current Place: @_hero.Place (@_hero.Points points)</h5>
-           <img src="@GetMeleeRangeImage(_hero.IsRanged)" alt="@_hero.HeroId" width="64px" height="auto"/>
+           <img style="margin-bottom: 0.5rem;" src="@GetMeleeRangeImage(_hero.IsRanged)" alt="@_hero.HeroId" width="64px" height="auto"/>
            <h5>Hp: @_hero.Hero.Hp</h5>
            <h5>Deck size: @_hero.Hero.DeckSize</h5> 
            <h5>Titles: @ShowTitles() </h5>
@@ -21,7 +21,7 @@
            {
                var sidekick = _hero.Hero.Sidekicks.First();
                <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
-               <img src="@GetMeleeRangeImage(sidekick.IsRanged)" alt="@sidekick.Id" width="64px" height="auto"/>
+               <img style="margin-bottom: 0.5rem;" src="@GetMeleeRangeImage(sidekick.IsRanged)" alt="@sidekick.Id" width="64px" height="auto"/>
                <h5>@_sidekickTitle Hp: @sidekick.Hp</h5>
            } 
         </div>
