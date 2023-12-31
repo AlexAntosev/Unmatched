@@ -61,7 +61,7 @@ public class StreakTitleHandler : IStreakTitleHandler
             {
                 heroWithBestStreak.Key
             };
-        title.Comment = $"({heroWithBestStreak.Value} wins)";
+        title.Comment = $"({heroWithBestStreak.Value} wins in a row)";
         _unitOfWork.Titles.AddOrUpdate(title);
         await _unitOfWork.SaveChangesAsync();
     }
