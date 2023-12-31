@@ -5,6 +5,7 @@ using System.Globalization;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
+using Unmatched.Entities;
 using Unmatched.Repositories;
 
 public class HeroStatisticsService : IHeroStatisticsService
@@ -66,13 +67,15 @@ public class HeroStatisticsService : IHeroStatisticsService
         var points = rating?.Points ?? 0;
         var titles = await _unitOfWork.Titles.GetByHeroId(heroId);
         var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
-        
+        var place = await GetHeroPlace(rating);
+
         var statistics = new HeroStatisticsDto
             {
                 Hero = heroDto,
                 HeroId = hero.Id,
                 HeroName = hero.Name,
                 Points = points,
+                Place = place,
                 TotalMatches = fights.Count,
                 TotalWins = fights.Count(x => x.IsWinner),
                 TotalLooses = fights.Count(x => x.IsWinner == false),
@@ -83,7 +86,7 @@ public class HeroStatisticsService : IHeroStatisticsService
         
         return statistics;
     }
-    
+
     public async Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId)
     {
         var heroMatches = await _unitOfWork.Matches
@@ -147,5 +150,27 @@ public class HeroStatisticsService : IHeroStatisticsService
         ratingChanges.Reverse();
         
         return ratingChanges;
+    }
+    
+    private async Task<int> GetHeroPlace(Rating? rating)
+    {
+        var place = 0;
+        if (rating is null)
+        {
+            return place;
+        }
+
+        var ratings = await _unitOfWork.Ratings
+            .Query()
+            .Include(r => r.Hero)
+            .OrderByDescending(r => r.Points)
+            .ToListAsync();
+
+        if (ratings.Any(r => r.Id == rating.Id))
+        {
+            place = ratings.IndexOf(rating) + 1;
+        }
+
+        return place;
     }
 }
