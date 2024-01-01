@@ -103,7 +103,7 @@
         try
         {
             PreloadService.Show();
-            
+            title.Comment = string.Empty;
             await TitleService.AddAsync(title);
             _titles = (await TitleService.GetAsync()).ToList();
         }
