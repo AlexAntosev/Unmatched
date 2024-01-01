@@ -10,64 +10,84 @@
     <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
     <div class="net">
         <div>
-            @if (octoFinals is not null && octoFinals.Count > 0)
-            {
                 <h3 class="match-stage-name">1/8 finals</h3>
                 <div class="match-stage">
-                    @foreach (var match in octoFinals)
+                    @if (octoFinals is not null && octoFinals.Count > 0)
                     {
-                        <TournamentRecord Match="match"></TournamentRecord>
+                        @foreach (var match in octoFinals)
+                        {
+                            <TournamentRecord Match="match"></TournamentRecord>
+                        }   
+                    }
+                    else if(!isFinished)
+                    {
+                        <button class="btn btn-primary">Generate matches</button>
                     }
                 </div>
-            }
         </div>
         <div>
-            @if (quarterFinals is not null && quarterFinals.Count > 0)
-            {
                 <h3 class="match-stage-name">Quater finals</h3>
                 <div class="match-stage">
-                    @foreach (var match in quarterFinals)
+                    @if (quarterFinals is not null && quarterFinals.Count > 0)
                     {
-                        <TournamentRecord Match="match"></TournamentRecord>
+                        @foreach (var match in quarterFinals)
+                        {
+                            <TournamentRecord Match="match"></TournamentRecord>
+                        }
+                    }
+                    else if(!isFinished)
+                    {
+                        <button class="btn btn-primary">Generate matches</button>
                     }
                 </div>
-            }
         </div>
         <div>
-            @if (semiFinalsMatches is not null && semiFinalsMatches.Count > 0)
-            {
                 <h3 class="match-stage-name">Semi finals</h3>
                 <div class="match-stage">
-                    @foreach (var match in semiFinalsMatches)
+                    @if (semiFinalsMatches is not null && semiFinalsMatches.Count > 0)
                     {
-                        <TournamentRecord Match="match"></TournamentRecord>
+                        @foreach (var match in semiFinalsMatches)
+                        {
+                            <TournamentRecord Match="match"></TournamentRecord>
+                        }
+                    }
+                    else if(!isFinished)
+                    {
+                        <button class="btn btn-primary">Generate matches</button>
                     }
                 </div>
-            }
         </div>
         <div>
-            @if (thirdPlaceFinalsMatches is not null && thirdPlaceFinalsMatches.Count > 0)
-            {
                 <h3 class="match-stage-name">3rd finals</h3>
                 <div class="match-stage">
-                    @foreach (var match in thirdPlaceFinalsMatches)
+                    @if (thirdPlaceFinalsMatches is not null && thirdPlaceFinalsMatches.Count > 0)
                     {
-                        <TournamentRecord Match="match"></TournamentRecord>
+                        @foreach (var match in thirdPlaceFinalsMatches)
+                        {
+                            <TournamentRecord Match="match"></TournamentRecord>
+                        }
+                    }
+                    else if(!isFinished)
+                    {
+                        <button class="btn btn-primary">Generate matches</button>
                     }
                 </div>
-            }
         </div>
         <div>
-            @if (finalsMatches is not null && finalsMatches.Count > 0)
-            {
                 <h3 class="match-stage-name">Grand finals</h3>
                 <div class="match-stage">
-                    @foreach (var match in finalsMatches)
+                    @if (finalsMatches is not null && finalsMatches.Count > 0)
                     {
-                        <TournamentRecord Match="match"></TournamentRecord>
+                        @foreach (var match in finalsMatches)
+                        {
+                            <TournamentRecord Match="match"></TournamentRecord>
+                        }
+                    }
+                    else if(!isFinished)
+                    {
+                        <button class="btn btn-primary">Generate matches</button>
                     }
                 </div>
-            }
         </div>
     </div>
 </div>
@@ -77,6 +97,8 @@
     public string Id { get; set; } = "";
 
     private TournamentDto TournamentModel { get; set; } = new ();
+
+    private bool isFinished;
 
     public List<MatchDto> octoFinals = new(); 
     public List<MatchDto> quarterFinals = new(); 
@@ -104,6 +126,10 @@
             semiFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.SemiFinals)).ToList();
             thirdPlaceFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.ThirdPlaceFinals)).ToList();
             finalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.Finals)).ToList();
+            if (finalsMatches.Count > 0)
+            {
+                isFinished = true;
+            }
         }
         finally
         {
