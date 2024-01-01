@@ -1,0 +1,35 @@
+﻿@page "/tournaments/{id}"
+@using Unmatched.Services
+@using Unmatched.Dtos
+@using BlazorBootstrap
+@inject ITournamentService TournamentService
+
+<h3>@TournamentModel.Name</h3>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    private TournamentDto TournamentModel { get; set; } = new ();
+    
+    [Inject] protected PreloadService PreloadService { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+            Guid.TryParse(Id, out var tournamentId);
+            if (tournamentId == Guid.Empty)
+            {
+                return;
+            }
+            
+            TournamentModel = await TournamentService.GetAsync(tournamentId);
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+}

@@ -33,6 +33,14 @@ public class TournamentService : ITournamentService
         return tournaments;
     }
 
+    public async Task<TournamentDto> GetAsync(Guid id)
+    {
+        var entity = await _unitOfWork.Tournaments.GetByIdAsync(id);
+        var tournament = _mapper.Map<TournamentDto>(entity);
+
+        return tournament;
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         await _unitOfWork.Tournaments.Delete(id);

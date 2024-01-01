@@ -2,12 +2,13 @@
 @using Unmatched.Dtos
 @using Unmatched.Services
 @inject ITournamentService TournamentService
+@inject NavigationManager NavManager
 
 <div class="page-content">
     <h1 class="page-title">Tournaments</h1>
     <div style="margin-bottom: 16px">
         <SfGrid DataSource="@_tournaments" AllowPaging="true" AllowSorting="true">
-            <GridEvents CommandClicked="OnCommandClick" TValue="TournamentDto"></GridEvents>
+            <GridEvents CommandClicked="OnCommandClick" OnRecordClick="RecordClickHandler" TValue="TournamentDto"></GridEvents>
             <GridPageSettings PageSize="20"></GridPageSettings>
             <GridColumns>
                 <GridColumn Field=@nameof(TournamentDto.Name) HeaderText="Tournament" Width="120"></GridColumn>
@@ -39,6 +40,13 @@
     protected override async Task OnInitializedAsync()
     {
         await RefreshTournamentsAsync();
+    }
+    
+    private void RecordClickHandler(RecordClickEventArgs<TournamentDto> args)
+    {
+        var tournamentId = args.RowData.Id;
+        var url = $"/tournaments/{tournamentId}";
+        NavManager.NavigateTo(url);
     }
 
     private async Task RefreshTournamentsAsync()
