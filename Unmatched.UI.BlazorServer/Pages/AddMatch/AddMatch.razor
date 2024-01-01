@@ -2,6 +2,7 @@
 @using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Constants
+@using Unmatched.Entities
 @inject IMatchService MatchService
 @inject NavigationManager NavManager
 
@@ -50,6 +51,15 @@
                     <label for="Comment">Comment:</label>
                     <InputText @bind-Value=Match.Comment name="Comment" class="form-control"/>
                 </div>
+                <div>
+                    <label for="Stage">Stage:</label>
+                    <InputSelect @bind-Value=Match.Stage name="Stage" id="stages" class="form-select">
+                        @foreach (var stage in _stages)
+                        {
+                            <option value="@stage.Item1"> @stage.Item2</option>
+                        }
+                    </InputSelect >
+                </div>
                 <p></p>
                 <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
                 <button class="btn btn-secondary" @onclick="Randomize">Randomize</button>
@@ -68,12 +78,13 @@
     private List<MapDto> _maps = new();
 
     private List<TournamentDto> _tournaments = new();
+    private List<(Stage?, string)> _stages = new();
 
     public FighterInfo FighterComponent;
 
     public FighterInfo OpponentComponent;
 
-    readonly MatchDto Match = new()
+    readonly MatchWithStageDto Match = new()
         {
             Date = DateTime.UtcNow
         };
@@ -89,6 +100,15 @@
             _heroes = (await MatchService.GetAllHeroesAsync()).ToList();
             _maps = (await MatchService.GetAllMapsAsync()).ToList();
             _tournaments = (await MatchService.GetAllTournamentsAsync()).ToList();
+            _stages = new List<(Stage?, string)>
+                {
+                    (null, ""),
+                    (Stage.OctoFinals, "1/8 Finals"),
+                    (Stage.QuarterFinals, "Quarter Finals"),
+                    (Stage.SemiFinals, "Semi Finals"),
+                    (Stage.ThirdPlaceFinals, "Third Place Finals"),
+                    (Stage.Finals, "Grand Finals"),
+                };
 
             var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.SilverhandTournament);
             if (defaultTournament != null)

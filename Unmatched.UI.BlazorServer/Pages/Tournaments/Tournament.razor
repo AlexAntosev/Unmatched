@@ -10,11 +10,11 @@
     <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
     <div class="net">
         <div>
-            @if (eightFinals is not null && eightFinals.Count > 0)
+            @if (octoFinals is not null && octoFinals.Count > 0)
             {
                 <h3 class="match-stage-name">1/8 finals</h3>
                 <div class="match-stage">
-                    @foreach (var match in eightFinals)
+                    @foreach (var match in octoFinals)
                     {
                         <TournamentRecord Match="match"></TournamentRecord>
                     }
@@ -78,7 +78,7 @@
 
     private TournamentDto TournamentModel { get; set; } = new ();
 
-    public List<MatchDto> eightFinals = new(); 
+    public List<MatchDto> octoFinals = new(); 
     public List<MatchDto> quarterFinals = new(); 
     public List<MatchDto> semiFinalsMatches = new(); 
     public List<MatchDto> thirdPlaceFinalsMatches = new(); 
@@ -99,6 +99,7 @@
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
             
+            octoFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.OctoFinals)).ToList();
             quarterFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.QuarterFinals)).ToList();
             semiFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.SemiFinals)).ToList();
             thirdPlaceFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.ThirdPlaceFinals)).ToList();

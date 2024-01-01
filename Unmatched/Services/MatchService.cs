@@ -37,7 +37,7 @@ public class MatchService : IMatchService
 
     public Task AddAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
     {
-        var match = _mapper.Map<Match>(matchDto);
+        var match = matchDto is MatchWithStageDto ? _mapper.Map<MatchWithStage>(matchDto) : _mapper.Map<Match>(matchDto);
         var firstFighter = _mapper.Map<Fighter>(fighterDto);
         var secondFighter = _mapper.Map<Fighter>(opponentDto);
 

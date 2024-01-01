@@ -2,8 +2,9 @@
 
 using System;
 
+using Unmatched.Entities;
 
 public class MatchWithStageDto : MatchDto
 {
-    public MatchStageDto Stage { get; set; }
+    public Stage Stage { get; set; }
 }
