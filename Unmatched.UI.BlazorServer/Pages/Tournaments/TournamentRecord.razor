@@ -1,38 +1,48 @@
 ﻿@using Unmatched.Dtos
+@using Unmatched.Constants
 
-<div class="main">
-    <div class="fighter">
-        <div>
-            @{
-                <div class="image">
-                    <img src="@($"/{Match.Fighters.First().Hero.Name}.png")" alt="@Match.Fighters.First().Hero.Id" width="100%" height="auto"/>
-                </div>
-            }
+@if (Match is not null)
+{
+    <div class="match-main">
+        <div class="fighter" style="background-color: @GetWinLooseColor(Match.Fighters.First().IsWinner)">
+            <div>
+                @{
+                    <div class="image">
+                        <img src="@($"/{Match.Fighters.First().Hero.Name}.png")" alt="@Match.Fighters.First().Hero.Id" width="100%" height="auto"/>
+                    </div>
+                }
+            </div>
+            <div class="fighter_name">@Match.Fighters.First().Hero.Name</div>
+            <div class="fighter_hp">@Match.Fighters.First().HpLeft</div>
         </div>
-        <div class="fighter_name">@Match.Fighters.First().Hero.Name</div>
-        <div class="fighter_hp">@Match.Fighters.First().HpLeft</div>
-    </div>
-    <div class="fighter">
-        <div>
-            @{
-                <div class="image">
-                    <img src="@($"/{Match.Fighters.Last().Hero.Name}.png")" alt="@Match.Fighters.Last().Hero.Id" width="100%" height="auto"/>
-                </div>
-            }
+        <div class="fighter" style="background-color: @GetWinLooseColor(Match.Fighters.Last().IsWinner)">
+            <div>
+                @{
+                    <div class="image">
+                        <img src="@($"/{Match.Fighters.Last().Hero.Name}.png")" alt="@Match.Fighters.Last().Hero.Id" width="100%" height="auto"/>
+                    </div>
+                }
+            </div>
+            <div class="fighter_name">@Match.Fighters.Last().Hero.Name</div>
+            <div class="fighter_hp">@Match.Fighters.Last().HpLeft</div>
         </div>
-        <div class="fighter_name">@Match.Fighters.Last().Hero.Name</div>
-        <div class="fighter_hp">@Match.Fighters.Last().HpLeft</div>
     </div>
-</div>
-
+}
 
 @code {
     [Parameter]
     public MatchDto Match { get; set; }
+    
+    public string GetWinLooseColor(bool isWinner)
+    {
+        return isWinner
+            ? Colors.WinnerColor
+            : Colors.LooserColor;
+    }
 }
 
 <style>
-    .main {
+    .match-main {
         height: 86px;
         width: 220px;
         border: 2px solid black;

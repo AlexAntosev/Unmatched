@@ -102,4 +102,20 @@ public class MatchService : IMatchService
 
         return matchLogs;
     }
+
+    public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id, Stage? stage = null)
+    {
+        var query = _unitOfWork.Matches.Query().Include(x => x.Map).Include(x => x.Tournament).Include(m => m.Fighters).ThenInclude(f => f.Hero).Where(m => m.TournamentId == id);
+
+        if (stage is not null)
+        {
+            var matchStages = _unitOfWork.MatchStages.Query().Where(ms => ms.Stage == stage);
+            query = query.Where(m => matchStages.Any(ms => ms.MatchId == m.Id));
+        }
+
+        var entities = await query.ToListAsync();
+
+        var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
+        return matches;
+    }
 }
