@@ -4,13 +4,18 @@
 @using BlazorBootstrap
 @inject ITournamentService TournamentService
 
-<h3>@TournamentModel.Name</h3>
+<div class="page-content">
+    <h1 class="page-title">@TournamentModel.Name</h1>
+    <TournamentRecord Match="testMatch"></TournamentRecord>
+</div>
 
 @code {
     [Parameter]
     public string Id { get; set; } = "";
 
     private TournamentDto TournamentModel { get; set; } = new ();
+    
+    private MatchDto testMatch { get; set; }
     
     [Inject] protected PreloadService PreloadService { get; set; }
     
@@ -26,6 +31,29 @@
             }
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
+
+            testMatch = new MatchDto()
+                {
+                    Fighters = new List<FighterDto>()
+                        {
+                            new()
+                                {
+                                    Hero = new HeroDto
+                                        {
+                                            Name = "Princess Yennenga"
+                                        },
+                                    HpLeft = 10
+                                },
+                            new()
+                                {
+                                    Hero = new HeroDto
+                                        {
+                                            Name = "King Arthur"
+                                        },
+                                    HpLeft = 0
+                                }
+                        }
+                };
         }
         finally
         {

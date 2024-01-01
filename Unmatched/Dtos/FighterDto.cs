@@ -3,6 +3,8 @@
 public class FighterDto
 {
     public int? CardsLeft { get; set; }
+    
+    public HeroDto Hero { get; set; }
 
     public Guid HeroId { get; set; }
 

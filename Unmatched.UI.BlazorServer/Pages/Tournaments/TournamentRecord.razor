@@ -1,0 +1,55 @@
+﻿@using Unmatched.Dtos
+
+<div class="main">
+    <div class="fighter">
+        <div>
+            @{
+                <div class="image">
+                    <img src="@($"/{Match.Fighters.First().Hero.Name}.png")" alt="@Match.Fighters.First().Hero.Id" width="100%" height="auto"/>
+                </div>
+            }
+        </div>
+        <div class="fighter_name">@Match.Fighters.First().Hero.Name</div>
+        <div class="fighter_hp">@Match.Fighters.First().HpLeft</div>
+    </div>
+    <div class="fighter">
+        <div>
+            @{
+                <div class="image">
+                    <img src="@($"/{Match.Fighters.Last().Hero.Name}.png")" alt="@Match.Fighters.Last().Hero.Id" width="100%" height="auto"/>
+                </div>
+            }
+        </div>
+        <div class="fighter_name">@Match.Fighters.Last().Hero.Name</div>
+        <div class="fighter_hp">@Match.Fighters.Last().HpLeft</div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public MatchDto Match { get; set; }
+}
+
+<style>
+    .main {
+        height: 86px;
+        width: 220px;
+        border: 2px solid black;
+        margin: 4px;
+        background-color: #d3d3d4;
+    }
+    .fighter {
+        border: 1px solid black;
+        background-color: #d3d3d4;
+        display: grid;
+        grid-template-columns: 35px 150px 15px;
+        padding: 2px;
+    }
+    .fighter_name {
+        margin: auto;
+    }
+    .fighter_hp {
+        margin: auto;
+    }
+</style>
