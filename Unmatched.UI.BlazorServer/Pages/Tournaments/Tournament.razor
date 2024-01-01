@@ -169,7 +169,7 @@
         currentStageWinners = Shuffle(currentStageWinners);
         
         var generatedMatches = new List<MatchDto>();
-        for (var i = 0; i < currentStageWinners.Count / 2; i++)
+        for (var i = 0; i < currentStageWinners.Count; i += 2)
         {
             var fighter = currentStageWinners[i];
             fighter.Id = Guid.Empty;
