@@ -25,7 +25,7 @@ public class TournamentRepository : ITournamentRepository
 
     public void AddOrUpdate(Tournament model)
     {
-        throw new NotImplementedException();
+        _dbContext.Update(model);
     }
 
     public async Task AddRangeAsync(IEnumerable<Tournament> models)

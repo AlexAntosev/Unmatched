@@ -25,10 +25,27 @@ public class TournamentService : ITournamentService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(TournamentDto dto)
+    public async Task UpdateAsync(Guid id, IEnumerable<MatchDto> matches, Stage stage)
     {
-        var tournament = _mapper.Map<Tournament>(dto);
+        var matchEntities = _mapper.Map<IEnumerable<Match>>(matches);
+
+        foreach (var matchEntity in matchEntities)
+        {
+            var created = await _unitOfWork.Matches.AddAsync(matchEntity);
+            
+            var matchStage = new MatchStage
+                {
+                    MatchId = created.Id,
+                    Stage = stage
+                };
+            await _unitOfWork.MatchStages.AddAsync(matchStage);
+        }
+
+        var tournament = await _unitOfWork.Tournaments.GetByIdAsync(id);
+        
+        tournament.CurrentStage = stage;
         _unitOfWork.Tournaments.AddOrUpdate(tournament);
+        
         await _unitOfWork.SaveChangesAsync();
     }
 

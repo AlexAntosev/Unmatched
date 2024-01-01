@@ -171,13 +171,23 @@
         var generatedMatches = new List<MatchDto>();
         for (var i = 0; i < currentStageWinners.Count / 2; i++)
         {
+            var fighter = currentStageWinners[i];
+            fighter.Id = Guid.Empty;
+            fighter.MatchPoints = 0;
+            fighter.IsWinner = false;
+            var opponent = currentStageWinners[i + 1];
+            opponent.Id = Guid.Empty;
+            opponent.MatchPoints = 0;
+            opponent.IsWinner = false;
+            
             var match = new MatchWithStageDto
                 {
+                    Id = Guid.Empty,
                     Stage = TournamentModel.CurrentStage,
                     Fighters = new List<FighterDto>
                         {
-                            currentStageWinners[i],
-                            currentStageWinners[i + 1]
+                            fighter,
+                            opponent
                         },
                     TournamentId = TournamentModel.Id,
                     MapId = RandomizeMap()
@@ -185,8 +195,7 @@
             generatedMatches.Add(match);
         }
         
-        TournamentModel.Matches.AddRange(generatedMatches);
-        // await TournamentService.UpdateAsync(TournamentModel);
+        await TournamentService.UpdateAsync(TournamentModel.Id, generatedMatches, TournamentModel.CurrentStage);
     }
     
     public static List<FighterDto> Shuffle(List<FighterDto> list)
@@ -213,7 +222,7 @@
     public async Task OnFinishTournamentClick()
     {
         TournamentModel.CurrentStage = Stage.Finished;
-        await TournamentService.UpdateAsync(TournamentModel);
+        // await TournamentService.UpdateAsync(TournamentModel);
     }
 }
 
