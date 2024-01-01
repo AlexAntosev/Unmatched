@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -50,7 +52,7 @@ public class TournamentRepository : ITournamentRepository
 
     public async Task<Tournament> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Tournaments.FindAsync(id);
+        var entity = await _dbContext.Tournaments.Include(t => t.Matches).ThenInclude(m => m.Fighters).FirstOrDefaultAsync(t => t.Id == id);
 
         return entity;
     }

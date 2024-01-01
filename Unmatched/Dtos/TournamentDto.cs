@@ -11,6 +11,8 @@ public class TournamentDto
     public TournamentType Type { get; set; }
     
     public Stage CurrentStage { get; set; }
+    
+    public List<MatchDto> Matches { get; set; }
 }
 
 public enum TournamentType

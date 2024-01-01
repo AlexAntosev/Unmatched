@@ -118,4 +118,11 @@ public class MatchService : IMatchService
         var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
         return matches;
     }
+
+    public async Task<IEnumerable<MatchStageDto>> GetMatchStagesAsync()
+    {
+        var entities = await _unitOfWork.MatchStages.Query().Include(ms => ms.Match).ToListAsync();
+        var matchStages = _mapper.Map<IEnumerable<MatchStageDto>>(entities);
+        return matchStages;
+    }
 }

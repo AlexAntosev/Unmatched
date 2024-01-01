@@ -24,7 +24,14 @@ public class TournamentService : ITournamentService
         await _unitOfWork.Tournaments.AddAsync(tournament);
         await _unitOfWork.SaveChangesAsync();
     }
-    
+
+    public async Task UpdateAsync(TournamentDto dto)
+    {
+        var tournament = _mapper.Map<Tournament>(dto);
+        _unitOfWork.Tournaments.AddOrUpdate(tournament);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<TournamentDto>> GetAsync()
     {
         var entities = await _unitOfWork.Tournaments.Query().ToListAsync();

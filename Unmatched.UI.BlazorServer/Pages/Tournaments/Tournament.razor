@@ -21,7 +21,7 @@
                     }
                     else if(TournamentModel.CurrentStage == Stage.Group)
                     {
-                        <button class="btn btn-primary">Generate matches</button>
+                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
                 </div>
         </div>
@@ -37,7 +37,7 @@
                     }
                     else if(TournamentModel.CurrentStage == Stage.OctoFinals)
                     {
-                        <button class="btn btn-primary">Generate matches</button>
+                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
                 </div>
         </div>
@@ -53,7 +53,7 @@
                     }
                     else if(TournamentModel.CurrentStage == Stage.QuarterFinals)
                     {
-                        <button class="btn btn-primary">Generate matches</button>
+                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
                 </div>
         </div>
@@ -69,7 +69,7 @@
                     }
                     else if(TournamentModel.CurrentStage == Stage.SemiFinals)
                     {
-                        <button class="btn btn-primary">Generate matches</button>
+                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
                 </div>
         </div>
@@ -85,11 +85,11 @@
                     }
                     else if(TournamentModel.CurrentStage == Stage.ThirdPlaceFinals)
                     {
-                        <button class="btn btn-primary">Generate matches</button>
+                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
                     else if(TournamentModel.CurrentStage == Stage.Finals)
                     {
-                        <button class="btn btn-primary">Finish tournament</button>
+                        <button class="btn btn-primary" onclick="@OnFinishTournamentClick">Finish tournament</button>
                     }
                 </div>
         </div>
@@ -102,6 +102,8 @@
 
     private TournamentDto TournamentModel { get; set; } = new ();
 
+    private List<MapDto> _maps = new();
+    
     private bool isFinished;
 
     public List<MatchDto> octoFinals = new(); 
@@ -124,6 +126,7 @@
             }
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
+            _maps = (await MatchService.GetAllMapsAsync()).ToList();
             
             octoFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.OctoFinals)).ToList();
             quarterFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.QuarterFinals)).ToList();
@@ -139,6 +142,78 @@
         {
             PreloadService.Hide();
         }
+    }
+
+    public async Task OnGenerateMatchesClick()
+    {
+        var matchStages = await MatchService.GetMatchStagesAsync();
+        var currentStageWinners = TournamentModel.Matches
+            .Where(tm => matchStages.Any(ms => ms.MatchId == tm.Id && ms.Stage == TournamentModel.CurrentStage))
+            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
+            .ToList();
+
+        //Migrate all match stages to correct order in enum 
+        if (TournamentModel.CurrentStage == Stage.OctoFinals)
+        {
+            TournamentModel.CurrentStage = Stage.QuarterFinals;
+        }        
+        else if(TournamentModel.CurrentStage == Stage.Finals)
+        {
+            TournamentModel.CurrentStage = Stage.Finished;
+        }
+        else
+        {
+            TournamentModel.CurrentStage++;
+        }
+        
+        currentStageWinners = Shuffle(currentStageWinners);
+        
+        var generatedMatches = new List<MatchDto>();
+        for (var i = 0; i < currentStageWinners.Count / 2; i++)
+        {
+            var match = new MatchWithStageDto
+                {
+                    Stage = TournamentModel.CurrentStage,
+                    Fighters = new List<FighterDto>
+                        {
+                            currentStageWinners[i],
+                            currentStageWinners[i + 1]
+                        },
+                    TournamentId = TournamentModel.Id,
+                    MapId = RandomizeMap()
+                };
+            generatedMatches.Add(match);
+        }
+        
+        TournamentModel.Matches.AddRange(generatedMatches);
+        // await TournamentService.UpdateAsync(TournamentModel);
+    }
+    
+    public static List<FighterDto> Shuffle(List<FighterDto> list)
+    {
+        var random = new Random();
+        var newShuffledList = new List<FighterDto>();
+        var listCount = list.Count;
+        for (var i = 0; i < listCount; i++)
+        {
+            var randomElementInList = random.Next(0, list.Count);
+            newShuffledList.Add(list[randomElementInList]);
+            list.Remove(list[randomElementInList]);
+        }
+        return newShuffledList;
+    }
+    
+    private Guid RandomizeMap()
+    {
+        //Need to be distinct
+        var mapIndex = new Random().Next(0, _maps.Count());
+        return _maps.ToArray()[mapIndex].Id;
+    }
+
+    public async Task OnFinishTournamentClick()
+    {
+        TournamentModel.CurrentStage = Stage.Finished;
+        await TournamentService.UpdateAsync(TournamentModel);
     }
 }
 

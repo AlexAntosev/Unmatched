@@ -7,6 +7,8 @@ using Unmatched.Dtos;
 public interface ITournamentService
 {
     Task AddAsync(TournamentDto dto);
+    
+    Task UpdateAsync(TournamentDto dto);
 
     Task<IEnumerable<TournamentDto>> GetAsync();
     
