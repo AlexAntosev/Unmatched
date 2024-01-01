@@ -19,7 +19,7 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }   
                     }
-                    else if(!isFinished)
+                    else if(TournamentModel.CurrentStage == Stage.Group)
                     {
                         <button class="btn btn-primary">Generate matches</button>
                     }
@@ -35,7 +35,7 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }
                     }
-                    else if(!isFinished)
+                    else if(TournamentModel.CurrentStage == Stage.OctoFinals)
                     {
                         <button class="btn btn-primary">Generate matches</button>
                     }
@@ -51,7 +51,7 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }
                     }
-                    else if(!isFinished)
+                    else if(TournamentModel.CurrentStage == Stage.QuarterFinals)
                     {
                         <button class="btn btn-primary">Generate matches</button>
                     }
@@ -67,7 +67,7 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }
                     }
-                    else if(!isFinished)
+                    else if(TournamentModel.CurrentStage == Stage.SemiFinals)
                     {
                         <button class="btn btn-primary">Generate matches</button>
                     }
@@ -83,9 +83,13 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }
                     }
-                    else if(!isFinished)
+                    else if(TournamentModel.CurrentStage == Stage.ThirdPlaceFinals)
                     {
                         <button class="btn btn-primary">Generate matches</button>
+                    }
+                    else if(TournamentModel.CurrentStage == Stage.Finals)
+                    {
+                        <button class="btn btn-primary">Finish tournament</button>
                     }
                 </div>
         </div>

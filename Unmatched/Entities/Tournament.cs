@@ -10,11 +10,14 @@ public class Tournament
     public string Name { get; set; }
 
     public TournamentType Type { get; set; }
+    
+    public Stage CurrentStage { get; set; }
+    
+    public virtual ICollection<Match> Matches { get; set; }
 }
 
 public enum TournamentType
 {
     League,
-
     Championship
 }

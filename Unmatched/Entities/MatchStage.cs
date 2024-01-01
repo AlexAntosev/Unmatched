@@ -11,7 +11,8 @@ public enum Stage
     SemiFinals,
     ThirdPlaceFinals,
     Finals,
-    OctoFinals
+    OctoFinals,
+    Finished
 }
 
 public class MatchStage
