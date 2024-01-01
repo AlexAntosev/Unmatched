@@ -16,6 +16,7 @@ public class TitleService : ITitleService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
+    
     public async Task AddAsync(TitleDto titleDto)
     {
         var title = _mapper.Map<Title>(titleDto);

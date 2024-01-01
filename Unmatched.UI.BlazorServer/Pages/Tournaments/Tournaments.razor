@@ -1,0 +1,118 @@
+﻿@page "/tournaments"
+@using Unmatched.Dtos
+@using Unmatched.Services
+@inject ITournamentService TournamentService
+
+<div class="page-content">
+    <h1 class="page-title">Tournaments</h1>
+    <div style="margin-bottom: 16px">
+        <SfGrid DataSource="@_tournaments" AllowPaging="true" AllowSorting="true">
+            <GridEvents CommandClicked="OnCommandClick" TValue="TournamentDto"></GridEvents>
+            <GridPageSettings PageSize="20"></GridPageSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(TournamentDto.Name) HeaderText="Tournament" Width="120"></GridColumn>
+                <GridColumn Width="150">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+    <div>
+        <EditForm Model=@_addTournamentForm>
+            <div style="width: 256px; margin-bottom: 8px">
+                <label>Name:</label>
+                <InputText @bind-Value=_addTournamentForm.Name name="Name" class="form-control"/>
+            </div>
+            <button class="btn btn-primary" @onclick="OnAddTournamentClick">Add tournament</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private List<TournamentDto> _tournaments = new ();
+    private readonly TournamentDto _addTournamentForm = new();
+    
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshTournamentsAsync();
+    }
+
+    private async Task RefreshTournamentsAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            _tournaments = (await TournamentService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task OnAddTournamentClick()
+    {
+        if (IsInvalidTournamentName(_addTournamentForm.Name))
+        {
+            return;
+        }
+        
+        await AddTournamentAsync(_addTournamentForm);
+    }
+
+    private bool IsInvalidTournamentName(string? tournamentName)
+    {
+        return tournamentName is null || tournamentName == string.Empty || _tournaments.Any(t => t.Name == tournamentName);
+    }
+    
+    private async Task AddTournamentAsync(TournamentDto tournament)
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            await TournamentService.AddAsync(tournament);
+            _tournaments = (await TournamentService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task OnCommandClick(CommandClickEventArgs<TournamentDto> args)
+    {
+        switch (args.CommandColumn.Type)
+        {
+            case CommandButtonType.Delete:
+                await DeleteTournamentAsync(args.RowData.Id);
+                break;
+            case CommandButtonType.Edit:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private async Task DeleteTournamentAsync(Guid id)
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            await TournamentService.DeleteAsync(id);
+            _tournaments = (await TournamentService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+    
+
+}

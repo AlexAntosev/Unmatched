@@ -47,5 +47,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITitleService, TitleService>();
         services.AddTransient<IHeroService, HeroService>();
         services.AddTransient<IStreakTitleHandler, StreakTitleHandler>();
+        services.AddTransient<ITournamentService, TournamentService>();
     }
 }
