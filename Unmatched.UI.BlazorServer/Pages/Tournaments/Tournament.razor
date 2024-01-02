@@ -2,7 +2,6 @@
 @using Unmatched.Services
 @using Unmatched.Dtos
 @using BlazorBootstrap
-@using Unmatched.Entities
 @using Unmatched.Enums
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
@@ -11,90 +10,22 @@
     <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
     <div class="net">
         <div>
-                <h3 class="match-stage-name">1/8 finals</h3>
-                <div class="match-stage">
-                    @if (octoFinals is not null && octoFinals.Count > 0)
-                    {
-                        @foreach (var match in octoFinals)
-                        {
-                            <TournamentRecord Match="match"></TournamentRecord>
-                        }   
-                    }
-                    else if(TournamentModel.CurrentStage == Stage.Group)
-                    {
-                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
-                    }
-                </div>
+            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.EighthFinals" StageMatches="octoFinals" Maps="_maps"></TournamentStage>
         </div>
         <div>
-                <h3 class="match-stage-name">Quater finals</h3>
-                <div class="match-stage">
-                    @if (quarterFinals is not null && quarterFinals.Count > 0)
-                    {
-                        @foreach (var match in quarterFinals)
-                        {
-                            <TournamentRecord Match="match"></TournamentRecord>
-                        }
-                    }
-                    else if(TournamentModel.CurrentStage == Stage.EighthFinals)
-                    {
-                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
-                    }
-                </div>
+            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.QuarterFinals" StageMatches="quarterFinals" Maps="_maps"></TournamentStage>
         </div>
         <div>
-                <h3 class="match-stage-name">Semi finals</h3>
-                <div class="match-stage">
-                    @if (semiFinalsMatches is not null && semiFinalsMatches.Count > 0)
-                    {
-                        @foreach (var match in semiFinalsMatches)
-                        {
-                            <TournamentRecord Match="match"></TournamentRecord>
-                        }
-                    }
-                    else if(TournamentModel.CurrentStage == Stage.QuarterFinals)
-                    {
-                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
-                    }
-                </div>
+            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.SemiFinals" StageMatches="semiFinalsMatches" Maps="_maps"></TournamentStage>
         </div>
         <div>
-                <h3 class="match-stage-name">3rd finals</h3>
-                <div class="match-stage">
-                    @if (thirdPlaceFinalsMatches is not null && thirdPlaceFinalsMatches.Count > 0)
-                    {
-                        @foreach (var match in thirdPlaceFinalsMatches)
-                        {
-                            <TournamentRecord Match="match"></TournamentRecord>
-                        }
-                    }
-                    else if(TournamentModel.CurrentStage == Stage.SemiFinals)
-                    {
-                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
-                    }
-                </div>
+            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.ThirdPlaceDecider" StageMatches="thirdPlaceFinalsMatches" Maps="_maps"></TournamentStage>
         </div>
         <div>
-                <h3 class="match-stage-name">Grand finals</h3>
-                <div class="match-stage">
-                    @if (finalsMatches is not null && finalsMatches.Count > 0)
-                    {
-                        @foreach (var match in finalsMatches)
-                        {
-                            <TournamentRecord Match="match"></TournamentRecord>
-                        }
-                    }
-                    else if(TournamentModel.CurrentStage == Stage.ThirdPlaceDecider)
-                    {
-                        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
-                    }
-                    else if(TournamentModel.CurrentStage == Stage.GrandFinals)
-                    {
-                        <button class="btn btn-primary" onclick="@OnFinishTournamentClick">Finish tournament</button>
-                    }
-                </div>
+            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.GrandFinals" StageMatches="finalsMatches" Maps="_maps"></TournamentStage>
         </div>
     </div>
+    @* <button class="btn btn-primary" onclick="@OnFinishTournamentClick">Finish tournament</button> *@
 </div>
 
 @code {
@@ -145,69 +76,6 @@
         }
     }
 
-    public async Task OnGenerateMatchesClick()
-    {
-        var matchStages = await MatchService.GetMatchStagesAsync();
-        var currentStageWinners = TournamentModel.Matches
-            .Where(tm => matchStages.Any(ms => ms.MatchId == tm.Id && ms.Stage == TournamentModel.CurrentStage))
-            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .ToList();
-
-        TournamentModel.CurrentStage++;
-
-        currentStageWinners = Shuffle(currentStageWinners);
-        
-        var generatedMatches = new List<MatchDto>();
-        for (var i = 0; i < currentStageWinners.Count; i += 2)
-        {
-            var fighter = currentStageWinners[i];
-            fighter.Id = Guid.Empty;
-            fighter.MatchPoints = 0;
-            fighter.IsWinner = false;
-            var opponent = currentStageWinners[i + 1];
-            opponent.Id = Guid.Empty;
-            opponent.MatchPoints = 0;
-            opponent.IsWinner = false;
-            
-            var match = new MatchWithStageDto
-                {
-                    Id = Guid.Empty,
-                    Stage = TournamentModel.CurrentStage,
-                    Fighters = new List<FighterDto>
-                        {
-                            fighter,
-                            opponent
-                        },
-                    TournamentId = TournamentModel.Id,
-                    MapId = RandomizeMap()
-                };
-            generatedMatches.Add(match);
-        }
-        
-        await TournamentService.UpdateAsync(TournamentModel.Id, generatedMatches, TournamentModel.CurrentStage);
-    }
-    
-    public static List<FighterDto> Shuffle(List<FighterDto> list)
-    {
-        var random = new Random();
-        var newShuffledList = new List<FighterDto>();
-        var listCount = list.Count;
-        for (var i = 0; i < listCount; i++)
-        {
-            var randomElementInList = random.Next(0, list.Count);
-            newShuffledList.Add(list[randomElementInList]);
-            list.Remove(list[randomElementInList]);
-        }
-        return newShuffledList;
-    }
-    
-    private Guid RandomizeMap()
-    {
-        //Need to be distinct
-        var mapIndex = new Random().Next(0, _maps.Count());
-        return _maps.ToArray()[mapIndex].Id;
-    }
-
     public async Task OnFinishTournamentClick()
     {
         TournamentModel.IsActive = false;
@@ -219,17 +87,5 @@
     .net {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-    }
-    
-    .match-stage-name {
-        margin: 30px;
-    }
-    
-    .match-stage {
-        display: flex;
-        justify-content: space-around;
-        flex-direction: column;
-        height: 700px;
-        margin: 30px;
     }
 </style>

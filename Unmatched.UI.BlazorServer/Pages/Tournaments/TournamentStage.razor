@@ -1,0 +1,128 @@
+﻿@using Unmatched.Enums
+@using Unmatched.Dtos
+@using Unmatched.Services
+@inject IMatchService MatchService
+@inject ITournamentService TournamentService
+
+<h3 class="match-stage-name">@GetStageName(Stage)</h3>
+<div class="match-stage">
+    @if (StageMatches is not null && StageMatches.Count > 0)
+    {
+        @foreach (var match in StageMatches)
+        {
+            <TournamentRecord Match="match"></TournamentRecord>
+        }   
+    }
+    else if(TournamentModel.CurrentStage + 1 == Stage)
+    {
+        <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public TournamentDto TournamentModel { get; set; } = new();
+    
+    [Parameter]
+    public Stage Stage { get; set; }
+
+    [Parameter]
+    public List<MatchDto> StageMatches { get; set; } = new();
+    
+    [Parameter]
+    public List<MapDto> Maps { get; set; } = new();
+    
+    public async Task OnGenerateMatchesClick()
+    {
+        var matchStages = await MatchService.GetMatchStagesAsync();
+        var currentStageWinners = TournamentModel.Matches
+            .Where(tm => matchStages.Any(ms => ms.MatchId == tm.Id && ms.Stage == TournamentModel.CurrentStage))
+            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
+            .ToList();
+
+        TournamentModel.CurrentStage++;
+
+        currentStageWinners = ShuffleWinners(currentStageWinners);
+        foreach (var winner in currentStageWinners)
+        {
+            winner.Id = Guid.Empty;
+            winner.MatchPoints = 0;
+            winner.IsWinner = false;
+        }
+        
+        var generatedMatches = new List<MatchDto>();
+        for (var i = 0; i < currentStageWinners.Count; i += 2)
+        {
+            var fighter = currentStageWinners[i];
+            var opponent = currentStageWinners[i + 1];
+            
+            var match = new MatchWithStageDto
+                {
+                    Id = Guid.Empty,
+                    Stage = TournamentModel.CurrentStage,
+                    Fighters = new List<FighterDto>
+                        {
+                            fighter,
+                            opponent
+                        },
+                    TournamentId = TournamentModel.Id,
+                    MapId = RandomizeMap()
+                };
+            generatedMatches.Add(match);
+        }
+        
+        await TournamentService.UpdateAsync(TournamentModel.Id, generatedMatches, TournamentModel.CurrentStage);
+    }
+    
+    private static List<FighterDto> ShuffleWinners(List<FighterDto> winners)
+    {
+        var random = new Random();
+        var shuffled = new List<FighterDto>();
+        
+        var listCount = winners.Count;
+        for (var i = 0; i < listCount; i++)
+        {
+            var randomIndex = random.Next(0, winners.Count);
+            shuffled.Add(winners[randomIndex]);
+            winners.Remove(winners[randomIndex]);
+        }
+        
+        return shuffled;
+    }
+    
+    private Guid RandomizeMap()
+    {
+        var mapIndex = new Random().Next(0, Maps.Count);
+        var map = Maps.ToArray()[mapIndex];
+        Maps.Remove(map);
+
+        return map.Id;
+    }
+
+    private string GetStageName(Stage stage)
+    {
+        return stage switch
+        {
+            Stage.EighthFinals => "1/8 Finals",
+            Stage.QuarterFinals => "1/4 Finals",
+            Stage.SemiFinals => "1/2 Finals",
+            Stage.ThirdPlaceDecider => "3rd Place Decider",
+            Stage.GrandFinals => "Grand Final",
+            _ => ""
+        };
+    }
+}
+
+<style>    
+    .match-stage-name {
+        margin: 30px;
+    }
+    
+    .match-stage {
+        display: flex;
+        justify-content: space-around;
+        flex-direction: column;
+        height: 700px;
+        margin: 30px;
+    }
+</style>

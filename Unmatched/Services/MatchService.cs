@@ -124,6 +124,10 @@ public class MatchService : IMatchService
         var entities = await query.ToListAsync();
 
         var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
+        foreach (var match in matches)
+        {
+            match.Fighters = match.Fighters.OrderBy(f => f.Turn);
+        }
         return matches;
     }
 
