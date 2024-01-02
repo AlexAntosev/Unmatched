@@ -25,7 +25,6 @@
             <TournamentStage TournamentModel="TournamentModel" Stage="Stage.GrandFinals" StageMatches="finalsMatches" Maps="_maps"></TournamentStage>
         </div>
     </div>
-    @* <button class="btn btn-primary" onclick="@OnFinishTournamentClick">Finish tournament</button> *@
 </div>
 
 @code {
@@ -35,8 +34,6 @@
     private TournamentDto TournamentModel { get; set; } = new ();
 
     private List<MapDto> _maps = new();
-    
-    private bool isFinished;
 
     public List<MatchDto> octoFinals = new(); 
     public List<MatchDto> quarterFinals = new(); 
@@ -58,28 +55,17 @@
             }
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
-            _maps = (await MatchService.GetAllMapsAsync()).ToList();
             
             octoFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.EighthFinals)).ToList();
             quarterFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.QuarterFinals)).ToList();
             semiFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.SemiFinals)).ToList();
             thirdPlaceFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.ThirdPlaceDecider)).ToList();
             finalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.GrandFinals)).ToList();
-            if (finalsMatches.Count > 0)
-            {
-                isFinished = true;
-            }
         }
         finally
         {
             PreloadService.Hide();
         }
-    }
-
-    public async Task OnFinishTournamentClick()
-    {
-        TournamentModel.IsActive = false;
-        // await TournamentService.UpdateAsync(TournamentModel);
     }
 }
 

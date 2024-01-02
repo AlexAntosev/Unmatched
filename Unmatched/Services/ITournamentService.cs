@@ -8,7 +8,7 @@ using Unmatched.Enums;
 
 public interface ITournamentService
 {
-    Task AddAsync(TournamentDto dto);
+    Task<TournamentDto> AddAsync(TournamentDto dto);
     
     Task UpdateAsync(Guid id, IEnumerable<MatchDto> matches, Stage stage);
 
@@ -17,4 +17,8 @@ public interface ITournamentService
     Task<TournamentDto> GetAsync(Guid id);
 
     Task DeleteAsync(Guid id);
+
+    Task CreateInitialPlannedMatchesAsync(TournamentDto tournament);
+
+    Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament);
 }

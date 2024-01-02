@@ -9,8 +9,8 @@ public class TournamentDto
     public string Name { get; set; }
 
     public TournamentType Type { get; set; }
-    
-    public bool IsActive { get; set; }
+
+    public bool IsActive { get; set; } = true;
     
     public Stage CurrentStage { get; set; }
     

@@ -34,69 +34,7 @@
     
     public async Task OnGenerateMatchesClick()
     {
-        var matchStages = await MatchService.GetMatchStagesAsync();
-        var currentStageWinners = TournamentModel.Matches
-            .Where(tm => matchStages.Any(ms => ms.MatchId == tm.Id && ms.Stage == TournamentModel.CurrentStage))
-            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .ToList();
-
-        TournamentModel.CurrentStage++;
-
-        currentStageWinners = ShuffleWinners(currentStageWinners);
-        foreach (var winner in currentStageWinners)
-        {
-            winner.Id = Guid.Empty;
-            winner.MatchPoints = 0;
-            winner.IsWinner = false;
-        }
-        
-        var generatedMatches = new List<MatchDto>();
-        for (var i = 0; i < currentStageWinners.Count; i += 2)
-        {
-            var fighter = currentStageWinners[i];
-            var opponent = currentStageWinners[i + 1];
-            
-            var match = new MatchWithStageDto
-                {
-                    Id = Guid.Empty,
-                    Stage = TournamentModel.CurrentStage,
-                    Fighters = new List<FighterDto>
-                        {
-                            fighter,
-                            opponent
-                        },
-                    TournamentId = TournamentModel.Id,
-                    MapId = RandomizeMap()
-                };
-            generatedMatches.Add(match);
-        }
-        
-        await TournamentService.UpdateAsync(TournamentModel.Id, generatedMatches, TournamentModel.CurrentStage);
-    }
-    
-    private static List<FighterDto> ShuffleWinners(List<FighterDto> winners)
-    {
-        var random = new Random();
-        var shuffled = new List<FighterDto>();
-        
-        var listCount = winners.Count;
-        for (var i = 0; i < listCount; i++)
-        {
-            var randomIndex = random.Next(0, winners.Count);
-            shuffled.Add(winners[randomIndex]);
-            winners.Remove(winners[randomIndex]);
-        }
-        
-        return shuffled;
-    }
-    
-    private Guid RandomizeMap()
-    {
-        var mapIndex = new Random().Next(0, Maps.Count);
-        var map = Maps.ToArray()[mapIndex];
-        Maps.Remove(map);
-
-        return map.Id;
+        await TournamentService.CreateNextStagePlannedMatchesAsync(TournamentModel);
     }
 
     private string GetStageName(Stage stage)

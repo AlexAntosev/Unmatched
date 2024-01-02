@@ -1,5 +1,6 @@
 ﻿@page "/tournaments"
 @using Unmatched.Dtos
+@using Unmatched.Enums
 @using Unmatched.Services
 @inject ITournamentService TournamentService
 @inject NavigationManager NavManager
@@ -26,6 +27,24 @@
                 <label>Name:</label>
                 <InputText @bind-Value=_addTournamentForm.Name name="Name" class="form-control"/>
             </div>
+            <div style="width: 256px; margin-bottom: 8px">
+                <label>Start stage:</label>
+                <InputSelect @bind-Value=_addTournamentForm.CurrentStage name="CurrentStage" id="stages" class="form-select">
+                    @foreach (var stage in _stages)
+                    {
+                        <option value="@stage.Item1"> @stage.Item2</option>
+                    }
+                </InputSelect >
+            </div>
+            <div style="width: 256px; margin-bottom: 8px">
+                <label>Tournament type:</label>
+                <InputSelect @bind-Value=_addTournamentForm.Type name="Type" id="types" class="form-select">
+                    @foreach (var type in _types)
+                    {
+                        <option value="@type.Item1"> @type.Item2</option>
+                    }
+                </InputSelect >
+            </div>
             <button class="btn btn-primary" @onclick="OnAddTournamentClick">Add tournament</button>
         </EditForm>
     </div>
@@ -34,11 +53,28 @@
 @code {
     private List<TournamentDto> _tournaments = new ();
     private readonly TournamentDto _addTournamentForm = new();
+    private List<(Stage?, string)> _stages = new();
+    private List<(TournamentType, string)> _types = new();
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        _types = new List<(TournamentType, string)>
+            {
+                (TournamentType.Championship, "Championship"),
+                (TournamentType.League, "League"),
+            };
+        _stages = new List<(Stage?, string)>
+            {
+                (null, ""),
+                (Stage.EighthFinals, "1/8 Finals"),
+                (Stage.QuarterFinals, "1/4 Finals"),
+                (Stage.SemiFinals, "1/2 Finals"),
+                (Stage.ThirdPlaceDecider, "3rd Place Decider"),
+                (Stage.GrandFinals, "Grand Finals")
+            };
+        
         await RefreshTournamentsAsync();
     }
     
@@ -84,7 +120,8 @@
         {
             PreloadService.Show();
             
-            await TournamentService.AddAsync(tournament);
+            var created = await TournamentService.AddAsync(tournament);
+            await TournamentService.CreateInitialPlannedMatchesAsync(created);
             _tournaments = (await TournamentService.GetAsync()).ToList();
         }
         finally

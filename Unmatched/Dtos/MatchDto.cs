@@ -17,4 +17,6 @@ public class MatchDto
     public IEnumerable<FighterDto> Fighters { get; set; }
 
     public Guid? TournamentId { get; set; }
+    
+    public bool IsPlanned { get; set; }
 }

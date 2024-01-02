@@ -54,6 +54,11 @@
     
     public string GetWinLooseColor(bool isWinner)
     {
+        if (Match.IsPlanned)
+        {
+            return "#d3d3d4;";
+        }
+        
         return isWinner
             ? Colors.WinnerColor
             : Colors.LooserColor;
