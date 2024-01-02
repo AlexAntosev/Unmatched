@@ -3,6 +3,7 @@
 using System;
 using Moq;
 using Unmatched.Entities;
+using Unmatched.Enums;
 using Unmatched.Models;
 using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Unmatched.Constants;
 using Unmatched.Entities;
+using Unmatched.Enums;
 using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
@@ -375,12 +376,12 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
         
         foreach (var match in thirdPlaceFinalsMatches)
         {
-            await InsertMatchStage(match, Stage.ThirdPlaceFinals);
+            await InsertMatchStage(match, Stage.ThirdPlaceDecider);
         }
         
         foreach (var match in finalsMatches)
         {
-            await InsertMatchStage(match, Stage.Finals);
+            await InsertMatchStage(match, Stage.GrandFinals);
         }
 
         await _matchStageRepository.SaveChangesAsync();

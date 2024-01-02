@@ -2,6 +2,7 @@
 
 using Unmatched.Constants;
 using Unmatched.Entities;
+using Unmatched.Enums;
 using Unmatched.Repositories;
 
 public class TournamentsDataInitializer : IDataInitializer<Tournament>

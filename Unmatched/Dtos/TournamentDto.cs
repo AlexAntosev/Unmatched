@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-using Unmatched.Entities;
+using Unmatched.Enums;
 
 public class TournamentDto
 {
@@ -10,14 +10,9 @@ public class TournamentDto
 
     public TournamentType Type { get; set; }
     
+    public bool IsActive { get; set; }
+    
     public Stage CurrentStage { get; set; }
     
     public List<MatchDto> Matches { get; set; }
-}
-
-public enum TournamentType
-{
-    NonRating,
-
-    Rating
 }

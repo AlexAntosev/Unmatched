@@ -2,6 +2,7 @@
 
 using Unmatched.Dtos;
 using Unmatched.Entities;
+using Unmatched.Enums;
 
 public interface IMatchService
 {

@@ -3,6 +3,7 @@
 @using Unmatched.Services
 @using Unmatched.Constants
 @using Unmatched.Entities
+@using Unmatched.Enums
 @inject IMatchService MatchService
 @inject NavigationManager NavManager
 
@@ -103,11 +104,11 @@
             _stages = new List<(Stage?, string)>
                 {
                     (null, ""),
-                    (Stage.OctoFinals, "1/8 Finals"),
+                    (Stage.EighthFinals, "1/8 Finals"),
                     (Stage.QuarterFinals, "Quarter Finals"),
                     (Stage.SemiFinals, "Semi Finals"),
-                    (Stage.ThirdPlaceFinals, "Third Place Finals"),
-                    (Stage.Finals, "Grand Finals"),
+                    (Stage.ThirdPlaceDecider, "Third Place Finals"),
+                    (Stage.GrandFinals, "Grand Finals"),
                 };
 
             var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.SilverhandTournament);

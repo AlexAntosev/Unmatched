@@ -3,17 +3,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-public enum Stage
-{
-    Group,
-    QuarterFinals,
-    SemiFinals,
-    ThirdPlaceFinals,
-    Finals,
-    OctoFinals,
-    Finished
-}
+using Unmatched.Enums;
 
 public class MatchStage
 {

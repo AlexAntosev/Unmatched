@@ -3,6 +3,7 @@
 @using Unmatched.Dtos
 @using BlazorBootstrap
 @using Unmatched.Entities
+@using Unmatched.Enums
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
 
@@ -35,7 +36,7 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }
                     }
-                    else if(TournamentModel.CurrentStage == Stage.OctoFinals)
+                    else if(TournamentModel.CurrentStage == Stage.EighthFinals)
                     {
                         <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
@@ -83,11 +84,11 @@
                             <TournamentRecord Match="match"></TournamentRecord>
                         }
                     }
-                    else if(TournamentModel.CurrentStage == Stage.ThirdPlaceFinals)
+                    else if(TournamentModel.CurrentStage == Stage.ThirdPlaceDecider)
                     {
                         <button class="btn btn-primary" onclick="@OnGenerateMatchesClick">Generate matches</button>
                     }
-                    else if(TournamentModel.CurrentStage == Stage.Finals)
+                    else if(TournamentModel.CurrentStage == Stage.GrandFinals)
                     {
                         <button class="btn btn-primary" onclick="@OnFinishTournamentClick">Finish tournament</button>
                     }
@@ -128,11 +129,11 @@
             TournamentModel = await TournamentService.GetAsync(tournamentId);
             _maps = (await MatchService.GetAllMapsAsync()).ToList();
             
-            octoFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.OctoFinals)).ToList();
+            octoFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.EighthFinals)).ToList();
             quarterFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.QuarterFinals)).ToList();
             semiFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.SemiFinals)).ToList();
-            thirdPlaceFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.ThirdPlaceFinals)).ToList();
-            finalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.Finals)).ToList();
+            thirdPlaceFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.ThirdPlaceDecider)).ToList();
+            finalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.GrandFinals)).ToList();
             if (finalsMatches.Count > 0)
             {
                 isFinished = true;
@@ -152,20 +153,8 @@
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
             .ToList();
 
-        //Migrate all match stages to correct order in enum 
-        if (TournamentModel.CurrentStage == Stage.OctoFinals)
-        {
-            TournamentModel.CurrentStage = Stage.QuarterFinals;
-        }        
-        else if(TournamentModel.CurrentStage == Stage.Finals)
-        {
-            TournamentModel.CurrentStage = Stage.Finished;
-        }
-        else
-        {
-            TournamentModel.CurrentStage++;
-        }
-        
+        TournamentModel.CurrentStage++;
+
         currentStageWinners = Shuffle(currentStageWinners);
         
         var generatedMatches = new List<MatchDto>();
@@ -221,7 +210,7 @@
 
     public async Task OnFinishTournamentClick()
     {
-        TournamentModel.CurrentStage = Stage.Finished;
+        TournamentModel.IsActive = false;
         // await TournamentService.UpdateAsync(TournamentModel);
     }
 }

@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Entities;
+using Unmatched.Enums;
 using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.TitleHandlers;

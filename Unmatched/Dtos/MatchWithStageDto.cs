@@ -1,8 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-using System;
-
-using Unmatched.Entities;
+using Unmatched.Enums;
 
 public class MatchWithStageDto : MatchDto
 {

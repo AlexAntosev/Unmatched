@@ -22,4 +22,6 @@ public class Match
     public virtual Tournament? Tournament { get; set; }
 
     public Guid? TournamentId { get; set; }
+    
+    public bool IsPlanned { get; set; }
 }

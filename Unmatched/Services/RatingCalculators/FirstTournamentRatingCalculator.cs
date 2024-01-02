@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.RatingCalculators;
 
 using Unmatched.Entities;
+using Unmatched.Enums;
 using Unmatched.Models;
 using Unmatched.Repositories;
 
@@ -29,8 +30,8 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
                 Stage.Group => 2,
                 Stage.QuarterFinals => 8,
                 Stage.SemiFinals => 8,
-                Stage.ThirdPlaceFinals => 8,
-                Stage.Finals => 4,
+                Stage.ThirdPlaceDecider => 8,
+                Stage.GrandFinals => 4,
                 _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
             };
 

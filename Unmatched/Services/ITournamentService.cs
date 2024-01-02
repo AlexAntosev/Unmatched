@@ -4,6 +4,7 @@ using System;
 
 using Unmatched.Dtos;
 using Unmatched.Entities;
+using Unmatched.Enums;
 
 public interface ITournamentService
 {

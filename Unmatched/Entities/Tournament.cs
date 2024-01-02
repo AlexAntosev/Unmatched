@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using Unmatched.Enums;
 
 public class Tournament
 {
@@ -10,14 +11,10 @@ public class Tournament
     public string Name { get; set; }
 
     public TournamentType Type { get; set; }
+
+    public bool IsActive { get; set; } = true;
     
     public Stage CurrentStage { get; set; }
     
     public virtual ICollection<Match> Matches { get; set; }
-}
-
-public enum TournamentType
-{
-    League,
-    Championship
 }

@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Entities;
 
-using System;
-
+using Unmatched.Enums;
 
 public class MatchWithStage : Match
 {
