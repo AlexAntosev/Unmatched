@@ -106,7 +106,14 @@ public class MatchService : IMatchService
 
     public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id, Stage? stage = null)
     {
-        var query = _unitOfWork.Matches.Query().Include(x => x.Map).Include(x => x.Tournament).Include(m => m.Fighters).ThenInclude(f => f.Hero).Where(m => m.TournamentId == id);
+        var query = _unitOfWork.Matches.Query()
+            .Include(x => x.Map)
+            .Include(x => x.Tournament)
+            .Include(m => m.Fighters)
+                .ThenInclude(f => f.Hero)
+            .Include(m => m.Fighters)
+                .ThenInclude(f => f.Player)
+            .Where(m => m.TournamentId == id);
 
         if (stage is not null)
         {
