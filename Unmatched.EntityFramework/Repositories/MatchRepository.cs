@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -28,7 +30,17 @@ public class MatchRepository : IMatchRepository
 
     public Match Update(Match model)
     {
-        return _dbContext.Update(model).Entity;
+        var local = _dbContext.Set<Match>()
+            .Local
+            .FirstOrDefault(entry => entry.Id.Equals(model.Id));
+
+        if (local != null)
+        {
+            _dbContext.Entry(local).State = EntityState.Detached;
+        }
+        
+        _dbContext.Update(model);
+        return model;
     }
 
     public async Task AddRangeAsync(IEnumerable<Match> models)
@@ -55,7 +67,13 @@ public class MatchRepository : IMatchRepository
 
     public async Task<Match> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Matches.FindAsync(id);
+        var entity = await _dbContext.Matches
+            .AsNoTracking()
+            .Include(m => m.Fighters)
+                .ThenInclude(f => f.Hero)
+            .Include(m => m.Fighters)
+                .ThenInclude(f => f.Player)
+            .FirstOrDefaultAsync(m => m.Id == id);
 
         return entity;
     }

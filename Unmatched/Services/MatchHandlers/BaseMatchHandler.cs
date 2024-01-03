@@ -30,6 +30,7 @@ public abstract class BaseMatchHandler : IMatchHandler
             fighter.MatchPoints = matchPoints[fighter.HeroId];
         }
 
+        match.IsPlanned = false;
         var createdMatch = match.Id == Guid.Empty ? await UnitOfWork.Matches.AddAsync(match) : UnitOfWork.Matches.Update(match);
 
         var updatedHeroRatings = new List<Rating>();

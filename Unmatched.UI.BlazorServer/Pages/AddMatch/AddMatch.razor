@@ -11,10 +11,10 @@
 
     <div class="row">
         <div class="column center">
-            <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes"></FighterInfo>
+            <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes" Fighter="Match.Fighters.First()"></FighterInfo>
         </div>
         <div class="column center">
-            <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes"></FighterInfo>
+            <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes" Fighter="Match.Fighters.Last()"></FighterInfo>
         </div>
     </div>
 
@@ -88,6 +88,11 @@
 
     MatchDto Match = new()
         {
+            Fighters = new List<FighterDto>()
+                {
+                    new(),
+                    new()
+                },
             Date = DateTime.UtcNow
         };
     
@@ -126,6 +131,7 @@
             if (id != Guid.Empty)
             {
                 var match = await MatchService.GetAsync(id);
+                match.Date = DateTime.Now;
                 Match = match;
             }
         }
@@ -153,7 +159,7 @@
         }
         else
         {
-            await MatchService.UpdateAsync((MatchDto)match, fighter, opponent);
+            await MatchService.UpdateAsync(match, fighter, opponent);
         }
         
         //TODO: if successful 

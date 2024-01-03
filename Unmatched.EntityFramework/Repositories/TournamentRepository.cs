@@ -52,7 +52,7 @@ public class TournamentRepository : ITournamentRepository
 
     public async Task<Tournament> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Tournaments.Include(t => t.Matches).ThenInclude(m => m.Fighters).FirstOrDefaultAsync(t => t.Id == id);
+        var entity = await _dbContext.Tournaments.Include(t => t.Matches).ThenInclude(m => m.Fighters).ThenInclude(f => f.Hero).FirstOrDefaultAsync(t => t.Id == id);
 
         return entity;
     }
