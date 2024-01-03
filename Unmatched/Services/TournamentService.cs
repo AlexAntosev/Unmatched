@@ -80,7 +80,7 @@ public class TournamentService : ITournamentService
     public async Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament)
     {
         var currentStageWinners = tournament.Matches.
-            Where(m => m.Stage == tournament.CurrentStage)
+            Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
             .Select(f => f.Hero)
             .ToList();
