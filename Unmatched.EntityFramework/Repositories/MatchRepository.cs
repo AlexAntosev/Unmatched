@@ -23,7 +23,12 @@ public class MatchRepository : IMatchRepository
 
     public void AddOrUpdate(Match model)
     {
-        throw new NotImplementedException();
+        _dbContext.Update(model);
+    }
+
+    public Match Update(Match model)
+    {
+        return _dbContext.Update(model).Entity;
     }
 
     public async Task AddRangeAsync(IEnumerable<Match> models)

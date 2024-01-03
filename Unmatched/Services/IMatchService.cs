@@ -6,9 +6,11 @@ using Unmatched.Enums;
 
 public interface IMatchService
 {
-    public Task AddAsync(Match match);
+    Task AddAsync(Match match);
     
-    public Task AddAsync(MatchDto match, FighterDto fighter, FighterDto opponent);
+    Task AddAsync(MatchDto match, FighterDto fighter, FighterDto opponent);
+
+    Task UpdateAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto);
     
     Task<IEnumerable<HeroDto>> GetAllHeroesAsync();
 
@@ -23,4 +25,6 @@ public interface IMatchService
     Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id, Stage? stage = null);
 
     Task<IEnumerable<MatchStageDto>> GetMatchStagesAsync();
+
+    Task<MatchDto> GetAsync(Guid id);
 }

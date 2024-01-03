@@ -50,7 +50,22 @@ public class MatchService : IMatchService
 
         return AddAsync(match);
     }
-    
+
+    public Task UpdateAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
+    {
+        var match = matchDto is MatchWithStageDto ? _mapper.Map<MatchWithStage>(matchDto) : _mapper.Map<Match>(matchDto);
+        var firstFighter = _mapper.Map<Fighter>(fighterDto);
+        var secondFighter = _mapper.Map<Fighter>(opponentDto);
+
+        match.Fighters = new List<Fighter>
+            {
+                firstFighter,
+                secondFighter
+            };
+
+        return AddAsync(match);
+    }
+
     public async Task<IEnumerable<HeroDto>> GetAllHeroesAsync()
     {
         var entities = await _unitOfWork.Heroes.Query().Include(e => e.Sidekicks).OrderBy(x => x.Name).ToListAsync();
@@ -136,5 +151,12 @@ public class MatchService : IMatchService
         var entities = await _unitOfWork.MatchStages.Query().Include(ms => ms.Match).ToListAsync();
         var matchStages = _mapper.Map<IEnumerable<MatchStageDto>>(entities);
         return matchStages;
+    }
+
+    public async Task<MatchDto> GetAsync(Guid id)
+    {
+        var entity = await _unitOfWork.MatchStages.GetByIdAsync(id);
+        var match = _mapper.Map<MatchDto>(entity);
+        return match;
     }
 }

@@ -1,8 +1,7 @@
-﻿@page "/addMatch"
+﻿@page "/match/{id}"
 @using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Constants
-@using Unmatched.Entities
 @using Unmatched.Enums
 @inject IMatchService MatchService
 @inject NavigationManager NavManager
@@ -71,7 +70,9 @@
 </div>
 
 @code {
-
+    [Parameter]
+    public string Id { get; set; }
+    
     private List<PlayerDto> _players = new();
 
     private List<HeroDto> _heroes = new();
@@ -85,7 +86,7 @@
 
     public FighterInfo OpponentComponent;
 
-    readonly MatchWithStageDto Match = new()
+    MatchWithStageDto Match = new()
         {
             Date = DateTime.UtcNow
         };
@@ -116,6 +117,17 @@
             {
                 Match.TournamentId = defaultTournament.Id;
             }
+            
+            var isValidId = Guid.TryParse(Id, out var id);
+            if (!isValidId)
+            {
+                return;
+            }
+            if (id != Guid.Empty)
+            {
+                var match = await MatchService.GetAsync(id);
+                Match = match;
+            }
         }
         finally
         {
@@ -129,7 +141,20 @@
         var fighter = FighterComponent.BuildDto();
         var opponent = OpponentComponent.BuildDto();
 
-        await MatchService.AddAsync(match, fighter, opponent);
+        var isValidId = Guid.TryParse(Id, out var id);
+        if (!isValidId)
+        {
+            return;
+        }
+        
+        if (id == Guid.Empty)
+        {
+            await MatchService.AddAsync(match, fighter, opponent);
+        }
+        else
+        {
+            await MatchService.UpdateAsync((MatchDto)match, fighter, opponent);
+        }
         
         //TODO: if successful 
         var url = "/duelMatchLog";

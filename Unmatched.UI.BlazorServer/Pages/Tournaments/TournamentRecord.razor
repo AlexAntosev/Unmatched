@@ -1,9 +1,10 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Constants
+@inject NavigationManager NavManager
 
 @if (Match is not null)
 {
-    <div class="match-main">
+    <div class="match-main" onclick="@OnRecordClick">
         <div class="fighter" style="background-color: @GetWinLooseColor(Match.Fighters.First().IsWinner)">
             <div>
                 @{
@@ -62,6 +63,15 @@
         return isWinner
             ? Colors.WinnerColor
             : Colors.LooserColor;
+    }
+
+    private void OnRecordClick()
+    {
+        if (Match.IsPlanned)
+        {
+            var url = $"/match/{Match.Id}";
+            NavManager.NavigateTo(url);
+        }
     }
 }
 
