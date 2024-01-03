@@ -87,21 +87,8 @@
     [Parameter]
     public List<PlayerDto> Players { get; set; } = new();
 
-    private FighterDto _fighter = new();
     [Parameter]
-    public FighterDto Fighter {
-        get
-        {
-            return _fighter;
-        }
-        set
-        {
-            _fighter = value;
-            if (_fighter is not null && _fighter.HeroId != Guid.Empty && Heroes.Count > 0)
-            {
-                HeroChanged(_fighter.HeroId);
-            }
-        } }
+    public FighterDto Fighter { get; set; } = new();
 
     public FighterDto BuildDto()
     {

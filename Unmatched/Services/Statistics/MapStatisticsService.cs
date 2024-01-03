@@ -22,6 +22,7 @@ public class MapStatisticsService : IMapStatisticsService
         var maps = await _unitOfWork.Maps.Query().ToListAsync();
         var mapMatches = await _unitOfWork.Matches
             .Query()
+            .Where(m => !m.IsPlanned)
             .ToListAsync();
 
         var statistics = new List<MapStatisticsDto>();
@@ -51,7 +52,7 @@ public class MapStatisticsService : IMapStatisticsService
         
         var mapMatches = await _unitOfWork.Matches
             .Query()
-            .Where(x => x.MapId.Equals(map.Id))
+            .Where(x => x.MapId.Equals(map.Id) && !x.IsPlanned)
             .OrderByDescending(x => x.Date)
             .ToListAsync();
         
@@ -69,7 +70,7 @@ public class MapStatisticsService : IMapStatisticsService
     {
         var mapMatches = await _unitOfWork.Matches
             .Query()
-            .Where(m => m.MapId == mapId)
+            .Where(m => m.MapId == mapId && !m.IsPlanned)
             .Include(x => x.Map)
             .Include(x => x.Tournament)
             .ToListAsync();

@@ -20,7 +20,7 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
     {
         var players = await _unitOfWork.Players.Query().ToListAsync();
-        var fighters = await _unitOfWork.Fighters.Query().Include(x => x.Match).ToListAsync();
+        var fighters = await _unitOfWork.Fighters.Query().Include(x => x.Match).Where(f => !f.Match.IsPlanned).ToListAsync();
 
         var statistics = new List<PlayerStatisticsDto>();
 
@@ -51,7 +51,7 @@ public class PlayerStatisticsService : IPlayerStatisticsService
         var playerFighters = await _unitOfWork.Fighters
             .Query()
             .Include(x => x.Match)
-            .Where(x => x.PlayerId.Equals(player.Id))
+            .Where(x => x.PlayerId.Equals(player.Id) && !x.Match.IsPlanned)
             .OrderByDescending(x => x.Match.Date)
             .ToListAsync();
         
@@ -72,7 +72,7 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     {
         var playerMatches = await _unitOfWork.Matches
             .Query()
-            .Where(m => m.Fighters.Any(f => f.PlayerId == playerId))
+            .Where(m => m.Fighters.Any(f => f.PlayerId == playerId) && !m.IsPlanned)
             .Include(x => x.Map)
             .Include(x => x.Tournament)
             .ToListAsync();

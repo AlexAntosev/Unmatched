@@ -96,7 +96,7 @@ public class MatchService : IMatchService
     
     public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
     {
-        var allMatches = await _unitOfWork.Matches.Query().Include(x => x.Map).Include(x => x.Tournament).ToListAsync();
+        var allMatches = await _unitOfWork.Matches.Query().Include(x => x.Map).Include(x => x.Tournament).Where(m => !m.IsPlanned).ToListAsync();
 
         var matchLogs = new List<MatchLogDto>();
         foreach (var match in allMatches)

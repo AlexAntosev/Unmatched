@@ -71,6 +71,7 @@ public class MatchRepository : IMatchRepository
             .AsNoTracking()
             .Include(m => m.Fighters)
                 .ThenInclude(f => f.Hero)
+                .ThenInclude(f => f.Sidekicks)
             .Include(m => m.Fighters)
                 .ThenInclude(f => f.Player)
             .FirstOrDefaultAsync(m => m.Id == id);

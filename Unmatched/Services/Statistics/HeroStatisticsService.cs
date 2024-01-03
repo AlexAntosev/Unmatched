@@ -24,7 +24,7 @@ public class HeroStatisticsService : IHeroStatisticsService
     {
         var heroes = await _unitOfWork.Heroes.Query().ToListAsync();
         var ratings = await _unitOfWork.Ratings.Query().ToListAsync();
-        var fighters = await _unitOfWork.Fighters.Query().Include(x => x.Match).ToListAsync();
+        var fighters = await _unitOfWork.Fighters.Query().Include(x => x.Match).Where(x => !x.Match.IsPlanned).ToListAsync();
 
         var statistics = new List<HeroStatisticsDto>();
 
@@ -60,7 +60,7 @@ public class HeroStatisticsService : IHeroStatisticsService
         var fights = await _unitOfWork.Fighters
             .Query()
             .Include(x => x.Match)
-            .Where(x => x.HeroId.Equals(hero.Id))
+            .Where(x => x.HeroId.Equals(hero.Id) && !x.Match.IsPlanned)
             .OrderByDescending(x => x.Match.Date)
             .ToListAsync();
         var rating = await _unitOfWork.Ratings.GetByHeroIdAsync(hero.Id);
@@ -91,7 +91,7 @@ public class HeroStatisticsService : IHeroStatisticsService
     {
         var heroMatches = await _unitOfWork.Matches
             .Query()
-            .Where(m => m.Fighters.Any(f => f.HeroId == heroId))
+            .Where(m => m.Fighters.Any(f => f.HeroId == heroId) && !m.IsPlanned)
             .Include(x => x.Map)
             .Include(x => x.Tournament)
             .ToListAsync();
@@ -132,7 +132,7 @@ public class HeroStatisticsService : IHeroStatisticsService
 
         var heroMatches = await _unitOfWork.Matches
             .Query()
-            .Where(m => m.Fighters.Any(f => f.HeroId == heroId))
+            .Where(m => m.Fighters.Any(f => f.HeroId == heroId) && !m.IsPlanned)
             .OrderByDescending(m => m.Date)
             .ToListAsync();
         

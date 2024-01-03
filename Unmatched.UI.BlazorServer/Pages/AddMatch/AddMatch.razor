@@ -11,10 +11,10 @@
 
     <div class="row">
         <div class="column center">
-            <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes" Fighter="Match.Fighters.First()"></FighterInfo>
+            <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes" Fighter="Fighter"></FighterInfo>
         </div>
         <div class="column center">
-            <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes" Fighter="Match.Fighters.Last()"></FighterInfo>
+            <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes" Fighter="Opponent"></FighterInfo>
         </div>
     </div>
 
@@ -95,6 +95,9 @@
                 },
             Date = DateTime.UtcNow
         };
+
+    FighterDto Fighter = new();
+    FighterDto Opponent = new();
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
@@ -132,6 +135,10 @@
             {
                 var match = await MatchService.GetAsync(id);
                 match.Date = DateTime.Now;
+                Fighter = match.Fighters.First();
+                SetFighterInfo(Fighter);
+                Opponent = match.Fighters.Last();
+                SetFighterInfo(Opponent);
                 Match = match;
             }
         }
@@ -139,6 +146,15 @@
         {
             PreloadService.Hide();
         }
+    }
+    
+    private void SetFighterInfo(FighterDto fighter)
+    {
+        fighter.HpLeft = fighter.Hero.Hp;
+        fighter.HeroId = fighter.Hero.Id;
+        fighter.SidekickName = fighter.Hero.Sidekicks.FirstOrDefault()?.Name;
+        fighter.SidekickHpLeft = fighter.Hero.Sidekicks.Sum(s => s.Hp * s.Count);
+        fighter.CardsLeft = fighter.Hero.DeckSize;
     }
 
     private async Task AddNewMatch()
