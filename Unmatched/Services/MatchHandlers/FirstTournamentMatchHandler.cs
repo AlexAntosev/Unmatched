@@ -17,31 +17,18 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
     
     protected override async Task InnerHandleAsync(Match match)
     {
-        var matchWithStage = (MatchWithStage)match;
-        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), matchWithStage.Stage);
+        var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), match.Stage.Value);
         
-        var createdMatch = await CreateMatch(match, matchPoints);
-
-        await CreateMatchStageAsync(matchWithStage.Stage, createdMatch.Id);
+        await CreateMatch(match, matchPoints);
 
         await UnitOfWork.SaveChangesAsync();
     }
 
     protected override void InnerValidate(Match match)
     {
-        if (match is not MatchWithStage)
+        if (match.Stage is null)
         {
-            throw new InvalidCastException($"{nameof(match)} is not of type {nameof(MatchWithStage)}");
+            throw new InvalidCastException($"{nameof(match)} has no stage");
         }
-    }
-
-    private Task<MatchStage> CreateMatchStageAsync(Stage stage, Guid matchId)
-    {
-        var matchStage = new MatchStage
-            {
-                MatchId = matchId,
-                Stage = stage
-            };
-        return UnitOfWork.MatchStages.AddAsync(matchStage);
     }
 }

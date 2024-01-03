@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Unmatched.EntityFramework.Context;
 
@@ -11,9 +12,11 @@ using Unmatched.EntityFramework.Context;
 namespace Unmatched.EntityFramework.Migrations
 {
     [DbContext(typeof(UnmatchedDbContext))]
-    partial class UnmatchedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240103200245_RemoveMatchStageTable")]
+    partial class RemoveMatchStageTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

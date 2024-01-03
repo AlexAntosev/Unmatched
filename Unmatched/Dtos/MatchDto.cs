@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.Dtos;
 
+using Unmatched.Enums;
+
 public class MatchDto
 {
     public string Comment { get; set; }
@@ -19,4 +21,6 @@ public class MatchDto
     public Guid? TournamentId { get; set; }
     
     public bool IsPlanned { get; set; }
+    
+    public Stage? Stage { get; set; }
 }

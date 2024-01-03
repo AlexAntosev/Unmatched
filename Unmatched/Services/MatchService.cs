@@ -38,7 +38,7 @@ public class MatchService : IMatchService
 
     public Task AddAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
     {
-        var match = matchDto is MatchWithStageDto ? _mapper.Map<MatchWithStage>(matchDto) : _mapper.Map<Match>(matchDto);
+        var match = _mapper.Map<Match>(matchDto);
         var firstFighter = _mapper.Map<Fighter>(fighterDto);
         var secondFighter = _mapper.Map<Fighter>(opponentDto);
 
@@ -53,7 +53,7 @@ public class MatchService : IMatchService
 
     public Task UpdateAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
     {
-        var match = matchDto is MatchWithStageDto ? _mapper.Map<MatchWithStage>(matchDto) : _mapper.Map<Match>(matchDto);
+        var match = _mapper.Map<Match>(matchDto);
         var firstFighter = _mapper.Map<Fighter>(fighterDto);
         var secondFighter = _mapper.Map<Fighter>(opponentDto);
 
@@ -128,13 +128,7 @@ public class MatchService : IMatchService
                 .ThenInclude(f => f.Hero)
             .Include(m => m.Fighters)
                 .ThenInclude(f => f.Player)
-            .Where(m => m.TournamentId == id);
-
-        if (stage is not null)
-        {
-            var matchStages = _unitOfWork.MatchStages.Query().Where(ms => ms.Stage == stage);
-            query = query.Where(m => matchStages.Any(ms => ms.MatchId == m.Id));
-        }
+            .Where(m => m.TournamentId == id && m.Stage == stage);
 
         var entities = await query.ToListAsync();
 
@@ -146,16 +140,9 @@ public class MatchService : IMatchService
         return matches;
     }
 
-    public async Task<IEnumerable<MatchStageDto>> GetMatchStagesAsync()
-    {
-        var entities = await _unitOfWork.MatchStages.Query().Include(ms => ms.Match).ToListAsync();
-        var matchStages = _mapper.Map<IEnumerable<MatchStageDto>>(entities);
-        return matchStages;
-    }
-
     public async Task<MatchDto> GetAsync(Guid id)
     {
-        var entity = await _unitOfWork.MatchStages.GetByIdAsync(id);
+        var entity = await _unitOfWork.Matches.GetByIdAsync(id);
         var match = _mapper.Map<MatchDto>(entity);
         return match;
     }

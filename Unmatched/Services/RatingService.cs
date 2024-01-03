@@ -32,15 +32,6 @@ public class RatingService : IRatingService
     private IEnumerable<Match> GetMatches()
     {
         var matches = _unitOfWork.Matches.Query().Include(m => m.Fighters).OrderBy(x => x.Date).AsNoTracking().ToArray();
-        var matchStages = _unitOfWork.MatchStages.Query().ToArray();
-        foreach (var matchStage in matchStages)
-        {
-            var match = matches.First(x => x.Id.Equals(matchStage.MatchId));
-            var matchWithStage = _mapper.Map<MatchWithStage>(match);
-            matchWithStage.Stage = matchStage.Stage;
-            var matchIndex = Array.IndexOf(matches, match);
-            matches[matchIndex] = matchWithStage;
-        }
         return matches;
     }
 
@@ -48,7 +39,6 @@ public class RatingService : IRatingService
     {
         _unitOfWork.Matches.DeleteAll();
         _unitOfWork.Fighters.DeleteAll();
-        _unitOfWork.MatchStages.DeleteAll();
         _unitOfWork.Ratings.DeleteAll();
 
         await _unitOfWork.SaveChangesAsync();

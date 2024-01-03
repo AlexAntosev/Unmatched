@@ -45,8 +45,6 @@ public class UnmatchedDbContext : DbContext
     public DbSet<Map> Maps { get; set; }
 
     public DbSet<Match> Matches { get; set; }
-    
-    public DbSet<MatchStage> MatchStages { get; set; }
 
     public DbSet<Player> Players { get; set; }
 

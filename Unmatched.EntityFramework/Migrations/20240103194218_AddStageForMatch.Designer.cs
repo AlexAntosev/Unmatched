@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Unmatched.EntityFramework.Context;
 
@@ -11,9 +12,11 @@ using Unmatched.EntityFramework.Context;
 namespace Unmatched.EntityFramework.Migrations
 {
     [DbContext(typeof(UnmatchedDbContext))]
-    partial class UnmatchedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240103194218_AddStageForMatch")]
+    partial class AddStageForMatch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,6 +161,25 @@ namespace Unmatched.EntityFramework.Migrations
                     b.HasIndex("TournamentId");
 
                     b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("Unmatched.Entities.MatchStage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("MatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.ToTable("MatchStages");
                 });
 
             modelBuilder.Entity("Unmatched.Entities.Player", b =>
@@ -321,6 +343,15 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Navigation("Map");
 
                     b.Navigation("Tournament");
+                });
+
+            modelBuilder.Entity("Unmatched.Entities.MatchStage", b =>
+                {
+                    b.HasOne("Unmatched.Entities.Match", "Match")
+                        .WithMany()
+                        .HasForeignKey("MatchId");
+
+                    b.Navigation("Match");
                 });
 
             modelBuilder.Entity("Unmatched.Entities.Rating", b =>

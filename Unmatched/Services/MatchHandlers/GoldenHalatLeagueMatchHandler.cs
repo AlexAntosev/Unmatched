@@ -19,27 +19,12 @@ public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
     {
         var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last());
         
-        var createdMatch = await CreateMatch(match, matchPoints);
-
-        if (match is MatchWithStage matchWithStage)
-        {
-            await CreateMatchStageAsync(matchWithStage.Stage, createdMatch.Id);
-        }
+        await CreateMatch(match, matchPoints);
         
         await UnitOfWork.SaveChangesAsync();
     }
 
     protected override void InnerValidate(Match match)
     {
-    }
-    
-    private Task<MatchStage> CreateMatchStageAsync(Stage stage, Guid matchId)
-    {
-        var matchStage = new MatchStage
-            {
-                MatchId = matchId,
-                Stage = stage
-            };
-        return UnitOfWork.MatchStages.AddAsync(matchStage);
     }
 }

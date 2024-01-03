@@ -15,7 +15,6 @@ public class FirstTournamentMatchHandlerTests
     private readonly Mock<IFirstTournamentRatingCalculator> _ratingCalculator = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
-    private readonly Mock<IMatchStageRepository> _matchStageRepository = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly FirstTournamentMatchHandler _handler;
@@ -24,7 +23,6 @@ public class FirstTournamentMatchHandlerTests
     {
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
-        _unitOfWork.Setup(uow => uow.MatchStages).Returns(_matchStageRepository.Object);
         
         _handler = new FirstTournamentMatchHandler(_unitOfWork.Object, _ratingCalculator.Object);
     }
@@ -44,7 +42,7 @@ public class FirstTournamentMatchHandlerTests
                 HeroId = opponentHeroId
             };
         var stage = Stage.Group;
-        var match = new MatchWithStage
+        var match = new Match
             {
                 Fighters = new List<Fighter>
                     {
@@ -71,13 +69,6 @@ public class FirstTournamentMatchHandlerTests
                 Id = createdMatchId
             };
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch);
-
-        var matchStage = new MatchStage()
-            {
-                MatchId = createdMatch.Id,
-                Stage = stage
-            };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
         
         // Act
         await _handler.HandleAsync(match);
@@ -101,7 +92,7 @@ public class FirstTournamentMatchHandlerTests
                 HeroId = opponentHeroId
             };
         var stage = Stage.Group;
-        var match = new MatchWithStage
+        var match = new Match
             {
                 Fighters = new List<Fighter>
                     {
@@ -130,13 +121,6 @@ public class FirstTournamentMatchHandlerTests
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch).Verifiable();
         _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
         
-        var matchStage = new MatchStage()
-            {
-                MatchId = createdMatch.Id,
-                Stage = stage
-            };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
-        
         // Act
         await _handler.HandleAsync(match);
         
@@ -160,7 +144,7 @@ public class FirstTournamentMatchHandlerTests
                 HeroId = opponentHeroId
             };
         var stage = Stage.Group;
-        var match = new MatchWithStage
+        var match = new Match
             {
                 Fighters = new List<Fighter>
                     {
@@ -196,13 +180,6 @@ public class FirstTournamentMatchHandlerTests
                 }
             }).ReturnsAsync(createdMatch).Verifiable();
         _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
-        
-        var matchStage = new MatchStage()
-            {
-                MatchId = createdMatch.Id,
-                Stage = stage
-            };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
 
         // Act
         await _handler.HandleAsync(match);
@@ -230,7 +207,7 @@ public class FirstTournamentMatchHandlerTests
                 HeroId = opponentHeroId
             };
         var stage = Stage.Group;
-        var match = new MatchWithStage
+        var match = new Match
             {
                 Fighters = new List<Fighter>
                     {
@@ -274,14 +251,7 @@ public class FirstTournamentMatchHandlerTests
         _ratingRepository.Setup(r => r.AddOrUpdate(fighterHeroRating)).Verifiable();
         _ratingRepository.Setup(r => r.AddOrUpdate(opponentHeroRating)).Verifiable();
         _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
-        
-        var matchStage = new MatchStage()
-            {
-                MatchId = createdMatch.Id,
-                Stage = stage
-            };
-        _matchStageRepository.Setup(r => r.AddAsync(It.Is<MatchStage>(x => x.MatchId == createdMatchId))).ReturnsAsync(matchStage);
-        
+
         // Act
         await _handler.HandleAsync(match);
         

@@ -12,8 +12,6 @@ public interface IUnitOfWork : IDisposable
     
     IMatchRepository Matches { get; }
     
-    IMatchStageRepository MatchStages { get; }
-    
     IPlayerRepository Players { get; }
     
     IRatingRepository Ratings { get; }

@@ -36,14 +36,7 @@ public class TournamentService : ITournamentService
 
         foreach (var matchEntity in matchEntities)
         {
-            var created = await _unitOfWork.Matches.AddAsync(matchEntity);
-            
-            var matchStage = new MatchStage
-                {
-                    MatchId = created.Id,
-                    Stage = stage
-                };
-            await _unitOfWork.MatchStages.AddAsync(matchStage);
+            await _unitOfWork.Matches.AddAsync(matchEntity);
         }
 
         var tournament = await _unitOfWork.Tournaments.GetByIdAsync(id);
@@ -86,9 +79,8 @@ public class TournamentService : ITournamentService
     
     public async Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament)
     {
-        var matchStages = await _unitOfWork.MatchStages.Query().Include(ms => ms.Match).ToListAsync();
         var currentStageWinners = tournament.Matches.
-            Where(tm => matchStages.Any(ms => ms.MatchId == tm.Id && ms.Stage == tournament.CurrentStage))
+            Where(m => m.Stage == tournament.CurrentStage)
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
             .Select(f => f.Hero)
             .ToList();
@@ -133,7 +125,7 @@ public class TournamentService : ITournamentService
             opponent.PlayerId = RandomizePlayer(players);
             opponent.Turn = RandomizeTurns(turns);
             
-            var match = new MatchWithStageDto
+            var match = new MatchDto
                 {
                     Id = Guid.Empty,
                     Stage = tournament.CurrentStage,

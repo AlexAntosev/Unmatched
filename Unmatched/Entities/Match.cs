@@ -3,6 +3,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Unmatched.Enums;
+
 public class Match 
 {
     public string? Comment { get; set; }
@@ -24,4 +26,6 @@ public class Match
     public Guid? TournamentId { get; set; }
     
     public bool IsPlanned { get; set; }
+    
+    public Stage? Stage { get; set; }
 }

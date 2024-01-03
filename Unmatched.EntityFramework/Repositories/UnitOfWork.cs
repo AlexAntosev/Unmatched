@@ -15,8 +15,6 @@ public class UnitOfWork : IUnitOfWork
 
     public IMatchRepository Matches { get; }
 
-    public IMatchStageRepository MatchStages { get; }
-
     public IPlayerRepository Players { get; }
 
     public IRatingRepository Ratings { get; }
@@ -34,7 +32,6 @@ public class UnitOfWork : IUnitOfWork
         Heroes = new HeroRepository(context);
         Maps = new MapRepository(context);
         Matches = new MatchRepository(context);
-        MatchStages = new MatchStageRepository(context);
         Players = new PlayerRepository(context);
         Ratings = new RatingRepository(context);
         Sidekicks = new SidekickRepository(context);

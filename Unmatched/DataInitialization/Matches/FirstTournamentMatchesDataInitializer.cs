@@ -12,7 +12,6 @@ using Unmatched.Services.RatingCalculators;
 class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTournamentMatchesDataInitializer
 {
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
-    private readonly IMatchStageRepository _matchStageRepository;
 
     private readonly IUnitOfWork _unitOfWork;
 
@@ -22,12 +21,10 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
         IMapRepository mapRepository,
         ITournamentRepository tournamentRepository,
         IPlayerRepository playerRepository,
-        IFirstTournamentRatingCalculator ratingCalculator,
-        IMatchStageRepository matchStageRepository) : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
+        IFirstTournamentRatingCalculator ratingCalculator) : base(heroRepository, mapRepository, playerRepository, tournamentRepository)
     {
         _unitOfWork = unitOfWork;
         _ratingCalculator = ratingCalculator;
-        _matchStageRepository = matchStageRepository;
     }
 
     public IEnumerable<Match> GetEntities()
@@ -37,7 +34,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
 
     public async Task InitializeAsync()
     {
-        var groupStageMatches = new List<MatchWithStage>()
+        var groupStageMatches = new List<Match>()
             {
                 new() {Date = new DateTime(2022, 11, 11),MapId = GetMap(MapNames.GreenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -296,7 +293,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
         
-        var quarterFinalsMatches = new List<MatchWithStage>()
+        var quarterFinalsMatches = new List<Match>()
             {
                 new() {Date = new DateTime(2022, 12, 24),MapId = GetMap(MapNames.GreenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -320,7 +317,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
 
-        var semiFinalsMatches = new List<MatchWithStage>()
+        var semiFinalsMatches = new List<Match>()
             {
                 new() {Date = new DateTime(2022, 12, 27),MapId = GetMap(MapNames.GoldenForest), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -334,7 +331,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
         
-        var thirdPlaceFinalsMatches = new List<MatchWithStage>()
+        var thirdPlaceFinalsMatches = new List<Match>()
             {
                 new() {Date = new DateTime(2022, 12, 29),MapId = GetMap(MapNames.Mansion), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -343,7 +340,7 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
                     }}
             };
 
-        var finalsMatches = new List<MatchWithStage>()
+        var finalsMatches = new List<Match>()
             {
                 new() {Date = new DateTime(2023, 1, 2),MapId = GetMap(MapNames.Ship), TournamentId = GetTournament(TournamentNames.UnmatchedFirstTournament), Fighters = new List<Fighter>()
                     {
@@ -359,58 +356,6 @@ class FirstTournamentMatchesDataInitializer : BaseMatchDataInitializer, IFirstTo
         
         var handler = new FirstTournamentMatchHandler(_unitOfWork, _ratingCalculator);
 
-        foreach (var match in groupStageMatches)
-        {
-            await InsertMatchStage(match, Stage.Group);
-        }
-        
-        foreach (var match in quarterFinalsMatches)
-        {
-            await InsertMatchStage(match, Stage.QuarterFinals);
-        }
-
-        foreach (var match in semiFinalsMatches)
-        {
-            await InsertMatchStage(match, Stage.SemiFinals);
-        }
-        
-        foreach (var match in thirdPlaceFinalsMatches)
-        {
-            await InsertMatchStage(match, Stage.ThirdPlaceDecider);
-        }
-        
-        foreach (var match in finalsMatches)
-        {
-            await InsertMatchStage(match, Stage.GrandFinals);
-        }
-
-        await _matchStageRepository.SaveChangesAsync();
-    }
-
-    private async Task InsertMatchStage(MatchWithStage match, Stage stage)
-    {
-        var existingMatch = FindExistingMatch(match);
-        var matchStage = new MatchStage()
-            {
-                MatchId = existingMatch.Id,
-                Stage = stage
-            };
-        await _matchStageRepository.AddAsync(matchStage);
-    }
-
-    private Match FindExistingMatch(MatchWithStage match)
-    {
-        var existingMatch = _unitOfWork.Matches.Query()
-            .Include(x => x.Fighters)
-            .Where(
-                x => x.TournamentId.Equals(match.TournamentId)
-                 && x.Date.Equals(match.Date)
-                 && x.MapId.Equals(match.MapId)).ToArray().SingleOrDefault(x => x.Fighters.First(f => f.IsWinner).HeroId.Equals(match.Fighters.First(f => f.IsWinner).HeroId));
-        if (existingMatch == null)
-        {
-            throw new InvalidOperationException();
-        }
-
-        return existingMatch;
+        await _unitOfWork.SaveChangesAsync();
     }
 }

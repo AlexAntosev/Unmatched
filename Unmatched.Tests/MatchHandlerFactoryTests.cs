@@ -22,7 +22,6 @@ public class MatchHandlerFactoryTests
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
     private readonly Mock<IFighterRepository> _fighterRepository = new();
-    private readonly Mock<IMatchStageRepository> _matchStageRepository = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private readonly MatchHandlerFactory _factory;
@@ -33,7 +32,6 @@ public class MatchHandlerFactoryTests
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
-        _unitOfWork.Setup(uow => uow.MatchStages).Returns(_matchStageRepository.Object);
         _unitOfWork.Setup(uow => uow.Tournaments).Returns(_tournamentRepository.Object);
         
         _tournamentRepository.Setup(x => x.Query())
