@@ -1,6 +1,5 @@
 ﻿namespace Unmatched.Tests;
 
-using Microsoft.Extensions.Logging;
 using Moq;
 using Unmatched.Constants;
 using Unmatched.Entities;
@@ -14,7 +13,6 @@ public class MatchHandlerFactoryTests
     private readonly Guid _firstTournamentId = Guid.NewGuid();
     private readonly Guid _goldenHalatLeagueId = Guid.NewGuid();
 
-    private readonly Mock<ILoggerFactory> _loggerFactory = new();
     private readonly Mock<ITournamentRepository> _tournamentRepository = new();
     private readonly Mock<IRatingCalculator> _ratingCalculator = new();
     private readonly Mock<IUnrankedRatingCalculator> _unrankedRatingCalculator = new();
@@ -28,7 +26,6 @@ public class MatchHandlerFactoryTests
 
     public MatchHandlerFactoryTests()
     {
-        
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(uow => uow.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
@@ -52,7 +49,6 @@ public class MatchHandlerFactoryTests
         
         _factory = new MatchHandlerFactory(
             _unitOfWork.Object,
-            _loggerFactory.Object,
             _ratingCalculator.Object,
             _firstTournamentRatingCalculator.Object,
             _unrankedRatingCalculator.Object);

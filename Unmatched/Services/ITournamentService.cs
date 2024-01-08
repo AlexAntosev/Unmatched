@@ -21,4 +21,8 @@ public interface ITournamentService
     Task CreateInitialPlannedMatchesAsync(TournamentDto tournament);
 
     Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament);
+
+    Task CreateThirdPlaceDeciderMatchAsync(TournamentDto tournament);
+
+    Task CreateGrandFinalMatchesAsync(TournamentDto tournament);
 }

@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.Services;
 
+using System.Text.Json;
+
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -86,6 +88,99 @@ public class TournamentService : ITournamentService
             .ToList();
         
         tournament.CurrentStage++;
+        
+        await CreatePlannedMatchesAsync(tournament, currentStageWinners);
+    }
+    
+    public async Task CreateThirdPlaceDeciderMatchAsync(TournamentDto tournament)
+    {
+        var currentStageLosers = tournament.Matches.
+            Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
+            .Select(m => m.Fighters.FirstOrDefault(f => !f.IsWinner))
+            .Select(f => f.Hero)
+            .ToList();
+        
+        tournament.CurrentStage++;
+        
+        await CreatePlannedMatchesAsync(tournament, currentStageLosers);
+    }
+    
+    public async Task CreateGrandFinalMatchesAsync(TournamentDto tournament)
+    {
+        var currentStageWinners = tournament.Matches.
+            Where(m => m.Stage == tournament.CurrentStage - 1 && !m.IsPlanned)
+            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
+            .Select(f => f.Hero)
+            .ToList();
+        
+        tournament.CurrentStage++;
+
+        var maps = await _unitOfWork.Maps.Query().ToListAsync();
+        for (var j = 0; j < 2; j++)
+        {
+            var finalists = JsonSerializer.Deserialize<List<HeroDto>>(JsonSerializer.Serialize(currentStageWinners));
+
+            var participants = new List<FighterDto>();
+            foreach (var hero in finalists)
+            {
+                var participant = new FighterDto
+                    {
+                        Hero = hero,
+                        HeroId = hero.Id
+                    };
+                participants.Add(participant);
+            }
+
+            var generatedMatches = new List<MatchDto>();
+            for (var i = 0; i < participants.Count; i += 2)
+            {
+                var players = await _unitOfWork.Players.Query()
+                    .Where(p => p.Name.Equals(PlayerNames.Andrii) || p.Name.Equals(PlayerNames.Oleksandr))
+                    .ToListAsync();
+                var turns = new List<int>
+                    {
+                        1,
+                        2
+                    };
+            
+                var fighter = participants[i];
+                var opponent = participants[i + 1];
+
+                if (j == 0)
+                {
+                    fighter.PlayerId = players[0].Id;
+                    fighter.Turn = turns[0];
+                    opponent.PlayerId = players[1].Id;
+                    opponent.Turn = turns[1];
+                }
+                else
+                {
+                    fighter.PlayerId = players[1].Id;
+                    fighter.Turn = turns[1];
+                    opponent.PlayerId = players[0].Id;
+                    opponent.Turn = turns[0];
+                }
+              
+            
+                var match = new MatchDto
+                    {
+                        Id = Guid.Empty,
+                        Stage = tournament.CurrentStage,
+                        Fighters = new List<FighterDto>
+                            {
+                                fighter,
+                                opponent
+                            },
+                        TournamentId = tournament.Id,
+                        MapId = RandomizeMap(maps),
+                        IsPlanned = true
+                    };
+                generatedMatches.Add(match);
+            }
+
+            await UpdateAsync(tournament.Id, generatedMatches, tournament.CurrentStage);
+        }
+        
         
         await CreatePlannedMatchesAsync(tournament, currentStageWinners);
     }

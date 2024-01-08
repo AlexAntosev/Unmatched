@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Unmatched.Entities;
-using Unmatched.Enums;
 using Unmatched.Repositories;
 using Unmatched.Services.RatingCalculators;
 
