@@ -4,6 +4,10 @@
 @using Unmatched.Constants
 @using Unmatched.Enums
 @inject IMatchService MatchService
+@inject IHeroService HeroService
+@inject ITournamentService TournamentService
+@inject IPlayerService PlayerService
+@inject IMapService MapService
 @inject NavigationManager NavManager
 
 <div class="page-content">
@@ -106,10 +110,10 @@
         try
         {
             PreloadService.Show();
-            _players = (await MatchService.GetAllPlayersAsync()).ToList();
-            _heroes = (await MatchService.GetAllHeroesAsync()).ToList();
-            _maps = (await MatchService.GetAllMapsAsync()).ToList();
-            _tournaments = (await MatchService.GetAllTournamentsAsync()).ToList();
+            _players = (await PlayerService.GetAsync()).ToList();
+            _heroes = (await HeroService.GetAsync()).ToList();
+            _maps = (await MapService.GetAsync()).ToList();
+            _tournaments = (await TournamentService.GetAsync()).ToList();
             _stages = new List<(Stage?, string)>
                 {
                     (null, ""),

@@ -32,26 +32,9 @@ public class TournamentService : ITournamentService
         return createdDto;
     }
 
-    public async Task UpdateAsync(Guid id, IEnumerable<MatchDto> matches, Stage stage)
-    {
-        var matchEntities = _mapper.Map<IEnumerable<Match>>(matches);
-
-        foreach (var matchEntity in matchEntities)
-        {
-            await _unitOfWork.Matches.AddAsync(matchEntity);
-        }
-
-        var tournament = await _unitOfWork.Tournaments.GetByIdAsync(id);
-        
-        tournament.CurrentStage = stage;
-        _unitOfWork.Tournaments.AddOrUpdate(tournament);
-        
-        await _unitOfWork.SaveChangesAsync();
-    }
-
     public async Task<IEnumerable<TournamentDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Tournaments.Query().ToListAsync();
+        var entities = await _unitOfWork.Tournaments.Query().OrderBy(x => x.Name).ToListAsync();
         var tournaments = _mapper.Map<IEnumerable<TournamentDto>>(entities);
 
         return tournaments;
@@ -183,6 +166,23 @@ public class TournamentService : ITournamentService
         
         
         await CreatePlannedMatchesAsync(tournament, currentStageWinners);
+    }
+    
+    private async Task UpdateAsync(Guid id, IEnumerable<MatchDto> matches, Stage stage)
+    {
+        var matchEntities = _mapper.Map<IEnumerable<Match>>(matches);
+
+        foreach (var matchEntity in matchEntities)
+        {
+            await _unitOfWork.Matches.AddAsync(matchEntity);
+        }
+
+        var tournament = await _unitOfWork.Tournaments.GetByIdAsync(id);
+        
+        tournament.CurrentStage = stage;
+        _unitOfWork.Tournaments.AddOrUpdate(tournament);
+        
+        await _unitOfWork.SaveChangesAsync();
     }
     
     private async Task CreatePlannedMatchesAsync(TournamentDto tournament, List<HeroDto> heroes)

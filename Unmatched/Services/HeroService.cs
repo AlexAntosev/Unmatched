@@ -18,7 +18,7 @@ public class HeroService : IHeroService
     
     public async Task<IEnumerable<HeroDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Heroes.Query().ToListAsync();
+        var entities = await _unitOfWork.Heroes.Query().Include(e => e.Sidekicks).OrderBy(x => x.Name).ToListAsync();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
 
         return heroes;

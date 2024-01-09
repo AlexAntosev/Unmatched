@@ -11,14 +11,6 @@ public interface IMatchService
     Task AddAsync(MatchDto match, FighterDto fighter, FighterDto opponent);
 
     Task UpdateAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto);
-    
-    Task<IEnumerable<HeroDto>> GetAllHeroesAsync();
-
-    Task<IEnumerable<MapDto>> GetAllMapsAsync();
-
-    Task<IEnumerable<PlayerDto>> GetAllPlayersAsync();
-
-    Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
 
