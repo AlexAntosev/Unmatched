@@ -1,11 +1,7 @@
 ﻿namespace Unmatched.Services;
 
 using System.Text.Json;
-
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-
-using Unmatched.Constants;
 using Unmatched.Dtos;
 using Unmatched.Entities;
 using Unmatched.Enums;
@@ -34,7 +30,7 @@ public class TournamentService : ITournamentService
 
     public async Task<IEnumerable<TournamentDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Tournaments.Query().OrderBy(x => x.Name).ToListAsync();
+        var entities = await _unitOfWork.Tournaments.GetAsync();
         var tournaments = _mapper.Map<IEnumerable<TournamentDto>>(entities);
 
         return tournaments;
@@ -56,7 +52,7 @@ public class TournamentService : ITournamentService
     
     public async Task CreateInitialPlannedMatchesAsync(TournamentDto tournament)
     {
-        var heroesEntities = await _unitOfWork.Heroes.Query().ToListAsync();
+        var heroesEntities = await _unitOfWork.Heroes.GetAsync();
         var heroes = _mapper.Map<List<HeroDto>>(heroesEntities);
         heroes = ShuffleHeroes(heroes).Take(GetStageHeroes(tournament.CurrentStage)).ToList();
         await CreatePlannedMatchesAsync(tournament, heroes);
@@ -98,7 +94,7 @@ public class TournamentService : ITournamentService
         
         tournament.CurrentStage++;
 
-        var maps = await _unitOfWork.Maps.Query().ToListAsync();
+        var maps = await _unitOfWork.Maps.GetAsync();
         for (var j = 0; j < 2; j++)
         {
             var finalists = JsonSerializer.Deserialize<List<HeroDto>>(JsonSerializer.Serialize(currentStageWinners));
@@ -117,9 +113,7 @@ public class TournamentService : ITournamentService
             var generatedMatches = new List<MatchDto>();
             for (var i = 0; i < participants.Count; i += 2)
             {
-                var players = await _unitOfWork.Players.Query()
-                    .Where(p => p.Name.Equals(PlayerNames.Andrii) || p.Name.Equals(PlayerNames.Oleksandr))
-                    .ToListAsync();
+                var players = await _unitOfWork.Players.GetOleksAndAndrewAsync();
                 var turns = new List<int>
                     {
                         1,
@@ -187,7 +181,7 @@ public class TournamentService : ITournamentService
     
     private async Task CreatePlannedMatchesAsync(TournamentDto tournament, List<HeroDto> heroes)
     {
-        var maps = await _unitOfWork.Maps.Query().ToListAsync();
+        var maps = await _unitOfWork.Maps.GetAsync();
 
         heroes = ShuffleHeroes(heroes);
         var participants = new List<FighterDto>();
@@ -204,9 +198,7 @@ public class TournamentService : ITournamentService
         var generatedMatches = new List<MatchDto>();
         for (var i = 0; i < participants.Count; i += 2)
         {
-            var players = await _unitOfWork.Players.Query()
-                .Where(p => p.Name.Equals(PlayerNames.Andrii) || p.Name.Equals(PlayerNames.Oleksandr))
-                .ToListAsync();
+            var players = await _unitOfWork.Players.GetOleksAndAndrewAsync();
             var turns = new List<int>
                 {
                     1,

@@ -59,7 +59,7 @@ public class HeroRepository : IHeroRepository
 
     public IQueryable<Hero> Query()
     {
-        return _dbContext.Heroes;
+        return _dbContext.Heroes.Include(e => e.Sidekicks);
     }
 
     public async Task SaveChangesAsync()
@@ -70,5 +70,10 @@ public class HeroRepository : IHeroRepository
     public Guid GetIdByName(string name)
     {
         return _dbContext.Heroes.First(x => x.Name.Equals(name)).Id;
+    }
+    
+    public async Task<List<Hero>> GetAsync()
+    {
+        return await _dbContext.Heroes.Include(e => e.Sidekicks).OrderBy(h => h.Name).ToListAsync();
     }
 }

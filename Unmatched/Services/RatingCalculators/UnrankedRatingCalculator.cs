@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services.RatingCalculators;
 
 using Unmatched.Entities;
-using Unmatched.Models;
 
 public class UnrankedRatingCalculator : IUnrankedRatingCalculator
 {

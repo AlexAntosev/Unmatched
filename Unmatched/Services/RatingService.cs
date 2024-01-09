@@ -1,25 +1,21 @@
 ﻿namespace Unmatched.Services;
 
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Entities;
 using Unmatched.Repositories;
 
 public class RatingService : IRatingService
 {
     private readonly IMatchService _matchService;
-    private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public RatingService(IMatchService matchService, IMapper mapper, IUnitOfWork unitOfWork)
+    public RatingService(IMatchService matchService, IUnitOfWork unitOfWork)
     {
         _matchService = matchService;
-        _mapper = mapper;
         _unitOfWork = unitOfWork;
     }
     public async Task RecalculateAsync()
     {
-        var matches = GetMatches();
+        var matches = await GetMatchesAsync();
         
         await ClearDataAsync();
         
@@ -29,9 +25,9 @@ public class RatingService : IRatingService
         }
     }
     
-    private IEnumerable<Match> GetMatches()
+    private async Task<IEnumerable<Match>> GetMatchesAsync()
     {
-        var matches = _unitOfWork.Matches.Query().Include(m => m.Fighters).OrderBy(x => x.Date).AsNoTracking().ToArray();
+        var matches = await _unitOfWork.Matches.GetAsync();
         return matches;
     }
 

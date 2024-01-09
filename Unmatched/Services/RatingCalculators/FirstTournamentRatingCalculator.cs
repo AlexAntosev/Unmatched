@@ -2,7 +2,6 @@
 
 using Unmatched.Entities;
 using Unmatched.Enums;
-using Unmatched.Models;
 using Unmatched.Repositories;
 
 public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator

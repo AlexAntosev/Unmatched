@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -26,7 +25,7 @@ public class TitleService : ITitleService
     
     public async Task<IEnumerable<TitleDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Titles.Query().Include(t => t.Heroes).ToListAsync();
+        var entities = await _unitOfWork.Titles.GetAsync();
         var titles = _mapper.Map<IEnumerable<TitleDto>>(entities);
 
         return titles;

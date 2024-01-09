@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -58,6 +60,11 @@ public class MapRepository : IMapRepository
     public IQueryable<Map> Query()
     {
         return _dbContext.Maps;
+    }
+
+    public async Task<List<Map>> GetAsync()
+    {
+        return await _dbContext.Maps.OrderBy(x => x.Name).ToListAsync();
     }
 
     public async Task SaveChangesAsync()

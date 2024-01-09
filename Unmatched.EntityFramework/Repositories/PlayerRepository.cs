@@ -1,5 +1,8 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
+using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -60,6 +63,11 @@ public class PlayerRepository : IPlayerRepository
         return _dbContext.Players;
     }
 
+    public async Task<List<Player>> GetAsync()
+    {
+        return await _dbContext.Players.OrderBy(x => x.Name).ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
@@ -68,5 +76,10 @@ public class PlayerRepository : IPlayerRepository
     public Guid GetIdByName(string name)
     {
         return _dbContext.Players.First(x => x.Name.Equals(name)).Id;
+    }
+
+    public async Task<List<Player>> GetOleksAndAndrewAsync()
+    {
+        return await _dbContext.Players.Where(p => p.Name.Equals(PlayerNames.Andrii) || p.Name.Equals(PlayerNames.Oleksandr)).ToListAsync();
     }
 }

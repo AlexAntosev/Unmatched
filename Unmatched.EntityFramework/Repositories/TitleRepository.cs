@@ -61,7 +61,12 @@ public class TitleRepository : ITitleRepository
 
     public IQueryable<Title> Query()
     {
-        return _dbContext.Titles;
+        return _dbContext.Titles.Include(t => t.Heroes);
+    }
+
+    public async Task<List<Title>> GetAsync()
+    {
+        return await _dbContext.Titles.ToListAsync();
     }
 
     public async Task SaveChangesAsync()

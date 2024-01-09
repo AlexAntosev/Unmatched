@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Repositories;
 
@@ -18,7 +17,7 @@ public class PlayerService : IPlayerService
     
     public async Task<IEnumerable<PlayerDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Players.Query().OrderBy(x => x.Name).ToListAsync();
+        var entities = await _unitOfWork.Players.GetAsync();
         var players = _mapper.Map<IEnumerable<PlayerDto>>(entities);
         return players;
     }

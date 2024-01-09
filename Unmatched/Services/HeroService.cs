@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Repositories;
 
@@ -18,7 +17,7 @@ public class HeroService : IHeroService
     
     public async Task<IEnumerable<HeroDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Heroes.Query().Include(e => e.Sidekicks).OrderBy(x => x.Name).ToListAsync();
+        var entities = await _unitOfWork.Heroes.GetAsync();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
 
         return heroes;
@@ -26,8 +25,8 @@ public class HeroService : IHeroService
 
     public async Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId)
     {
-        var entities = await _unitOfWork.Heroes.Query().OrderBy(h => h.Name).ToListAsync();
-        var title = await _unitOfWork.Titles.Query().Include(t => t.Heroes).FirstOrDefaultAsync(t => t.Id == titleId);
+        var entities = await _unitOfWork.Heroes.GetAsync();
+        var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
 
         var heroes = _mapper.Map<IEnumerable<HeroTitleAssignDto>>(entities);
 

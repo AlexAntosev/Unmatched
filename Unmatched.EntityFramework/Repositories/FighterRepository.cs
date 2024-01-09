@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.Entities;
 using Unmatched.EntityFramework.Context;
 using Unmatched.Repositories;
@@ -59,9 +61,46 @@ public class FighterRepository : IFighterRepository
     {
         return _dbContext.Fighters;
     }
+    
+    public async Task<List<Fighter>> GetAsync()
+    {
+        return await _dbContext.Fighters.Include(f => f.Match).OrderBy(f => f.Match.Date).ToListAsync();
+    }
 
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<Fighter>> GetByMatchIdAsync(Guid matchId)
+    {
+        return await _dbContext.Fighters
+            .Include(x => x.Player)
+            .Include(x => x.Hero)
+            .Where(x => matchId == x.MatchId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Fighter>> GetFromFinishedMatchesAsync()
+    {
+        return await _dbContext.Fighters.Include(x => x.Match).Where(x => !x.Match.IsPlanned).ToListAsync();
+    }
+
+    public async Task<List<Fighter>> GetFromFinishedMatchesByHeroIdAsync(Guid heroId)
+    {
+        return await _dbContext.Fighters
+            .Include(x => x.Match)
+            .Where(x => x.HeroId.Equals(heroId) && !x.Match.IsPlanned)
+            .OrderByDescending(x => x.Match.Date)
+            .ToListAsync();
+    }
+
+    public async Task<List<Fighter>> GetFromFinishedMatchesByPlayerIdAsync(Guid playerId)
+    {
+        return await _dbContext.Fighters
+            .Include(x => x.Match)
+            .Where(x => x.PlayerId.Equals(playerId) && !x.Match.IsPlanned)
+            .OrderByDescending(x => x.Match.Date)
+            .ToListAsync();
     }
 }

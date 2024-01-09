@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Repositories;
 
@@ -18,7 +17,7 @@ public class MapService : IMapService
     
     public async Task<IEnumerable<MapDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Maps.Query().OrderBy(x => x.Name).ToListAsync();
+        var entities = await _unitOfWork.Maps.GetAsync();
         var maps = _mapper.Map<IEnumerable<MapDto>>(entities);
         return maps;
     }

@@ -2,7 +2,6 @@
 
 using System;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Repositories;
 
@@ -19,11 +18,8 @@ public class MapStatisticsService : IMapStatisticsService
     
     public async Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync()
     {
-        var maps = await _unitOfWork.Maps.Query().ToListAsync();
-        var mapMatches = await _unitOfWork.Matches
-            .Query()
-            .Where(m => !m.IsPlanned)
-            .ToListAsync();
+        var maps = await _unitOfWork.Maps.GetAsync();
+        var mapMatches = await _unitOfWork.Matches.GetFinishedAsync();
 
         var statistics = new List<MapStatisticsDto>();
 
@@ -44,17 +40,11 @@ public class MapStatisticsService : IMapStatisticsService
         return statistics;
     }
 
-    
-
     public async Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId)
     {
         var map = await _unitOfWork.Maps.GetByIdAsync(mapId);
         
-        var mapMatches = await _unitOfWork.Matches
-            .Query()
-            .Where(x => x.MapId.Equals(map.Id) && !x.IsPlanned)
-            .OrderByDescending(x => x.Date)
-            .ToListAsync();
+        var mapMatches = await _unitOfWork.Matches.GetFinishedByMapIdAsync(mapId);
         
         var statistics = new MapStatisticsDto
             {
@@ -68,12 +58,7 @@ public class MapStatisticsService : IMapStatisticsService
     
     public async Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId)
     {
-        var mapMatches = await _unitOfWork.Matches
-            .Query()
-            .Where(m => m.MapId == mapId && !m.IsPlanned)
-            .Include(x => x.Map)
-            .Include(x => x.Tournament)
-            .ToListAsync();
+        var mapMatches = await _unitOfWork.Matches.GetFinishedByMapIdAsync(mapId);
 
         var matchLogs = new List<MatchLogDto>();
         
@@ -81,15 +66,9 @@ public class MapStatisticsService : IMapStatisticsService
         {
             var matchLog = _mapper.Map<MatchLogDto>(match);
 
-            var fighters = await _unitOfWork.Fighters
-                .Query()
-                .Where(x => matchLog.MatchId == x.MatchId)
-                .Include(x => x.Player)
-                .Include(x => x.Hero)
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToListAsync();
+            var fighters = await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
             
-            matchLog.Fighters = fighters;
+            matchLog.Fighters = _mapper.Map<List<FighterDto>>(fighters);
 
             matchLogs.Add(matchLog);
         }

@@ -62,6 +62,11 @@ public class TournamentRepository : ITournamentRepository
         return _dbContext.Tournaments;
     }
 
+    public async Task<List<Tournament>> GetAsync()
+    {
+        return await _dbContext.Tournaments.OrderBy(h => h.Name).ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();

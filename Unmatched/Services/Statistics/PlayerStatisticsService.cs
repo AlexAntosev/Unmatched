@@ -2,7 +2,6 @@
 
 using System;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Repositories;
 
@@ -19,8 +18,8 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     
     public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
     {
-        var players = await _unitOfWork.Players.Query().ToListAsync();
-        var fighters = await _unitOfWork.Fighters.Query().Include(x => x.Match).Where(f => !f.Match.IsPlanned).ToListAsync();
+        var players = await _unitOfWork.Players.GetAsync();
+        var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
         var statistics = new List<PlayerStatisticsDto>();
 
@@ -47,13 +46,7 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     public async Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId)
     {
         var player = await _unitOfWork.Players.GetByIdAsync(playerId);
-        
-        var playerFighters = await _unitOfWork.Fighters
-            .Query()
-            .Include(x => x.Match)
-            .Where(x => x.PlayerId.Equals(player.Id) && !x.Match.IsPlanned)
-            .OrderByDescending(x => x.Match.Date)
-            .ToListAsync();
+        var playerFighters = await _unitOfWork.Fighters.GetFromFinishedMatchesByPlayerIdAsync(playerId);
         
         var statistics = new PlayerStatisticsDto
             {
@@ -70,12 +63,7 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     
     public async Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId)
     {
-        var playerMatches = await _unitOfWork.Matches
-            .Query()
-            .Where(m => m.Fighters.Any(f => f.PlayerId == playerId) && !m.IsPlanned)
-            .Include(x => x.Map)
-            .Include(x => x.Tournament)
-            .ToListAsync();
+        var playerMatches = await _unitOfWork.Matches.GetFinishedByPlayerIdAsync(playerId);
 
         var matchLogs = new List<MatchLogDto>();
         
@@ -83,15 +71,9 @@ public class PlayerStatisticsService : IPlayerStatisticsService
         {
             var matchLog = _mapper.Map<MatchLogDto>(match);
 
-            var fighters = await _unitOfWork.Fighters
-                .Query()
-                .Where(x => matchLog.MatchId == x.MatchId)
-                .Include(x => x.Player)
-                .Include(x => x.Hero)
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToListAsync();
+            var fighters = await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
             
-            matchLog.Fighters = fighters;
+            matchLog.Fighters = _mapper.Map<List<FighterDto>>(fighters);
 
             matchLogs.Add(matchLog);
         }

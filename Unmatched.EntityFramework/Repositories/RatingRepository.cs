@@ -74,6 +74,11 @@ public class RatingRepository : IRatingRepository
         return _dbContext.Ratings;
     }
 
+    public async Task<List<Rating>> GetAsync()
+    {
+        return await _dbContext.Ratings.Include(r => r.Hero).OrderByDescending(r => r.Points).ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();

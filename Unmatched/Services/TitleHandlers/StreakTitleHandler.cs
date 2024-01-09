@@ -1,9 +1,5 @@
 ﻿namespace Unmatched.Services.TitleHandlers;
 
-using System;
-
-using Microsoft.EntityFrameworkCore;
-
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -26,8 +22,8 @@ public class StreakTitleHandler : IStreakTitleHandler
         }
 
         var heroesStreaks = new Dictionary<Hero, int>();
-        var heroes = await _unitOfWork.Heroes.Query().ToListAsync();
-        var fighters = await _unitOfWork.Fighters.Query().Include(f => f.Match).OrderBy(f => f.Match.Date).ToListAsync();
+        var heroes = await _unitOfWork.Heroes.GetAsync();
+        var fighters = await _unitOfWork.Fighters.GetAsync();
         
         foreach (var hero in heroes)
         {

@@ -60,6 +60,11 @@ public class SidekickRepository : ISidekickRepository
         return _dbContext.Sidekicks;
     }
 
+    public Task<List<Sidekick>> GetAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();

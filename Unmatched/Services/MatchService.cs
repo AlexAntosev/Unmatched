@@ -1,7 +1,6 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Unmatched.Dtos;
 using Unmatched.Entities;
 using Unmatched.Enums;
@@ -68,19 +67,14 @@ public class MatchService : IMatchService
 
     public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
     {
-        var allMatches = await _unitOfWork.Matches.Query().Include(x => x.Map).Include(x => x.Tournament).Where(m => !m.IsPlanned).ToListAsync();
+        var allMatches = await _unitOfWork.Matches.GetFinishedAsync();
 
         var matchLogs = new List<MatchLogDto>();
         foreach (var match in allMatches)
         {
             var matchLog = _mapper.Map<MatchLogDto>(match);
 
-            var fighters = (await _unitOfWork.Fighters
-                    .Query()
-                    .Include(x => x.Player)
-                    .Include(x => x.Hero)
-                    .Where(x => matchLog.MatchId == x.MatchId)
-                    .ToListAsync())
+            var fighters = (await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId))
                 .Select(fighter => _mapper.Map<FighterDto>(fighter))
                 .ToArray();
             matchLog.Fighters = fighters;
@@ -93,22 +87,14 @@ public class MatchService : IMatchService
 
     public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id, Stage? stage = null)
     {
-        var query = _unitOfWork.Matches.Query()
-            .Include(x => x.Map)
-            .Include(x => x.Tournament)
-            .Include(m => m.Fighters)
-                .ThenInclude(f => f.Hero)
-            .Include(m => m.Fighters)
-                .ThenInclude(f => f.Player)
-            .Where(m => m.TournamentId == id && m.Stage == stage);
-
-        var entities = await query.ToListAsync();
+        var entities = await _unitOfWork.Matches.GetByTournamentAndStageAsync(id, stage);
 
         var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
         foreach (var match in matches)
         {
             match.Fighters = match.Fighters.OrderBy(f => f.Turn);
         }
+        
         return matches;
     }
 

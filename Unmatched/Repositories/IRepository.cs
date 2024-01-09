@@ -16,5 +16,7 @@ public interface IRepository<T>
 
     IQueryable<T> Query();
 
+    Task<List<T>> GetAsync();
+
     Task SaveChangesAsync();
 }
