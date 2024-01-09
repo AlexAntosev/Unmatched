@@ -1,8 +1,8 @@
 ﻿namespace Unmatched.DataInitialization;
 
 using Unmatched.Constants;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 
 public class HoudiniVsGenieDadaInitializer : IHoudiniVsGenieDadaInitializer
 {

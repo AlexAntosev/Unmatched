@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.UI.BlazorServer",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.Tests", "Unmatched.Tests\Unmatched.Tests.csproj", "{2C001D46-BC3B-4F94-9DD3-76BC76036AF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.Data", "Unmatched.Data\Unmatched.Data.csproj", "{4925F2A1-744F-4418-93F3-51B5653F9ECE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{2C001D46-BC3B-4F94-9DD3-76BC76036AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C001D46-BC3B-4F94-9DD3-76BC76036AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C001D46-BC3B-4F94-9DD3-76BC76036AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4925F2A1-744F-4418-93F3-51B5653F9ECE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4925F2A1-744F-4418-93F3-51B5653F9ECE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4925F2A1-744F-4418-93F3-51B5653F9ECE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4925F2A1-744F-4418-93F3-51B5653F9ECE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

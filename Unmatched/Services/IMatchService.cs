@@ -1,8 +1,8 @@
 ﻿namespace Unmatched.Services;
 
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
 using Unmatched.Dtos;
-using Unmatched.Entities;
-using Unmatched.Enums;
 
 public interface IMatchService
 {

@@ -1,11 +1,11 @@
 ﻿namespace Unmatched.Tests;
 
 using Moq;
+
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Services.MatchHandlers;
-using Unmatched.Entities;
-using Unmatched.Models;
-using Match = Unmatched.Entities.Match;
-using Unmatched.Repositories;
+using Match = Unmatched.Data.Entities.Match;
 using Unmatched.Services.RatingCalculators;
 
 public class GoldenHalatLeagueMatchHandlerTests

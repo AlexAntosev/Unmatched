@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Enums;
+﻿namespace Unmatched.Data.Enums;
 
 public enum TournamentType
 {

@@ -1,8 +1,8 @@
 ﻿namespace Unmatched.Services.TitleHandlers;
 
 using Unmatched.Constants;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 
 public class StreakTitleHandler : IStreakTitleHandler
 {

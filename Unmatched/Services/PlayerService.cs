@@ -1,8 +1,9 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
+
+using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
-using Unmatched.Repositories;
 
 public class PlayerService : IPlayerService
 {

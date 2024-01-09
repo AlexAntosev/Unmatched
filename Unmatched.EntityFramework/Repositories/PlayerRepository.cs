@@ -3,9 +3,9 @@
 using Microsoft.EntityFrameworkCore;
 
 using Unmatched.Constants;
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
-using Unmatched.Repositories;
 
 public class PlayerRepository : IPlayerRepository
 {

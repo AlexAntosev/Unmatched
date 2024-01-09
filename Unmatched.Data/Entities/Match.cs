@@ -1,9 +1,8 @@
-﻿namespace Unmatched.Entities;
+﻿namespace Unmatched.Data.Entities;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-using Unmatched.Enums;
+using Unmatched.Data.Enums;
 
 public class Match 
 {

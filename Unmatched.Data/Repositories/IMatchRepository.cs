@@ -1,7 +1,7 @@
-﻿namespace Unmatched.Repositories;
+﻿namespace Unmatched.Data.Repositories;
 
-using Unmatched.Entities;
-using Unmatched.Enums;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
 
 public interface IMatchRepository : IRepository<Match>
 {

@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Entities;
+﻿namespace Unmatched.Data.Entities;
 
 using System;
 using System.ComponentModel.DataAnnotations;

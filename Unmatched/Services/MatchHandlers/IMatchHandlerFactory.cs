@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
 
 public interface IMatchHandlerFactory
 {

@@ -2,10 +2,10 @@
 
 using Moq;
 using Unmatched.Constants;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Services.MatchHandlers;
-using Match = Unmatched.Entities.Match;
+using Match = Unmatched.Data.Entities.Match;
 using Unmatched.Services.RatingCalculators;
 
 public class MatchHandlerFactoryTests

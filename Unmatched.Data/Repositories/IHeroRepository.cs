@@ -1,6 +1,6 @@
-﻿namespace Unmatched.Repositories;
+﻿namespace Unmatched.Data.Repositories;
 
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
 
 public interface IHeroRepository : IRepository<Hero>
 {

@@ -1,7 +1,7 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
-using Unmatched.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {

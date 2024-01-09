@@ -3,10 +3,9 @@
 using Moq;
 
 using Unmatched.Constants;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.DataInitialization;
-using Unmatched.Entities;
-using Unmatched.Models;
-using Unmatched.Repositories;
 using Unmatched.Services.RatingCalculators;
 
 public class RatingCalculatorTests

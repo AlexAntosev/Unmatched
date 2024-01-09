@@ -1,8 +1,8 @@
 ﻿namespace Unmatched.DataInitialization.Matches;
 
 using Unmatched.Constants;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
 

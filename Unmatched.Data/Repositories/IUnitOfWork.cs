@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Repositories;
+﻿namespace Unmatched.Data.Repositories;
 
 using System;
 

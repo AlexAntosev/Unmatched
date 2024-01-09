@@ -1,9 +1,10 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
+
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
-using Unmatched.Entities;
-using Unmatched.Repositories;
 
 public class TitleService : ITitleService
 {

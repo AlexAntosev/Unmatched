@@ -3,8 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
 
 public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDbContext>
 {

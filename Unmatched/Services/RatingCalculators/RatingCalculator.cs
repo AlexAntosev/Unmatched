@@ -1,8 +1,8 @@
 ﻿namespace Unmatched.Services.RatingCalculators;
 
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Models;
-using Unmatched.Repositories;
 
 public class RatingCalculator : IRatingCalculator
 {

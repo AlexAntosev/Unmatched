@@ -2,8 +2,8 @@
 
 using AutoMapper;
 
+using Unmatched.Data.Entities;
 using Unmatched.Dtos;
-using Unmatched.Entities;
 
 public class UnmatchedMapper : Profile
 {

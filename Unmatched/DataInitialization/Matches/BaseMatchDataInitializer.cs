@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.DataInitialization.Matches;
 
-using Unmatched.Repositories;
+using Unmatched.Data.Repositories;
 
 public abstract class BaseMatchDataInitializer
 {

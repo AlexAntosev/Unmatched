@@ -1,8 +1,9 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
 using Microsoft.Extensions.Logging;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 
 public class EmptyMatchHandler : BaseMatchHandler
 {

@@ -1,7 +1,7 @@
 ﻿namespace Unmatched.Services.MatchHandlers;
 
-using Unmatched.Entities;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Services.RatingCalculators;
 
 public class GoldenHalatLeagueMatchHandler : BaseMatchHandler

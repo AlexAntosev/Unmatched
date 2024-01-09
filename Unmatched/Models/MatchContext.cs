@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Models;
 
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
 
 class MatchContext
 {

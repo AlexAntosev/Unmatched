@@ -2,8 +2,9 @@
 
 using System;
 using AutoMapper;
+
+using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
-using Unmatched.Repositories;
 
 public class MapStatisticsService : IMapStatisticsService
 {

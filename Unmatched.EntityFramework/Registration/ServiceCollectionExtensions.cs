@@ -3,10 +3,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
 using Unmatched.EntityFramework.Repositories;
-using Unmatched.Repositories;
 
 public static class ServiceCollectionExtensions
 {

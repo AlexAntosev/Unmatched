@@ -2,11 +2,12 @@
 
 using System;
 using Moq;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
-using Match = Unmatched.Entities.Match;
+using Match = Unmatched.Data.Entities.Match;
 
 public class UnrankedMatchHandlerTests
 {

@@ -2,10 +2,11 @@
 
 using System.Text.Json;
 using AutoMapper;
+
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
+using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
-using Unmatched.Entities;
-using Unmatched.Enums;
-using Unmatched.Repositories;
 
 public class TournamentService : ITournamentService
 {

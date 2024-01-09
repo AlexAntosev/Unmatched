@@ -1,8 +1,8 @@
-﻿namespace Unmatched.Entities;
+﻿namespace Unmatched.Data.Entities;
 
 using System.ComponentModel.DataAnnotations;
 
-public class Map
+public class Player
 {
     [Key]
     public Guid Id { get; set; }

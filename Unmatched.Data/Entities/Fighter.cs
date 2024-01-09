@@ -1,7 +1,6 @@
-﻿namespace Unmatched.Entities;
+﻿namespace Unmatched.Data.Entities;
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 public class Fighter
 {

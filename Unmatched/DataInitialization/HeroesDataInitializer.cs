@@ -1,13 +1,12 @@
 ﻿namespace Unmatched.DataInitialization;
 
 using Unmatched.Constants;
-using Unmatched.Entities;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Repositories;
 
 public class HeroesDataInitializer : IDataInitializer<Hero>
 {
     private readonly IHeroRepository _heroRepository;
-
     private readonly ISidekickRepository _sidekickRepository;
 
     public HeroesDataInitializer(IHeroRepository heroRepository, ISidekickRepository sidekickRepository)

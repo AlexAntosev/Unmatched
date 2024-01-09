@@ -1,11 +1,10 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
 using Microsoft.EntityFrameworkCore;
-
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
+using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
-using Unmatched.Enums;
-using Unmatched.Repositories;
 
 public class MatchRepository : IMatchRepository
 {

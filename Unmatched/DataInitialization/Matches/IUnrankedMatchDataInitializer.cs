@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.DataInitialization.Matches;
 
-using Unmatched.Entities;
+using Unmatched.Data.Entities;
 
 public interface IUnrankedMatchDataInitializer: IDataInitializer<Match>
 {

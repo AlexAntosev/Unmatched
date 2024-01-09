@@ -1,8 +1,7 @@
 ﻿namespace Unmatched.Services.RatingCalculators;
 
-using Unmatched.Entities;
-using Unmatched.Enums;
-using Unmatched.Models;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
 
 public interface IFirstTournamentRatingCalculator
 {

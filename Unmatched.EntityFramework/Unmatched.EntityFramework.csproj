@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Unmatched.Data\Unmatched.Data.csproj" />
         <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
     </ItemGroup>
 

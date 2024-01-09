@@ -1,9 +1,9 @@
 ﻿namespace Unmatched.DataInitialization;
 
 using Unmatched.Constants;
-using Unmatched.Entities;
-using Unmatched.Enums;
-using Unmatched.Repositories;
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
+using Unmatched.Data.Repositories;
 
 public class TournamentsDataInitializer : IDataInitializer<Tournament>
 {

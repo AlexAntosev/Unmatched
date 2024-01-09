@@ -1,10 +1,11 @@
 ﻿namespace Unmatched.Services;
 
 using AutoMapper;
+
+using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
+using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
-using Unmatched.Entities;
-using Unmatched.Enums;
-using Unmatched.Repositories;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.TitleHandlers;
 
