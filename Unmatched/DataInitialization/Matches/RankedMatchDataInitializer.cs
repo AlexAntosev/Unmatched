@@ -1,7 +1,5 @@
 ﻿namespace Unmatched.DataInitialization.Matches;
 
-using Microsoft.EntityFrameworkCore;
-
 using Unmatched.Constants;
 using Unmatched.Entities;
 using Unmatched.Repositories;
@@ -348,7 +346,7 @@ public class RankedMatchDataInitializer : BaseMatchDataInitializer, IRankedMatch
 
     public async Task InitializeAsync()
     {
-        var ratings = await _ratingRepository.Query().ToListAsync();
+        var ratings = await _ratingRepository.GetAsync();
         var matches = GetEntities();
         foreach (var match in matches)
         {
