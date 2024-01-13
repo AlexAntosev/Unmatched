@@ -40,7 +40,7 @@
     private void RecordClickHandler(RecordClickEventArgs<PlayerStatisticsDto> args)
     {
         var playerId = args.RowData.PlayerId;
-        var url = $"/players-statistics/{playerId}";
+        var url = $"{Urls.PlayersStatistics}/{playerId}";
         NavManager.NavigateTo(url);
     }
 }

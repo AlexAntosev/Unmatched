@@ -168,6 +168,8 @@
     {
         try
         {
+            PreloadService.Show();
+            
             var match = Match;
             var fighter = FighterComponent.BuildDto();
             var opponent = OpponentComponent.BuildDto();
@@ -192,9 +194,12 @@
             Console.WriteLine(e);
             throw;
         }
+        finally
+        {
+            PreloadService.Hide();
+        }
         
-        var url = "/duelMatchLog";
-        NavManager.NavigateTo(url);
+        NavManager.NavigateTo(Urls.DuelMatchLog);
     }
 
     private async Task Randomize()
@@ -211,17 +216,15 @@
     
     private void RandomizeMap()
     {
-        var mapIndex = new Random().Next(0, _maps.Count());
-        Match.MapId = _maps.ToArray()[mapIndex].Id;
+        Match.MapId = _maps.GetRandomItem().Id;
     }
 
     private void RandomizeFighter(FighterInfo targetFighterComponent, params FighterInfo[] exceptFighters)
     {
         var exceptPlayers = exceptFighters.Select(x => x.Fighter.PlayerId).ToArray();
-        var availablePlayers = _players.Where(x => x.Name is PlayerNames.Andrii or PlayerNames.Oleksandr).Select(x => x.Id).Except(exceptPlayers).ToArray();
+        var availablePlayers = _players.Where(x => x.Name is PlayerNames.Andrii or PlayerNames.Oleksandr).Select(x => x.Id).Except(exceptPlayers).ToList();
         
-        var randomPlayerIndex = new Random().Next(0, availablePlayers.Count());
-        var randomPlayerId = availablePlayers.ToArray()[randomPlayerIndex];
+        var randomPlayerId = availablePlayers.GetRandomItem();
         var randomPlayer = _players.First(x => x.Id == randomPlayerId);
         
         targetFighterComponent.Fighter.PlayerId = randomPlayer.Id;

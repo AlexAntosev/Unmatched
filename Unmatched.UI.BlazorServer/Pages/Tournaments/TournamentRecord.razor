@@ -69,7 +69,7 @@
     {
         if (Match.IsPlanned)
         {
-            var url = $"/match/{Match.Id}";
+            var url = $"{Urls.Match}/{Match.Id}";
             NavManager.NavigateTo(url);
         }
     }

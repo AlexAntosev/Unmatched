@@ -68,7 +68,7 @@
     private void RecordClickHandler(RecordClickEventArgs<HeroStatisticsDto> args)
     {
         var heroId = args.RowData.HeroId;
-        var url = $"/heroes-statistics/{heroId}";
+        var url = $"{Urls.HeroesStatistics}/{heroId}";
         NavManager.NavigateTo(url);
     }
 

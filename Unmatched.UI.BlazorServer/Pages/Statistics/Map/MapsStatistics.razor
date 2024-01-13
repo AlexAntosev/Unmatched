@@ -37,7 +37,7 @@
     private void RecordClickHandler(RecordClickEventArgs<MapStatisticsDto> args)
     {
         var mapId = args.RowData.MapId;
-        var url = $"/maps-statistics/{mapId}";
+        var url = $"{Urls.MapsStatistics}/{mapId}";
         NavManager.NavigateTo(url);
     }
 }

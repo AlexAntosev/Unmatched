@@ -1,4 +1,5 @@
 ﻿@using Unmatched.Dtos
+@using Unmatched.Extensions
 <EditForm Model=@Fighter>
     <fieldset class="wrapper">
         <legend class="title">@Title</legend>
@@ -112,10 +113,8 @@
 
     public void RandomizeHero(params Guid[] exceptHeroIds)
     {
-        var availableHeroes = Heroes.Select(x => x.Id).Except(exceptHeroIds).ToArray();
-
-        var heroIndex = new Random().Next(0, availableHeroes.Count());
-        var randomHeroId = availableHeroes.ToArray()[heroIndex];
+        var availableHeroes = Heroes.Select(x => x.Id).Except(exceptHeroIds).ToList();
+        var randomHeroId = availableHeroes.GetRandomItem();
         var randomHero = Heroes.First(x => x.Id == randomHeroId);
         SetHeroInfo(randomHero);
     }

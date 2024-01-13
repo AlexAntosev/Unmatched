@@ -15,39 +15,39 @@
             </NavLink>
             @if (expandStatisticsSubNav)
             {
-                <NavLink class="nav-link" href="heroes-statistics">
+                <NavLink class="nav-link" href="@Urls.HeroesStatistics">
                     <span class="oi oi-shield" aria-hidden="false"></span> Heroes
                 </NavLink>
-                <NavLink class="nav-link" href="players-statistics">
+                <NavLink class="nav-link" href="@Urls.PlayersStatistics">
                     <span class="oi oi-people" aria-hidden="true"></span> Players
                 </NavLink>
-                <NavLink class="nav-link" href="maps-statistics">
+                <NavLink class="nav-link" href="@Urls.MapsStatistics">
                     <span class="oi oi-map" aria-hidden="true"></span> Maps
                 </NavLink>
             }
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="match/00000000-0000-0000-0000-000000000000">
+            <NavLink class="nav-link" href="@Urls.AddMatch">
                 <span class="oi oi-plus" aria-hidden="true"></span> Add match
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="duelMatchLog">
+            <NavLink class="nav-link" href="@Urls.DuelMatchLog">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Duel Match log
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="titles">
+            <NavLink class="nav-link" href="@Urls.Titles">
                 <span class="oi oi-badge" aria-hidden="true"></span> Titles
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tournaments">
+            <NavLink class="nav-link" href="@Urls.Tournaments">
                 <span class="oi oi-flag" aria-hidden="true"></span> Tournaments
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="initialize">
+            <NavLink class="nav-link" href="@Urls.Initialize">
                 <span class="oi oi-cloud-download" aria-hidden="true"></span> Initialize default data
             </NavLink>
         </div>

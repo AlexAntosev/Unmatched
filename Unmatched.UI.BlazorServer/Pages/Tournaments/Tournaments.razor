@@ -81,7 +81,7 @@
     private void RecordClickHandler(RecordClickEventArgs<TournamentDto> args)
     {
         var tournamentId = args.RowData.Id;
-        var url = $"/tournaments/{tournamentId}";
+        var url = $"{Urls.Tournaments}/{tournamentId}";
         NavManager.NavigateTo(url);
     }
 

@@ -34,4 +34,12 @@ public static class ListExtensions
 
         return item;
     }
+    
+    public static T GetRandomItem<T>(this List<T> list)
+    {
+        var index = new Random().Next(0, list.Count);
+        var item = list.ToArray()[index];
+
+        return item;
+    }
 }
