@@ -53,12 +53,20 @@ public abstract class BaseMatchHandler : IMatchHandler
         {
             throw new ArgumentException("Not enough fighters.", nameof(match));
         }
+        
+        if (IsNotOneWinner(match.Fighters))
+        {
+            throw new ArgumentException("Match should has one winner.", nameof(match));
+        }
 
         InnerValidate(match);
     }
     
     private static bool IsNotEnoughFighters(ICollection<Fighter>? fighters) 
         => fighters is null || fighters.Count < 2;
+    
+    private static bool IsNotOneWinner(ICollection<Fighter> fighters) 
+        => fighters.Count(f => f.IsWinner) != 1;
 
     private async Task<Rating> UpdateHeroRatingAsync(Guid heroId, int matchPoint)
     {
