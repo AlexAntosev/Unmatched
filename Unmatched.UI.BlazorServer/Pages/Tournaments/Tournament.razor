@@ -6,7 +6,7 @@
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
 
-<div class="page-content">
+<div class="page-content tournament-background">
     <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
     <div class="net">
         @for (var stage = TournamentModel.InitialStage; stage <= Stage.GrandFinals; stage++)
@@ -52,5 +52,12 @@
     .net {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .tournament-background {
+        background-image: url("./Silverhand Tournament.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
     }
 </style>
