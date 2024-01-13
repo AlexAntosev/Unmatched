@@ -7,9 +7,9 @@
 
 <h3 class="match-stage-name">@Stage.GetStageName()</h3>
 <div class="match-stage">
-    @if (StageMatches is not null && StageMatches.Count > 0)
+    @if (TournamentMatches is not null && TournamentMatches.Any(m => m.Stage == Stage))
     {
-        @foreach (var match in StageMatches)
+        @foreach (var match in TournamentMatches.Where(m => m.Stage == Stage))
         {
             <TournamentRecord Match="match"></TournamentRecord>
         }   
@@ -28,7 +28,7 @@
     public Stage Stage { get; set; }
 
     [Parameter]
-    public List<MatchDto> StageMatches { get; set; } = new();
+    public List<MatchDto> TournamentMatches { get; set; } = new();
     
     [Parameter]
     public List<MapDto> Maps { get; set; } = new();

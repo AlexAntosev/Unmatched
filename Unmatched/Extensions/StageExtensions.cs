@@ -8,6 +8,7 @@ public static class StageExtensions
     {
         return stage switch
             {
+                Stage.Group => 32,
                 Stage.SixteenthFinals => 32,
                 Stage.EighthFinals => 16,
                 Stage.QuarterFinals => 8,
@@ -22,6 +23,8 @@ public static class StageExtensions
     {
         return stage switch
             {
+                Stage.Group => "Group Stage",
+                Stage.SixteenthFinals => "1/16 Finals",
                 Stage.EighthFinals => "1/8 Finals",
                 Stage.QuarterFinals => "1/4 Finals",
                 Stage.SemiFinals => "1/2 Finals",

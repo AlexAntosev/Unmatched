@@ -15,5 +15,5 @@ public interface IMatchRepository : IRepository<Match>
     
     Task<List<Match>> GetFinishedByPlayerIdAsync(Guid playerId);
     
-    Task<List<Match>> GetByTournamentAndStageAsync(Guid id, Stage? stage = null);
+    Task<List<Match>> GetByTournamentAsync(Guid id);
 }

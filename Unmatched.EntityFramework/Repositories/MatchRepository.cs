@@ -81,7 +81,7 @@ public class MatchRepository : IMatchRepository
             .ToListAsync();
     }
 
-    public async Task<List<Match>> GetByTournamentAndStageAsync(Guid id, Stage? stage = null)
+    public async Task<List<Match>> GetByTournamentAsync(Guid id)
     {
         return await _dbContext.Matches.Include(x => x.Map)
             .Include(x => x.Tournament)
@@ -89,7 +89,7 @@ public class MatchRepository : IMatchRepository
             .ThenInclude(f => f.Hero)
             .Include(m => m.Fighters)
             .ThenInclude(f => f.Player)
-            .Where(m => m.TournamentId == id && m.Stage == stage)
+            .Where(m => m.TournamentId == id)
             .ToListAsync();
     }
 

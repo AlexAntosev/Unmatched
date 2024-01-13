@@ -14,7 +14,7 @@ public interface IMatchService
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
 
-    Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id, Stage? stage = null);
+    Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id);
 
     Task<MatchDto> GetAsync(Guid id);
 }

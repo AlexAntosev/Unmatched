@@ -3,7 +3,6 @@
 using AutoMapper;
 
 using Unmatched.Data.Entities;
-using Unmatched.Data.Enums;
 using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
 using Unmatched.Services.MatchHandlers;
@@ -86,9 +85,9 @@ public class MatchService : IMatchService
         return matchLogs;
     }
 
-    public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id, Stage? stage = null)
+    public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id)
     {
-        var entities = await _unitOfWork.Matches.GetByTournamentAndStageAsync(id, stage);
+        var entities = await _unitOfWork.Matches.GetByTournamentAsync(id);
 
         var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
         foreach (var match in matches)

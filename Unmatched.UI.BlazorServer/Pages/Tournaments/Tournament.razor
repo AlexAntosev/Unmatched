@@ -9,21 +9,12 @@
 <div class="page-content">
     <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
     <div class="net">
-        <div>
-            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.EighthFinals" StageMatches="octoFinals" Maps="_maps"></TournamentStage>
-        </div>
-        <div>
-            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.QuarterFinals" StageMatches="quarterFinals" Maps="_maps"></TournamentStage>
-        </div>
-        <div>
-            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.SemiFinals" StageMatches="semiFinalsMatches" Maps="_maps"></TournamentStage>
-        </div>
-        <div>
-            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.ThirdPlaceDecider" StageMatches="thirdPlaceFinalsMatches" Maps="_maps"></TournamentStage>
-        </div>
-        <div>
-            <TournamentStage TournamentModel="TournamentModel" Stage="Stage.GrandFinals" StageMatches="finalsMatches" Maps="_maps"></TournamentStage>
-        </div>
+        @for (var stage = TournamentModel.InitialStage; stage <= Stage.GrandFinals; stage++)
+        {
+            <div>
+                <TournamentStage TournamentModel="TournamentModel" Stage="stage" TournamentMatches="@tournamentMatches" Maps="_maps"></TournamentStage>
+            </div>
+        }
     </div>
 </div>
 
@@ -35,11 +26,7 @@
 
     private List<MapDto> _maps = new();
 
-    public List<MatchDto> octoFinals = new(); 
-    public List<MatchDto> quarterFinals = new(); 
-    public List<MatchDto> semiFinalsMatches = new(); 
-    public List<MatchDto> thirdPlaceFinalsMatches = new(); 
-    public List<MatchDto> finalsMatches = new();
+    public List<MatchDto> tournamentMatches = new();
     
     [Inject] protected PreloadService PreloadService { get; set; }
     
@@ -56,11 +43,7 @@
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
             
-            octoFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.EighthFinals)).ToList();
-            quarterFinals = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.QuarterFinals)).ToList();
-            semiFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.SemiFinals)).ToList();
-            thirdPlaceFinalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.ThirdPlaceDecider)).ToList();
-            finalsMatches = (await MatchService.GetByTournamentIdAsync(tournamentId, Stage.GrandFinals)).ToList();
+            tournamentMatches = (await MatchService.GetByTournamentIdAsync(tournamentId)).ToList();
         }
         finally
         {
