@@ -3,6 +3,7 @@
 using Unmatched.Data.Entities;
 using Unmatched.Data.Enums;
 using Unmatched.Data.Repositories;
+using Unmatched.Extensions;
 
 public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
 {
@@ -23,18 +24,7 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
             : fighter;
 
         var winnerHeroMaxHp = (await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId)).Hp;
-        
-        var coefficient = stage switch
-            {
-                Stage.Group => 2,
-                Stage.QuarterFinals => 8,
-                Stage.SemiFinals => 8,
-                Stage.ThirdPlaceDecider => 8,
-                Stage.GrandFinals => 4,
-                _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
-            };
-
-        var winnerPoints = Convert.ToInt32(Math.Round(coefficient * (80 + 40 * ((double)winner.HpLeft / winnerHeroMaxHp)), 0));
+        var winnerPoints = Convert.ToInt32(Math.Round(stage.GetCoefficient() * (80 + 40 * ((double)winner.HpLeft / winnerHeroMaxHp)), 0));
 
         return new Dictionary<Guid, int>
             {

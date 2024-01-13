@@ -1,10 +1,11 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Data.Enums
+@using Unmatched.Extensions
 @inject IMatchService MatchService
 @inject ITournamentService TournamentService
 
-<h3 class="match-stage-name">@GetStageName(Stage)</h3>
+<h3 class="match-stage-name">@Stage.GetStageName()</h3>
 <div class="match-stage">
     @if (StageMatches is not null && StageMatches.Count > 0)
     {
@@ -49,18 +50,7 @@
         await TournamentService.CreateNextStagePlannedMatchesAsync(TournamentModel);
     }
 
-    private string GetStageName(Stage stage)
-    {
-        return stage switch
-        {
-            Stage.EighthFinals => "1/8 Finals",
-            Stage.QuarterFinals => "1/4 Finals",
-            Stage.SemiFinals => "1/2 Finals",
-            Stage.ThirdPlaceDecider => "3rd Place Decider",
-            Stage.GrandFinals => "Grand Final",
-            _ => ""
-        };
-    }
+    
 }
 
 <style>    

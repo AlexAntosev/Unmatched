@@ -1,10 +1,10 @@
-﻿namespace Unmatched.Models;
+﻿namespace Unmatched.Dtos;
 
 using Unmatched.Data.Entities;
 
-class MatchContext
+class MatchContextDto
 {
-    public MatchContext(
+    public MatchContextDto(
         Hero winnerReferenceHero,
         Hero looserReferenceHero,
         Fighter winnerFighter,

@@ -2,7 +2,7 @@
 
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
-using Unmatched.Models;
+using Unmatched.Dtos;
 
 public class RatingCalculator : IRatingCalculator
 {
@@ -22,7 +22,7 @@ public class RatingCalculator : IRatingCalculator
             ? opponent
             : fighter;
 
-        var matchContext = new MatchContext(
+        var matchContext = new MatchContextDto(
             await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId),
             await _unitOfWork.Heroes.GetByIdAsync(looser.HeroId),
             winner,
@@ -41,7 +41,7 @@ public class RatingCalculator : IRatingCalculator
             };
     }
 
-    private int CalculateForLooser(MatchContext matchContext)
+    private int CalculateForLooser(MatchContextDto matchContext)
     {
         var maxLooserSidekicksHp = matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
         var maxWinnerSidekicksHp = matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
@@ -59,7 +59,7 @@ public class RatingCalculator : IRatingCalculator
         return result;
     }
 
-    private int CalculateForWinner(MatchContext matchContext)
+    private int CalculateForWinner(MatchContextDto matchContext)
     {
         var maxLooserSidekicksHp = matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
         var maxWinnerSidekicksHp = matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;

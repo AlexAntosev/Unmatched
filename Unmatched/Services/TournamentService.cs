@@ -7,6 +7,7 @@ using Unmatched.Data.Entities;
 using Unmatched.Data.Enums;
 using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
+using Unmatched.Extensions;
 
 public class TournamentService : ITournamentService
 {
@@ -55,7 +56,7 @@ public class TournamentService : ITournamentService
     {
         var heroesEntities = await _unitOfWork.Heroes.GetAsync();
         var heroes = _mapper.Map<List<HeroDto>>(heroesEntities);
-        heroes = ShuffleHeroes(heroes).Take(GetStageHeroes(tournament.CurrentStage)).ToList();
+        heroes = heroes.Shuffle().Take(tournament.CurrentStage.GetFightersCount()).ToList();
         await CreatePlannedMatchesAsync(tournament, heroes);
     }
     
@@ -98,7 +99,7 @@ public class TournamentService : ITournamentService
         var maps = await _unitOfWork.Maps.GetAsync();
         for (var j = 0; j < 2; j++)
         {
-            var finalists = JsonSerializer.Deserialize<List<HeroDto>>(JsonSerializer.Serialize(currentStageWinners));
+            var finalists = currentStageWinners.Clone();
 
             var participants = new List<FighterDto>();
             foreach (var hero in finalists)
@@ -150,7 +151,7 @@ public class TournamentService : ITournamentService
                                 opponent
                             },
                         TournamentId = tournament.Id,
-                        MapId = RandomizeMap(maps),
+                        MapId = maps.GetAndRemoveRandomItem().Id,
                         IsPlanned = true
                     };
                 generatedMatches.Add(match);
@@ -184,7 +185,7 @@ public class TournamentService : ITournamentService
     {
         var maps = await _unitOfWork.Maps.GetAsync();
 
-        heroes = ShuffleHeroes(heroes);
+        heroes = heroes.Shuffle();
         var participants = new List<FighterDto>();
         foreach (var hero in heroes)
         {
@@ -207,11 +208,11 @@ public class TournamentService : ITournamentService
                 };
             
             var fighter = participants[i];
-            fighter.PlayerId = RandomizePlayer(players);
-            fighter.Turn = RandomizeTurns(turns);
+            fighter.PlayerId = players.GetAndRemoveRandomItem().Id;
+            fighter.Turn = turns.GetAndRemoveRandomItem();
             var opponent = participants[i + 1];
-            opponent.PlayerId = RandomizePlayer(players);
-            opponent.Turn = RandomizeTurns(turns);
+            opponent.PlayerId = players.GetAndRemoveRandomItem().Id;
+            opponent.Turn = turns.GetAndRemoveRandomItem();
             
             var match = new MatchDto
                 {
@@ -223,68 +224,12 @@ public class TournamentService : ITournamentService
                             opponent
                         },
                     TournamentId = tournament.Id,
-                    MapId = RandomizeMap(maps),
+                    MapId = maps.GetAndRemoveRandomItem().Id,
                     IsPlanned = true
                 };
             generatedMatches.Add(match);
         }
 
         await UpdateAsync(tournament.Id, generatedMatches, tournament.CurrentStage);
-    }
-
-    private static List<HeroDto> ShuffleHeroes(List<HeroDto> winners)
-    {
-        var random = new Random();
-        var shuffled = new List<HeroDto>();
-        
-        var listCount = winners.Count;
-        for (var i = 0; i < listCount; i++)
-        {
-            var randomIndex = random.Next(0, winners.Count);
-            shuffled.Add(winners[randomIndex]);
-            winners.Remove(winners[randomIndex]);
-        }
-        
-        return shuffled;
-    }
-    
-    private Guid RandomizeMap(List<Map> maps)
-    {
-        var index = new Random().Next(0, maps.Count);
-        var map = maps.ToArray()[index];
-        maps.Remove(map);
-
-        return map.Id;
-    }
-    
-    private Guid RandomizePlayer(List<Player> players)
-    {
-        var index = new Random().Next(0, players.Count);
-        var player = players.ToArray()[index];
-        players.Remove(player);
-
-        return player.Id;
-    }
-    
-    private int RandomizeTurns(List<int> turns)
-    {
-        var index = new Random().Next(0, turns.Count);
-        var turn = turns.ToArray()[index];
-        turns.Remove(turn);
-
-        return turn;
-    }
-
-    private int GetStageHeroes(Stage stage)
-    {
-        return stage switch
-            {
-                Stage.SixteenthFinals => 32,
-                Stage.EighthFinals => 16,
-                Stage.QuarterFinals => 8,
-                Stage.SemiFinals => 4,
-                Stage.GrandFinals => 2,
-                _ => 16
-            };
     }
 }
