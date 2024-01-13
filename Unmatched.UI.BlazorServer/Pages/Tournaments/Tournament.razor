@@ -12,7 +12,7 @@
         @for (var stage = TournamentModel.InitialStage; stage <= Stage.GrandFinals; stage++)
         {
             <div>
-                <TournamentStage TournamentModel="TournamentModel" Stage="stage" TournamentMatches="@tournamentMatches" Maps="_maps"></TournamentStage>
+                <TournamentStage TournamentModel="TournamentModel" Stage="stage" TournamentMatches="@TournamentMatches"></TournamentStage>
             </div>
         }
     </div>
@@ -23,10 +23,7 @@
     public string Id { get; set; } = "";
 
     private TournamentDto TournamentModel { get; set; } = new ();
-
-    private List<MapDto> _maps = new();
-
-    public List<MatchDto> tournamentMatches = new();
+    private List<MatchDto> TournamentMatches { get; set; } = new();
     
     [Inject] protected PreloadService PreloadService { get; set; }
     
@@ -42,8 +39,7 @@
             }
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
-            
-            tournamentMatches = (await MatchService.GetByTournamentIdAsync(tournamentId)).ToList();
+            TournamentMatches = (await MatchService.GetByTournamentIdAsync(tournamentId)).ToList();
         }
         finally
         {

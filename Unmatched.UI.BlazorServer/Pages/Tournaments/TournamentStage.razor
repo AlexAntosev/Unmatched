@@ -7,7 +7,7 @@
 
 <h3 class="match-stage-name">@Stage.GetStageName()</h3>
 <div class="match-stage">
-    @if (TournamentMatches is not null && TournamentMatches.Any(m => m.Stage == Stage))
+    @if (TournamentMatches.Any(m => m.Stage == Stage))
     {
         @foreach (var match in TournamentMatches.Where(m => m.Stage == Stage))
         {
@@ -29,11 +29,8 @@
 
     [Parameter]
     public List<MatchDto> TournamentMatches { get; set; } = new();
-    
-    [Parameter]
-    public List<MapDto> Maps { get; set; } = new();
-    
-    public async Task OnGenerateMatchesClick()
+
+    private async Task OnGenerateMatchesClick()
     {
         if (TournamentModel.CurrentStage == Stage.SemiFinals)
         {
@@ -49,8 +46,6 @@
 
         await TournamentService.CreateNextStagePlannedMatchesAsync(TournamentModel);
     }
-
-    
 }
 
 <style>    
