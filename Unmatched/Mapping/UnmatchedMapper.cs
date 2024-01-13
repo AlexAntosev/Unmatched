@@ -3,7 +3,9 @@
 using AutoMapper;
 
 using Unmatched.Data.Entities;
+using Unmatched.Data.Enums;
 using Unmatched.Dtos;
+using Unmatched.Extensions;
 
 public class UnmatchedMapper : Profile
 {
@@ -17,7 +19,7 @@ public class UnmatchedMapper : Profile
         CreateMap<Match, MatchLogDto>()
             .ForMember(x => x.MapName, c => c.MapFrom(x => TryGetMapName(x.Map)))
             .ForMember(x => x.MatchId, c => c.MapFrom(x => x.Id))
-            .ForMember(x => x.TournamentName, c => c.MapFrom(x => TryGetTournamentName(x.Tournament)))
+            .ForMember(x => x.TournamentName, c => c.MapFrom(x => TryGetTournamentName(x.Tournament, x.Stage)))
             .ForMember(x => x.Fighters, c => c.Ignore())
             .ReverseMap()
             .ForMember(x => x.Map, c => c.Ignore())
@@ -40,8 +42,14 @@ public class UnmatchedMapper : Profile
         return map?.Name ?? "<forgotten>";
     }
 
-    private string TryGetTournamentName(Tournament tournament)
+    private string TryGetTournamentName(Tournament? tournament, Stage? stage)
     {
-        return tournament?.Name ?? "<unranked>";
+        var tournamentName = tournament?.Name ?? "<unranked>";
+        if (stage is not null)
+        {
+            var stageName = stage.Value.GetStageName();
+            tournamentName += $" ({stageName})";
+        }
+        return tournamentName;
     }
 }
