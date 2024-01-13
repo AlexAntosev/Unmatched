@@ -2,6 +2,7 @@
 @using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Data.Enums
+@using Unmatched.Extensions
 @inject ITournamentService TournamentService
 @inject NavigationManager NavManager
 
@@ -28,8 +29,8 @@
                 <InputText @bind-Value=_addTournamentForm.Name name="Name" class="form-control"/>
             </div>
             <div style="width: 256px; margin-bottom: 8px">
-                <label>Start stage:</label>
-                <InputSelect @bind-Value=_addTournamentForm.CurrentStage name="CurrentStage" id="stages" class="form-select">
+                <label>Initial stage:</label>
+                <InputSelect @bind-Value=_addTournamentForm.InitialStage name="InitialStage" id="stages" class="form-select">
                     @foreach (var stage in _stages)
                     {
                         <option value="@stage.Item1"> @stage.Item2</option>
@@ -68,11 +69,11 @@
         _stages = new List<(Stage?, string)>
             {
                 (null, ""),
-                (Stage.EighthFinals, "1/8 Finals"),
-                (Stage.QuarterFinals, "1/4 Finals"),
-                (Stage.SemiFinals, "1/2 Finals"),
-                (Stage.ThirdPlaceDecider, "3rd Place Decider"),
-                (Stage.GrandFinals, "Grand Finals")
+                (Stage.EighthFinals, Stage.EighthFinals.GetStageName()),
+                (Stage.QuarterFinals, Stage.QuarterFinals.GetStageName()),
+                (Stage.SemiFinals, Stage.SemiFinals.GetStageName()),
+                (Stage.ThirdPlaceDecider, Stage.ThirdPlaceDecider.GetStageName()),
+                (Stage.GrandFinals, Stage.GrandFinals.GetStageName())
             };
         
         await RefreshTournamentsAsync();
@@ -119,7 +120,8 @@
         try
         {
             PreloadService.Show();
-            
+
+            tournament.CurrentStage = tournament.InitialStage;
             var created = await TournamentService.AddAsync(tournament);
             await TournamentService.CreateInitialPlannedMatchesAsync(created);
             _tournaments = (await TournamentService.GetAsync()).ToList();

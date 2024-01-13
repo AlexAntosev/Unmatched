@@ -12,6 +12,8 @@ public class TournamentDto
 
     public bool IsActive { get; set; } = true;
     
+    public Stage InitialStage { get; set; }
+    
     public Stage CurrentStage { get; set; }
     
     public List<MatchDto> Matches { get; set; }

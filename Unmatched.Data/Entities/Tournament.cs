@@ -14,6 +14,8 @@ public class Tournament
 
     public bool IsActive { get; set; } = true;
     
+    public Stage InitialStage { get; set; }
+    
     public Stage CurrentStage { get; set; }
     
     public virtual ICollection<Match> Matches { get; set; }
