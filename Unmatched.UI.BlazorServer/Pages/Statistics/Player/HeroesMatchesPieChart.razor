@@ -11,7 +11,7 @@
         set
         {
             _heroesMatches = value;
-            if (_heroesMatches is not null)
+            if (_heroesMatches is not null && _heroesMatches.Any())
             {
                 chartData = new ChartData { Labels = GetDataLabels(_heroesMatches), Datasets = GetDataSets(_heroesMatches) };
                 pieChart.UpdateAsync(chartData, pieChartOptions);
