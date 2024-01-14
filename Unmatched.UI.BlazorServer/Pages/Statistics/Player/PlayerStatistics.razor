@@ -44,12 +44,12 @@
 
             _matches = _matchLogEntries
                 .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
-                .GroupBy(f => f.HeroName)
+                .GroupBy(f => f.Hero.Name)
                 .ToList();
 
             var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
-            var favoriteMatch = _matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.HeroName == favoriteName));
-            _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.HeroName == favoriteName)?.HeroColor ?? "rgba(255,255,255,1)";
+            var favoriteMatch = _matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.Hero.Name == favoriteName));
+            _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.Hero.Name == favoriteName)?.Hero?.Color ?? "rgba(255,255,255,1)";
         }
         finally
         {

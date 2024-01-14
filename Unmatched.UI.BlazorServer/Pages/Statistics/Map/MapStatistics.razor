@@ -39,7 +39,7 @@
         
             _mapChampMatches = _matchLogEntries
                 .SelectMany(m => m.Fighters.Where(f => f.IsWinner))
-                .GroupBy(f => f.HeroName)
+                .GroupBy(f => f.Hero.Name)
                 .OrderByDescending(g => g.Count())
                 .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
                 .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())

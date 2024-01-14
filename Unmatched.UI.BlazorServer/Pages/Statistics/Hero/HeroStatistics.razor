@@ -48,7 +48,7 @@
 
             _againstAntagonistMatches = _matchLogEntries
                 .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
-                .GroupBy(f => f.HeroName)
+                .GroupBy(f => f.Hero.Name)
                 .OrderByDescending(g => g.Count(f => f.IsWinner))
                 .ThenBy(g => g.Count(f => !f.IsWinner))
                 .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())

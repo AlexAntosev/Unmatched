@@ -7,10 +7,6 @@ public class FighterDto
     public HeroDto? Hero { get; set; }
 
     public Guid HeroId { get; set; }
-
-    public string HeroName { get; set; }
-
-    public string HeroColor { get; set; }
     
     public int? MatchPoints { get; set; }
 
@@ -27,8 +23,6 @@ public class FighterDto
     public PlayerDto? Player { get; set; }
 
     public Guid PlayerId { get; set; }
-
-    public string PlayerName { get; set; }
     
     public string? SidekickName { get; set; }
 

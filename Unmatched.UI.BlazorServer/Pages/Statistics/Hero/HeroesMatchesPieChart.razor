@@ -75,7 +75,7 @@
         foreach (var heroFights in heroesFights)
         {
             dataCount += 1;
-            backgroundColors.Add(heroFights.First().HeroColor);
+            backgroundColors.Add(heroFights.First().Hero?.Color);
             data.Add(heroFights.Count());
         }
         var dataset = new PieChartDataset()

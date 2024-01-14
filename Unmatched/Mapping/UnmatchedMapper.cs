@@ -25,9 +25,6 @@ public class UnmatchedMapper : Profile
             .ForMember(x => x.Map, c => c.Ignore())
             .ForMember(x => x.Tournament, c => c.Ignore());
         CreateMap<Fighter, FighterDto>()
-            .ForMember(x => x.PlayerName, c => c.MapFrom(x => x.Player.Name))
-            .ForMember(x => x.HeroName, c => c.MapFrom(x => x.Hero.Name))
-            .ForMember(x => x.HeroColor, c => c.MapFrom(x => x.Hero.Color))
             .ForMember(x => x.MatchPoints, c => c.MapFrom(x => x.MatchPoints))
             .ReverseMap()
             .ForMember(x => x.Player, c => c.Ignore())
