@@ -8,14 +8,21 @@
 
 <div class="page-content tournament-background">
     <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
-    <div class="net">
-        @for (var stage = TournamentModel.InitialStage; stage <= Stage.GrandFinals; stage++)
-        {
-            <div>
-                <TournamentStage TournamentModel="TournamentModel" Stage="stage" TournamentMatches="@TournamentMatches"></TournamentStage>
-            </div>
-        }
-    </div>
+    @if (TournamentModel.Type == TournamentType.Championship)
+    {
+        <div class="net">
+            @for (var stage = TournamentModel.InitialStage; stage <= Stage.GrandFinals; stage++)
+            {
+                <div>
+                    <TournamentStage TournamentModel="TournamentModel" Stage="stage" TournamentMatches="@TournamentMatches"></TournamentStage>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <DuelMatches MatchLogEntries="LeagueMatches"></DuelMatches>
+    }
 </div>
 
 @code {
@@ -24,6 +31,7 @@
 
     private TournamentDto TournamentModel { get; set; } = new ();
     private List<MatchDto> TournamentMatches { get; set; } = new();
+    private List<MatchLogDto> LeagueMatches { get; set; } = new();
     
     [Inject] protected PreloadService PreloadService { get; set; }
     
@@ -40,6 +48,15 @@
             
             TournamentModel = await TournamentService.GetAsync(tournamentId);
             TournamentMatches = (await MatchService.GetByTournamentIdAsync(tournamentId)).ToList();
+            LeagueMatches = (await MatchService.GetMatchLogAsync())
+                .Where(m => m.TournamentName == TournamentModel.Name)
+                .OrderByDescending(x => x.Date)
+                .ToList();
+            
+            foreach (var matchLogEntry in LeagueMatches)
+            {
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
+            }
         }
         finally
         {
