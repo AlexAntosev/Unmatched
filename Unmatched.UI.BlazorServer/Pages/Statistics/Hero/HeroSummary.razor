@@ -38,11 +38,12 @@
             _statistics = value;
             if (IsAnySidekick())
             {
-                _sidekickTitle = _statistics.Hero.Sidekicks.First().Count > 1
+                var sidekicksCount = _statistics.Hero.Sidekicks.First().Count;
+                _sidekickTitle = sidekicksCount > 1
                     ? "Sidekicks"
                     : "Sidekick";
-                _sidekicksSuffix = _statistics.Hero.Sidekicks.First().Count > 1
-                    ? $"(x {value.Hero.Sidekicks.First().Count})"
+                _sidekicksSuffix = sidekicksCount > 1
+                    ? $"(x {sidekicksCount})"
                     : "";
             }
         }

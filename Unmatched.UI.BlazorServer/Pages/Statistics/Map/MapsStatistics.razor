@@ -10,7 +10,7 @@
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
         <GridColumns>
-            <GridColumn Field=@nameof(MapStatisticsDto.MapName) HeaderText="Map" Width="120"></GridColumn>
+            <GridColumn Field="Map.Name" HeaderText="Map" Width="120"></GridColumn>
             <GridColumn Field=@nameof(MapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
         </GridColumns>
     </SfGrid>
@@ -26,7 +26,7 @@
         try
         {
             PreloadService.Show();
-            _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.MapName).ToList();
+            _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.Map.Name).ToList();
         }
         finally
         {

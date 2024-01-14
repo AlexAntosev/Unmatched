@@ -10,11 +10,11 @@ public class MatchDto
 
     public Guid Id { get; set; }
 
-    public virtual MapDto Map { get; set; }
+    public MapDto? Map { get; set; }
 
     public Guid MapId { get; set; }
 
-    public virtual TournamentDto? Tournament { get; set; }
+    public TournamentDto? Tournament { get; set; }
     
     public IEnumerable<FighterDto> Fighters { get; set; }
 

@@ -19,7 +19,8 @@ public class MapStatisticsService : IMapStatisticsService
     
     public async Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync()
     {
-        var maps = await _unitOfWork.Maps.GetAsync();
+        var mapEntities = await _unitOfWork.Maps.GetAsync();
+        var maps = _mapper.Map<List<MapDto>>(mapEntities);
         var mapMatches = await _unitOfWork.Matches.GetFinishedAsync();
 
         var statistics = new List<MapStatisticsDto>();
@@ -30,8 +31,8 @@ public class MapStatisticsService : IMapStatisticsService
 
             var mapStatistics = new MapStatisticsDto
                 {
+                    Map = map,
                     MapId = map.Id,
-                    MapName = map.Name,
                     TotalMatches = mapFighters.Length,
                 };
 
@@ -43,14 +44,14 @@ public class MapStatisticsService : IMapStatisticsService
 
     public async Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId)
     {
-        var map = await _unitOfWork.Maps.GetByIdAsync(mapId);
-        
+        var mapEntity = await _unitOfWork.Maps.GetByIdAsync(mapId);
+        var map = _mapper.Map<MapDto>(mapEntity);
         var mapMatches = await _unitOfWork.Matches.GetFinishedByMapIdAsync(mapId);
         
         var statistics = new MapStatisticsDto
             {
+                Map = map,
                 MapId = map.Id,
-                MapName = map.Name,
                 TotalMatches = mapMatches.Count,
             };
         

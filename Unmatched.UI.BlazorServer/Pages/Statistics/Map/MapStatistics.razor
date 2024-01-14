@@ -4,9 +4,9 @@
 @inject IMapStatisticsService MapStatisticsService
 
 <div class="page-content">
-    <h3 align="center" class="page-title">@Map.MapName</h3>
-    <img src="@_imageSource" />
-    <TotalMatchesRecord Total="Map.TotalMatches" ></TotalMatchesRecord>
+    <h3 align="center" class="page-title">@Statistics.Map?.Name</h3>
+    <img src="@Statistics.Map?.ImageUrl" />
+    <TotalMatchesRecord Total="Statistics.TotalMatches" ></TotalMatchesRecord>
     <StatisticsRecord Title="Map champ" HeroMatches="_mapChampMatches"></StatisticsRecord>
     <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
 </div>
@@ -16,8 +16,7 @@
     public string Id { get; set; } = "";
     
     private List<MatchLogDto> _matchLogEntries = new();
-    private MapStatisticsDto Map { get; set; } = new ();
-    private string _imageSource = "";
+    private MapStatisticsDto Statistics { get; set; } = new ();
     
     private IGrouping<string, FighterDto>? _mapChampMatches;
     
@@ -29,13 +28,12 @@
         {
             PreloadService.Show();
             var mapId = Guid.Parse(Id);
-            Map = await MapStatisticsService.GetMapStatisticsAsync(mapId);
+            Statistics = await MapStatisticsService.GetMapStatisticsAsync(mapId);
             _matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToList();
             foreach (var matchLogEntry in _matchLogEntries)
             {
                 matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);
             }
-            _imageSource = $"/{Map.MapName}.png";
         
             _mapChampMatches = _matchLogEntries
                 .SelectMany(m => m.Fighters.Where(f => f.IsWinner))
