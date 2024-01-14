@@ -35,32 +35,16 @@ public class MatchService : IMatchService
         await _streakTitleHandler.HandleAsync();
     }
 
-    public Task AddAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
+    public Task AddAsync(MatchDto matchDto)
     {
         var match = _mapper.Map<Match>(matchDto);
-        var firstFighter = _mapper.Map<Fighter>(fighterDto);
-        var secondFighter = _mapper.Map<Fighter>(opponentDto);
-
-        match.Fighters = new List<Fighter>
-            {
-                firstFighter,
-                secondFighter
-            };
 
         return AddAsync(match);
     }
 
-    public Task UpdateAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto)
+    public Task UpdateAsync(MatchDto matchDto)
     {
         var match = _mapper.Map<Match>(matchDto);
-        var firstFighter = _mapper.Map<Fighter>(fighterDto);
-        var secondFighter = _mapper.Map<Fighter>(opponentDto);
-
-        match.Fighters = new List<Fighter>
-            {
-                firstFighter,
-                secondFighter
-            };
 
         return AddAsync(match);
     }

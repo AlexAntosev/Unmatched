@@ -33,4 +33,13 @@ public class FighterDto
     public int? SidekickHpLeft { get; set; }
 
     public int? Turn { get; set; }
+
+    public void SetDefaultData()
+    {
+        HpLeft = Hero.Hp;
+        HeroId = Hero.Id;
+        SidekickName = Hero.Sidekicks.FirstOrDefault()?.Name;
+        SidekickHpLeft = Hero.Sidekicks.Sum(s => s.Hp * s.Count);
+        CardsLeft = Hero.DeckSize;
+    }
 }

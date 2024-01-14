@@ -1,5 +1,9 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Extensions
+@using Unmatched.Constants
+@using Action = System.Action
+@inject NotificationService NotificationService
+
 <EditForm Model=@Fighter>
     <fieldset class="wrapper">
         <legend class="title">@Title</legend>
@@ -91,9 +95,9 @@
     [Parameter]
     public FighterDto Fighter { get; set; } = new();
 
-    public FighterDto BuildDto()
+    protected override async Task OnInitializedAsync()
     {
-        return Fighter;
+        NotificationService.OnRandomizeFighter += RandomizeFighter;
     }
 
     private void HeroChanged(Guid heroId)
@@ -104,6 +108,7 @@
 
     private void SetHeroInfo(HeroDto hero)
     {
+        Fighter.Hero = hero;
         Fighter.HpLeft = hero.Hp;
         Fighter.HeroId = hero.Id;
         Fighter.SidekickName = hero.Sidekicks.FirstOrDefault()?.Name;
@@ -111,12 +116,41 @@
         Fighter.CardsLeft = hero.DeckSize;
     }
 
-    public void RandomizeHero(params Guid[] exceptHeroIds)
+    private void RandomizeHero(params Guid[] exceptHeroIds)
     {
         var availableHeroes = Heroes.Select(x => x.Id).Except(exceptHeroIds).ToList();
         var randomHeroId = availableHeroes.GetRandomItem();
         var randomHero = Heroes.First(x => x.Id == randomHeroId);
         SetHeroInfo(randomHero);
+    }
+    
+    private void RandomizeFighter(FighterDto targetFighter, FighterDto? exceptFighter = null)
+    {
+        var exceptPlayers = new List<Guid>();
+        if (exceptFighter is not null)
+        {
+            exceptPlayers.Add(exceptFighter.PlayerId);
+        }
+        
+        var availablePlayers = Players
+            .Where(x => x.Name is PlayerNames.Andrii or PlayerNames.Oleksandr)
+            .Select(x => x.Id)
+            .Except(exceptPlayers)
+            .ToList();
+        
+        var randomPlayerId = availablePlayers.GetRandomItem();
+        var randomPlayer = Players.First(x => x.Id == randomPlayerId);
+        
+        targetFighter.PlayerId = randomPlayer.Id;
+        
+        var exceptHeroes = new List<Guid>();
+        if (exceptFighter is not null)
+        {
+            exceptHeroes.Add(exceptFighter.HeroId);
+        }
+        RandomizeHero(exceptHeroes.Select(h => h).ToArray());
+        
+        targetFighter.ItemsUsed = 0;
     }
 }
 

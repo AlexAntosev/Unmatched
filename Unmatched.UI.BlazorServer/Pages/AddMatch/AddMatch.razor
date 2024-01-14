@@ -10,27 +10,28 @@
 @inject IPlayerService PlayerService
 @inject IMapService MapService
 @inject NavigationManager NavManager
+@inject NotificationService NotificationService
 
 <div class="page-content">
     <h1 class="page-title"></h1>
 
     <div class="row">
         <div class="column center">
-            <FighterInfo @ref="FighterComponent" Title="Fighter" Players="_players" Heroes="_heroes" Fighter="Fighter"></FighterInfo>
+            <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.First()"></FighterInfo>
         </div>
         <div class="column center">
-            <FighterInfo @ref="OpponentComponent" Title="Opponent" Players="_players" Heroes="_heroes" Fighter="Opponent"></FighterInfo>
+            <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.Last()"></FighterInfo>
         </div>
     </div>
 
     <div class="row">
         <div class="triple-column"></div>
         <div class="triple-column center">
-            <EditForm Model=@Match>
+            <EditForm Model=@_match>
                 <div>
                     <label for="Map">Map:</label>
                     <div style=" display: flex; flex-direction: row;">
-                        <InputSelect @bind-Value=Match.MapId name="Map" id="maps" class="form-select">
+                        <InputSelect @bind-Value=_match.MapId name="Map" id="maps" class="form-select">
                             @foreach (var map in _maps)
                             {
                                 <option value="@map.Id"> @map.Name</option>
@@ -41,7 +42,7 @@
                 </div>
                 <div>
                     <label for="Tournament">Tournament:</label>
-                    <InputSelect @bind-Value=Match.TournamentId name="Tournament" id="tournaments" class="form-select">
+                    <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select">
                         @foreach (var tournament in _tournaments)
                         {
                             <option value="@tournament.Id"> @tournament.Name</option>
@@ -50,15 +51,15 @@
                 </div>
                 <div>
                     <label for="Date">Date:</label>
-                    <InputDate @bind-Value=Match.Date name="Date" class="form-control"/>
+                    <InputDate @bind-Value=_match.Date name="Date" class="form-control"/>
                 </div>
                 <div>
                     <label for="Comment">Comment:</label>
-                    <InputText @bind-Value=Match.Comment name="Comment" class="form-control"/>
+                    <InputText @bind-Value=_match.Comment name="Comment" class="form-control"/>
                 </div>
                 <div>
                     <label for="Stage">Stage:</label>
-                    <InputSelect @bind-Value=Match.Stage name="Stage" id="stages" class="form-select">
+                    <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select">
                         @foreach (var stage in _stages)
                         {
                             <option value="@stage.Item1"> @stage.Item2</option>
@@ -66,8 +67,8 @@
                     </InputSelect >
                 </div>
                 <p></p>
-                <button class="btn btn-primary" @onclick="AddNewMatch">Add match</button>
-                <button class="btn btn-secondary" @onclick="Randomize">Randomize</button>
+                <button class="btn btn-primary" @onclick="OnAddNewMatchClickAsync">Add match</button>
+                <button class="btn btn-secondary" @onclick="OnRandomizeMatchClick">Randomize</button>
             </EditForm>
         </div>
         <div class="triple-column"></div>
@@ -79,19 +80,12 @@
     public string Id { get; set; }
     
     private List<PlayerDto> _players = new();
-
     private List<HeroDto> _heroes = new();
-
     private List<MapDto> _maps = new();
-
     private List<TournamentDto> _tournaments = new();
     private List<(Stage?, string)> _stages = new();
 
-    public FighterInfo FighterComponent;
-
-    public FighterInfo OpponentComponent;
-
-    MatchDto Match = new()
+    MatchDto _match = new()
         {
             Fighters = new List<FighterDto>()
                 {
@@ -101,9 +95,6 @@
             Date = DateTime.UtcNow
         };
 
-    FighterDto Fighter = new();
-    FighterDto Opponent = new();
-    
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -116,7 +107,6 @@
             _heroes = (await HeroService.GetAsync()).ToList();
             _maps = (await MapService.GetAsync()).ToList();
             _tournaments = (await TournamentService.GetAsync()).ToList();
-            
             _stages = new List<(Stage?, string)>
                 {
                     (null, ""),
@@ -130,7 +120,7 @@
             var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.SilverhandTournament);
             if (defaultTournament != null)
             {
-                Match.TournamentId = defaultTournament.Id;
+                _match.TournamentId = defaultTournament.Id;
             }
             
             var isValidId = Guid.TryParse(Id, out var id);
@@ -141,12 +131,10 @@
             if (id != Guid.Empty)
             {
                 var match = await MatchService.GetAsync(id);
-                match.Date = DateTime.Now;
-                Fighter = match.Fighters.First();
-                SetFighterInfo(Fighter);
-                Opponent = match.Fighters.Last();
-                SetFighterInfo(Opponent);
-                Match = match;
+                match.Date = DateTime.UtcNow;
+                match.Fighters.First().SetDefaultData();
+                match.Fighters.Last().SetDefaultData();
+                _match = match;
             }
         }
         finally
@@ -154,25 +142,14 @@
             PreloadService.Hide();
         }
     }
-    
-    private void SetFighterInfo(FighterDto fighter)
-    {
-        fighter.HpLeft = fighter.Hero.Hp;
-        fighter.HeroId = fighter.Hero.Id;
-        fighter.SidekickName = fighter.Hero.Sidekicks.FirstOrDefault()?.Name;
-        fighter.SidekickHpLeft = fighter.Hero.Sidekicks.Sum(s => s.Hp * s.Count);
-        fighter.CardsLeft = fighter.Hero.DeckSize;
-    }
 
-    private async Task AddNewMatch()
+    private async Task OnAddNewMatchClickAsync()
     {
         try
         {
             PreloadService.Show();
             
-            var match = Match;
-            var fighter = FighterComponent.BuildDto();
-            var opponent = OpponentComponent.BuildDto();
+            var match = _match;
 
             var isValidId = Guid.TryParse(Id, out var id);
             if (!isValidId)
@@ -182,11 +159,11 @@
         
             if (id == Guid.Empty)
             {
-                await MatchService.AddAsync(match, fighter, opponent);
+                await MatchService.AddAsync(match);
             }
             else
             {
-                await MatchService.UpdateAsync(match, fighter, opponent);
+                await MatchService.UpdateAsync(match);
             }
         }
         catch (Exception e)
@@ -202,36 +179,27 @@
         NavManager.NavigateTo(Urls.DuelMatchLog);
     }
 
-    private async Task Randomize()
+    private void OnRandomizeMatchClick()
     {
         RandomizeMap();
-        
-        RandomizeFighter(FighterComponent);
-        FighterComponent.Fighter.Turn = 1;
-        
-        RandomizeFighter(OpponentComponent, FighterComponent);
-        OpponentComponent.Fighter.Turn = 2;
-
+        RandomizeFighter();
+        RandomizeOpponent();
     }
     
     private void RandomizeMap()
     {
-        Match.MapId = _maps.GetRandomItem().Id;
+        _match.MapId = _maps.GetRandomItem().Id;
     }
-
-    private void RandomizeFighter(FighterInfo targetFighterComponent, params FighterInfo[] exceptFighters)
+    
+    private void RandomizeFighter()
     {
-        var exceptPlayers = exceptFighters.Select(x => x.Fighter.PlayerId).ToArray();
-        var availablePlayers = _players.Where(x => x.Name is PlayerNames.Andrii or PlayerNames.Oleksandr).Select(x => x.Id).Except(exceptPlayers).ToList();
-        
-        var randomPlayerId = availablePlayers.GetRandomItem();
-        var randomPlayer = _players.First(x => x.Id == randomPlayerId);
-        
-        targetFighterComponent.Fighter.PlayerId = randomPlayer.Id;
-        
-        var exceptHeroIds = exceptFighters.Select(x => x.Fighter.HeroId).ToArray();
-        targetFighterComponent.RandomizeHero(exceptHeroIds);
-        
-        targetFighterComponent.Fighter.ItemsUsed = 0;
+        NotificationService.CallRandomizeFighter(_match.Fighters.First());
+        _match.Fighters.First().Turn = 1;
+    }
+    
+    private void RandomizeOpponent()
+    {
+        NotificationService.CallRandomizeFighter(_match.Fighters.Last(), _match.Fighters.First());
+        _match.Fighters.Last().Turn = 2;
     }
 }

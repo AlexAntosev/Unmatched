@@ -8,9 +8,9 @@ public interface IMatchService
 {
     Task AddAsync(Match match);
     
-    Task AddAsync(MatchDto match, FighterDto fighter, FighterDto opponent);
+    Task AddAsync(MatchDto match);
 
-    Task UpdateAsync(MatchDto matchDto, FighterDto fighterDto, FighterDto opponentDto);
+    Task UpdateAsync(MatchDto matchDto);
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
 

@@ -2,6 +2,7 @@ using Syncfusion.Blazor;
 
 using Unmatched.EntityFramework.Registration;
 using Unmatched.Registration;
+using Unmatched.UI.BlazorServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddBlazorBootstrap();
+builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
