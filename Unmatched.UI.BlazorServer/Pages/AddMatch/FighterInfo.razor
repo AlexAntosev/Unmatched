@@ -7,11 +7,15 @@
 <EditForm Model=@Fighter>
     <fieldset class="wrapper">
         <legend class="title">@Title</legend>
-        <img class="image" src="@PlayerImageSource"/>
-        <img class="image" src="@HeroImageSource"/>
+        <img class="image" src="@Fighter.PlayerImageUrl"/>
+        <img class="image" src="@Fighter.HeroImageUrl"/>
         <div>
             <label for="players">Player:</label>
-            <InputSelect @bind-Value=Fighter.PlayerId name="Player" id="players" class="form-select">
+            <InputSelect 
+                ValueExpression="@(() => Fighter.PlayerId)" 
+                Value=Fighter.PlayerId 
+                ValueChanged="@((Guid value) => PlayerChanged(value))"
+                name="Player" id="players" class="form-select">
                 @foreach (var player in Players)
                 {
                     <option value="@player.Id"> @player.Name</option>
@@ -68,24 +72,6 @@
     [Parameter]
     public string Title { get; set; }
 
-    private string PlayerImageSource
-    {
-        get
-        {
-            var player = Players.FirstOrDefault(p => p.Id == Fighter.PlayerId);
-            return $"/{player?.Name ?? "Unknown"}.png";
-        }
-    }
-
-    private string HeroImageSource
-    {
-        get
-        {
-            var hero = Heroes.FirstOrDefault(p => p.Id == Fighter.HeroId);
-            return $"/{hero?.Name ?? "Unknown"}.png";
-        }
-    }
-
     [Parameter]
     public List<HeroDto> Heroes { get; set; } = new();
 
@@ -104,6 +90,14 @@
     {
         var hero = Heroes.First(h => h.Id == heroId);
         SetHeroInfo(hero);
+    }
+    
+    private void PlayerChanged(Guid playerId) 
+    {
+        var player = Players.First(h => h.Id == playerId);
+        Fighter.Player = player;
+        Fighter.PlayerName = player.Name;
+        Fighter.PlayerId = player.Id;
     }
 
     private void SetHeroInfo(HeroDto hero)
@@ -140,7 +134,8 @@
         
         var randomPlayerId = availablePlayers.GetRandomItem();
         var randomPlayer = Players.First(x => x.Id == randomPlayerId);
-        
+
+        targetFighter.Player = randomPlayer;
         targetFighter.PlayerId = randomPlayer.Id;
         
         var exceptHeroes = new List<Guid>();

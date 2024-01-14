@@ -4,7 +4,7 @@ public class FighterDto
 {
     public int? CardsLeft { get; set; }
     
-    public HeroDto Hero { get; set; }
+    public HeroDto? Hero { get; set; }
 
     public Guid HeroId { get; set; }
 
@@ -23,6 +23,8 @@ public class FighterDto
     public int? ItemsUsed { get; set; }
 
     public Guid MatchId { get; set; }
+    
+    public PlayerDto? Player { get; set; }
 
     public Guid PlayerId { get; set; }
 
@@ -36,10 +38,17 @@ public class FighterDto
 
     public void SetDefaultData()
     {
-        HpLeft = Hero.Hp;
-        HeroId = Hero.Id;
-        SidekickName = Hero.Sidekicks.FirstOrDefault()?.Name;
-        SidekickHpLeft = Hero.Sidekicks.Sum(s => s.Hp * s.Count);
-        CardsLeft = Hero.DeckSize;
+        if (Hero is not null)
+        {
+            HpLeft = Hero.Hp;
+            HeroId = Hero.Id;
+            SidekickName = Hero.Sidekicks.FirstOrDefault()?.Name;
+            SidekickHpLeft = Hero.Sidekicks.Sum(s => s.Hp * s.Count);
+            CardsLeft = Hero.DeckSize;
+        }
     }
+
+    public string HeroImageUrl => $"/{Hero?.Name ?? "Unknown"}.png";
+
+    public string PlayerImageUrl => $"/{Player?.Name ?? "Unknown"}.png";
 }
