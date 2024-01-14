@@ -17,8 +17,12 @@ public class MapNames
     public const string London = "London";
 
     public const string Mansion = "Mansion";
+    
+    public const string McMinnville = "McMinnville";
 
     public const string RaptorPaddock = "Raptor paddock";
+    
+    public const string PointPleasant = "Point Pleasant";
 
     public const string Ruins = "Ruins";
 

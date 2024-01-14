@@ -6,6 +6,8 @@ public static class HeroNames
 
     public const string Alice = "Alice";
 
+    public const string AnnieChristmas = "Annie Christmas";
+
     public const string Beowulf = "Beowulf";
 
     public const string Bigfoot = "Bigfoot";
@@ -17,12 +19,16 @@ public static class HeroNames
     public const string Daredevil = "Daredevil";
 
     public const string Dracula = "Dracula";
+    
+    public const string DrJillTrent = "Dr. Jill Trent";
 
     public const string DrSattler = "Dr. Sattler";
 
     public const string Elektra = "Elektra";
 
     public const string Ghostrider = "Ghostrider";
+    
+    public const string GoldenBat = "Golden Bat";
 
     public const string Houdini = "Houdini";
 
@@ -31,7 +37,7 @@ public static class HeroNames
     public const string InvisibleMan = "Invisible Man";
 
     public const string JakylAndHide = "Jakyl and Hide";
-
+    
     public const string KingArthur = "King Arthur";
 
     public const string LittleRed = "Little Red";
@@ -41,6 +47,8 @@ public static class HeroNames
     public const string Medusa = "Medusa";
 
     public const string MoonKnight = "Moon Knight";
+    
+    public const string NikolaTesla = "Nikola Tesla";
 
     public const string PrincessYennenga = "Princess Yennenga";
 

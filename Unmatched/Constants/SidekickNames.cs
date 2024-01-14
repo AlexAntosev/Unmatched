@@ -6,6 +6,10 @@ public static class SidekickNames
 
     public const string Bess = "Bess";
 
+    public const string Charlie = "Charlie";
+
+    public const string Daisy = "Daisy";
+
     public const string DrMalcolm = "Dr. Malcolm";
 
     public const string DrWatson = "Dr. Watson";

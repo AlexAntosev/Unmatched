@@ -13,6 +13,7 @@
 @inject IRankedMatchDataInitializer RankedMatchDataInitializer
 @inject IFirstTournamentMatchesDataInitializer FirstTournamentMatchesDataInitializer
 @inject IHoudiniVsGenieDadaInitializer HoudiniVsGenieDadaInitializer
+@inject ITalesOfAmazeDataInitializer TalesOfAmazeDataInitializer
 @inject IRatingService RatingService
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
@@ -34,6 +35,7 @@
         // await RankedMatchDataInitializer.InitializeAsync();
 
         //await HoudiniVsGenieDadaInitializer.InitializeAsync();
+        await TalesOfAmazeDataInitializer.InitializeAsync();
     }
     
     private async Task RecalculateRating()
