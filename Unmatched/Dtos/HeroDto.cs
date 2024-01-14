@@ -7,6 +7,8 @@ public class HeroDto
     public int Hp { get; set; }
 
     public Guid Id { get; set; }
+    
+    public bool IsRanged { get; set; }
 
     public string Name { get; set; }
 
@@ -15,4 +17,8 @@ public class HeroDto
     public string Color { get; set; }
     
     public IEnumerable<TitleDto> Titles { get; set; }
+    
+    public string ImageUrl => $"/{Name}.png";
+    
+    public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
 }

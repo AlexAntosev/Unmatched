@@ -18,7 +18,8 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     
     public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
     {
-        var players = await _unitOfWork.Players.GetAsync();
+        var playerEntities = await _unitOfWork.Players.GetAsync();
+        var players = _mapper.Map<List<PlayerDto>>(playerEntities);
         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
         var statistics = new List<PlayerStatisticsDto>();
@@ -29,8 +30,8 @@ public class PlayerStatisticsService : IPlayerStatisticsService
 
             var playerStatistics = new PlayerStatisticsDto
                 {
+                    Player = player,
                     PlayerId = player.Id,
-                    PlayerName = player.Name,
                     TotalMatches = playerFighters.Length,
                     TotalWins = playerFighters.Count(x => x.IsWinner),
                     TotalLooses = playerFighters.Count(x => x.IsWinner == false),
@@ -45,13 +46,14 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     
     public async Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId)
     {
-        var player = await _unitOfWork.Players.GetByIdAsync(playerId);
+        var playerEntity = await _unitOfWork.Players.GetByIdAsync(playerId);
+        var player = _mapper.Map<PlayerDto>(playerEntity);
         var playerFighters = await _unitOfWork.Fighters.GetFromFinishedMatchesByPlayerIdAsync(playerId);
         
         var statistics = new PlayerStatisticsDto
             {
+                Player = player,
                 PlayerId = player.Id,
-                PlayerName = player.Name,
                 TotalMatches = playerFighters.Count,
                 TotalWins = playerFighters.Count(x => x.IsWinner),
                 TotalLooses = playerFighters.Count(x => x.IsWinner == false),

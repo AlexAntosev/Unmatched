@@ -1,10 +1,11 @@
 ﻿@page "/players-statistics/{id}"
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
+@using Unmatched.Constants
 @inject IPlayerStatisticsService PlayerStatisticsService
 
 <div style="margin-bottom: 16px">
-    <PlayerSummary Player="Player" Matches="_matches" FavoriteColor="@_favoriteColor"></PlayerSummary>
+    <PlayerSummary Statistics="Player" Matches="_matches" FavoriteColor="@_favoriteColor"></PlayerSummary>
 </div>
 <div class="page-content">
     <TotalMatchesRecord Total="Player.TotalMatches" Wins="Player.TotalWins" Looses="Player.TotalLooses" Kd="Player.Kd"></TotalMatchesRecord>
@@ -20,7 +21,7 @@
 
     private PlayerStatisticsDto Player { get; set; } = new ();
 
-    private string _favoriteColor = "rgba(255,255,255,1)";
+    private string _favoriteColor = Colors.Default;
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
@@ -49,7 +50,7 @@
 
             var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
             var favoriteMatch = _matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.Hero.Name == favoriteName));
-            _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.Hero.Name == favoriteName)?.Hero?.Color ?? "rgba(255,255,255,1)";
+            _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.Hero.Name == favoriteName)?.Hero?.Color ?? Colors.Default;
         }
         finally
         {

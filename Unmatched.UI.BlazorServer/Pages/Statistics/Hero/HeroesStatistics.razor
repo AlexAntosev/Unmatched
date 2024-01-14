@@ -21,18 +21,18 @@
                     @{
                         var hero = context as HeroStatisticsDto;
                         <div class="image">
-                            <img src="@($"/{hero?.HeroName}.png")" alt="@hero.HeroId" width="100%" height="auto"/>
+                            <img src="@hero?.Hero.ImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
                         </div>
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.HeroName) HeaderText="Hero" Width="120"></GridColumn>
+            <GridColumn Field="Hero.Name" HeaderText="Hero" Width="120"></GridColumn>
             <GridColumn Width="20">
                 <Template>
                     @{
                         var hero = context as HeroStatisticsDto;
                         <div class="image">
-                            <img src="@($"/{(hero.IsRanged ? "Ranged" : "Melee")}.png")" alt="@hero.HeroId" width="100%" height="auto"/>
+                            <img src="@hero.Hero.MeleeRangeImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
                         </div>
                     }
                 </Template>
@@ -57,7 +57,7 @@
         try
         {
             PreloadService.Show();
-            _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.HeroName).ToList();
+            _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.Hero.Name).ToList();
         }
         finally
         {

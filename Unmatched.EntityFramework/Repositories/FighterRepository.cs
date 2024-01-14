@@ -99,6 +99,7 @@ public class FighterRepository : IFighterRepository
     {
         return await _dbContext.Fighters
             .Include(x => x.Match)
+            .Include(x => x.Player)
             .Where(x => x.PlayerId.Equals(playerId) && !x.Match.IsPlanned)
             .OrderByDescending(x => x.Match.Date)
             .ToListAsync();

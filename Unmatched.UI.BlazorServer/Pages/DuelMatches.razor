@@ -105,17 +105,17 @@
     private string GetWinLooseColor(bool isWinner)
     {
         return isWinner
-            ? Colors.WinnerColor
-            : Colors.LooserColor;
+            ? Colors.Winner
+            : Colors.Looser;
     }
 }
 
 <style>
     .winner-cell {
-        background-color: @Colors.WinnerColor !important;
+        background-color: @Colors.Winner !important;
     }
     
     .looser-cell {
-        background-color: @Colors.LooserColor !important;
+        background-color: @Colors.Looser !important;
     }
 </style>

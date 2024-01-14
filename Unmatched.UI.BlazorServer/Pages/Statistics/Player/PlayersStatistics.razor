@@ -10,7 +10,7 @@
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>
         <GridColumns>
-            <GridColumn Field=@nameof(PlayerStatisticsDto.PlayerName) HeaderText="Player" Width="120"></GridColumn>
+            <GridColumn Field="Player.Name" HeaderText="Player" Width="120"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
@@ -29,7 +29,7 @@
         try
         {
             PreloadService.Show();
-            _players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.PlayerName).ToList();
+            _players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.Player.Name).ToList();
         }
         finally
         {

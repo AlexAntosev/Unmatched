@@ -1,27 +1,27 @@
 ﻿@using Unmatched.Dtos
 
-<div style="background: linear-gradient(180deg, @Hero.Hero.Color 0%, rgba(255,255,255,1) 100%);">
-    <h3 align="center" class="page-title">@Hero.HeroName</h3>
+<div style="background: linear-gradient(180deg, @Statistics.Hero.Color 0%, rgba(255,255,255,1) 100%);">
+    <h3 align="center" class="page-title">@Statistics.Hero.Name</h3>
     <div class="wrapper page-content">
         <div class="image-container">
-            @if (_imageSource is not null)
+            @if (Statistics.Hero is not null)
             {
-                <img src="@_imageSource"/>
+                <img src="@Statistics.Hero.ImageUrl"/>
             }
         </div>
         <div>
-           <h5>Current Place: @_hero.Place (@_hero.Points points)</h5>
-           <img style="margin-bottom: 0.5rem;" src="@GetMeleeRangeImage(_hero.IsRanged)" alt="@_hero.HeroId" width="64px" height="auto"/>
-           <h5>Hp: @_hero.Hero.Hp</h5>
-           <h5>Deck size: @_hero.Hero.DeckSize</h5> 
+           <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
+           <img style="margin-bottom: 0.5rem;" src="@_statistics.Hero?.MeleeRangeImageUrl" alt="@_statistics.HeroId" width="64px" height="auto"/>
+           <h5>Hp: @_statistics.Hero.Hp</h5>
+           <h5>Deck size: @_statistics.Hero.DeckSize</h5> 
            <h5>Titles: @ShowTitles() </h5>
         </div>
         <div>
            @if (IsAnySidekick())
            {
-               var sidekick = _hero.Hero.Sidekicks.First();
+               var sidekick = _statistics.Hero.Sidekicks.First();
                <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
-               <img style="margin-bottom: 0.5rem;" src="@GetMeleeRangeImage(sidekick.IsRanged)" alt="@sidekick.Id" width="64px" height="auto"/>
+               <img style="margin-bottom: 0.5rem;" src="@sidekick.MeleeRangeImageUrl" alt="@sidekick.Id" width="64px" height="auto"/>
                <h5>@_sidekickTitle Hp: @sidekick.Hp</h5>
            } 
         </div>
@@ -30,35 +30,33 @@
 
 @code {
     [Parameter]
-    public HeroStatisticsDto Hero
+    public HeroStatisticsDto Statistics
     {
-        get => _hero;
+        get => _statistics;
         set
         {
-            _hero = value;
-            _imageSource = $"/{_hero.HeroName}.png";
+            _statistics = value;
             if (IsAnySidekick())
             {
-                _sidekickTitle = _hero.Hero.Sidekicks.First().Count > 1
+                _sidekickTitle = _statistics.Hero.Sidekicks.First().Count > 1
                     ? "Sidekicks"
                     : "Sidekick";
-                _sidekicksSuffix = _hero.Hero.Sidekicks.First().Count > 1
+                _sidekicksSuffix = _statistics.Hero.Sidekicks.First().Count > 1
                     ? $"(x {value.Hero.Sidekicks.First().Count})"
                     : "";
             }
         }
     }
     
-    private HeroStatisticsDto _hero = new();
-    private string? _imageSource;
+    private HeroStatisticsDto _statistics = new();
     private string? _sidekickTitle;
     private string? _sidekicksSuffix;
 
     private string ShowTitles()
     {
-        if (_hero is not null && _hero.Titles is not null && _hero.Titles.Any())
+        if (_statistics is not null && _statistics.Titles is not null && _statistics.Titles.Any())
         {
-            return string.Join(", ", _hero.Titles.Select(t => string.Concat(t.Name, " ", t.Comment)).ToArray());
+            return string.Join(", ", _statistics.Titles.Select(t => string.Concat(t.Name, " ", t.Comment)).ToArray());
         }
 
         return "";
@@ -66,12 +64,7 @@
 
     private bool IsAnySidekick()
     {
-        return _hero.Hero.Sidekicks is not null && _hero.Hero.Sidekicks.Any();
-    }
-
-    private string GetMeleeRangeImage(bool isRanged)
-    {
-        return $"/{(isRanged ? "Ranged" : "Melee")}.png";
+        return _statistics.Hero.Sidekicks is not null && _statistics.Hero.Sidekicks.Any();
     }
 }
 

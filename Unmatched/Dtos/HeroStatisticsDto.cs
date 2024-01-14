@@ -2,9 +2,8 @@
 
 public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
 {
-    public HeroDto Hero;
+    public HeroDto? Hero { get; set; }
     public Guid HeroId { get; set; }
-    public string HeroName { get; set; }
 
     public double Kd
         => TotalMatches > 0
@@ -22,9 +21,7 @@ public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
     public int TotalMatches { get; set; }
 
     public int TotalWins { get; set; }
-    
-    public bool IsRanged { get; set; }
-    
+
     public IEnumerable<TitleDto> Titles { get; set; }
 
     public int CompareTo(HeroStatisticsDto? other)
@@ -55,7 +52,6 @@ public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
                 : -1;
         }
 
-        return HeroName.CompareTo(other.HeroName);
-
+        return Hero.Name.CompareTo(other.Hero.Name);
     }
 }

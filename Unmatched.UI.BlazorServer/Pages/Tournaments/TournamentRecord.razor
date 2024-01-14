@@ -57,12 +57,10 @@
     {
         if (Match.IsPlanned)
         {
-            return "#d3d3d4;";
+            return Colors.Planned;
         }
         
-        return isWinner
-            ? Colors.WinnerColor
-            : Colors.LooserColor;
+        return isWinner ? Colors.Winner : Colors.Looser;
     }
 
     private void OnRecordClick()

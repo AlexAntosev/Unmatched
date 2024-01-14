@@ -5,8 +5,8 @@ using System;
 
 public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
 {
+    public PlayerDto? Player { get; set; }
     public Guid PlayerId { get; set; }
-    public string PlayerName { get; set; }
 
     public double Kd
         => TotalMatches > 0
@@ -44,7 +44,7 @@ public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
                 : -1;
         }
 
-        return PlayerName.CompareTo(other.PlayerName);
+        return Player.Name.CompareTo(other.Player.Name);
 
     }
 }

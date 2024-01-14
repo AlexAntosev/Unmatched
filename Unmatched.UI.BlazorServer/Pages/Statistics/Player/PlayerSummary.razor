@@ -1,10 +1,10 @@
 ﻿@using Unmatched.Dtos
 
 <div style="background: linear-gradient(180deg, @FavoriteColor 0%, rgba(255,255,255,1) 100%);">
-    <h3 align="center" class="page-title">@Player.PlayerName</h3>
+    <h3 align="center" class="page-title">@Statistics.Player?.Name</h3>
     <div class="wrapper page-content">
         <div class="image-container">
-            <img src="@_imageSource"/>
+            <img src="@Statistics.Player?.ImageUrl"/>
         </div>
         <div>
             <StatisticsRecord Title="Favorite" HeroMatches="_favoriteMatches"></StatisticsRecord>
@@ -20,16 +20,8 @@
 
 @code {
     [Parameter]
-    public PlayerStatisticsDto Player
-    {
-        get => _player;
-        set
-        {
-            _player = value;
-            _imageSource = $"/{value.PlayerName}.png";
-        }
-    }
-    
+    public PlayerStatisticsDto Statistics { get; set; } = new();
+
     [Parameter]
     public List<IGrouping<string, FighterDto>> Matches
     {
@@ -55,9 +47,7 @@
     [Parameter]
     public string FavoriteColor { get; set; } = "rgba(255,255,255,1)";
 
-    private PlayerStatisticsDto _player = new();
     private List<IGrouping<string, FighterDto>> _matches = new();
-    private string _imageSource = "";
     private IGrouping<string, FighterDto> _favoriteMatches;
     private IGrouping<string, FighterDto> _strongestHeroMatches;
     private IGrouping<string, FighterDto> _weakestHeroMatches;

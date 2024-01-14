@@ -36,13 +36,11 @@ public class HeroStatisticsService : IHeroStatisticsService
                 {
                     Hero = heroDto,
                     HeroId = hero.Id,
-                    HeroName = hero.Name,
                     Points = points,
                     TotalMatches = fights.Length,
                     TotalWins = fights.Count(x => x.IsWinner),
                     TotalLooses = fights.Count(x => x.IsWinner == false),
-                    LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0,
-                    IsRanged = hero.IsRanged
+                    LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0
                 };
 
             statistics.Add(heroStatistics);
@@ -66,14 +64,12 @@ public class HeroStatisticsService : IHeroStatisticsService
             {
                 Hero = heroDto,
                 HeroId = hero.Id,
-                HeroName = hero.Name,
                 Points = points,
                 Place = place,
                 TotalMatches = fights.Count,
                 TotalWins = fights.Count(x => x.IsWinner),
                 TotalLooses = fights.Count(x => x.IsWinner == false),
                 LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0,
-                IsRanged = hero.IsRanged,
                 Titles = titlesDto
             };
         

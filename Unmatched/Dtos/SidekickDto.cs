@@ -15,4 +15,6 @@ public class SidekickDto
     public int Count { get; set; }
     
     public bool IsRanged { get; set; }
+    
+    public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
 }
