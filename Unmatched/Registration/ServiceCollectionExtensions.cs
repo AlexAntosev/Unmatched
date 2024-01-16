@@ -52,5 +52,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPlayerService, PlayerService>();
         services.AddTransient<IMapService, MapService>();
         services.AddTransient<IRusherTitleHandler, RusherTitleHandler>();
+        services.AddTransient<IPunisherTitleHandler, PunisherTitleHandler>();
     }
 }

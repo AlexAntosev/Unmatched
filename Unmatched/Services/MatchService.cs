@@ -16,19 +16,22 @@ public class MatchService : IMatchService
 
     private readonly IStreakTitleHandler _streakTitleHandler;
     private readonly IRusherTitleHandler _rusherTitleHandler;
+    private readonly IPunisherTitleHandler _punisherTitleHandler;
 
     public MatchService(
         IMatchHandlerFactory matchHandlerFactory,
         IMapper mapper,
         IUnitOfWork unitOfWork,
         IStreakTitleHandler streakTitleHandler,
-        IRusherTitleHandler rusherTitleHandler)
+        IRusherTitleHandler rusherTitleHandler,
+        IPunisherTitleHandler punisherTitleHandler)
     {
         _matchHandlerFactory = matchHandlerFactory;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _streakTitleHandler = streakTitleHandler;
         _rusherTitleHandler = rusherTitleHandler;
+        _punisherTitleHandler = punisherTitleHandler;
     }
     
     public async Task AddAsync(Match match)
@@ -37,6 +40,7 @@ public class MatchService : IMatchService
         await handler.HandleAsync(match);
         await _streakTitleHandler.HandleAsync();
         await _rusherTitleHandler.HandleAsync(match);
+        await _punisherTitleHandler.HandleAsync(match);
     }
 
     public Task AddAsync(MatchDto matchDto)
