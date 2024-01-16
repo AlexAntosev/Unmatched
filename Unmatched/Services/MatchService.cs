@@ -15,17 +15,20 @@ public class MatchService : IMatchService
     private readonly IUnitOfWork _unitOfWork;
 
     private readonly IStreakTitleHandler _streakTitleHandler;
+    private readonly IRusherTitleHandler _rusherTitleHandler;
 
     public MatchService(
         IMatchHandlerFactory matchHandlerFactory,
         IMapper mapper,
         IUnitOfWork unitOfWork,
-        IStreakTitleHandler streakTitleHandler)
+        IStreakTitleHandler streakTitleHandler,
+        IRusherTitleHandler rusherTitleHandler)
     {
         _matchHandlerFactory = matchHandlerFactory;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _streakTitleHandler = streakTitleHandler;
+        _rusherTitleHandler = rusherTitleHandler;
     }
     
     public async Task AddAsync(Match match)
@@ -33,6 +36,7 @@ public class MatchService : IMatchService
         var handler = _matchHandlerFactory.Create(match);
         await handler.HandleAsync(match);
         await _streakTitleHandler.HandleAsync();
+        await _rusherTitleHandler.HandleAsync(match);
     }
 
     public Task AddAsync(MatchDto matchDto)
