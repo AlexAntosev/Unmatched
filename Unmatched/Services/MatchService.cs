@@ -34,23 +34,44 @@ public class MatchService : IMatchService
         _punisherTitleHandler = punisherTitleHandler;
     }
     
-    public async Task AddAsync(Match match)
+    public async Task<SaveMatchResultDto> AddAsync(Match match)
     {
         var handler = _matchHandlerFactory.Create(match);
         await handler.HandleAsync(match);
         await _streakTitleHandler.HandleAsync();
-        await _rusherTitleHandler.HandleAsync(match);
-        await _punisherTitleHandler.HandleAsync(match);
+        var rusherTitleEarned = await _rusherTitleHandler.HandleAsync(match);
+        var punisherTitleEarned = await _punisherTitleHandler.HandleAsync(match);
+
+        var titlesEarned = new List<TitleDto>();
+        if (rusherTitleEarned is not null)
+        {
+            titlesEarned.Add(rusherTitleEarned);
+        }
+        if (punisherTitleEarned is not null)
+        {
+            titlesEarned.Add(punisherTitleEarned);
+        }
+
+        var result = new SaveMatchResultDto
+            {
+                WinnerHeroName = match.Fighters.First(f => f.IsWinner).Hero.Name,
+                WinnerMatchPoints = match.Fighters.First(f => f.IsWinner).MatchPoints.Value,
+                LooserHeroName = match.Fighters.First(f => !f.IsWinner).Hero.Name,
+                LooserMatchPoints = match.Fighters.First(f => !f.IsWinner).MatchPoints.Value,
+                TitlesEarned = titlesEarned
+            };
+
+        return result;
     }
 
-    public Task AddAsync(MatchDto matchDto)
+    public Task<SaveMatchResultDto> AddAsync(MatchDto matchDto)
     {
         var match = _mapper.Map<Match>(matchDto);
 
         return AddAsync(match);
     }
 
-    public Task UpdateAsync(MatchDto matchDto)
+    public Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto)
     {
         var match = _mapper.Map<Match>(matchDto);
 

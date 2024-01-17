@@ -1,10 +1,9 @@
 ﻿namespace Unmatched.Services.TitleHandlers;
 
-using System;
-
 using Unmatched.Data.Entities;
+using Unmatched.Dtos;
 
 public interface IRusherTitleHandler
 {
-    Task HandleAsync(Match match);
+    Task<TitleDto?> HandleAsync(Match match);
 }

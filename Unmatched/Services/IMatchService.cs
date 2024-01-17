@@ -6,11 +6,11 @@ using Unmatched.Dtos;
 
 public interface IMatchService
 {
-    Task AddAsync(Match match);
+    Task<SaveMatchResultDto> AddAsync(Match match);
     
-    Task AddAsync(MatchDto match);
+    Task<SaveMatchResultDto> AddAsync(MatchDto match);
 
-    Task UpdateAsync(MatchDto matchDto);
+    Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto);
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
 

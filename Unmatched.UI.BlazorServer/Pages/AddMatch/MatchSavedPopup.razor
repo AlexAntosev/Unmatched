@@ -1,0 +1,21 @@
+﻿@using Unmatched.Dtos
+
+<div class="row">
+    <div class="col-5 col-md-5 text-end">Winner :</div>
+    <div class="col-7 col-md-7">@Result.WinnerHeroName (@Result.WinnerMatchPoints points)</div>
+</div>
+<div class="row">
+    <div class="col-5 col-md-5 text-end">Looser :</div>
+    <div class="col-7 col-md-7">@Result.LooserHeroName (@Result.LooserMatchPoints points)</div>
+</div>
+@if (Result.TitlesEarned.Any())
+{
+    <div class="row">
+        <div class="col-5 col-md-5 text-end">@Result.WinnerHeroName achieved :</div>
+        <div class="col-7 col-md-7">@Result.TitlesEarned.Select(t => $"{t.Name} Title").Aggregate((a, x) => a + ", " + x)</div>
+    </div>
+}
+
+@code {
+    [Parameter] public SaveMatchResultDto Result { get; set; }
+}

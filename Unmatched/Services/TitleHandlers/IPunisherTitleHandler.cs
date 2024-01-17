@@ -1,8 +1,9 @@
 ﻿namespace Unmatched.Services.TitleHandlers;
 
 using Unmatched.Data.Entities;
+using Unmatched.Dtos;
 
 public interface IPunisherTitleHandler
 {
-    Task HandleAsync(Match match);
+    Task<TitleDto?> HandleAsync(Match match);
 }

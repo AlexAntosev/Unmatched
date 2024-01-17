@@ -1,8 +1,11 @@
 ﻿namespace Unmatched.Services.TitleHandlers;
 
+using AutoMapper;
+
 using Unmatched.Constants;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
+using Unmatched.Dtos;
 
 public class RusherTitleHandler : IRusherTitleHandler
 {
@@ -10,17 +13,20 @@ public class RusherTitleHandler : IRusherTitleHandler
     
     private readonly IUnitOfWork _unitOfWork;
 
-    public RusherTitleHandler(IUnitOfWork unitOfWork)
+    private readonly IMapper _mapper;
+
+    public RusherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
     
-    public async Task HandleAsync(Match match)
+    public async Task<TitleDto?> HandleAsync(Match match)
     {
         var title = await _unitOfWork.Titles.GetByNameAsync(Titles.Rusher);
         if (title is null)
         {
-            return;
+            return null;
         }
 
         var winner = match.Fighters.FirstOrDefault(f => f.IsWinner);
@@ -33,7 +39,12 @@ public class RusherTitleHandler : IRusherTitleHandler
                 title.Heroes.Add(winner.Hero);
                 _unitOfWork.Titles.AddOrUpdate(title);
                 await _unitOfWork.SaveChangesAsync();
+
+                var titleDto = _mapper.Map<TitleDto>(title);
+                return titleDto;
             }
         }
+
+        return null;
     }
 }
