@@ -15,7 +15,7 @@
                 ValueExpression="@(() => Fighter.PlayerId)" 
                 Value=Fighter.PlayerId 
                 ValueChanged="@((Guid value) => PlayerChanged(value))"
-                name="Player" id="players" class="form-select">
+                name="Player" id="players" class="form-select transparent">
                 @foreach (var player in Players)
                 {
                     <option value="@player.Id"> @player.Name</option>
@@ -25,7 +25,7 @@
         <div>
             <label for="hero">Hero:</label>
             <div style=" display: flex; flex-direction: row;">
-                <InputSelect name="Hero" id="hero" class="form-select" ValueExpression="@(() => Fighter.HeroId)"
+                <InputSelect name="Hero" id="hero" class="form-select transparent" ValueExpression="@(() => Fighter.HeroId)"
                              Value="@Fighter.HeroId"
                              ValueChanged="@((Guid value) => HeroChanged(value))">
                     @foreach (var hero in Heroes)
@@ -33,44 +33,44 @@
                         <option value="@hero.Id"> @hero.Name</option>
                     }
                 </InputSelect>
-                <button style="border-width: 0" @onclick="() => RandomizeHero(Fighter.HeroId)">🎲</button>
+                <button style="border-width: 0; background: transparent;" @onclick="() => RandomizeHero(Fighter.HeroId)">🎲</button>
             </div>
         </div>
         <div>
             <label for="hp">HP:</label>
-            <InputNumber @bind-Value=Fighter.HpLeft id="hp" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.HpLeft id="hp" class="form-control transparent"/>
         </div>
         <div>
             <label for="sidekick">Sidekick:</label>
-            <InputText @bind-Value=Fighter.SidekickName id="sidekick" class="form-control" disabled="true"/>
+            <InputText @bind-Value=Fighter.SidekickName id="sidekick" class="form-control transparent" disabled="true"/>
         </div>
         <div>
             <label for="sidekickHP">Sidekick HP:</label>
-            <InputNumber @bind-Value=Fighter.SidekickHpLeft id="sidekickHP" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.SidekickHpLeft id="sidekickHP" class="form-control transparent"/>
         </div>
         <div>
             <label for="cardsLeft">Cards Left:</label>
-            <InputNumber @bind-Value=Fighter.CardsLeft id="cardsLeft" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.CardsLeft id="cardsLeft" class="form-control transparent"/>
         </div>
         <div>
             <label for="itemsUsed">Items Used:</label>
-            <InputNumber @bind-Value=Fighter.ItemsUsed id="itemsUsed" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.ItemsUsed id="itemsUsed" class="form-control transparent"/>
         </div>
         <div>
             <label for="turn">Turn:</label>
-            <InputNumber @bind-Value=Fighter.Turn id="turn" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.Turn id="turn" class="form-control transparent"/>
         </div>
         <div>
             <label for="actionsMade">Actions made:</label>
-            <InputNumber @bind-Value=Fighter.ActionsMade id="actionsMade" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.ActionsMade id="actionsMade" class="form-control transparent"/>
         </div>
         <div>
             <label for="timeSpent">Time spent (in seconds):</label>
-            <InputNumber @bind-Value=Fighter.TimeSpentInSeconds id="timeSpent" class="form-control"/>
+            <InputNumber @bind-Value=Fighter.TimeSpentInSeconds id="timeSpent" class="form-control transparent"/>
         </div>
         <div>
             <label for="isWinner">Winner:</label>
-            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check"/>
+            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check transparent"/>
         </div>
 
     </fieldset>
@@ -116,6 +116,7 @@
         Fighter.SidekickName = hero.Sidekicks.FirstOrDefault()?.Name;
         Fighter.SidekickHpLeft = hero.Sidekicks.Sum(s => s.Hp * s.Count);
         Fighter.CardsLeft = hero.DeckSize;
+        NotificationService.CallRequestRefresh();
     }
 
     private void RandomizeHero(params Guid[] exceptHeroIds)
@@ -170,11 +171,24 @@
         grid-row-start: 1;
         grid-row-end: 2;
         text-align: center;
+        opacity: 0.9 !important;
+        color: white;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     }
     .image {
         height: 200px;
         border: 4px solid black;
         border-radius: 100%;
     }
-                
+    
+    label {
+        opacity: 0.9 !important;
+        font-size: 20px;
+        color: white;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+    
+    .transparent {
+        opacity: 0.9 !important;
+    }
 </style>

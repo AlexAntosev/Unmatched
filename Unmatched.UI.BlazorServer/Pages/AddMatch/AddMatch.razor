@@ -13,9 +13,7 @@
 @inject NavigationManager NavManager
 @inject NotificationService NotificationService
 
-<div class="page-content">
-    <h1 class="page-title"></h1>
-    
+<div style="background: linear-gradient(90deg, @_match.Fighters.FirstOrDefault()?.Hero?.Color 0%, @_match.Fighters.LastOrDefault()?.Hero?.Color 100%);">
     <Modal @ref="matchSavedPopup" Title="Match successfully saved!">
         <BodyTemplate>
         </BodyTemplate>
@@ -25,10 +23,13 @@
     </Modal>
 
     <div class="row">
-        <div class="column center">
+        <div class="triple-column center" >
             <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.First()"></FighterInfo>
         </div>
-        <div class="column center">
+        <div class="triple-column center">
+            <img src="Vs.png"/>
+        </div>
+        <div class="triple-column center">
             <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.Last()"></FighterInfo>
         </div>
     </div>
@@ -40,18 +41,18 @@
                 <div>
                     <label for="Map">Map:</label>
                     <div style=" display: flex; flex-direction: row;">
-                        <InputSelect @bind-Value=_match.MapId name="Map" id="maps" class="form-select">
+                        <InputSelect @bind-Value=_match.MapId name="Map" id="maps" class="form-select transparent">
                             @foreach (var map in _maps)
                             {
                                 <option value="@map.Id"> @map.Name</option>
                             }
                         </InputSelect >
-                        <button style="border-width: 0" @onclick="RandomizeMap">🎲</button>
+                        <button style="border-width: 0; background: transparent;" @onclick="RandomizeMap">🎲</button>
                     </div>
                 </div>
                 <div>
                     <label for="Tournament">Tournament:</label>
-                    <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select">
+                    <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select transparent">
                         @foreach (var tournament in _tournaments)
                         {
                             <option value="@tournament.Id"> @tournament.Name</option>
@@ -60,15 +61,15 @@
                 </div>
                 <div>
                     <label for="Date">Date:</label>
-                    <InputDate @bind-Value=_match.Date name="Date" class="form-control"/>
+                    <InputDate @bind-Value=_match.Date name="Date" class="form-control transparent"/>
                 </div>
                 <div>
                     <label for="Comment">Comment:</label>
-                    <InputText @bind-Value=_match.Comment name="Comment" class="form-control"/>
+                    <InputText @bind-Value=_match.Comment name="Comment" class="form-control transparent"/>
                 </div>
                 <div>
                     <label for="Stage">Stage:</label>
-                    <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select">
+                    <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select transparent">
                         @foreach (var stage in _stages)
                         {
                             <option value="@stage.Item1"> @stage.Item2</option>
@@ -87,7 +88,7 @@
 @code {
     [Parameter]
     public string Id { get; set; }
-    
+
     private List<PlayerDto> _players = new();
     private List<HeroDto> _heroes = new();
     private List<MapDto> _maps = new();
@@ -110,6 +111,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        NotificationService.RefreshRequested += RefreshMe;
         try
         {
             PreloadService.Show();
@@ -227,4 +229,22 @@
         await matchSavedPopup.HideAsync();
         NavManager.NavigateTo(Urls.DuelMatchLog);
     }
+    
+    private void RefreshMe()
+    {
+        StateHasChanged();
+    }
 }
+
+<style>
+    label {
+        opacity: 0.9 !important;
+        font-size: 20px;
+        color: white;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+    
+    .transparent {
+        opacity: 0.9 !important;
+    }
+</style>
