@@ -57,13 +57,22 @@
             <InputNumber @bind-Value=Fighter.ItemsUsed id="itemsUsed" class="form-control"/>
         </div>
         <div>
-            <label for="isWinner">Winner:</label>
-            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check"/>
-        </div>
-        <div>
             <label for="turn">Turn:</label>
             <InputNumber @bind-Value=Fighter.Turn id="turn" class="form-control"/>
         </div>
+        <div>
+            <label for="actionsMade">Actions made:</label>
+            <InputNumber @bind-Value=Fighter.ActionsMade id="actionsMade" class="form-control"/>
+        </div>
+        <div>
+            <label for="timeSpent">Time spent (in seconds):</label>
+            <InputNumber @bind-Value=Fighter.TimeSpentInSeconds id="timeSpent" class="form-control"/>
+        </div>
+        <div>
+            <label for="isWinner">Winner:</label>
+            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check"/>
+        </div>
+
     </fieldset>
 </EditForm>
 

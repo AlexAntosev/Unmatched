@@ -6,30 +6,50 @@
     <GridPageSettings PageSize="@PageSize"></GridPageSettings>
     <GridEvents QueryCellInfo="CustomizeCell" TValue="ExpandoObject"></GridEvents>
     <GridColumns>
-        <GridColumn Field="Date" Format="d" Type="ColumnType.Date" HeaderText="Date" Width="40" HeaderTextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field="Tournament" HeaderText="Tournament" Width="100" HeaderTextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field="Map" HeaderText="Map" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Date" Format="d" Type="ColumnType.Date" HeaderText="Date" Width="44" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Tournament" HeaderText="Tournament" Width="100"  HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Map" HeaderText="Map" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
         <GridColumn HeaderText="Fighter" HeaderTextAlign="TextAlign.Center" Width="300">
             <GridColumns>
-                <GridColumn Field="FighterPlayer" HeaderText="Player" Width="40"></GridColumn>
-                <GridColumn Field="FighterHero" HeaderText="Hero" Width="60"></GridColumn>
-                <GridColumn Field="FighterHp" HeaderText="Hp" Width="30"></GridColumn>
-                <GridColumn Field="FighterSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
-                <GridColumn Field="FighterCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
-                <GridColumn Field="FighterPoints" HeaderText="Points" Width="40"></GridColumn>
+                <GridColumn Width="20" Field="FighterPlayer" HeaderText="">
+                    <Template>
+                        @{
+                            var record = context as dynamic;
+                            <div class="image">
+                                <img src="@record?.FighterPlayerImageUrl" width="100%" height="auto"/>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="FighterHero" HeaderText="Hero" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="FighterHp" HeaderText="Hp (Sidekick)" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="FighterCardsLeft" HeaderText="🎴" Width="25" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="FighterActionsMade" HeaderText="⚡" Width="25" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="FighterTimeSpent" HeaderText="⌛" Width="25" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="FighterPoints" HeaderText="Points" Width="40" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
             </GridColumns>
         </GridColumn>
         <GridColumn HeaderText="Opponent" HeaderTextAlign="TextAlign.Center" Width="300">
             <GridColumns>
-                <GridColumn Field="OpponentPlayer" HeaderText="Player" Width="40"></GridColumn>
-                <GridColumn Field="OpponentHero" HeaderText="Hero" Width="60"></GridColumn>
-                <GridColumn Field="OpponentHp" HeaderText="Hp" Width="30"></GridColumn>
-                <GridColumn Field="OpponentSidekickHp" HeaderText="SidekickHp" Width="50"></GridColumn>
-                <GridColumn Field="OpponentCardsLeft" HeaderText="CardsLeft" Width="50"></GridColumn>
-                <GridColumn Field="OpponentPoints" HeaderText="Points" Width="40"></GridColumn>
+                <GridColumn Width="20" Field="OpponentPlayer" HeaderText="">
+                    <Template>
+                        @{
+                            var record = context as dynamic;
+                            <div class="image">
+                                <img src="@record?.OpponentPlayerImageUrl" width="100%" height="auto"/>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="OpponentHero" HeaderText="Hero" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="OpponentHp" HeaderText="Hp (Sidekick)" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="OpponentCardsLeft" HeaderText="🎴" Width="25" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="OpponentActionsMade" HeaderText="⚡" Width="25" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="OpponentTimeSpent" HeaderText="⌛" Width="25" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="OpponentPoints" HeaderText="Points" Width="40" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
             </GridColumns>
         </GridColumn>
-        <GridColumn Field="Comment" HeaderText="Comment" Width="60" HeaderTextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Comment" HeaderText="Comment" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
     </GridColumns>
 </SfGrid>
 
@@ -49,19 +69,21 @@
                     d.Tournament = e.TournamentName;
                     d.Map = e.MapName;
                     var fighter = e.Fighters.First();
-                    d.FighterPlayer = fighter.Player.Name;
+                    d.FighterPlayerImageUrl = fighter.PlayerImageUrl;
                     d.FighterHero = fighter.Hero.Name;
-                    d.FighterHp = fighter.HpLeft;
-                    d.FighterSidekickHp = fighter.SidekickHpLeft;
+                    d.FighterHp = $"{fighter.HpLeft}{(fighter.Hero.Sidekicks.Any() ? $" ({fighter.SidekickHpLeft})" : "")}";
                     d.FighterCardsLeft = fighter.CardsLeft;
+                    d.FighterActionsMade = fighter.ActionsMade;
+                    d.FighterTimeSpent = fighter.TimeSpentInSeconds;
                     d.FighterPoints = fighter.MatchPoints;
                     d.IsFighterWinner = fighter.IsWinner;
                     var opponent = e.Fighters.Last();
-                    d.OpponentPlayer = opponent.Player.Name;
+                    d.OpponentPlayerImageUrl = opponent.PlayerImageUrl;
                     d.OpponentHero = opponent.Hero.Name;
-                    d.OpponentHp = opponent.HpLeft;
-                    d.OpponentSidekickHp = opponent.SidekickHpLeft;
+                    d.OpponentHp = $"{opponent.HpLeft}{(fighter.Hero.Sidekicks.Any() ? $" ({opponent.SidekickHpLeft})" : "")}";
                     d.OpponentCardsLeft = opponent.CardsLeft;
+                    d.OpponentActionsMade = opponent.ActionsMade;
+                    d.OpponentTimeSpent = opponent.TimeSpentInSeconds;
                     d.OpponentPoints = opponent.MatchPoints;
                     d.IsOpponentWinner = opponent.IsWinner;
                     d.Comment = e.Comment;
@@ -78,7 +100,7 @@
     {
         var isFighterWinner = ((dynamic)args.Data).IsFighterWinner;
         var isOpponentWinner = ((dynamic)args.Data).IsOpponentWinner;
-        if (args.Column.Field is "FighterPlayer" or "FighterHero" or "FighterHp" or "FighterSidekickHp" or "FighterCardsLeft" or "FighterPoints")
+        if (args.Column.Field is "FighterPlayer" or "FighterHero" or "FighterHp" or "FighterSidekickHp" or "FighterCardsLeft" or "FighterPoints" or "FighterActionsMade" or "FighterTimeSpent")
         {
             if (isFighterWinner)
             {
@@ -89,7 +111,7 @@
                 args.Cell.AddClass(new [] { "looser-cell" });
             }
         }
-        if (args.Column.Field is "OpponentPlayer" or "OpponentHero" or "OpponentHp" or "OpponentSidekickHp" or "OpponentCardsLeft" or "OpponentPoints")
+        if (args.Column.Field is "OpponentPlayer" or "OpponentHero" or "OpponentHp" or "OpponentSidekickHp" or "OpponentCardsLeft" or "OpponentPoints" or "OpponentActionsMade" or "OpponentTimeSpent")
         {
             if (isOpponentWinner)
             {

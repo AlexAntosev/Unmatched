@@ -77,6 +77,7 @@ public class FighterRepository : IFighterRepository
         return await _dbContext.Fighters
             .Include(x => x.Player)
             .Include(x => x.Hero)
+            .ThenInclude(h => h.Sidekicks)
             .Where(x => matchId == x.MatchId)
             .ToListAsync();
     }

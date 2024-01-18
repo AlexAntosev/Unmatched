@@ -32,4 +32,8 @@ public class Fighter
     public int? SidekickHpLeft { get; set; }
 
     public int? Turn { get; set; }
+    
+    public int? ActionsMade { get; set; }
+    
+    public int? TimeSpentInSeconds { get; set; }
 }
