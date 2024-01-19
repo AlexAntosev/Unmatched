@@ -35,13 +35,12 @@
     </div>
 
     <div class="row">
-        <div class="triple-column"></div>
-        <div class="triple-column center">
+        <div class="column end">
             <EditForm Model=@_match>
                 <div>
                     <label for="Map">Map:</label>
                     <div style=" display: flex; flex-direction: row;">
-                        <InputSelect @bind-Value=_match.MapId name="Map" id="maps" class="form-select transparent">
+                        <InputSelect Value="@_match.MapId" ValueExpression="@(() => _match.MapId)" name="Map" id="maps" class="form-select transparent" ValueChanged="@((Guid value) => SetMapInfo(value))">
                             @foreach (var map in _maps)
                             {
                                 <option value="@map.Id"> @map.Name</option>
@@ -81,7 +80,9 @@
                 <button class="btn btn-secondary" @onclick="OnRandomizeMatchClick">Randomize</button>
             </EditForm>
         </div>
-        <div class="triple-column"></div>
+        <div class="column start">
+            <img src="@_match.Map?.ImageUrl"/>
+        </div>
     </div>
 </div>
 
@@ -101,6 +102,10 @@
                 {
                     new(),
                     new()
+                },
+            Map = new()
+                {
+                    Name = "Unknown"
                 },
             Date = DateTime.UtcNow
         };
@@ -209,7 +214,8 @@
     
     private void RandomizeMap()
     {
-        _match.MapId = _maps.GetRandomItem().Id;
+        var mapId = _maps.GetRandomItem().Id;
+        SetMapInfo(mapId);
     }
     
     private void RandomizeFighter()
@@ -228,6 +234,13 @@
     {
         await matchSavedPopup.HideAsync();
         NavManager.NavigateTo(Urls.DuelMatchLog);
+    }
+    
+    private void SetMapInfo(Guid mapId)
+    {
+        var map = _maps.First(h => h.Id == mapId);
+        _match.Map = map;
+        _match.MapId = mapId;
     }
     
     private void RerenderComponent()

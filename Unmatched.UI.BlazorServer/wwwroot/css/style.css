@@ -10,9 +10,21 @@
     display: flex;
 }
 
+.start {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
 .center {
     display: flex;
     justify-content: center;
+    align-items: center;
+}
+
+.end {
+    display: flex;
+    justify-content: end;
     align-items: center;
 }
 
