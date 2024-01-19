@@ -124,6 +124,7 @@ public class MatchRepository : IMatchRepository
                 .ThenInclude(f => f.Sidekicks)
             .Include(m => m.Fighters)
                 .ThenInclude(f => f.Player)
+            .Include(m => m.Map)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         return entity;
