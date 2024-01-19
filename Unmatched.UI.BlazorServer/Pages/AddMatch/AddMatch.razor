@@ -13,7 +13,7 @@
 @inject NavigationManager NavManager
 @inject NotificationService NotificationService
 
-<div style="background: linear-gradient(90deg, @_match.Fighters.FirstOrDefault()?.Hero?.Color 0%, @_match.Fighters.LastOrDefault()?.Hero?.Color 100%);">
+<div style="background: linear-gradient(90deg, @(_match.Fighters.FirstOrDefault()?.Hero?.Color ?? "white") 0%, @(_match.Fighters.LastOrDefault()?.Hero?.Color ?? "white") 100%);">
     <Modal @ref="matchSavedPopup" Title="Match successfully saved!">
         <BodyTemplate>
         </BodyTemplate>
@@ -111,7 +111,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        NotificationService.RefreshRequested += RefreshMe;
+        NotificationService.RefreshRequested += RerenderComponent;
         try
         {
             PreloadService.Show();
@@ -230,7 +230,7 @@
         NavManager.NavigateTo(Urls.DuelMatchLog);
     }
     
-    private void RefreshMe()
+    private void RerenderComponent()
     {
         StateHasChanged();
     }
