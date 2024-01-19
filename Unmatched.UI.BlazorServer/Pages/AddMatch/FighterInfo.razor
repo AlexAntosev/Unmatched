@@ -5,7 +5,7 @@
 @inject NotificationService NotificationService
 
 <EditForm Model=@Fighter>
-    <fieldset class="wrapper">
+    <fieldset class="wrapper" style="@WinnerStyle()">
         <legend class="title">@Title</legend>
         <img class="image" src="@Fighter.PlayerImageUrl"/>
         <img class="image" src="@Fighter.HeroImageUrl"/>
@@ -70,7 +70,7 @@
         </div>
         <div>
             <label for="isWinner">Winner:</label>
-            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check transparent"/>
+            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check-input transparent"/>
         </div>
 
     </fieldset>
@@ -155,6 +155,12 @@
         RandomizeHero(exceptHeroes.Select(h => h).ToArray());
         
         targetFighter.ItemsUsed = 0;
+    }
+    
+    private string WinnerStyle()
+    {
+        if (!Fighter.IsWinner) return "";
+        return "background: radial-gradient(circle, rgba(255,255,0,0.5) 0%, rgba(255,255,255,0) 55%);";
     }
 }
 
