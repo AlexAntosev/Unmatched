@@ -1,7 +1,11 @@
 ﻿@using Unmatched.Dtos
 
 <div style="background: linear-gradient(180deg, @Statistics.Hero.Color 0%, rgba(255,255,255,1) 100%);">
-    <h3 align="center" class="page-title">@Statistics.Hero.Name</h3>
+    <div style="display: flex; align-items: center; justify-content: center;" >
+        <h3 class="page-title">@Statistics.Hero.Name</h3>
+        <button style="background-color: transparent; border: 0px" onclick="@UpdateHeroColor">✎</button>
+        <input type="color" value="@Statistics.Hero.Color" onchange="@OnColorChange"/>
+    </div>
     <div class="wrapper page-content">
         <div class="image-container">
             @if (Statistics.Hero is not null)
@@ -10,20 +14,20 @@
             }
         </div>
         <div>
-           <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
-           <img style="margin-bottom: 0.5rem;" src="@_statistics.Hero?.MeleeRangeImageUrl" alt="@_statistics.HeroId" width="64px" height="auto"/>
-           <h5>Hp: @_statistics.Hero.Hp</h5>
-           <h5>Deck size: @_statistics.Hero.DeckSize</h5> 
-           <h5>Titles: @ShowTitles() </h5>
+            <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
+            <img style="margin-bottom: 0.5rem;" src="@_statistics.Hero?.MeleeRangeImageUrl" alt="@_statistics.HeroId" width="64px" height="auto"/>
+            <h5>Hp: @_statistics.Hero.Hp</h5>
+            <h5>Deck size: @_statistics.Hero.DeckSize</h5>
+            <h5>Titles: @ShowTitles() </h5>
         </div>
         <div>
-           @if (IsAnySidekick())
-           {
-               var sidekick = _statistics.Hero.Sidekicks.First();
-               <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
-               <img style="margin-bottom: 0.5rem;" src="@sidekick.MeleeRangeImageUrl" alt="@sidekick.Id" width="64px" height="auto"/>
-               <h5>@_sidekickTitle Hp: @sidekick.Hp</h5>
-           } 
+            @if (IsAnySidekick())
+            {
+                var sidekick = _statistics.Hero.Sidekicks.First();
+                <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
+                <img style="margin-bottom: 0.5rem;" src="@sidekick.MeleeRangeImageUrl" alt="@sidekick.Id" width="64px" height="auto"/>
+                <h5>@_sidekickTitle Hp: @sidekick.Hp</h5>
+            }
         </div>
     </div>
 </div>
@@ -66,6 +70,16 @@
     private bool IsAnySidekick()
     {
         return _statistics.Hero.Sidekicks is not null && _statistics.Hero.Sidekicks.Any();
+    }
+
+    private void OnColorChange(ChangeEventArgs e)
+    {
+        _statistics.Hero.Color = e.Value?.ToString();
+    }
+    
+    private void UpdateHeroColor()
+    {
+        var color = _statistics.Hero.Color;
     }
 }
 
