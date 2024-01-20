@@ -40,7 +40,7 @@
                 <div>
                     <label for="Map">Map:</label>
                     <div style=" display: flex; flex-direction: row;">
-                        <InputSelect Value="@_match.MapId" ValueExpression="@(() => _match.MapId)" name="Map" id="maps" class="form-select transparent" ValueChanged="@((Guid value) => SetMapInfo(value))">
+                        <InputSelect Value="@_match.MapId" ValueExpression="@(() => _match.MapId)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
                             @foreach (var map in _maps)
                             {
                                 <option value="@map.Id"> @map.Name</option>
@@ -51,7 +51,7 @@
                 </div>
                 <div>
                     <label for="Tournament">Tournament:</label>
-                    <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select transparent">
+                    <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select transparent rounded-form">
                         @foreach (var tournament in _tournaments)
                         {
                             <option value="@tournament.Id"> @tournament.Name</option>
@@ -60,15 +60,15 @@
                 </div>
                 <div>
                     <label for="Date">Date:</label>
-                    <InputDate @bind-Value=_match.Date name="Date" class="form-control transparent"/>
+                    <InputDate @bind-Value=_match.Date name="Date" class="form-control transparent rounded-form"/>
                 </div>
                 <div>
                     <label for="Comment">Comment:</label>
-                    <InputText @bind-Value=_match.Comment name="Comment" class="form-control transparent"/>
+                    <InputText @bind-Value=_match.Comment name="Comment" class="form-control transparent rounded-form"/>
                 </div>
                 <div>
                     <label for="Stage">Stage:</label>
-                    <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select transparent">
+                    <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select transparent rounded-form">
                         @foreach (var stage in _stages)
                         {
                             <option value="@stage.Item1"> @stage.Item2</option>
@@ -76,8 +76,8 @@
                     </InputSelect >
                 </div>
                 <p></p>
-                <button class="btn btn-primary" @onclick="OnAddNewMatchClickAsync">Add match</button>
-                <button class="btn btn-secondary" @onclick="OnRandomizeMatchClick">Randomize</button>
+                <button class="btn btn-primary rounded-form" @onclick="OnAddNewMatchClickAsync">Add match</button>
+                <button class="btn btn-secondary rounded-form" @onclick="OnRandomizeMatchClick">Randomize</button>
             </EditForm>
         </div>
         <div class="column start">
@@ -262,6 +262,9 @@
     
     .transparent {
         opacity: 0.9 !important;
+    }
+    
+    .rounded-form {
         border-radius: 16px;
     }
 </style>
