@@ -1,6 +1,7 @@
 ﻿@page "/heroes-statistics"
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
+@using Unmatched.Constants
 @inject NavigationManager NavManager
 @inject IHeroStatisticsService HeroStatisticsService
 
@@ -8,7 +9,7 @@
     <h1 class="page-title">Heroes Statistics</h1>
     <SfGrid @ref="_grid" DataSource="@_heroes" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
+        <GridEvents QueryCellInfo="CustomizeCell" OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
         <GridSortSettings>
             <GridSortColumns>
                 <GridSortColumn Field="@nameof(HeroStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
@@ -96,4 +97,44 @@
         }
     }
 
+    private void CustomizeCell(QueryCellInfoEventArgs<HeroStatisticsDto> args)
+    {
+        if (args.Data.Place == 1)
+        {
+            args.Cell.AddClass(new [] { "champion-cell" });
+        }
+        
+        if (args.Data.Place == 2)
+        {
+            args.Cell.AddClass(new [] { "second-place-cell" });
+        }
+        
+        if (args.Data.Place > 2 && args.Data.Place <= 5)
+        {
+            args.Cell.AddClass(new [] { "leader-cell" });
+        }
+        
+        if (args.Data.Place >= 30)
+        {
+            args.Cell.AddClass(new [] { "looser-cell" });
+        }
+    }
 }
+
+<style>
+    .champion-cell {
+        background-color: @Colors.Champion !important;
+    }
+    
+    .second-place-cell {
+        background-color: @Colors.SecondPlace !important;
+    }
+    
+    .leader-cell {
+        background-color: @Colors.Leader !important;
+    }
+    
+    .looser-cell {
+        background-color: @Colors.Looser !important;
+    }
+</style>
