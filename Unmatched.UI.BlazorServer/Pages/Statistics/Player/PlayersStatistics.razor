@@ -10,6 +10,16 @@
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>
         <GridColumns>
+             <GridColumn Width="20">
+                <Template>
+                    @{
+                        var player = context as PlayerStatisticsDto;
+                        <div class="image">
+                            <img src="@player?.Player.ImageUrl" alt="@player.PlayerId" width="100%" height="auto"/>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
             <GridColumn Field="Player.Name" HeaderText="Player" Width="120"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
