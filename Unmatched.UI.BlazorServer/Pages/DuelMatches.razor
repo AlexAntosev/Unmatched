@@ -71,7 +71,7 @@
                     var fighter = e.Fighters.First();
                     d.FighterPlayerImageUrl = fighter.PlayerImageUrl;
                     d.FighterHero = fighter.Hero.Name;
-                    d.FighterHp = $"{fighter.HpLeft}{(fighter.Hero.Sidekicks.Any() ? $" ({fighter.SidekickHpLeft})" : "")}";
+                    d.FighterHp = $"{fighter.HpLeft}{(fighter.Hero.Sidekicks.Any() && fighter.SidekickHpLeft is not null ? $" ({fighter.SidekickHpLeft})" : "")}";
                     d.FighterCardsLeft = fighter.CardsLeft;
                     d.FighterActionsMade = fighter.ActionsMade;
                     d.FighterTimeSpent = fighter.TimeSpentInSeconds;
@@ -80,7 +80,7 @@
                     var opponent = e.Fighters.Last();
                     d.OpponentPlayerImageUrl = opponent.PlayerImageUrl;
                     d.OpponentHero = opponent.Hero.Name;
-                    d.OpponentHp = $"{opponent.HpLeft}{(fighter.Hero.Sidekicks.Any() ? $" ({opponent.SidekickHpLeft})" : "")}";
+                    d.OpponentHp = $"{opponent.HpLeft}{(opponent.Hero.Sidekicks.Any() && opponent.SidekickHpLeft is not null ? $" ({opponent.SidekickHpLeft})" : "")}";
                     d.OpponentCardsLeft = opponent.CardsLeft;
                     d.OpponentActionsMade = opponent.ActionsMade;
                     d.OpponentTimeSpent = opponent.TimeSpentInSeconds;
