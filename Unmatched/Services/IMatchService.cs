@@ -17,4 +17,6 @@ public interface IMatchService
     Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id);
 
     Task<MatchDto> GetAsync(Guid id);
+    
+    Task UpdateEpicAsync(Guid matchId, int epic);
 }

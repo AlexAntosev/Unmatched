@@ -117,4 +117,15 @@ public class MatchService : IMatchService
         var match = _mapper.Map<MatchDto>(entity);
         return match;
     }
+
+    public async Task UpdateEpicAsync(Guid matchId, int epic)
+    {
+        var match = _unitOfWork.Matches.Query().FirstOrDefault(m => m.Id == matchId);
+        if (match is not null)
+        {
+            match.Epic = epic;
+            _unitOfWork.Matches.AddOrUpdate(match);
+            await _unitOfWork.SaveChangesAsync();
+        }
+    }
 }

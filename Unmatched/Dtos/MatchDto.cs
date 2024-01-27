@@ -23,4 +23,6 @@ public class MatchDto
     public bool IsPlanned { get; set; }
     
     public Stage? Stage { get; set; }
+    
+    public int? Epic { get; set; }
 }

@@ -1,6 +1,8 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Constants
 @using System.Dynamic
+@using Unmatched.Services
+@inject IMatchService MatchService
 
 <SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">
     <GridPageSettings PageSize="@PageSize"></GridPageSettings>
@@ -49,7 +51,18 @@
                 <GridColumn Field="OpponentPoints" HeaderText="Points" Width="40" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
             </GridColumns>
         </GridColumn>
-        <GridColumn Field="Comment" HeaderText="Comment" Width="60" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Comment" HeaderText="Comment" Width="80" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Epic" HeaderText="Epic" Width="50" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center">
+            <Template>
+                @{
+                    var record = context as dynamic;
+                    if (record.Epic is not null)
+                    {
+                        <Epic Rating="@(record.Epic)" Max="3" RatingChanged="@((int rate) => EpicChanged(rate, context))" />
+                    }
+                }
+            </Template>
+        </GridColumn>
     </GridColumns>
 </SfGrid>
 
@@ -66,8 +79,10 @@
                 {
                     dynamic d = new ExpandoObject();
                     d.Date = e.Date;
+                    d.MatchId = e.MatchId;
                     d.Tournament = e.TournamentName;
                     d.Map = e.MapName;
+                    d.Epic = e.Epic ?? 0;
                     var fighter = e.Fighters.First();
                     d.FighterPlayerImageUrl = fighter.PlayerImageUrl;
                     d.FighterHero = fighter.Hero.Name;
@@ -129,6 +144,12 @@
         return isWinner
             ? Colors.Winner
             : Colors.Looser;
+    }
+    
+    private async Task EpicChanged(int rate, dynamic matchLog)
+    {
+        matchLog.Epic = rate;
+        await MatchService.UpdateEpicAsync(matchLog.MatchId, matchLog.Epic);
     }
 }
 
