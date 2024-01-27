@@ -105,4 +105,14 @@ public class FighterRepository : IFighterRepository
             .OrderByDescending(x => x.Match.Date)
             .ToListAsync();
     }
+
+    public async Task<List<Fighter>> GetFromFinishedMatchesByHeroAndPlayerIdAsync(Guid heroId, Guid playerId)
+    {
+        return await _dbContext.Fighters
+            .Include(x => x.Match)
+            .Include(x => x.Player)
+            .Where(x => x.HeroId.Equals(heroId) && x.PlayerId.Equals(playerId) && !x.Match.IsPlanned)
+            .OrderByDescending(x => x.Match.Date)
+            .ToListAsync();
+    }
 }

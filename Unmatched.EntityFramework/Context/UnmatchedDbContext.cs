@@ -36,6 +36,8 @@ public class UnmatchedDbContext : DbContext
         : base(contextOptions)
     {
     }
+    
+    public DbSet<Favorite> Favorites { get; set; }
 
     public DbSet<Fighter> Fighters { get; set; }
 

@@ -11,4 +11,6 @@ public interface IFighterRepository : IRepository<Fighter>
     Task<List<Fighter>> GetFromFinishedMatchesByHeroIdAsync(Guid heroId);
     
     Task<List<Fighter>> GetFromFinishedMatchesByPlayerIdAsync(Guid playerId);
+
+    Task<List<Fighter>> GetFromFinishedMatchesByHeroAndPlayerIdAsync(Guid heroId, Guid playerId);
 }

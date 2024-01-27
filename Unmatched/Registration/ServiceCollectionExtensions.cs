@@ -53,5 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMapService, MapService>();
         services.AddTransient<IRusherTitleHandler, RusherTitleHandler>();
         services.AddTransient<IPunisherTitleHandler, PunisherTitleHandler>();
+        services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
+        services.AddTransient<IFavoriteService, FavoriteService>();
     }
 }

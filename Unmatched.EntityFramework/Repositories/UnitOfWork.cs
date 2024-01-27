@@ -7,6 +7,8 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly UnmatchedDbContext _context;
 
+    public IFavoritesRepository Favorites { get; }
+
     public IFighterRepository Fighters { get; }
 
     public IHeroRepository Heroes { get; }
@@ -28,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     public UnitOfWork(UnmatchedDbContext context)
     {
         _context = context;
+        Favorites = new FavoritesRepository(context);
         Fighters = new FighterRepository(context);
         Heroes = new HeroRepository(context);
         Maps = new MapRepository(context);

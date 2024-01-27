@@ -1,0 +1,132 @@
+﻿@using Unmatched.Dtos
+@using Unmatched.Constants
+@using Unmatched.Services
+@inject NavigationManager NavManager
+@inject IFavoriteService FavoriteService
+
+<h4 class="page-title"> Favorites: </h4>
+<SfGrid @ref="_grid" DataSource="@FavoritesRecords" AllowPaging="true" AllowSorting="true">
+    <GridPageSettings PageSize="10"></GridPageSettings>
+    <GridEvents QueryCellInfo="CustomizeCell" OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="FavoriteStatisticsDto"></GridEvents>
+    <GridSortSettings>
+        <GridSortColumns>
+            <GridSortColumn Field="@nameof(FavoriteStatisticsDto.TotalWins)" Direction="SortDirection.Descending"></GridSortColumn>
+        </GridSortColumns>
+    </GridSortSettings>
+    <GridColumns>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.Place) Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Width="20">
+            <Template>
+                @{
+                    var hero = context as FavoriteStatisticsDto;
+                    <div class="image">
+                        <img src="@hero?.Hero.ImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
+                    </div>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field="Hero.Name" HeaderText="Hero" Width="120"></GridColumn>
+        <GridColumn Width="20">
+            <Template>
+                @{
+                    var hero = context as FavoriteStatisticsDto;
+                    <div class="image">
+                        <img src="@hero.Hero.MeleeRangeImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
+                    </div>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.IsChosenOne) HeaderText="Chosen One" Width="40">
+           <Template>
+               @{
+                   var record = context as FavoriteStatisticsDto;
+                   <InputCheckbox Value=record.IsChosenOne ValueExpression="@(() => record.IsChosenOne)" ValueChanged="@(isChosenOne => ChosenChanged(isChosenOne, record))" id="isChosenOne" class="form-check-input"/>
+               }
+           </Template> 
+        </GridColumn>
+        <GridColumn Field=@nameof(FavoriteStatisticsDto.Favour) HeaderText="Favour" Width="50">
+            <Template>
+                @{
+                    var record = context as FavoriteStatisticsDto;
+                    <Epic Rating="@(record.Favour)" RatingChanged="@((int rate) => FavourChanged(rate, record))" />
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {    
+    [Parameter]
+    public List<FavoriteStatisticsDto> FavoritesRecords { get; set; } = new();
+    SfGrid<FavoriteStatisticsDto> _grid;
+    
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+
+    private void RecordClickHandler(RecordClickEventArgs<FavoriteStatisticsDto> args)
+    {
+        if (args.Column.Field is not ("Favour" or "IsChosenOne"))
+        {
+            var heroId = args.RowData.HeroId;
+            var url = $"{Urls.HeroesStatistics}/{heroId}";
+            NavManager.NavigateTo(url);
+        }
+    }
+
+    private void OnDataBoundHandler()
+    {
+        SetPlaces();
+    }
+
+    private void SetPlaces()
+    {
+        if (_grid.CurrentViewData is null)
+        {
+            return;
+        }
+        
+        var dataSource = _grid.CurrentViewData;
+        var place = 1;
+        foreach (var data in dataSource)
+        {
+            if (data is FavoriteStatisticsDto hero)
+            {
+                hero.Place = place;
+                place++;
+            }
+        }
+    }
+
+    private void CustomizeCell(QueryCellInfoEventArgs<FavoriteStatisticsDto> args)
+    {
+        if (args.Data.IsChosenOne)
+        {
+            args.Cell.AddClass(new [] { "champion-cell" });
+        }
+    }
+    
+    private async Task FavourChanged(int favour, FavoriteStatisticsDto favorite)
+    {
+        favorite.Favour = favour;
+        await FavoriteService.UpdateFavourAsync(favorite.FavoriteId, favorite.Favour);
+    }
+    
+    private async Task ChosenChanged(bool isChosenOne, FavoriteStatisticsDto selectedFavorite)
+    {
+        foreach (var favorite in FavoritesRecords)
+        {
+            favorite.IsChosenOne = false;
+        }
+        selectedFavorite.IsChosenOne = isChosenOne;
+        await FavoriteService.UpdateChosenOneAsync(selectedFavorite.FavoriteId, selectedFavorite.IsChosenOne);
+    }
+}
+
+<style>
+    .champion-cell {
+        background-color: @Colors.Champion !important;
+    }
+</style>

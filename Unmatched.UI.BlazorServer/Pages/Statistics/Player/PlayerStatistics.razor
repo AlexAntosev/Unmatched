@@ -3,6 +3,7 @@
 @using Unmatched.Services.Statistics
 @using Unmatched.Constants
 @inject IPlayerStatisticsService PlayerStatisticsService
+@inject IFavoriteStatisticsService FavoriteStatisticsService
 
 <div style="margin-bottom: 16px">
     <PlayerSummary Statistics="Player" Matches="_matches" FavoriteColor="@_favoriteColor"></PlayerSummary>
@@ -10,6 +11,7 @@
 <div class="page-content">
     <TotalMatchesRecord Total="Player.TotalMatches" Wins="Player.TotalWins" Looses="Player.TotalLooses" Kd="Player.Kd"></TotalMatchesRecord>
     <DuelMatches MatchLogEntries="_matchLogEntries" PageSize="10"></DuelMatches>
+    <Favorites FavoritesRecords="_favorites"></Favorites>
 </div>
 
 @code {
@@ -18,6 +20,7 @@
     
     private List<MatchLogDto> _matchLogEntries = new();
     private List<IGrouping<string, FighterDto>> _matches = new();
+    private List<FavoriteStatisticsDto> _favorites = new();
 
     private PlayerStatisticsDto Player { get; set; } = new ();
 
@@ -48,9 +51,8 @@
                 .GroupBy(f => f.Hero.Name)
                 .ToList();
 
-            var favoriteName = _matches.MaxBy(g => g.Count())?.Key;
-            var favoriteMatch = _matchLogEntries.FirstOrDefault(m => m.Fighters.Any(f => f.Hero.Name == favoriteName));
-            _favoriteColor = favoriteMatch?.Fighters.FirstOrDefault(f => f.Hero.Name == favoriteName)?.Hero?.Color ?? Colors.Default;
+            _favorites = (await FavoriteStatisticsService.GetFavoritesStatisticsAsync(playerId)).ToList();
+            _favoriteColor = _favorites.FirstOrDefault(f => f.IsChosenOne)?.Hero?.Color ?? Colors.Default;
         }
         finally
         {
