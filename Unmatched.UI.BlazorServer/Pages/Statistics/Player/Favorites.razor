@@ -121,7 +121,7 @@
             favorite.IsChosenOne = false;
         }
         selectedFavorite.IsChosenOne = isChosenOne;
-        await FavoriteService.UpdateChosenOneAsync(selectedFavorite.FavoriteId, selectedFavorite.IsChosenOne);
+        await FavoriteService.UpdateChosenOneAsync(selectedFavorite.PlayerId, selectedFavorite.FavoriteId, selectedFavorite.IsChosenOne);
     }
 }
 

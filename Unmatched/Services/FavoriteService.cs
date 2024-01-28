@@ -24,9 +24,9 @@ public class FavoriteService : IFavoriteService
         }
     }
 
-    public async Task UpdateChosenOneAsync(Guid favoriteId, bool isChosenOne)
+    public async Task UpdateChosenOneAsync(Guid playerId, Guid favoriteId, bool isChosenOne)
     {
-        var chosenOne = _unitOfWork.Favorites.Query().FirstOrDefault(m => m.IsChosenOne);
+        var chosenOne = _unitOfWork.Favorites.Query().FirstOrDefault(m => m.IsChosenOne && m.PlayerId == playerId);
         if (chosenOne is not null)
         {
             chosenOne.IsChosenOne = false;
