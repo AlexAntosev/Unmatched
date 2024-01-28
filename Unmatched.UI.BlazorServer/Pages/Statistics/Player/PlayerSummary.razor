@@ -1,16 +1,16 @@
 ﻿@using Unmatched.Dtos
+@using Unmatched.Constants
 
-<div style="background: linear-gradient(180deg, @FavoriteColor 0%, rgba(255,255,255,1) 100%);">
+<div style="background: linear-gradient(180deg, @(ChosenOne?.Hero?.Color ?? Colors.Default) 0%, rgba(255,255,255,1) 100%);">
     <h3 align="center" class="page-title">@Statistics.Player?.Name</h3>
     <div class="wrapper page-content">
         <div class="image-container">
             <img src="@Statistics.Player?.ImageUrl"/>
         </div>
         <div>
-            <StatisticsRecord Title="Favorite" HeroMatches="_favoriteMatches"></StatisticsRecord>
-            <StatisticsRecord Title="Strongest hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
-            <StatisticsRecord Title="Weakest hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
-            <h4>Titles:</h4>
+            <h4> Chosen One: @ChosenOne?.Hero?.Name</h4>
+            <StatisticsRecord Title="Strongest Hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
+            <StatisticsRecord Title="Weakest Hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
         </div>
         <div>
             <HeroesMatchesPieChart HeroesMatches="_favoritesMatches"></HeroesMatchesPieChart>
@@ -29,7 +29,6 @@
         set
         {
             _matches = value;
-            _favoriteMatches = _matches.OrderByDescending(g => g.Count()).FirstOrDefault();
             _strongestHeroMatches = _matches
                 .OrderByDescending(g => g.Count(f => f.IsWinner))
                 .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
@@ -45,10 +44,9 @@
     }
 
     [Parameter]
-    public string FavoriteColor { get; set; } = "rgba(255,255,255,1)";
+    public FavoriteStatisticsDto? ChosenOne { get; set; }
 
     private List<IGrouping<string, FighterDto>> _matches = new();
-    private IGrouping<string, FighterDto> _favoriteMatches;
     private IGrouping<string, FighterDto> _strongestHeroMatches;
     private IGrouping<string, FighterDto> _weakestHeroMatches;
     private List<IGrouping<string, FighterDto>> _favoritesMatches = new();

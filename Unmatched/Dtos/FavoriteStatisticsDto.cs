@@ -14,6 +14,8 @@ public class FavoriteStatisticsDto : IComparable<FavoriteStatisticsDto>
 
     public PlayerDto? Player { get; set; }
     
+    public List<FighterDto> Fights { get; set; }
+
     public bool IsChosenOne { get; set; }
     
     public int Favour { get; set; }

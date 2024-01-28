@@ -28,6 +28,7 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
         {
             var heroDto = _mapper.Map<HeroDto>(favorite.Hero);
             var fights = await _unitOfWork.Fighters.GetFromFinishedMatchesByHeroAndPlayerIdAsync(favorite.HeroId, playerId);
+            var fightsDto = _mapper.Map<List<FighterDto>>(fights);
 
             var favoriteStatistics = new FavoriteStatisticsDto 
                 {
@@ -36,6 +37,7 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
                     HeroId = favorite.HeroId,
                     Player = playerDto,
                     PlayerId = playerId,
+                    Fights = fightsDto,
                     IsChosenOne = favorite.IsChosenOne,
                     Favour = favorite.Favour,
                     TotalMatches = fights.Count,
