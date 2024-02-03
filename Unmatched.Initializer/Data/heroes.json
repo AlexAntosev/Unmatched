@@ -1,0 +1,391 @@
+﻿[
+  {
+    "Name": "Achilles",
+    "Hp": 18,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#B56647",
+    "Sidekicks": [
+      {
+        "Name": "Patroclus",
+        "Hp": 6,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Alice",
+    "Hp": 13,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#25A7DD",
+    "Sidekicks": [
+      {
+        "Name": "The Jabberwock",
+        "Hp": 8,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Annie Christmas",
+    "Hp": 14,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#4d0d8a",
+    "Sidekicks": [
+      {
+        "Name": "Charlie",
+        "Hp": 8,
+        "IsRanged": true,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Beowulf",
+    "Hp": 17,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#4DA392",
+    "Sidekicks": [
+      {
+        "Name": "Wiglaf",
+        "Hp": 9,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Bigfoot",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#825730",
+    "Sidekicks": [
+      {
+        "Name": "The Jackalope",
+        "Hp": 6,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Bloody Mary",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#858796",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Bullseye",
+    "Hp": 14,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#417DB1",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Daredevil",
+    "Hp": 17,
+    "DeckSize": 22,
+    "IsRanged": false,
+    "Color": "#D92C2E",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Dr. Jill Trent",
+    "Hp": 13,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#09587c",
+    "Sidekicks": [
+      {
+        "Name": "Daisy",
+        "Hp": 6,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Dr. Sattler",
+    "Hp": 13,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#E96C74",
+    "Sidekicks": [
+      {
+        "Name": "Dr. Malcolm",
+        "Hp": 7,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Dracula",
+    "Hp": 13,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#4B4746",
+    "Sidekicks": [
+      {
+        "Name": "The Sisters",
+        "Hp": 1,
+        "IsRanged": false,
+        "Count": 3
+      }
+    ]
+  },
+  {
+    "Name": "Elektra",
+    "Hp": 16,
+    "DeckSize": 40,
+    "IsRanged": false,
+    "Color": "#202020",
+    "Sidekicks": [
+      {
+        "Name": "The Hand",
+        "Hp": 1,
+        "IsRanged": false,
+        "Count": 4
+      }
+    ]
+  },
+  {
+    "Name": "Ghostrider",
+    "Hp": 17,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#E64E24",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Golden Bat",
+    "Hp": 18,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#c19a0c",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Houdini",
+    "Hp": 14,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#809676",
+    "Sidekicks": [
+      {
+        "Name": "Bess",
+        "Hp": 5,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Ingen",
+    "Hp": 14,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#FC4801",
+    "Sidekicks": [
+      {
+        "Name": "Ingen Workers",
+        "Hp": 1,
+        "IsRanged": true,
+        "Count": 3
+      }
+    ]
+  },
+  {
+    "Name": "Invisible Man",
+    "Hp": 15,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#5DB6CF",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Jakyl and Hide",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#70BD5A",
+    "Sidekicks": null
+  },
+  {
+    "Name": "King Arthur",
+    "Hp": 18,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#DC271B",
+    "Sidekicks": [
+      {
+        "Name": "Merlin",
+        "Hp": 7,
+        "IsRanged": true,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Little Red",
+    "Hp": 14,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#B3242A",
+    "Sidekicks": [
+      {
+        "Name": "Huntsman",
+        "Hp": 9,
+        "IsRanged": true,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Luke Cage",
+    "Hp": 13,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#ECCC45",
+    "Sidekicks": [
+      {
+        "Name": "Misty Knight",
+        "Hp": 6,
+        "IsRanged": true,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Medusa",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#5CAA44",
+    "Sidekicks": [
+      {
+        "Name": "Harpies",
+        "Hp": 1,
+        "IsRanged": false,
+        "Count": 3
+      }
+    ]
+  },
+  {
+    "Name": "Moon Knight",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#CDDFD5",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Nikola Tesla",
+    "Hp": 14,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#d5710d",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Princess Yennenga",
+    "Hp": 15,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#236393",
+    "Sidekicks": [
+      {
+        "Name": "Archers",
+        "Hp": 2,
+        "IsRanged": true,
+        "Count": 2
+      }
+    ]
+  },
+  {
+    "Name": "Raptors",
+    "Hp": 21,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#B8C504",
+    "Sidekicks": null
+  },
+  {
+    "Name": "Robin hood",
+    "Hp": 13,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#08623E",
+    "Sidekicks": [
+      {
+        "Name": "Outlaws",
+        "Hp": 1,
+        "IsRanged": false,
+        "Count": 4
+      }
+    ]
+  },
+  {
+    "Name": "Sherlok Holmes",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#EDBA17",
+    "Sidekicks": [
+      {
+        "Name": "Dr. Watson",
+        "Hp": 8,
+        "IsRanged": true,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Sindbad",
+    "Hp": 15,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#FE7E01",
+    "Sidekicks": [
+      {
+        "Name": "The Porter",
+        "Hp": 6,
+        "IsRanged": false,
+        "Count": 1
+      }
+    ]
+  },
+  {
+    "Name": "Sun Wukong",
+    "Hp": 17,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#EFC403",
+    "Sidekicks": null
+  },
+  {
+    "Name": "The Genie",
+    "Hp": 16,
+    "DeckSize": 30,
+    "IsRanged": true,
+    "Color": "#752577",
+    "Sidekicks": null
+  },
+  {
+    "Name": "T-Rex",
+    "Hp": 27,
+    "DeckSize": 30,
+    "IsRanged": false,
+    "Color": "#3E284F",
+    "Sidekicks": null
+  }
+]

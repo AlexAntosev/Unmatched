@@ -1,19 +1,8 @@
 ﻿@page "/initialize"
-@using Unmatched.DataInitialization
-@using Unmatched.DataInitialization.Matches
 @using Unmatched.Services
-@using Unmatched.Data.Entities
+@using Unmatched.Initializer.Initializers
 
-@inject IDataInitializer<Player> PlayersDataInitializer
-@inject IDataInitializer<Map> MapsDataInitializer
-@inject IDataInitializer<Tournament> TournamentsDataInitializer
-@inject IDataInitializer<Sidekick> SidekicksDataInitializer
-@inject IDataInitializer<Hero> HeroesDataInitializer
-@inject IUnrankedMatchDataInitializer UnrankedMatchDataInitializer
-@inject IRankedMatchDataInitializer RankedMatchDataInitializer
-@inject IFirstTournamentMatchesDataInitializer FirstTournamentMatchesDataInitializer
-@inject IHoudiniVsGenieDadaInitializer HoudiniVsGenieDadaInitializer
-@inject ITalesOfAmazeDataInitializer TalesOfAmazeDataInitializer
+@inject IDataInitializer DataInitializer
 @inject IRatingService RatingService
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
@@ -23,20 +12,10 @@
 
     private async Task InitializeData()
     {
-        // Sequence is important
-        // await PlayersDataInitializer.InitializeAsync();
-        // await MapsDataInitializer.InitializeAsync();
-        // await TournamentsDataInitializer.InitializeAsync();
-        // await SidekicksDataInitializer.InitializeAsync();
-        // await HeroesDataInitializer.InitializeAsync();
-        //
-        // await UnrankedMatchDataInitializer.InitializeAsync();
-        // await FirstTournamentMatchesDataInitializer.InitializeAsync();
-        // await RankedMatchDataInitializer.InitializeAsync();
-
-        //await HoudiniVsGenieDadaInitializer.InitializeAsync();
-        await TalesOfAmazeDataInitializer.InitializeAsync();
+        await DataInitializer.InitializeHeroesAsync();
+        await DataInitializer.InitializeMapsAsync();
     }
+    
     
     private async Task RecalculateRating()
     {

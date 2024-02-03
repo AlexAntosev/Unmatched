@@ -1,11 +1,9 @@
 ﻿namespace Unmatched.Tests;
 
 using Moq;
-
 using Unmatched.Constants;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
-using Unmatched.DataInitialization;
 using Unmatched.Services.RatingCalculators;
 
 public class RatingCalculatorTests
@@ -235,13 +233,8 @@ public class RatingCalculatorTests
 
     private IHeroRepository CreateMockHeroRepository()
     {
-        var mockSidekickRepository = new Mock<ISidekickRepository>();
-        mockSidekickRepository.Setup(x => x.Query()).Returns(new SidekicksDataInitializer(null).GetEntities().AsQueryable);
-
-        var heroDataInitializer = new HeroesDataInitializer(null, mockSidekickRepository.Object);
-
         var mockHeroRepository = new Mock<IHeroRepository>();
-        var heroes = heroDataInitializer.GetEntities();
+        var heroes = new List<Hero>();
         mockHeroRepository.Setup(x => x.Query()).Returns(heroes.AsQueryable);
         mockHeroRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>())).Returns((Guid id) => Task.FromResult(heroes.First(x => x.Id == id)));
 

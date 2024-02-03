@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Unmatched.EntityFramework\Unmatched.EntityFramework.csproj" />
+        <ProjectReference Include="..\Unmatched.Initializer\Unmatched.Initializer.csproj" />
         <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
     </ItemGroup>
 

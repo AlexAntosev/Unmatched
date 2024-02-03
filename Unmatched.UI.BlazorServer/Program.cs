@@ -1,6 +1,7 @@
 using Syncfusion.Blazor;
 
 using Unmatched.EntityFramework.Registration;
+using Unmatched.Initializer.Registration;
 using Unmatched.Registration;
 using Unmatched.UI.BlazorServer;
 
@@ -11,7 +12,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.RegisterServices();
 builder.Services.RegisterMapping();
-builder.Services.RegisterDataInitializers();
+builder.Services.RegisterInitializers();
 builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();
 builder.Services.AddSyncfusionBlazor();
