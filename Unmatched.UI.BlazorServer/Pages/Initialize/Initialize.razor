@@ -1,6 +1,9 @@
 ﻿@page "/initialize"
 @using Unmatched.Services
 @using Unmatched.Initializer.Initializers
+@using Microsoft.AspNetCore.Components
+@using Unmatched.Dtos
+@inject IPlayerService PlayerService
 
 @inject IDataInitializer DataInitializer
 @inject IRatingService RatingService
@@ -8,18 +11,93 @@
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
 <button class="btn btn-primary" @onclick="RecalculateRating">Rating Recalculation</button>
 
-@code {
+<div>
+    <EditForm Model=@_addPlayerForm>
+        <div style="width: 256px; margin-bottom: 8px">
+            <label>Name:</label>
+            <InputText @bind-Value=_addPlayerForm.Name name="Name" class="form-control"/>
+        </div>
+        <button class="btn btn-primary" @onclick="OnAddPlayerClick">Add player</button>
+    </EditForm>
+</div>
 
+@code {
+    private List<PlayerDto> _players = new ();
+    private readonly PlayerDto _addPlayerForm = new();
+    
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            _players = (await PlayerService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+    
     private async Task InitializeData()
     {
-        await DataInitializer.InitializeHeroesAsync();
-        await DataInitializer.InitializeMapsAsync();
+        try
+        {
+            PreloadService.Show();
+            
+            await DataInitializer.InitializeHeroesAsync();
+            await DataInitializer.InitializeMapsAsync();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
     
     
     private async Task RecalculateRating()
     {
-        await RatingService.RecalculateAsync();
-        Console.WriteLine("Recalculation is done!");
+        try
+        {
+            PreloadService.Show();
+            
+            await RatingService.RecalculateAsync();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+    
+    private async Task OnAddPlayerClick()
+    {
+        if (IsInvalidName(_addPlayerForm.Name))
+        {
+            return;
+        }
+        
+        await AddPlayerAsync(_addPlayerForm);
+    }
+
+    private bool IsInvalidName(string? name)
+    {
+        return name is null || name == string.Empty || _players.Any(t => t.Name == name);
+    }
+    
+    private async Task AddPlayerAsync(PlayerDto player)
+    {
+        try
+        {
+            PreloadService.Show();
+
+            await PlayerService.AddAsync(player);
+            _players = (await PlayerService.GetAsync()).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
     }
 }
