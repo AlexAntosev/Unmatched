@@ -20,13 +20,4 @@
         </PackageReference>
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Scripts\20231228124300_UpdateHeroesColors.sql">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Scripts\20231228124300_UpdateHeroesColors_Revert.sql">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>
