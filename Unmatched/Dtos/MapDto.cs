@@ -6,5 +6,5 @@ public class MapDto
 
     public string Name { get; set; }
 
-    public string ImageUrl => $"/{Name}.png";
+    public string ImageUrl => $"/{Name.Replace(" ", string.Empty)}.png";
 }
