@@ -11,7 +11,8 @@ public static class ServiceProviderExtensions
         using var scope = services.CreateScope();
         var dbContext = scope.ServiceProvider
             .GetRequiredService<UnmatchedDbContext>();
-        
+    
+        dbContext.Database.EnsureCreated();
         dbContext.Database.Migrate();
     }
 }
