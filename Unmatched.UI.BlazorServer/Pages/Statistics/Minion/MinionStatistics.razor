@@ -1,0 +1,133 @@
+﻿@page "/minions-statistics/{id}"
+@using Unmatched.Dtos
+@using Unmatched.Services.Statistics
+@inject IMinionStatisticsService MinionStatisticsService
+@using BlazorBootstrap
+
+<div style="margin-bottom: 16px">
+    <MinionSummary Statistics="Minion"></MinionSummary>
+</div>
+<div class="page-content" style="margin-bottom: 16px">
+    <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
+    <TotalMatchesRecord Total="Minion.TotalMatches" Wins="Minion.TotalWins" Looses="Minion.TotalLooses" Kd="Minion.Kd"></TotalMatchesRecord>
+    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
+</div>
+@* <div class="page-content"> *@
+@*     <LineChart @ref="_lineChart" /> *@
+@* </div> *@
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    
+    private List<MatchLogDto> _matchLogEntries = new();
+    private List<RatingChangeDto> _ratingChanges = new();
+    private IGrouping<string, FighterDto>? _againstAntagonistMatches;
+    private MinionStatisticsDto Minion { get; set; } = new () { Minion = new() };
+    private LineChart _lineChart;
+
+    [Inject] protected PreloadService PreloadService { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+            Guid.TryParse(Id, out var minionId);
+            if (minionId == Guid.Empty)
+            {
+                return;
+            }
+            
+            Minion = await MinionStatisticsService.GetMinionStatisticsAsync(minionId);
+            // _matchLogEntries = (await VillainStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToList();
+            // foreach (var matchLogEntry in _matchLogEntries)
+            // {
+            //     matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
+            // }
+            //
+            // _againstAntagonistMatches = _matchLogEntries
+            //     .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
+            //     .GroupBy(f => f.Hero.Name)
+            //     .OrderByDescending(g => g.Count(f => f.IsWinner))
+            //     .ThenBy(g => g.Count(f => !f.IsWinner))
+            //     .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
+            //     .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
+            //     .FirstOrDefault();
+
+            // _ratingChanges = await VillainStatisticsService.GetRatingChangesAsync(heroId);
+            // await UpdateChart();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    // private async Task UpdateChart()
+    // {
+    //     var heroColor = new List<string>
+    //         {
+    //             Hero.Hero.Color
+    //         };
+    //     var data = new ChartData
+    //         {
+    //             Labels = _ratingChanges.Select(c => c.Date).ToList(),
+    //             Datasets = new List<IChartDataset>
+    //                 {
+    //                     new LineChartDataset
+    //                         {
+    //                             Label = Hero.Hero.Name,
+    //                             Data = _ratingChanges.Select(c => (double)c.Rating).ToList(),
+    //                             BackgroundColor = heroColor,
+    //                             BorderColor = heroColor,
+    //                             BorderWidth = new List<double>{2},
+    //                             HoverBorderWidth = new List<double>{4},
+    //                             PointBackgroundColor = heroColor,
+    //                             PointBorderColor = heroColor,
+    //                             PointRadius = new List<int>{4},
+    //                             PointHoverRadius = new List<int>{4}
+    //                         }
+    //                 }
+    //         };
+    //     var options = new LineChartOptions
+    //         {
+    //             Interaction =
+    //                 {
+    //                     Mode = InteractionMode.Index
+    //                 }
+    //         };
+    //
+    //     options.Plugins.Title!.Text = "Rating changes";
+    //     options.Plugins.Title.Display = true;
+    //     options.Plugins.Title!.Font!.Size = 20;
+    //
+    //     options.Responsive = true;
+    //
+    //     options.Scales.X!.Title!.Text = "Date";
+    //     options.Scales.X.Title.Display = true;
+    //
+    //     options.Scales.Y!.Title!.Text = "Rating";
+    //     options.Scales.Y.Title.Display = true;
+    //
+    //     await _lineChart.UpdateAsync(data, options);
+    // }
+    //
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         var data = new ChartData
+    //             {
+    //                 Labels = _ratingChanges.Select(c => c.Date).ToList(),
+    //                 Datasets = new List<IChartDataset>()
+    //             };
+    //
+    //         var options = new LineChartOptions();
+    //
+    //         await _lineChart.InitializeAsync(data, options);
+    //     }
+    //
+    //     await base.OnAfterRenderAsync(firstRender);
+    // }
+}

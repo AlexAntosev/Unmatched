@@ -24,6 +24,7 @@ public class UnmatchedMapper : Profile
             .ReverseMap()
             .ForMember(x => x.Map, c => c.Ignore())
             .ForMember(x => x.Tournament, c => c.Ignore());
+        CreateMap<Minion, MinionDto>().ReverseMap();
         CreateMap<Fighter, FighterDto>()
             .ForMember(x => x.MatchPoints, c => c.MapFrom(x => x.MatchPoints))
             .ReverseMap()
@@ -32,6 +33,7 @@ public class UnmatchedMapper : Profile
         CreateMap<Tournament, TournamentDto>().ReverseMap();
         CreateMap<Title, TitleDto>().ReverseMap();
         CreateMap<Hero, HeroTitleAssignDto>();
+        CreateMap<Villain, VillainDto>().ReverseMap();
     }
 
     private string TryGetMapName(Map? map)

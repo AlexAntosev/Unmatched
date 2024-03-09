@@ -1,0 +1,68 @@
+﻿@using Unmatched.Dtos
+
+<div style="background: linear-gradient(180deg, @Statistics.Minion.Color 0%, rgba(255,255,255,1) 100%);">
+    <div style="display: flex; align-items: center; justify-content: center;" >
+        <h3 class="page-title">@Statistics.Minion.Name</h3>
+        <button style="background-color: transparent; border: 0px" onclick="@UpdateMinionColor">✎</button>
+        <input type="color" value="@Statistics.Minion.Color" onchange="@OnColorChange"/>
+    </div>
+    <div class="wrapper page-content">
+        <div class="image-container">
+            @if (Statistics.Minion is not null)
+            {
+                <img src="@Statistics.Minion.ImageUrl"/>
+            }
+        </div>
+        <div>
+            <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
+            <img style="margin-bottom: 0.5rem;" src="@_statistics.Minion?.MeleeRangeImageUrl" alt="@_statistics.MinionId" width="64px" height="auto"/>
+            <h5>Hp: @_statistics.Minion.Hp</h5>
+            <h5>Deck size: @_statistics.Minion.DeckSize</h5>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public MinionStatisticsDto Statistics
+    {
+        get => _statistics;
+        set
+        {
+            _statistics = value;
+        }
+    }
+    
+    private MinionStatisticsDto _statistics = new();
+
+    private void OnColorChange(ChangeEventArgs e)
+    {
+        _statistics.Minion.Color = e.Value?.ToString();
+    }
+    
+    private void UpdateMinionColor()
+    {
+        var color = _statistics.Minion.Color;
+    }
+}
+
+<style>
+    .wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 32px;
+      row-gap: 4px;
+    }
+    
+    .image-container {
+        width: 250px;
+        height: 200px;
+        text-align: center;
+        display: block;
+    }
+    
+    .container img {
+        margin: auto;
+        display: block;
+    }             
+</style>

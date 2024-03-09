@@ -1,0 +1,99 @@
+﻿@page "/villains-statistics"
+@using Unmatched.Dtos
+@using Unmatched.Services.Statistics
+@using Unmatched.Constants
+@inject NavigationManager NavManager
+@inject IVillainStatisticsService VillainStatisticsService
+
+<div class="page-content">
+    <h1 class="page-title">Villains Statistics</h1>
+    <SfGrid @ref="_grid" DataSource="@_villains" AllowPaging="true" AllowSorting="true">
+        <GridPageSettings PageSize="40"></GridPageSettings>
+        <GridEvents OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="VillainStatisticsDto"></GridEvents>
+        <GridSortSettings>
+            <GridSortColumns>
+                <GridSortColumn Field="@nameof(VillainStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
+            </GridSortColumns>
+        </GridSortSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(VillainStatisticsDto.Place) Width="25" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Width="20">
+                <Template>
+                    @{
+                        var villain = context as VillainStatisticsDto;
+                        <div class="image">
+                            <img src="@villain?.Villain.ImageUrl" alt="@villain.VillainId" width="100%" height="auto"/>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field="Villain.Name" HeaderText="Villain" Width="120"></GridColumn>
+            <GridColumn Width="20">
+                <Template>
+                    @{
+                        var villain = context as VillainStatisticsDto;
+                        <div class="image">
+                            <img src="@villain.Villain.MeleeRangeImageUrl" alt="@villain.VillainId" width="100%" height="auto"/>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field=@nameof(VillainStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(VillainStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(VillainStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(VillainStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(VillainStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+
+@code {
+    private List<VillainStatisticsDto> _villains = new();
+    SfGrid<VillainStatisticsDto> _grid;
+    
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+            _villains = (await VillainStatisticsService.GetVillainsStatisticsAsync()).OrderBy(x => x.Villain.Name).ToList();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private void RecordClickHandler(RecordClickEventArgs<VillainStatisticsDto> args)
+    {
+        var villainId = args.RowData.VillainId;
+        var url = $"{Urls.VillainsStatistics}/{villainId}";
+        NavManager.NavigateTo(url);
+    }
+
+    private void OnDataBoundHandler()
+    {
+        SetPlaces();
+    }
+
+    private void SetPlaces()
+    {
+        if (_grid.CurrentViewData is null)
+        {
+            return;
+        }
+        
+        var dataSource = _grid.CurrentViewData;
+        var place = 1;
+        foreach (var data in dataSource)
+        {
+            if (data is VillainStatisticsDto hero)
+            {
+                hero.Place = place;
+                place++;
+            }
+        }
+    }
+}

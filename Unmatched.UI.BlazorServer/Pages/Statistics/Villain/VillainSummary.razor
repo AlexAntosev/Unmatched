@@ -1,0 +1,68 @@
+﻿@using Unmatched.Dtos
+
+<div style="background: linear-gradient(180deg, @Statistics.Villain.Color 0%, rgba(255,255,255,1) 100%);">
+    <div style="display: flex; align-items: center; justify-content: center;" >
+        <h3 class="page-title">@Statistics.Villain.Name</h3>
+        <button style="background-color: transparent; border: 0px" onclick="@UpdateVillainColor">✎</button>
+        <input type="color" value="@Statistics.Villain.Color" onchange="@OnColorChange"/>
+    </div>
+    <div class="wrapper page-content">
+        <div class="image-container">
+            @if (Statistics.Villain is not null)
+            {
+                <img src="@Statistics.Villain.ImageUrl"/>
+            }
+        </div>
+        <div>
+            <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
+            <img style="margin-bottom: 0.5rem;" src="@_statistics.Villain?.MeleeRangeImageUrl" alt="@_statistics.VillainId" width="64px" height="auto"/>
+            <h5>Hp: @_statistics.Villain.Hp</h5>
+            <h5>Deck size: @_statistics.Villain.DeckSize</h5>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public VillainStatisticsDto Statistics
+    {
+        get => _statistics;
+        set
+        {
+            _statistics = value;
+        }
+    }
+    
+    private VillainStatisticsDto _statistics = new();
+
+    private void OnColorChange(ChangeEventArgs e)
+    {
+        _statistics.Villain.Color = e.Value?.ToString();
+    }
+    
+    private void UpdateVillainColor()
+    {
+        var color = _statistics.Villain.Color;
+    }
+}
+
+<style>
+    .wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 32px;
+      row-gap: 4px;
+    }
+    
+    .image-container {
+        width: 250px;
+        height: 200px;
+        text-align: center;
+        display: block;
+    }
+    
+    .container img {
+        margin: auto;
+        display: block;
+    }             
+</style>

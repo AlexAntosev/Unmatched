@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();
         services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
         services.AddTransient<IMapStatisticsService, MapStatisticsService>();
+        services.AddTransient<IMinionStatisticsService, MinionStatisticsService>();
         services.AddTransient<ITitleService, TitleService>();
         services.AddTransient<IHeroService, HeroService>();
         services.AddTransient<IStreakTitleHandler, StreakTitleHandler>();
@@ -36,5 +37,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPunisherTitleHandler, PunisherTitleHandler>();
         services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
         services.AddTransient<IFavoriteService, FavoriteService>();
+        services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
     }
 }

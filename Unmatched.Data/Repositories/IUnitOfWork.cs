@@ -14,6 +14,8 @@ public interface IUnitOfWork : IDisposable
     
     IMatchRepository Matches { get; }
     
+    IMinionRepository Minions { get; }
+    
     IPlayerRepository Players { get; }
     
     IRatingRepository Ratings { get; }
@@ -23,6 +25,8 @@ public interface IUnitOfWork : IDisposable
     ITournamentRepository Tournaments { get; }
     
     ITitleRepository Titles { get; }
+    
+    IVillainRepository Villains { get; }
     
     Task SaveChangesAsync();
 }

@@ -28,4 +28,20 @@ public class DataInitializer : IDataInitializer
         await _unitOfWork.Maps.AddRangeAsync(maps);
         await _unitOfWork.SaveChangesAsync();
     }
+    
+    public async Task InitializeMinionsAsync()
+    {
+        var minions = JsonReader.ReadJson<Minion>(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "minions.json"));
+
+        await _unitOfWork.Minions.AddRangeAsync(minions);
+        await _unitOfWork.SaveChangesAsync();
+    }
+    
+    public async Task InitializeVillainsAsync()
+    {
+        var villains = JsonReader.ReadJson<Villain>(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "villains.json"));
+
+        await _unitOfWork.Villains.AddRangeAsync(villains);
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

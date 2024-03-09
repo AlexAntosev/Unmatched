@@ -1,0 +1,16 @@
+﻿[
+  {
+    "Name": "Martain Invader",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#83A014"
+  },
+  {
+    "Name": "Mothman",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#811719"
+  }
+]

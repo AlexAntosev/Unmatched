@@ -16,6 +16,8 @@ public class UnitOfWork : IUnitOfWork
     public IMapRepository Maps { get; }
 
     public IMatchRepository Matches { get; }
+    
+    public IMinionRepository Minions { get; }
 
     public IPlayerRepository Players { get; }
 
@@ -27,6 +29,8 @@ public class UnitOfWork : IUnitOfWork
     
     public ITitleRepository Titles { get; }
     
+    public IVillainRepository Villains { get; }
+    
     public UnitOfWork(UnmatchedDbContext context)
     {
         _context = context;
@@ -35,11 +39,13 @@ public class UnitOfWork : IUnitOfWork
         Heroes = new HeroRepository(context);
         Maps = new MapRepository(context);
         Matches = new MatchRepository(context);
+        Minions = new MinionRepository(context);
         Players = new PlayerRepository(context);
         Ratings = new RatingRepository(context);
         Sidekicks = new SidekickRepository(context);
         Tournaments = new TournamentRepository(context);
         Titles = new TitleRepository(context);
+        Villains = new VillainRepository(context);
     }
 
     public Task SaveChangesAsync() 

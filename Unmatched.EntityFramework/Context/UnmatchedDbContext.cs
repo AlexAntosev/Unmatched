@@ -46,6 +46,8 @@ public class UnmatchedDbContext : DbContext
     public DbSet<Map> Maps { get; set; }
 
     public DbSet<Match> Matches { get; set; }
+    
+    public DbSet<Minion> Minions { get; set; }
 
     public DbSet<Player> Players { get; set; }
 
@@ -56,4 +58,6 @@ public class UnmatchedDbContext : DbContext
     public DbSet<Tournament> Tournaments { get; set; }
     
     public DbSet<Title> Titles { get; set; }
+    
+    public DbSet<Villain> Villains { get; set; }
 }

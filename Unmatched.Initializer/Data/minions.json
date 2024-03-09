@@ -1,0 +1,44 @@
+﻿[
+  {
+    "Name": "Ant Queen",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#FAC54D"
+  },
+  {
+    "Name": "Blob",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#B43B42"
+  },
+  {
+    "Name": "Jersey Devil",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#407481"
+  },
+  {
+    "Name": "Skunk Ape",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#855633"
+  },
+  {
+    "Name": "Tarantula",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#6A6768"
+  },
+  {
+    "Name": "The Loveland Frog",
+    "Hp": 10,
+    "DeckSize": 10,
+    "IsRanged": false,
+    "Color": "#819954"
+  }
+]

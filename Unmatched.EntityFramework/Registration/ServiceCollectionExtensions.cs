@@ -24,9 +24,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISidekickRepository, SidekickRepository>();
         services.AddTransient<IMapRepository, MapRepository>();
         services.AddTransient<IMatchRepository, MatchRepository>();
+        services.AddTransient<IMinionRepository, MinionRepository>();
         services.AddTransient<IFighterRepository, FighterRepository>();
         services.AddTransient<IRatingRepository, RatingRepository>();
         services.AddTransient<ITitleRepository, TitleRepository>();
         services.AddTransient<IFavoritesRepository, FavoritesRepository>();
+        services.AddTransient<IVillainRepository, VillainRepository>();
     }
 }
