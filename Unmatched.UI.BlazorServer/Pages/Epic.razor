@@ -1,4 +1,5 @@
-﻿@for (var i = 1; i <= Max; i++)
+﻿@using Microsoft.AspNetCore.Components
+@for (var i = 1; i <= Max; i++)
 {
     var currentStar = i;
     <span style="cursor: pointer;" @onclick="()=>UpdateRating(currentStar)">
