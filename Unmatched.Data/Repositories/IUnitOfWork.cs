@@ -28,5 +28,7 @@ public interface IUnitOfWork : IDisposable
     
     IVillainRepository Villains { get; }
     
+    IPlayStyleRepository PlayStyles { get; }
+    
     Task SaveChangesAsync();
 }

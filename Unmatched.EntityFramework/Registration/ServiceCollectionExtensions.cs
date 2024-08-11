@@ -30,5 +30,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITitleRepository, TitleRepository>();
         services.AddTransient<IFavoritesRepository, FavoritesRepository>();
         services.AddTransient<IVillainRepository, VillainRepository>();
+        services.AddTransient<IPlayStyleRepository, PlayStyleRepository>();
     }
 }

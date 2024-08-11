@@ -31,6 +31,8 @@ public class UnitOfWork : IUnitOfWork
     
     public IVillainRepository Villains { get; }
     
+    public IPlayStyleRepository PlayStyles { get; }
+    
     public UnitOfWork(UnmatchedDbContext context)
     {
         _context = context;
@@ -46,6 +48,7 @@ public class UnitOfWork : IUnitOfWork
         Tournaments = new TournamentRepository(context);
         Titles = new TitleRepository(context);
         Villains = new VillainRepository(context);
+        PlayStyles = new PlayStyleRepository(context);
     }
 
     public Task SaveChangesAsync() 

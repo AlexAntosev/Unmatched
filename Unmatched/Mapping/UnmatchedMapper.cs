@@ -34,6 +34,7 @@ public class UnmatchedMapper : Profile
         CreateMap<Title, TitleDto>().ReverseMap();
         CreateMap<Hero, HeroTitleAssignDto>();
         CreateMap<Villain, VillainDto>().ReverseMap();
+        CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
     }
 
     private string TryGetMapName(Map? map)

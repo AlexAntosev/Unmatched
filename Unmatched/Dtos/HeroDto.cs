@@ -21,4 +21,6 @@ public class HeroDto
     public string ImageUrl => $"/{Name}.png";
     
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
+    
+    public PlayStyleDto PlayStyle { get; set; }
 }

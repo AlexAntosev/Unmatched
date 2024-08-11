@@ -224,6 +224,35 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("Minions");
                 });
 
+            modelBuilder.Entity("Unmatched.Data.Entities.PlayStyle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Attack")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Defence")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("HeroId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Trickery")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HeroId")
+                        .IsUnique();
+
+                    b.ToTable("PlayStyles");
+                });
+
             modelBuilder.Entity("Unmatched.Data.Entities.Player", b =>
                 {
                     b.Property<Guid>("Id")
@@ -437,6 +466,15 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Navigation("Tournament");
                 });
 
+            modelBuilder.Entity("Unmatched.Data.Entities.PlayStyle", b =>
+                {
+                    b.HasOne("Unmatched.Data.Entities.Hero", null)
+                        .WithOne("PlayStyle")
+                        .HasForeignKey("Unmatched.Data.Entities.PlayStyle", "HeroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Unmatched.Data.Entities.Rating", b =>
                 {
                     b.HasOne("Unmatched.Data.Entities.Hero", "Hero")
@@ -459,6 +497,9 @@ namespace Unmatched.EntityFramework.Migrations
 
             modelBuilder.Entity("Unmatched.Data.Entities.Hero", b =>
                 {
+                    b.Navigation("PlayStyle")
+                        .IsRequired();
+
                     b.Navigation("Sidekicks");
                 });
 

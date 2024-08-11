@@ -10,6 +10,7 @@ public class Urls
     public const string VillainsStatistics = "/villains-statistics";
     public const string Match = "/match";
     public const string AddMatch = "/match/00000000-0000-0000-0000-000000000000";
+    public const string AddAdventure = "/adventure/00000000-0000-0000-0000-000000000000";
     public const string Titles = "/titles";
     public const string Tournaments = "/tournaments";
     public const string Initialize = "/initialize";

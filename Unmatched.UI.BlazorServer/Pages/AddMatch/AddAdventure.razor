@@ -1,0 +1,243 @@
+﻿@page "/adventure/{id}"
+@using Unmatched.Dtos
+@using Unmatched.Services
+@using Unmatched.Extensions
+@using BlazorBootstrap
+@inject IMatchService MatchService
+@inject IHeroService HeroService
+@inject IPlayerService PlayerService
+@inject IMapService MapService
+@inject NavigationManager NavManager
+@inject NotificationService NotificationService
+
+<div style="height: 100%; background: linear-gradient(90deg, @(_adventure.Fighters.FirstOrDefault()?.Hero?.Color ?? "white") 0%, @(_adventure.Fighters.LastOrDefault()?.Hero?.Color ?? "white") 100%);">
+    <Modal @ref="matchSavedPopup" Title="Adventure successfully saved!">
+        <BodyTemplate>
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button Color="ButtonColor.Secondary" @onclick="OnPopupCloseClick">Close</Button>
+        </FooterTemplate>
+    </Modal>
+
+    <div class="row">
+        <div class="triple-column center" >
+            <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_adventure.Fighters.First()"></FighterInfo>
+        </div>
+        <div class="triple-column center">
+            <img src="Vs.png"/>
+        </div>
+        <div class="triple-column center">
+            <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_adventure.Fighters.Last()"></FighterInfo>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column end">
+            <EditForm Model=@_adventure>
+                <div>
+                    <label for="Map">Map:</label>
+                    <div style=" display: flex; flex-direction: row;">
+                        <InputSelect Value="@_adventure.MapId" ValueExpression="@(() => _adventure.MapId)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
+                            @foreach (var map in _maps)
+                            {
+                                <option value="@map.Id"> @map.Name</option>
+                            }
+                        </InputSelect >
+                        <button style="border-width: 0; background: transparent;" @onclick="RandomizeMap">🎲</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="Date">Date:</label>
+                    <InputDate @bind-Value=_adventure.Date name="Date" class="form-control transparent rounded-form"/>
+                </div>
+                <div>
+                    <label for="Comment">Comment:</label>
+                    <InputText @bind-Value=_adventure.Comment name="Comment" class="form-control transparent rounded-form"/>
+                </div>
+                <p></p>
+                <button class="btn btn-primary rounded-form" @onclick="OnAddNewAdventureClickAsync">Add match</button>
+                <button class="btn btn-secondary rounded-form" @onclick="OnRandomizeMatchClick">Randomize</button>
+            </EditForm>
+        </div>
+        <div class="column start">
+            <img style="border: 4px solid black;" src="@_adventure.Map?.ImageUrl"/>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private List<PlayerDto> _players = new();
+    private List<HeroDto> _heroes = new();
+    private List<MapDto> _maps = new();
+    private List<VillainDto> _villains = new();
+    private List<MinionDto> _minions = new();
+
+    AdventureDto _adventure = new()
+        {
+            Fighters = new List<FighterDto>()
+                {
+                    new(),
+                    new()
+                },
+            Villain = new(),
+            Minions = new List<MinionDto>
+                {
+                    new(),
+                    new()
+                },
+            Map = new()
+                {
+                    Name = "UnknownMap"
+                },
+            Date = DateTime.UtcNow
+        };
+
+    [Inject] protected PreloadService PreloadService { get; set; }
+    
+    private Modal matchSavedPopup = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NotificationService.RefreshRequested += RerenderComponent;
+        try
+        {
+            PreloadService.Show();
+            
+            _players = (await PlayerService.GetAsync()).ToList();
+            _heroes = (await HeroService.GetAsync()).ToList();
+            _maps = (await MapService.GetAsync()).ToList();
+
+            var isValidId = Guid.TryParse(Id, out var id);
+            if (!isValidId)
+            {
+                return;
+            }
+            if (id != Guid.Empty)
+            {
+                var match = await MatchService.GetAsync(id);
+                match.Date = DateTime.UtcNow;
+                match.Fighters.First().SetDefaultData();
+                match.Fighters.Last().SetDefaultData();
+                // _match = match;
+            }
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task OnAddNewAdventureClickAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+            
+            var adventure = _adventure;
+
+            var isValidId = Guid.TryParse(Id, out var id);
+            if (!isValidId)
+            {
+                return;
+            }
+
+            // temporary solution to avoid EF exception of tracking Map during update
+            adventure.Map = null;
+
+            SaveMatchResultDto result; 
+            if (id == Guid.Empty)
+            {
+                // result = await AdventureService.AddAsync(adventure);
+
+            }
+            else
+            {
+                // result = await AdventureService.UpdateAsync(adventure);
+            }
+            
+            var parameters = new Dictionary<string, object>
+                {
+                    // {
+                    //     "Result", result
+                    // }
+                };
+            await matchSavedPopup.ShowAsync<MatchSavedPopup>(title: "Adventure successfully saved!", parameters: parameters);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private void OnRandomizeMatchClick()
+    {
+        RandomizeMap();
+        RandomizeFighter();
+        RandomizeSecondFighter();
+        // RandomizeVillain();
+        // RandomizeMinion();
+        // RandomizeSecondMinion();
+    }
+    
+    private void RandomizeMap()
+    {
+        var mapId = _maps.GetRandomItem().Id;
+        SetMapInfo(mapId);
+    }
+    
+    private void RandomizeFighter()
+    {
+        NotificationService.CallRandomizeFighter(_adventure.Fighters.First());
+        _adventure.Fighters.First().Turn = 1;
+    }
+    
+    private void RandomizeSecondFighter()
+    {
+        NotificationService.CallRandomizeFighter(_adventure.Fighters.Last(), _adventure.Fighters.First());
+        _adventure.Fighters.Last().Turn = 2;
+    }
+    
+    private async Task OnPopupCloseClick()
+    {
+        await matchSavedPopup.HideAsync();
+        NavManager.NavigateTo(Urls.DuelMatchLog);
+    }
+    
+    private void SetMapInfo(Guid mapId)
+    {
+        var map = _maps.First(h => h.Id == mapId);
+        _adventure.Map = map;
+        _adventure.MapId = mapId;
+    }
+    
+    private void RerenderComponent()
+    {
+        StateHasChanged();
+    }
+
+}
+
+<style>
+    label {
+        opacity: 0.9 !important;
+        font-size: 20px;
+        color: white;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+    
+    .transparent {
+        opacity: 0.9 !important;
+    }
+    
+    .rounded-form {
+        border-radius: 16px;
+    }
+</style>

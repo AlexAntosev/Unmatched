@@ -60,4 +60,6 @@ public class UnmatchedDbContext : DbContext
     public DbSet<Title> Titles { get; set; }
     
     public DbSet<Villain> Villains { get; set; }
+    
+    public DbSet<PlayStyle> PlayStyles { get; set; }
 }

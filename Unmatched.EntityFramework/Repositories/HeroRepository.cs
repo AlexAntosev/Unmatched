@@ -52,7 +52,7 @@ public class HeroRepository : IHeroRepository
 
     public async Task<Hero> GetByIdAsync(Guid id)
     {
-        var entity = await _dbContext.Heroes.Include(h => h.Sidekicks).FirstOrDefaultAsync(h => h.Id == id);
+        var entity = await _dbContext.Heroes.Include(h => h.Sidekicks).Include(h => h.PlayStyle).FirstOrDefaultAsync(h => h.Id == id);
 
         return entity;
     }

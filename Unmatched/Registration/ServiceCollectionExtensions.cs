@@ -38,5 +38,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
         services.AddTransient<IFavoriteService, FavoriteService>();
         services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
+        services.AddTransient<IPlayStyleService, PlayStyleService>();
     }
 }
