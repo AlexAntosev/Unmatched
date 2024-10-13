@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 public class Favorite
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
 
     public Guid PlayerId { get; set; }
 

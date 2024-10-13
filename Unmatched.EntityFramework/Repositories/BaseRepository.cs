@@ -30,7 +30,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity>
         }
         else
         {
-            DbContext.Set<TEntity>().Update(model);
+            DbContext.Entry(existingEntity).CurrentValues.SetValues(model);
         }
     }
 

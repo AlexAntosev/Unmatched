@@ -32,14 +32,14 @@ public class PlayStyleRepository : IPlayStyleRepository
 
     public void AddOrUpdate(PlayStyle model)
     {
-        var existingEntity = _dbContext.PlayStyles.Find(model.Id);
+        var existingEntity = _dbContext.PlayStyles.FirstOrDefault( x=> x.Id == model.Id);
         if (existingEntity == null)
         {
             _dbContext.Add(model);
         }
         else
         {
-            _dbContext.Update(model);
+            _dbContext.Entry(existingEntity).CurrentValues.SetValues(model);
         }
     }
 

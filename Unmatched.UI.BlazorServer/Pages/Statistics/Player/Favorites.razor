@@ -115,7 +115,6 @@
     {
         favorite.Favour = favour;
         await FavoriteStatisticsService.AddOrUpdateAsync(favorite);
-        await FavoriteService.UpdateFavourAsync(favorite.FavoriteId, favorite.Favour);
     }
     
     private async Task ChosenChanged(bool isChosenOne, FavoriteStatisticsDto selectedFavorite)

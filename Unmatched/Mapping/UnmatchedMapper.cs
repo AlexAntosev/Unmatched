@@ -35,7 +35,11 @@ public class UnmatchedMapper : Profile
         CreateMap<Hero, HeroTitleAssignDto>();
         CreateMap<Villain, VillainDto>().ReverseMap();
         CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
-        CreateMap<Favorite, FavoriteStatisticsDto>().ReverseMap().ForMember(x => x.Player, c => c.Ignore()).ForMember(x => x.Hero, c => c.Ignore());
+        CreateMap<Favorite, FavoriteStatisticsDto>()
+            .ForMember(x => x.FavoriteId, c => c.MapFrom(x => x.Id))
+            .ReverseMap()
+            .ForMember(x => x.Player, c => c.Ignore())
+            .ForMember(x => x.Hero, c => c.Ignore());
     }
 
     private string TryGetMapName(Map? map)
