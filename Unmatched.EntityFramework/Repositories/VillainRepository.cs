@@ -25,6 +25,11 @@ public class VillainRepository : IVillainRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Villain model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Villain model)
     {
         throw new NotImplementedException();

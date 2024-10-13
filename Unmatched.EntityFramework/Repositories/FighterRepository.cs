@@ -23,6 +23,11 @@ public class FighterRepository : IFighterRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Fighter model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Fighter model)
     {
         _dbContext.Update(model);

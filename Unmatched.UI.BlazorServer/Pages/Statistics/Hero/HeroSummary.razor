@@ -99,25 +99,25 @@
     private async Task PlayStyleAttackChanged(int rate, PlayStyleDto playStyle)
     {
         playStyle.Attack = rate;
-        await PlayStyleService.UpdateAsync(_statistics.HeroId, playStyle);
+        await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
     
     private async Task PlayStyleDefenceChanged(int rate, PlayStyleDto playStyle)
     {
         playStyle.Defence = rate;
-        await PlayStyleService.UpdateAsync(_statistics.HeroId, playStyle);
+        await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
     
     private async Task PlayStyleTrickeryChanged(int rate, PlayStyleDto playStyle)
     {
         playStyle.Trickery = rate;
-        await PlayStyleService.UpdateAsync(_statistics.HeroId, playStyle);
+        await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
     
     private async Task PlayStyleDifficultyChanged(int rate, PlayStyleDto playStyle)
     {
         playStyle.Difficulty = rate;
-        await PlayStyleService.UpdateAsync(_statistics.HeroId, playStyle);
+        await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
 }
 

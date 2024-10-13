@@ -19,4 +19,13 @@ public class PlayStyle
     public int Trickery { get; set; }
     
     public int Difficulty { get; set; }
+    
+    public static PlayStyle Default(Guid heroId)
+    {
+        return new PlayStyle()
+            {
+                HeroId = heroId,
+                Id = Guid.NewGuid()
+            };
+    }
 }

@@ -25,9 +25,22 @@ public class PlayStyleRepository : IPlayStyleRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(PlayStyle model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(PlayStyle model)
     {
-        _dbContext.Update(model);
+        var existingEntity = _dbContext.PlayStyles.Find(model.Id);
+        if (existingEntity == null)
+        {
+            _dbContext.Add(model);
+        }
+        else
+        {
+            _dbContext.Update(model);
+        }
     }
 
     public async Task AddRangeAsync(IEnumerable<PlayStyle> models)

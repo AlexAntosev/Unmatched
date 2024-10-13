@@ -12,7 +12,7 @@ public class UnmatchedMapper : Profile
     public UnmatchedMapper()
     {
         CreateMap<Player, PlayerDto>().ReverseMap();
-        CreateMap<Hero, HeroDto>().ReverseMap();
+        CreateMap<Hero, HeroDto>().ForMember(x => x.PlayStyle, c => c.MapFrom(x => x.PlayStyle ?? PlayStyle.Default(x.Id))).ReverseMap();
         CreateMap<Sidekick, SidekickDto>().ReverseMap();
         CreateMap<Map, MapDto>().ReverseMap();
         CreateMap<Match, MatchDto>().ReverseMap();
@@ -35,6 +35,7 @@ public class UnmatchedMapper : Profile
         CreateMap<Hero, HeroTitleAssignDto>();
         CreateMap<Villain, VillainDto>().ReverseMap();
         CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
+        CreateMap<Favorite, FavoriteStatisticsDto>().ReverseMap().ForMember(x => x.Player, c => c.Ignore()).ForMember(x => x.Hero, c => c.Ignore());
     }
 
     private string TryGetMapName(Map? map)
@@ -50,6 +51,7 @@ public class UnmatchedMapper : Profile
             var stageName = stage.Value.GetStageName();
             tournamentName += $" ({stageName})";
         }
+
         return tournamentName;
     }
 }

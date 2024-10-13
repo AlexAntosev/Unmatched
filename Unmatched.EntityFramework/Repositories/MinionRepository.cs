@@ -25,6 +25,11 @@ public class MinionRepository : IMinionRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Minion model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Minion model)
     {
         throw new NotImplementedException();

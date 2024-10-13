@@ -2,6 +2,7 @@
 
 using AutoMapper;
 
+using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
 
@@ -20,31 +21,34 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
     public async Task<IEnumerable<FavoriteStatisticsDto>> GetFavoritesStatisticsAsync(Guid playerId)
     {
         var favorites = await _unitOfWork.Favorites.GetByPlayerIdAsync(playerId);
+        var heroes = await _unitOfWork.Heroes.GetAsync();
         var player = await _unitOfWork.Players.GetByIdAsync(playerId);
         var playerDto = _mapper.Map<PlayerDto>(player);
 
         var statistics = new List<FavoriteStatisticsDto>();
-        foreach (var favorite in favorites)
+        foreach (var hero in heroes)
         {
-            var heroDto = _mapper.Map<HeroDto>(favorite.Hero);
-            var fights = await _unitOfWork.Fighters.GetFromFinishedMatchesByHeroAndPlayerIdAsync(favorite.HeroId, playerId);
+            var existingFavoriteHero = favorites.FirstOrDefault(x => x.HeroId == hero.Id);
+            
+            var heroDto = _mapper.Map<HeroDto>(hero);
+            var fights = await _unitOfWork.Fighters.GetFromFinishedMatchesByHeroAndPlayerIdAsync(hero.Id, playerId);
             var fightsDto = _mapper.Map<List<FighterDto>>(fights);
-
+            
             var favoriteStatistics = new FavoriteStatisticsDto 
                 {
-                    FavoriteId = favorite.Id,
+                    FavoriteId = existingFavoriteHero?.Id ?? Guid.NewGuid(),
                     Hero = heroDto,
-                    HeroId = favorite.HeroId,
+                    HeroId = hero.Id,
                     Player = playerDto,
                     PlayerId = playerId,
                     Fights = fightsDto,
-                    IsChosenOne = favorite.IsChosenOne,
-                    Favour = favorite.Favour,
+                    IsChosenOne = existingFavoriteHero?.IsChosenOne ?? default,
+                    Favour = existingFavoriteHero?.Favour ?? default,
                     TotalMatches = fights.Count,
                     TotalWins = fights.Count(x => x.IsWinner),
                     TotalLooses = fights.Count(x => x.IsWinner == false)
                 };
-
+            
             if (fights.Count > 0)
             {
                 statistics.Add(favoriteStatistics);
@@ -52,5 +56,12 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
         }
 
         return statistics;
+    }
+
+    public async Task AddOrUpdateAsync(FavoriteStatisticsDto favoriteStatisticsDto)
+    {
+        var entity = _mapper.Map<Favorite>(favoriteStatisticsDto);
+        _unitOfWork.Favorites.AddOrUpdate(entity);
+        await _unitOfWork.SaveChangesAsync();
     }
 }

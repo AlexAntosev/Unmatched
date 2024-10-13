@@ -6,6 +6,6 @@ using Unmatched.Data.Entities;
 
 public interface IPlayStyleRepository : IRepository<PlayStyle>
 {
-    Task<PlayStyle> GetByHeroIdAsync(Guid heroId);
+    Task<PlayStyle?> GetByHeroIdAsync(Guid heroId);
 }
 

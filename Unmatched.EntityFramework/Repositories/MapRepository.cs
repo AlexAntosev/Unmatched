@@ -23,6 +23,11 @@ public class MapRepository : IMapRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Map model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Map model)
     {
         throw new NotImplementedException();

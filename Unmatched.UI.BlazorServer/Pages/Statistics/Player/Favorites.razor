@@ -2,8 +2,10 @@
 @using Unmatched.Dtos
 @using Unmatched.Constants
 @using Unmatched.Services
+@using Unmatched.Services.Statistics
 @inject NavigationManager NavManager
 @inject IFavoriteService FavoriteService
+@inject IFavoriteStatisticsService FavoriteStatisticsService
 
 <h4 class="page-title"> Favorites: </h4>
 <SfGrid @ref="_grid" DataSource="@FavoritesRecords" AllowPaging="true" AllowSorting="true">
@@ -112,6 +114,7 @@
     private async Task FavourChanged(int favour, FavoriteStatisticsDto favorite)
     {
         favorite.Favour = favour;
+        await FavoriteStatisticsService.AddOrUpdateAsync(favorite);
         await FavoriteService.UpdateFavourAsync(favorite.FavoriteId, favorite.Favour);
     }
     
@@ -122,7 +125,7 @@
             favorite.IsChosenOne = false;
         }
         selectedFavorite.IsChosenOne = isChosenOne;
-        await FavoriteService.UpdateChosenOneAsync(selectedFavorite.PlayerId, selectedFavorite.FavoriteId, selectedFavorite.IsChosenOne);
+        await FavoriteStatisticsService.AddOrUpdateAsync(selectedFavorite);
     }
 }
 

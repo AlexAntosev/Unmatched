@@ -21,5 +21,5 @@ public class Hero
     
     public virtual ICollection<Title> Titles { get; set; }
     
-    public virtual PlayStyle PlayStyle { get; set; }
+    public virtual PlayStyle? PlayStyle { get; set; }
 }

@@ -22,6 +22,11 @@ public class RatingRepository : IRatingRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Rating model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Rating model)
     {
         _dbContext.Update(model);

@@ -21,6 +21,11 @@ public class SidekickRepository : ISidekickRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Sidekick model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Sidekick model)
     {
         throw new NotImplementedException();

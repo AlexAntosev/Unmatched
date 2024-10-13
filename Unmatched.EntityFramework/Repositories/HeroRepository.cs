@@ -23,6 +23,11 @@ public class HeroRepository : IHeroRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Hero model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Hero model)
     {
         throw new NotImplementedException();

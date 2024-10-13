@@ -23,6 +23,11 @@ public class TournamentRepository : ITournamentRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Tournament model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Tournament model)
     {
         _dbContext.Update(model);

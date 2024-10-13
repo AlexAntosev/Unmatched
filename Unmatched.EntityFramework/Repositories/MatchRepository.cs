@@ -23,6 +23,11 @@ public class MatchRepository : IMatchRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Match model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Match model)
     {
         _dbContext.Update(model);

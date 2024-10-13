@@ -23,6 +23,11 @@ public class TitleRepository : ITitleRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Title model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Title model)
     {
         _dbContext.Update(model);

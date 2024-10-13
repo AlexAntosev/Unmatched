@@ -24,6 +24,11 @@ public class PlayerRepository : IPlayerRepository
         return createdEntity;
     }
 
+    public void AddOrUpdate(Player model, Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void AddOrUpdate(Player model)
     {
         throw new NotImplementedException();
