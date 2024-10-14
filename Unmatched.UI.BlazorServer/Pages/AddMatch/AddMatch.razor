@@ -123,8 +123,8 @@
             PreloadService.Show();
             
             _players = (await PlayerService.GetAsync()).ToList();
-            _heroes = (await HeroService.GetAsync()).ToList();
-            _maps = (await MapService.GetAsync()).ToList();
+            _heroes = (await HeroService.GetAsync()).OrderBy(x => x.Name).ToList();
+            _maps = (await MapService.GetAsync()).OrderBy(x => x.Name).ToList();
             _tournaments = (await TournamentService.GetAsync()).ToList();
             _stages = new List<(Stage?, string)>
                 {
