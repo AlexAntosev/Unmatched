@@ -43,8 +43,13 @@ public class FighterDto
             SidekickName = Hero.Sidekicks.FirstOrDefault()?.Name;
             SidekickHpLeft = Hero.Sidekicks.Sum(s => s.Hp * s.Count);
             CardsLeft = Hero.DeckSize;
-            ActionsMade = 0;
-            TimeSpentInSeconds = 0;
+            ActionsMade = null;
+            TimeSpentInSeconds = null;
+        }
+
+        if (Player is not null)
+        {
+            PlayerId = Player.Id;
         }
     }
 

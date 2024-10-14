@@ -64,18 +64,18 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity>
         DbContext.Set<TEntity>().RemoveRange(entities);
     }
 
-    public Task<List<TEntity>> GetAsync()
+    public virtual Task<List<TEntity>> GetAsync()
     {
         return DbContext.Set<TEntity>().ToListAsync();
     }
 
-    public async Task<TEntity?> GetByIdAsync(Guid id)
+    public virtual async Task<TEntity?> GetByIdAsync(Guid id)
     {
         var entity = await DbContext.Set<TEntity>().FindAsync(id);
         return entity;
     }
 
-    public IQueryable<TEntity> Query()
+    public virtual IQueryable<TEntity> Query()
     {
         return DbContext.Set<TEntity>();
     }

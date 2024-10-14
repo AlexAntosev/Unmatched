@@ -4,74 +4,20 @@ using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
 
-public class SidekickRepository : ISidekickRepository
+public class SidekickRepository : BaseRepository<Sidekick>, ISidekickRepository
 {
-    private readonly UnmatchedDbContext _dbContext;
-
     public SidekickRepository(UnmatchedDbContext dbContext)
+        : base(dbContext)
     {
-        _dbContext = dbContext;
     }
 
-    public async Task<Sidekick> AddAsync(Sidekick model)
+    protected override Guid GetId(Sidekick model)
     {
-        var createdEntityEntry = await _dbContext.AddAsync(model);
-        var createdEntity = createdEntityEntry.Entity;
-
-        return createdEntity;
+        return model.Id;
     }
 
-    public void AddOrUpdate(Sidekick model, Guid id)
+    public IEnumerable<Sidekick> GetByHero(Guid heroId)
     {
-        throw new NotImplementedException();
-    }
-
-    public void AddOrUpdate(Sidekick model)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task AddRangeAsync(IEnumerable<Sidekick> models)
-    {
-        await _dbContext.AddRangeAsync(models);
-    }
-
-    public async Task Delete(Guid id)
-    {
-        var entity = await _dbContext.Sidekicks.FindAsync(id);
-        if (entity is null)
-        {
-            return;
-        }
-
-        _dbContext.Remove(entity);
-    }
-
-    public void DeleteAll()
-    {
-        var entities = _dbContext.Sidekicks;
-        _dbContext.Sidekicks.RemoveRange(entities);
-    }
-
-    public async Task<Sidekick> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Sidekicks.FindAsync(id);
-
-        return entity;
-    }
-
-    public IQueryable<Sidekick> Query()
-    {
-        return _dbContext.Sidekicks;
-    }
-
-    public Task<List<Sidekick>> GetAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _dbContext.SaveChangesAsync();
+        return DbContext.Sidekicks.Where(x => x.HeroId == heroId).ToList();
     }
 }

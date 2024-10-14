@@ -136,30 +136,75 @@
                     (Stage.GrandFinals, Stage.GrandFinals.GetStageName())
                 };
 
-            var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.SilverhandTournament);
+            var defaultTournament = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.GoldenHalatLeague);
             if (defaultTournament != null)
             {
                 _match.TournamentId = defaultTournament.Id;
             }
-            
-            var isValidId = Guid.TryParse(Id, out var id);
-            if (!isValidId)
+
+            MatchDto match;
+            if (Guid.TryParse(Id, out var id)
+             && id != Guid.Empty)
             {
-                return;
-            }
-            if (id != Guid.Empty)
-            {
-                var match = await MatchService.GetAsync(id);
+                match = await MatchService.GetAsync(id);
                 match.Date = DateTime.UtcNow;
                 match.Fighters.First().SetDefaultData();
                 match.Fighters.Last().SetDefaultData();
-                _match = match;
+
             }
+            else
+            {
+                match = await GenerateDefaultMatch();
+            }
+            
+            _match = match;
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    private async Task<MatchDto> GenerateDefaultMatch()
+    {
+        var match = new MatchDto();
+        var andy = _players.FirstOrDefault(x => x.Name == PlayerNames.Andrii);
+        var olex = _players.FirstOrDefault(x => x.Name == PlayerNames.Oleksandr);
+
+        if (andy is not null
+         && olex is not null)
+        {
+            var random = new Random();
+            var andyTurn = random.Next(1, 3);
+            var olexTurn = 3 - andyTurn; // in two player game there are Turn 1 and Turn 2. Sum is 3. So <seconds player turn> = 3 - <first player turn>
+            var favouriteAndyHero = await HeroService.GetFavouriteHeroAsync(andy.Id);
+            var favouriteOlexHero = await HeroService.GetFavouriteHeroAsync(olex.Id);
+            var defaultFighters = new List<FighterDto>()
+                {
+                    new()
+                        {
+                            Player = andy,
+                            Turn = andyTurn,
+                            Hero = favouriteAndyHero
+                        },
+                    new()
+                        {
+                            Player = olex,
+                            Turn = olexTurn,
+                            Hero = favouriteOlexHero
+                        }
+                };
+            match.Fighters = defaultFighters.OrderBy(x => x.Turn).ToArray();
+            match.Fighters.First().SetDefaultData();
+            match.Fighters.Last().SetDefaultData();
+        }
+
+        match.Date = DateTime.UtcNow;
+        match.TournamentId = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.GoldenHalatLeague)?.Id;
+        var map = _maps.FirstOrDefault(x => x.Name == MapNames.Castle);
+        match.MapId = map?.Id ?? Guid.Empty;
+        match.Map = map;
+        return match;
     }
 
     private async Task OnAddNewMatchClickAsync()

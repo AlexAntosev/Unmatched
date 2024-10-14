@@ -59,7 +59,9 @@ public class HeroStatisticsService : IHeroStatisticsService
         var titles = await _unitOfWork.Titles.GetByHeroId(heroId);
         var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
         var place = await GetHeroPlace(rating);
+        var playStyle = await _unitOfWork.PlayStyles.GetByHeroIdAsync(heroId);
 
+        heroDto.PlayStyle = _mapper.Map<PlayStyleDto>(playStyle) ?? PlayStyleDto.Default(heroId);
         var statistics = new HeroStatisticsDto
             {
                 Hero = heroDto,

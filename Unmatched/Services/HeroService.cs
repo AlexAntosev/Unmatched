@@ -2,6 +2,7 @@
 
 using AutoMapper;
 
+using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
 
@@ -40,5 +41,24 @@ public class HeroService : IHeroService
         }
 
         return heroes;
+    }
+
+    public async Task<HeroDto> GetFavouriteHeroAsync(Guid playerId)
+    {
+        var favourites = (await _unitOfWork.Favorites.GetByPlayerIdAsync(playerId)).OrderByDescending(x => x.IsChosenOne).ThenByDescending(x => x.Favour).ToArray();
+        
+        var hero = favourites.Any()
+            ? favourites.First().Hero
+            : _unitOfWork.Heroes.Query().FirstOrDefault();
+        
+        var result = _mapper.Map<HeroDto>(hero);
+
+        if (hero != null)
+        {
+            var sidekicks = _unitOfWork.Sidekicks.GetByHero(hero.Id);
+            result.Sidekicks = _mapper.Map<IEnumerable<SidekickDto>>(sidekicks);
+        }
+
+        return result;
     }
 }

@@ -119,9 +119,11 @@
     
     private async Task ChosenChanged(bool isChosenOne, FavoriteStatisticsDto selectedFavorite)
     {
-        foreach (var favorite in FavoritesRecords)
+        var previousChosen = FavoritesRecords.Where(x => x.IsChosenOne && x .HeroId != selectedFavorite.HeroId);
+        foreach (var looser in previousChosen)
         {
-            favorite.IsChosenOne = false;
+            looser.IsChosenOne = false;
+            await FavoriteStatisticsService.AddOrUpdateAsync(looser);
         }
         selectedFavorite.IsChosenOne = isChosenOne;
         await FavoriteStatisticsService.AddOrUpdateAsync(selectedFavorite);
