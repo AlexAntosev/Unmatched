@@ -75,9 +75,9 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity>
         return entity;
     }
 
-    public virtual IQueryable<TEntity> Query()
+    public virtual IQueryable<TEntity> Query(bool noTrack = false)
     {
-        return DbContext.Set<TEntity>();
+        return noTrack ? DbContext.Set<TEntity>().AsNoTracking() : DbContext.Set<TEntity>();
     }
 
     public Task SaveChangesAsync()

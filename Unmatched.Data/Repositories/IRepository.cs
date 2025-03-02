@@ -17,7 +17,7 @@ public interface IRepository<T>
 
     Task<T?> GetByIdAsync(Guid id);
 
-    IQueryable<T> Query();
+    IQueryable<T> Query(bool noTrack = false);
 
     Task SaveChangesAsync();
 }
