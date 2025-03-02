@@ -33,10 +33,11 @@ public class RusherTitleHandler : IRusherTitleHandler
 
         if (winner is not null)
         {
+            var winnerHero = await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId);
             var isAlreadyRusher = title.Heroes.Any(h => h.Id == winner.HeroId);
-            if (!isAlreadyRusher && winner.CardsLeft >= MinCardsForTitleRatio * winner.Hero.DeckSize)
+            if (!isAlreadyRusher && winner.CardsLeft >= MinCardsForTitleRatio * winnerHero.DeckSize)
             {
-                title.Heroes.Add(winner.Hero);
+                title.Heroes.Add(winnerHero);
                 _unitOfWork.Titles.AddOrUpdate(title);
                 await _unitOfWork.SaveChangesAsync();
 

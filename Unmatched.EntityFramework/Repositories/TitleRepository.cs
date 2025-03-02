@@ -15,14 +15,14 @@ public class TitleRepository : BaseRepository<Title>, ITitleRepository
 
     public async Task<IEnumerable<Title>> GetByHeroId(Guid heroId)
     {
-        var entities = await DbContext.Titles.Include(t => t.Heroes).Where(t => t.Heroes.Any(h => h.Id == heroId)).ToListAsync();
+        var entities = await DbContext.Titles.Include(t => t.Heroes).Where(t => t.Heroes.Any(h => h.Id == heroId)).AsNoTracking().ToListAsync();
 
         return entities;
     }
 
     public async Task<Title?> GetByNameAsync(string name)
     {
-        var entity = await DbContext.Titles.Include(t => t.Heroes).FirstOrDefaultAsync(t => t.Name.Equals(name));
+        var entity = await DbContext.Titles.Include(t => t.Heroes).AsNoTracking().FirstOrDefaultAsync(t => t.Name.Equals(name));
 
         return entity;
     }

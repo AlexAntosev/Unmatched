@@ -13,7 +13,7 @@ public class FavoritesRepository : BaseRepository<Favorite>, IFavoritesRepositor
     }
     public async Task<List<Favorite>> GetByPlayerIdAsync(Guid playerId)
     {
-        return await DbContext.Set<Favorite>().Include(f => f.Player).Include(f => f.Hero).Where(f => f.PlayerId == playerId).ToListAsync();
+        return await DbContext.Set<Favorite>().Include(f => f.Player).Include(f => f.Hero).Where(f => f.PlayerId == playerId).AsNoTracking().ToListAsync();
     }
 
     protected override Guid GetId(Favorite model)
