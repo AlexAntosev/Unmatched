@@ -3,3 +3,14 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+/.vs/ProjectEvaluation/unmatched.metadata.v9.bin
+/.vs/ProjectEvaluation/unmatched.projects.v9.bin
+/.vs/ProjectEvaluation/unmatched.strings.v9.bin
+/.vs/Unmatched/config/applicationhost.config
+/.vs/Unmatched/DesignTimeBuild/.dtbcache.v2
+/.vs/Unmatched/FileContentIndex/7992f567-af78-4dd8-bd6f-2fcfa2aa3100.vsidx
+/.vs/Unmatched/v17/.futdcache.v2
+/.vs/Unmatched/v17/.suo
+/.vs/Unmatched/v17/DocumentLayout.backup.json
+/.vs/Unmatched/v17/DocumentLayout.json
+/Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj.user
