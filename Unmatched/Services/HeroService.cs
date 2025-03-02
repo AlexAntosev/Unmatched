@@ -49,7 +49,7 @@ public class HeroService : IHeroService
         
         var hero = favourites.Any()
             ? favourites.First().Hero
-            : _unitOfWork.Heroes.Query().FirstOrDefault();
+            : _unitOfWork.Heroes.Query(true).FirstOrDefault();
         
         var result = _mapper.Map<HeroDto>(hero);
 

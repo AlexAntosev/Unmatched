@@ -14,3 +14,7 @@ riderModule.iml
 /.vs/Unmatched/v17/DocumentLayout.backup.json
 /.vs/Unmatched/v17/DocumentLayout.json
 /Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj.user
+/.vs/Unmatched/FileContentIndex/ee4b92be-adc3-4d45-a093-106d8ae53310.vsidx
+/.vs/Unmatched/FileContentIndex/*.vsidx
+/.vs/Unmatched/v17/TestStore/0/*.testlog
+/.vs/Unmatched/v17/TestStore/0/*.manifest

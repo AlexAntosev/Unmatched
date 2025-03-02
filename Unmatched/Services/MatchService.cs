@@ -52,11 +52,13 @@ public class MatchService : IMatchService
             titlesEarned.Add(punisherTitleEarned);
         }
 
+        var winnerHero = await _unitOfWork.Heroes.GetByIdAsync(match.Fighters.First(f => f.IsWinner).HeroId);
+        var looserHero = await _unitOfWork.Heroes.GetByIdAsync(match.Fighters.First(f => !f.IsWinner).HeroId);
         var result = new SaveMatchResultDto
             {
-                WinnerHeroName = match.Fighters.First(f => f.IsWinner).Hero.Name,
+                WinnerHeroName = winnerHero.Name,
                 WinnerMatchPoints = match.Fighters.First(f => f.IsWinner).MatchPoints.Value,
-                LooserHeroName = match.Fighters.First(f => !f.IsWinner).Hero.Name,
+                LooserHeroName = looserHero.Name,
                 LooserMatchPoints = match.Fighters.First(f => !f.IsWinner).MatchPoints.Value,
                 TitlesEarned = titlesEarned
             };

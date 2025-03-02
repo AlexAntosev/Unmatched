@@ -1,5 +1,8 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
@@ -19,5 +22,10 @@ public class TournamentRepository : BaseRepository<Tournament>, ITournamentRepos
     protected override Guid GetId(Tournament model)
     {
         return model.Id;
+    }
+
+    public override Task<List<Tournament>> GetAsync()
+    {
+        return DbContext.Set<Tournament>().AsNoTracking().ToListAsync();
     }
 }

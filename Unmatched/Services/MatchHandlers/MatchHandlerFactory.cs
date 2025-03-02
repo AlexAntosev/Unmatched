@@ -24,7 +24,7 @@ public class MatchHandlerFactory : IMatchHandlerFactory
         _unrankedRatingCalculator = unrankedRatingCalculator;
     }
 
-    private Lazy<IEnumerable<Tournament>> TournamentsCache => new(_unitOfWork.Tournaments.Query().ToList());
+    private IEnumerable<Tournament> TournamentsCache => _unitOfWork.Tournaments.Query(true).ToList();
 
     public IMatchHandler Create(Match match) => match switch
     {
@@ -56,7 +56,7 @@ public class MatchHandlerFactory : IMatchHandlerFactory
             return false;
         }
 
-        var tournamentName = TournamentsCache.Value.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
+        var tournamentName = TournamentsCache.FirstOrDefault(x => x.Id.Equals(match.TournamentId))?.Name;
         return tournamentName == targetTournamentName;
     }
 }

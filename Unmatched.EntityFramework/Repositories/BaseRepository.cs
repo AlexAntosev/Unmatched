@@ -66,18 +66,18 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity>
 
     public virtual Task<List<TEntity>> GetAsync()
     {
-        return DbContext.Set<TEntity>().ToListAsync();
+        return DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
     }
 
     public virtual async Task<TEntity?> GetByIdAsync(Guid id)
     {
-        var entity = await DbContext.Set<TEntity>().FindAsync(id);
+        var entity = (await DbContext.Set<TEntity>().AsNoTracking().ToListAsync()).FirstOrDefault(x => GetId(x) == id);
         return entity;
     }
 
-    public virtual IQueryable<TEntity> Query()
+    public virtual IQueryable<TEntity> Query(bool noTrack = false)
     {
-        return DbContext.Set<TEntity>();
+        return noTrack ? DbContext.Set<TEntity>().AsNoTracking() : DbContext.Set<TEntity>();
     }
 
     public Task SaveChangesAsync()
