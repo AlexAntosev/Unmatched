@@ -1,0 +1,23 @@
+<mat-toolbar class="header">
+  <button mat-icon-button class="menu-icon" (click)="menuClicked()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>Unmatched</span></mat-toolbar
+>
+
+<mat-sidenav-container class="container" (backdropClick)="menuClicked()">
+  <mat-sidenav
+    #sidenav
+    class="sidenav"
+    mode="side"
+    (keydown.escape)="menuClicked()"
+    disableClose
+  >
+    <p><button mat-button (click)="heroesClicked()">Heroes</button></p>
+    <p><button mat-button (click)="matchesClicked()">Matches</button></p>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>
