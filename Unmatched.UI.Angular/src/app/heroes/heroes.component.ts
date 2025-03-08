@@ -98,6 +98,6 @@ export class HeroesComponent implements OnInit, AfterViewInit {
   }
 
   heroClicked(heroId: string) {
-    this.router.navigate(['/hero', heroId]); 
+    this.router.navigate(['/heroes', heroId]); 
   }
 }
