@@ -34,6 +34,26 @@
               {
                 "glob": "**/*",
                 "input": "../data/original_images"
+              },
+              {
+                "glob": "**/*",
+                "input": "../data/original_images/heroes"
+              },
+              {
+                "glob": "**/*",
+                "input": "../data/original_images/maps"
+              },
+              {
+                "glob": "**/*",
+                "input": "../data/original_images/players"
+              },
+              {
+                "glob": "**/*",
+                "input": "../data/original_images/tournaments"
+              },
+              {
+                "glob": "**/*",
+                "input": "../data/original_images/villains"
               }
             ],
             "styles": [
