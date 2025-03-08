@@ -51,17 +51,17 @@
     </ng-container>
 
     <ng-container matColumnDef="matches">
-      <th mat-header-cell *matHeaderCellDef>Mathces</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Mathces</th>
       <td mat-cell *matCellDef="let row">{{ row.totalMatches }}</td>
     </ng-container>
 
     <ng-container matColumnDef="wins">
-      <th mat-header-cell *matHeaderCellDef>Wins</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Wins</th>
       <td mat-cell *matCellDef="let row">{{ row.totalWins }}</td>
     </ng-container>
 
     <ng-container matColumnDef="looses">
-      <th mat-header-cell *matHeaderCellDef>Looses</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Looses</th>
       <td mat-cell *matCellDef="let row">{{ row.totalLooses }}</td>
     </ng-container>
 
