@@ -71,6 +71,7 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="columns"></tr>
-    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    <tr mat-row class="table-heroes-row" *matRowDef="let row; columns: columns"
+    (click)="heroClicked(row.hero.id)"></tr>
   </table>
 </div>

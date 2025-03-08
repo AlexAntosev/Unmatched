@@ -5,6 +5,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { HeroStatisticsDto } from '../api/models/hero-statistics-dto';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
+import { Router } from '@angular/router';
 
 @UntilDestroy()
 @Component({
@@ -32,7 +33,7 @@ export class HeroesComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatTable) table!: MatTable<HeroStatisticsDto>;
 
-  constructor(private heroesApi: HeroesApi) {}
+  constructor(private heroesApi: HeroesApi, private readonly router: Router) {}
 
   ngOnInit(): void {
     this.heroesApi
@@ -94,5 +95,9 @@ export class HeroesComponent implements OnInit, AfterViewInit {
     isAsc: boolean
   ) {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
+  heroClicked(heroId: string) {
+    this.router.navigate(['/hero', heroId]); 
   }
 }

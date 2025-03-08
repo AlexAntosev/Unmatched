@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MatchComponent } from './match/match.component';
 import { HeroesComponent } from './heroes/heroes.component';
+import { HeroComponent } from './hero/hero.component';
 
 const routes: Routes = [{
   path: 'match',
@@ -10,6 +11,10 @@ const routes: Routes = [{
 {
   path: 'heroes',
   component: HeroesComponent
+}, 
+{
+  path: 'hero/:id',
+  component: HeroComponent
 }];
 
 @NgModule({

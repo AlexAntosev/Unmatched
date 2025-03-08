@@ -5,3 +5,11 @@
 .table {
     padding: 50px;
 }
+
+tr.table-heroes-row:hover {
+  background: darkslategray;
+}
+
+tr.table-heroes-row {
+  cursor: pointer;
+}
