@@ -7,7 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "5133:5000"   # Host:Container
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=192.168.0.9,1433\\SQLEXPRESS;Database=Unmatched;User Id=sa;Password=123456@A;TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=192.168.0.72,1433;Database=Unmatched;User Id=sa;Password=123456@A;TrustServerCertificate=true
+      - DOTNET_URLS=http://+:5000
