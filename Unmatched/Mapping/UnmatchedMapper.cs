@@ -27,16 +27,22 @@ public class UnmatchedMapper : Profile
         CreateMap<Minion, MinionDto>().ReverseMap();
         CreateMap<Fighter, FighterDto>()
             .ForMember(x => x.MatchPoints, c => c.MapFrom(x => x.MatchPoints))
+            .ForMember(x => x.SidekickName, c => c.Ignore())
             .ReverseMap()
             .ForMember(x => x.Player, c => c.Ignore())
             .ForMember(x => x.Hero, c => c.Ignore());
         CreateMap<Tournament, TournamentDto>().ReverseMap();
         CreateMap<Title, TitleDto>().ReverseMap();
-        CreateMap<Hero, HeroTitleAssignDto>();
+        CreateMap<Hero, HeroTitleAssignDto>().ForMember(x => x.IsAssigned, c => c.Ignore());
         CreateMap<Villain, VillainDto>().ReverseMap();
         CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
         CreateMap<Favorite, FavoriteStatisticsDto>()
             .ForMember(x => x.FavoriteId, c => c.MapFrom(x => x.Id))
+            .ForMember(x => x.Fights, c => c.Ignore())
+            .ForMember(x => x.Place, c => c.Ignore())
+            .ForMember(x => x.TotalLooses, c => c.Ignore())
+            .ForMember(x => x.TotalMatches, c => c.Ignore())
+            .ForMember(x => x.TotalWins, c => c.Ignore())
             .ReverseMap()
             .ForMember(x => x.Player, c => c.Ignore())
             .ForMember(x => x.Hero, c => c.Ignore());

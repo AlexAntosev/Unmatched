@@ -235,7 +235,7 @@ public class RatingCalculatorTests
     {
         var mockHeroRepository = new Mock<IHeroRepository>();
         var heroes = new List<Hero>();
-        mockHeroRepository.Setup(x => x.Query()).Returns(heroes.AsQueryable);
+        mockHeroRepository.Setup(x => x.Query(It.IsAny<bool>())).Returns(heroes.AsQueryable);
         mockHeroRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>())).Returns((Guid id) => Task.FromResult(heroes.First(x => x.Id == id)));
 
         return mockHeroRepository.Object;

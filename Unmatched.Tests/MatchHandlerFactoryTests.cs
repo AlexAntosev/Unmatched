@@ -31,7 +31,7 @@ public class MatchHandlerFactoryTests
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
         _unitOfWork.Setup(uow => uow.Tournaments).Returns(_tournamentRepository.Object);
         
-        _tournamentRepository.Setup(x => x.Query())
+        _tournamentRepository.Setup(x => x.Query(false))
             .Returns(
                 new List<Tournament>()
                     {

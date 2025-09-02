@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterMapping(this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
     }
 
     public static void RegisterServices(this IServiceCollection services)
