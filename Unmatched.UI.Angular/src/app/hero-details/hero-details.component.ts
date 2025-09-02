@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-hero',
+  selector: 'app-hero-details',
   standalone: false,
-  templateUrl: './hero.component.html',
-  styleUrl: './hero.component.css',
+  templateUrl: './hero-details.component.html',
+  styleUrl: './hero-details.component.css',
 })
-export class HeroComponent {
+export class HeroDetailsComponent {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {

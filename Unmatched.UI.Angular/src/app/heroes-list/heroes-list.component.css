@@ -7,7 +7,7 @@
 }
 
 tr.table-heroes-row:hover {
-  background: darkslategray;
+  background: rgb(24, 36, 36);
 }
 
 tr.table-heroes-row {

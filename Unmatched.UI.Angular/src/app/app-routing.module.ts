@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MatchComponent } from './match/match.component';
-import { HeroesComponent } from './heroes/heroes.component';
-import { HeroComponent } from './hero/hero.component';
+import { HeroesListComponent } from './heroes-list/heroes-list.component';
+import { HeroDetailsComponent } from './hero-details/hero-details.component';
 
 const routes: Routes = [{
   path: 'match',
@@ -10,11 +10,11 @@ const routes: Routes = [{
 }, 
 {
   path: 'heroes',
-  component: HeroesComponent
+  component: HeroesListComponent
 }, 
 {
   path: 'heroes/:id',
-  component: HeroComponent
+  component: HeroDetailsComponent
 }];
 
 @NgModule({

@@ -9,12 +9,12 @@ import { Router } from '@angular/router';
 
 @UntilDestroy()
 @Component({
-  selector: 'app-heroes',
+  selector: 'app-heroes-list',
   standalone: false,
-  templateUrl: './heroes.component.html',
-  styleUrl: './heroes.component.css',
+  templateUrl: './heroes-list.component.html',
+  styleUrl: './heroes-list.component.css',
 })
-export class HeroesComponent implements OnInit, AfterViewInit {
+export class HeroesListComponent implements OnInit, AfterViewInit {
   public heroesSbj$: BehaviorSubject<HeroStatisticsDto[]> = new BehaviorSubject<HeroStatisticsDto[]>([]);
   public heroes$: Observable<HeroStatisticsDto[]> = this.heroesSbj$.asObservable();
 

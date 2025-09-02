@@ -2,23 +2,23 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MatchComponent } from './match/match.component';
 import { provideHttpClient } from '@angular/common/http';
-import { HeroesModule } from './heroes/heroes.module';
+import { HeroesListModule } from './heroes-list/heroes-list.module';
 import { LayoutModule } from './layout/layout.module';
-import { HeroComponent } from './hero/hero.component';
+import { HeroDetailsComponent } from './hero-details/hero-details.component';
+import { MatchModule } from './match/match.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MatchComponent,
-    HeroComponent
+    HeroDetailsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HeroesModule,
-    LayoutModule
+    HeroesListModule,
+    LayoutModule,
+    MatchModule,
   ],
   providers: [
     provideHttpClient(),
