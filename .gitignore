@@ -18,3 +18,4 @@ riderModule.iml
 /.vs/Unmatched/FileContentIndex/*.vsidx
 /.vs/Unmatched/v17/TestStore/0/*.testlog
 /.vs/Unmatched/v17/TestStore/0/*.manifest
+/.env
