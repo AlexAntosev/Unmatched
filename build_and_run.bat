@@ -1,14 +1,15 @@
 @echo off
+set service_name=ms
 set docker_compose_file=docker-compose.yml
 
-rem Down and remove existing Docker containers (if any)
-docker-compose down
+rem Stop and remove specific container
+docker-compose -f %docker_compose_file% rm -sf %service_name%
 
-rem Build Docker image
-docker-compose build
+rem Rebuild only that service
+docker-compose -f %docker_compose_file% build %service_name%
 
-rem Build and run Docker containers using Docker Compose
-docker-compose up -d
+rem Start it again
+docker-compose -f %docker_compose_file% up -d %service_name%
 
-rem Display container logs (optional)
-docker-compose logs -f
+rem Show logs
+docker-compose -f %docker_compose_file% logs -f %service_name%

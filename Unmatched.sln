@@ -19,6 +19,10 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Unmatched.UI.Angular", "Unm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.Api", "Unmatched.Api\Unmatched.Api.csproj", "{697FF739-665E-4C0A-8215-58CFA53AA8EF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{81160F8E-ECA2-4792-8AB7-73C3963B944A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

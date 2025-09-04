@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  web:
+  ms:
     image: unmatched-image
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
