@@ -1,0 +1,6 @@
+<app-grid
+  [itemsSbj$]="playersSbj$"
+  [columns]="columns"
+  [defaultSort]="'name'"
+  (onRowClicked)="onRowClicked($event)"
+></app-grid>

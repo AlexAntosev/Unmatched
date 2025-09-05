@@ -1,0 +1,15 @@
+.image {
+  width: 64px;
+}
+
+.table {
+    padding: 50px;
+}
+
+tr.table-row:hover {
+  background: rgb(24, 36, 36);
+}
+
+tr.table-row {
+  cursor: pointer;
+}

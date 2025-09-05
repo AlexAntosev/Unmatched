@@ -1,0 +1,43 @@
+<div *ngIf="heroStatistics && hero">
+  <div style="display: flex; align-items: center; justify-content: center">
+    <h3 class="page-title">{{ hero.name }}</h3>
+  </div>
+  <div class="wrapper page-content">
+    <div class="image-container">
+      <img [src]="hero.imageUrl" />
+    </div>
+    <div>
+      <h5>
+        Current Place: {{ heroStatistics.place }} ({{ heroStatistics.points }}
+        points)
+      </h5>
+      <img
+        style="margin-bottom: 0.5rem"
+        [src]="hero.meleeRangeImageUrl"
+        [alt]="hero.id"
+        width="64px"
+        height="auto"
+      />
+      <h5>Hp: {{ hero.hp }}</h5>
+      <h5>Deck size: {{ hero.deckSize }}</h5>
+      <h5>Titles: {{ titles }}</h5>
+    </div>
+    <div *ngIf="sidekick">
+      <h5>Sidekick(s): {{ sidekick.name }} (x1)</h5>
+      <img
+        style="margin-bottom: 0.5rem"
+        [src]="sidekick.meleeRangeImageUrl"
+        [alt]="sidekick.id"
+        width="64px"
+        height="auto"
+      />
+      <h5>Sidekick(s) Hp: {{ sidekick.hp }}</h5>
+    </div>
+    <div *ngIf="playstyle">
+      <!-- <h5>Attack: <Epic Rating="@playStyle.Attack" Max="3" RatingChanged="@((int rate) => PlayStyleAttackChanged(rate, playStyle))" /></h5>
+            <h5>Defence: <Epic Rating="@playStyle.Defence" Max="3" RatingChanged="@((int rate) => PlayStyleDefenceChanged(rate, playStyle))"/></h5>
+            <h5>Trickery: <Epic Rating="@playStyle.Trickery" Max="3" RatingChanged="@((int rate) => PlayStyleTrickeryChanged(rate, playStyle))"/></h5>
+            <h5>Difficulty: <Epic Rating="@playStyle.Difficulty" Max="3" RatingChanged="@((int rate) => PlayStyleDifficultyChanged(rate, playStyle))"/></h5> -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+<app-grid
+  [itemsSbj$]="heroesSbj$"
+  [columns]="columns"
+  [defaultSort]="'points'"
+  (onRowClicked)="onRowClicked($event)"
+></app-grid>

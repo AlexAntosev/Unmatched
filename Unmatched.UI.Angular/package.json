@@ -6,7 +6,8 @@
     "start": "ng serve --host=127.0.0.1",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "api": "npm run ng-openapi-gen -i http://localhost:5096/swagger/v1/swagger.json -o src/app/backend-api --module BackendApiModule --modelIndex false --serviceIndex false"
   },
   "private": true,
   "dependencies": {
@@ -19,8 +20,8 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
-    "@ngneat/until-destroy": "^10.0.0",
     "jest-editor-support": "*",
+    "ng-openapi-gen": "^0.53.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
