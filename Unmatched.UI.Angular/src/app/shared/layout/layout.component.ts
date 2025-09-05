@@ -26,6 +26,6 @@ export class LayoutComponent {
   }
 
   matchesClicked() {
-    this.router.navigate(['match']);
+    this.router.navigate(['matches']);
   }
 }

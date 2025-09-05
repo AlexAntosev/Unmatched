@@ -10,9 +10,12 @@ import { MatStepperModule } from '@angular/material/stepper';
 import {MatInputModule} from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatchComponent } from './match/match.component';
+import { MatchesComponent } from './matches.component';
+import { MatchesGrid } from './matches-grid';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
-  declarations: [MatchComponent],
+  declarations: [MatchComponent, MatchesComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -25,8 +28,9 @@ import { MatchComponent } from './match/match.component';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    SharedModule
   ],
   exports: [MatchComponent],
-  providers: [],
+  providers: [MatchesGrid],
 })
 export class MatchesModule {}

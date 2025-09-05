@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
 import { HeroesService } from './services/heroes.service';
+import { MatchesService } from './services/matches.service';
 import { PlayersService } from './services/players.service';
 
 /**
@@ -16,6 +17,7 @@ import { PlayersService } from './services/players.service';
   declarations: [],
   providers: [
     HeroesService,
+    MatchesService,
     PlayersService,
     ApiConfiguration
   ],

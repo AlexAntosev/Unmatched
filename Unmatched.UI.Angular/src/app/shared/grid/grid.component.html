@@ -8,7 +8,9 @@
     matSortDirection="desc"
   >
     <ng-container *ngFor="let column of columns" [matColumnDef]="column.id">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.header }}</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ column.header }}
+      </th>
       <div *ngIf="isTextColumn(column.type)">
         <td mat-cell *matCellDef="let row">{{ column.valueGetter(row) }}</td>
       </div>
@@ -23,6 +25,9 @@
             />
           </div>
         </td>
+      </div>
+      <div *ngIf="isDateColumn(column.type)">
+        <td mat-cell *matCellDef="let row">{{ column.valueGetter(row).toDateString() }}</td>
       </div>
     </ng-container>
 

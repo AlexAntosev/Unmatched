@@ -83,4 +83,8 @@ export class GridComponent implements OnInit, AfterViewInit {
   isImageColumn(type: GridColumnType) {
     return type === GridColumnType.Image;
   }
+
+  isDateColumn(type: GridColumnType) {
+    return type === GridColumnType.Date;
+  }
 }
