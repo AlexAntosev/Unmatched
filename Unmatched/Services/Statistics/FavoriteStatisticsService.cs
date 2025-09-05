@@ -12,16 +12,19 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
 
     private readonly IMapper _mapper;
 
-    public FavoriteStatisticsService(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
+    public FavoriteStatisticsService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCache catalogHeroCache)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _catalogHeroCache = catalogHeroCache;
     }
     
     public async Task<IEnumerable<FavoriteStatisticsDto>> GetFavoritesStatisticsAsync(Guid playerId)
     {
         var favorites = await _unitOfWork.Favorites.GetByPlayerIdAsync(playerId);
-        var heroes = await _unitOfWork.Heroes.GetAsync();
+        var heroes = await _catalogHeroCache.GetAsync();
         var player = await _unitOfWork.Players.GetByIdAsync(playerId);
         var playerDto = _mapper.Map<PlayerDto>(player);
 

@@ -1,14 +1,14 @@
-﻿namespace Unmatched.EntityFramework.Repositories;
+﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
 using System;
 
 using Microsoft.EntityFrameworkCore;
 
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
-using Unmatched.EntityFramework.Context;
+using Unmatched.CatalogService.EntityFramework.Context;
+using Unmatched.CatalogService.EntityFramework.Entities;
+using Unmatched.Common.EntityFramework;
 
-public class PlayStyleRepository : BaseRepository<PlayStyle>, IPlayStyleRepository
+public class PlayStyleRepository : BaseRepository<PlayStyle, UnmatchedDbContext>, IPlayStyleRepository
 {
     public PlayStyleRepository(UnmatchedDbContext dbContext) : base(dbContext)
     {

@@ -1,12 +1,13 @@
 ﻿namespace Unmatched.Dtos;
 
 using Unmatched.Data.Entities;
+using Unmatched.Dtos.Catalog;
 
 class MatchContextDto
 {
     public MatchContextDto(
-        Hero winnerReferenceHero,
-        Hero looserReferenceHero,
+        CatalogHeroDto winnerReferenceHero,
+        CatalogHeroDto looserReferenceHero,
         Fighter winnerFighter,
         Fighter looserFighter,
         int winnerPointsBeforeMatch,
@@ -24,11 +25,11 @@ class MatchContextDto
 
     public int LooserPointsBeforeMatch { get; }
 
-    public Hero LooserReferenceHero { get; }
+    public CatalogHeroDto LooserReferenceHero { get; }
 
     public Fighter WinnerFighter { get; }
 
     public int WinnerPointsBeforeMatch { get; }
 
-    public Hero WinnerReferenceHero { get; }
+    public CatalogHeroDto WinnerReferenceHero { get; }
 }

@@ -41,7 +41,7 @@ public class UnmatchedDbContext : DbContext
 
     public DbSet<Fighter> Fighters { get; set; }
 
-    public DbSet<Hero> Heroes { get; set; }
+    public DbSet<HeroTitle> HeroTitles { get; set; }
 
     public DbSet<Map> Maps { get; set; }
 
@@ -53,7 +53,7 @@ public class UnmatchedDbContext : DbContext
 
     public DbSet<Rating> Ratings { get; set; }
 
-    public DbSet<Sidekick> Sidekicks { get; set; }
+    //public DbSet<Sidekick> Sidekicks { get; set; }
 
     public DbSet<Tournament> Tournaments { get; set; }
     
@@ -61,5 +61,16 @@ public class UnmatchedDbContext : DbContext
     
     public DbSet<Villain> Villains { get; set; }
     
-    public DbSet<PlayStyle> PlayStyles { get; set; }
+    //public DbSet<PlayStyle> PlayStyles { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<HeroTitle>(b =>
+            {
+                b.HasKey(ht => new { ht.HeroesId, ht.TitlesId });
+                b.ToTable("HeroTitle");
+            });
+
+        base.OnModelCreating(modelBuilder);
+    }
 }

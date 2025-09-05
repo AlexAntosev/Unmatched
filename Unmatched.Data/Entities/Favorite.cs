@@ -14,7 +14,7 @@ public class Favorite
 
     public Guid HeroId { get; set; }
 
-    public Hero? Hero { get; set; }
+    //public Hero? Hero { get; set; }
     
     public bool IsChosenOne { get; set; }
     

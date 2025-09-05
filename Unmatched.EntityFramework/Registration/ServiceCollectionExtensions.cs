@@ -19,17 +19,17 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddTransient<IPlayerRepository, PlayerRepository>();
-        services.AddTransient<IHeroRepository, HeroRepository>();
+        //services.AddTransient<IHeroRepository, HeroRepository>();
         services.AddTransient<ITournamentRepository, TournamentRepository>();
-        services.AddTransient<ISidekickRepository, SidekickRepository>();
-        services.AddTransient<IMapRepository, MapRepository>();
+        //services.AddTransient<ISidekickRepository, SidekickRepository>();
+        //services.AddTransient<IMapRepository, MapRepository>();
         services.AddTransient<IMatchRepository, MatchRepository>();
-        services.AddTransient<IMinionRepository, MinionRepository>();
+       // services.AddTransient<IMinionRepository, MinionRepository>();
         services.AddTransient<IFighterRepository, FighterRepository>();
         services.AddTransient<IRatingRepository, RatingRepository>();
         services.AddTransient<ITitleRepository, TitleRepository>();
         services.AddTransient<IFavoritesRepository, FavoritesRepository>();
-        services.AddTransient<IVillainRepository, VillainRepository>();
-        services.AddTransient<IPlayStyleRepository, PlayStyleRepository>();
+        //services.AddTransient<IVillainRepository, VillainRepository>();
+       // services.AddTransient<IPlayStyleRepository, PlayStyleRepository>();
     }
 }

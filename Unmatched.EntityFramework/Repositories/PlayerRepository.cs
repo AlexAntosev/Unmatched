@@ -2,18 +2,14 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using Unmatched.Common.EntityFramework;
 using Unmatched.Constants;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
 
-public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
+public class PlayerRepository(UnmatchedDbContext dbContext) : BaseRepository<Player, UnmatchedDbContext>(dbContext), IPlayerRepository
 {
-    public PlayerRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     public Guid GetIdByName(string name)
     {
         return DbContext.Players.First(x => x.Name.Equals(name)).Id;

@@ -2,12 +2,22 @@ version: '3.8'
 
 services:
   ms:
-    image: unmatched-image
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8081:8080"
+    depends_on:
+      - catalogservice
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+  catalogservice:
+    build:
+      context: .
+      dockerfile: Services/Catalog/Unmatched.CatalogService.Api/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true

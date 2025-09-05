@@ -8,18 +8,22 @@ using Unmatched.Dtos;
 
 public class HeroService : IHeroService
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public HeroService(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
+    private readonly IUnitOfWork _unitOfWork;
+
+    public HeroService(IMapper mapper, ICatalogHeroCache catalogHeroCache,IUnitOfWork unitOfWork)
     {
-        _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _catalogHeroCache = catalogHeroCache;
+        _unitOfWork = unitOfWork;
     }
     
     public async Task<IEnumerable<HeroDto>> GetAsync()
     {
-        var entities = await _unitOfWork.Heroes.GetAsync();
+        var entities = await _catalogHeroCache.GetAsync();
         var heroes = _mapper.Map<IEnumerable<HeroDto>>(entities);
 
         return heroes;
@@ -27,7 +31,7 @@ public class HeroService : IHeroService
 
     public async Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId)
     {
-        var entities = await _unitOfWork.Heroes.GetAsync();
+        var entities = await _catalogHeroCache.GetAsync();
         var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
 
         var heroes = _mapper.Map<IEnumerable<HeroTitleAssignDto>>(entities);
@@ -36,7 +40,7 @@ public class HeroService : IHeroService
         {
             if (title is not null)
             {
-                hero.IsAssigned = title.Heroes.Any(h => h.Id == hero.Id);
+                hero.IsAssigned = title.HeroTitles.Any(h => h.HeroesId == hero.Id);
             }
         }
 
@@ -46,18 +50,21 @@ public class HeroService : IHeroService
     public async Task<HeroDto> GetFavouriteHeroAsync(Guid playerId)
     {
         var favourites = (await _unitOfWork.Favorites.GetByPlayerIdAsync(playerId)).OrderByDescending(x => x.IsChosenOne).ThenByDescending(x => x.Favour).ToArray();
-        
-        var hero = favourites.Any()
-            ? favourites.First().Hero
-            : _unitOfWork.Heroes.Query(true).FirstOrDefault();
+
+        var favouriteHeroId = favourites.FirstOrDefault()?.HeroId;
+
+        var heroes = await _catalogHeroCache.GetAsync();
+        var hero = favouriteHeroId != null
+            ? heroes.FirstOrDefault(x => x.Id == favouriteHeroId)
+            : heroes.FirstOrDefault();
         
         var result = _mapper.Map<HeroDto>(hero);
 
-        if (hero != null)
-        {
-            var sidekicks = _unitOfWork.Sidekicks.GetByHero(hero.Id);
-            result.Sidekicks = _mapper.Map<IEnumerable<SidekickDto>>(sidekicks);
-        }
+        // if (hero != null)
+        // {
+        //     var sidekicks = _unitOfWork.Sidekicks.GetByHero(hero.Id);
+        //     result.Sidekicks = _mapper.Map<IEnumerable<SidekickDto>>(sidekicks);
+        // }
 
         return result;
     }

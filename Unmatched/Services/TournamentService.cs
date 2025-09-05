@@ -15,10 +15,13 @@ public class TournamentService : ITournamentService
 
     private readonly IMapper _mapper;
 
-    public TournamentService(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
+    public TournamentService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCache catalogHeroCache)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _catalogHeroCache = catalogHeroCache;
     }
     
     public async Task<TournamentDto> AddAsync(TournamentDto dto)
@@ -54,7 +57,7 @@ public class TournamentService : ITournamentService
     
     public async Task CreateInitialPlannedMatchesAsync(TournamentDto tournament)
     {
-        var heroesEntities = await _unitOfWork.Heroes.GetAsync();
+        var heroesEntities = await _catalogHeroCache.GetAsync();
         var heroes = _mapper.Map<List<HeroDto>>(heroesEntities);
         heroes = heroes.Shuffle().Take(tournament.CurrentStage.GetFightersCount()).ToList();
         await CreatePlannedMatchesAsync(tournament, heroes);

@@ -1,17 +1,14 @@
 ﻿namespace Unmatched.EntityFramework.Repositories;
 
 using Microsoft.EntityFrameworkCore;
+using Unmatched.Common.EntityFramework;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Enums;
 using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
 
-public class MatchRepository : BaseRepository<Match>, IMatchRepository
+public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Match, UnmatchedDbContext>(dbContext), IMatchRepository
 {
-    public MatchRepository(UnmatchedDbContext dbContext) : base(dbContext)
-    {
-    }
-    
     public Match Update(Match model)
     {
         var local = DbContext.Set<Match>()
@@ -70,10 +67,19 @@ public class MatchRepository : BaseRepository<Match>, IMatchRepository
 
     public async Task<List<Match>> GetByTournamentAsync(Guid id)
     {
+        // return await DbContext.Matches.Include(x => x.Map)
+        //     .Include(x => x.Tournament)
+        //     .Include(m => m.Fighters)
+        //     .ThenInclude(f => f.Hero)
+        //     .Include(m => m.Fighters)
+        //     .ThenInclude(f => f.Player)
+        //     .Where(m => m.TournamentId == id)
+        //     .AsNoTracking()
+        //     .ToListAsync();
         return await DbContext.Matches.Include(x => x.Map)
             .Include(x => x.Tournament)
             .Include(m => m.Fighters)
-            .ThenInclude(f => f.Hero)
+            //.ThenInclude(f => f.Hero)
             .Include(m => m.Fighters)
             .ThenInclude(f => f.Player)
             .Where(m => m.TournamentId == id)
@@ -88,11 +94,13 @@ public class MatchRepository : BaseRepository<Match>, IMatchRepository
 
     public override Task<List<Match>> GetAsync()
     {
-        return DbContext.Set<Match>().Include(x => x.Fighters).ThenInclude(x => x.Hero).AsNoTracking().ToListAsync();
+        return DbContext.Set<Match>().Include(x => x.Fighters).AsNoTracking().ToListAsync();
+        //return DbContext.Set<Match>().Include(x => x.Fighters).ThenInclude(x => x.Hero).AsNoTracking().ToListAsync();
     }
     public override async Task<Match?> GetByIdAsync(Guid id)
     {
-        var entity = await DbContext.Set<Match>().Include(x => x.Map).Include(x => x.Fighters).ThenInclude(x => x.Hero).ThenInclude(x => x.Sidekicks).Include(x => x.Fighters).ThenInclude(x => x.Player).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        //var entity = await DbContext.Set<Match>().Include(x => x.Map).Include(x => x.Fighters).ThenInclude(x => x.Hero).ThenInclude(x => x.Sidekicks).Include(x => x.Fighters).ThenInclude(x => x.Player).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var entity = await DbContext.Set<Match>().Include(x => x.Map).Include(x => x.Fighters).Include(x => x.Fighters).ThenInclude(x => x.Player).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         return entity;
     }
 }

@@ -5,6 +5,7 @@ using AutoMapper;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
+using Unmatched.Services.Catalog;
 
 public class HeroStatisticsService : IHeroStatisticsService
 {
@@ -12,15 +13,18 @@ public class HeroStatisticsService : IHeroStatisticsService
 
     private readonly IMapper _mapper;
 
-    public HeroStatisticsService(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
+    public HeroStatisticsService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCache catalogHeroCache)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _catalogHeroCache = catalogHeroCache;
     }
     
     public async Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync()
     {
-        var heroes = await _unitOfWork.Heroes.GetAsync();
+        var heroes = await _catalogHeroCache.GetAsync();
         var ratings = await _unitOfWork.Ratings.GetAsync();
         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
@@ -51,7 +55,7 @@ public class HeroStatisticsService : IHeroStatisticsService
     
     public async Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
     {
-        var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
+        var hero = await _catalogHeroCache.GetAsync(heroId);
         var heroDto = _mapper.Map<HeroDto>(hero);
         var fights = await _unitOfWork.Fighters.GetFromFinishedMatchesByHeroIdAsync(heroId);
         var rating = await _unitOfWork.Ratings.GetByHeroIdAsync(hero.Id);
@@ -59,9 +63,9 @@ public class HeroStatisticsService : IHeroStatisticsService
         var titles = await _unitOfWork.Titles.GetByHeroId(heroId);
         var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
         var place = await GetHeroPlace(rating);
-        var playStyle = await _unitOfWork.PlayStyles.GetByHeroIdAsync(heroId);
+        //var playStyle = await _unitOfWork.PlayStyles.GetByHeroIdAsync(heroId);
 
-        heroDto.PlayStyle = _mapper.Map<PlayStyleDto>(playStyle) ?? PlayStyleDto.Default(heroId);
+        heroDto.PlayStyle = PlayStyleDto.Default(heroId);// _mapper.Map<PlayStyleDto>(playStyle) ?? PlayStyleDto.Default(heroId);
         var statistics = new HeroStatisticsDto
             {
                 Hero = heroDto,

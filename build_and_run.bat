@@ -1,15 +1,17 @@
 @echo off
-set service_name=ms
 set docker_compose_file=docker-compose.yml
 
-rem Stop and remove specific container
-docker-compose -f %docker_compose_file% rm -sf %service_name%
+rem Stop specific services
+docker-compose -f %docker_compose_file% stop ms catalogservice
 
-rem Rebuild only that service
-docker-compose -f %docker_compose_file% build %service_name%
+rem Remove stopped containers
+docker-compose -f %docker_compose_file% rm -f ms catalogservice
 
-rem Start it again
-docker-compose -f %docker_compose_file% up -d %service_name%
+rem Rebuild
+docker-compose -f %docker_compose_file% build ms catalogservice
+
+rem Start
+docker-compose -f %docker_compose_file% up -d ms catalogservice
 
 rem Show logs
-docker-compose -f %docker_compose_file% logs -f %service_name%
+docker-compose -f %docker_compose_file% logs -f ms catalogservice

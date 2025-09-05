@@ -8,8 +8,6 @@ public interface IUnitOfWork : IDisposable
 
     IFighterRepository Fighters { get; }
     
-    IHeroRepository Heroes { get; }
-    
     IMapRepository Maps { get; }
     
     IMatchRepository Matches { get; }
@@ -20,15 +18,11 @@ public interface IUnitOfWork : IDisposable
     
     IRatingRepository Ratings { get; }
     
-    ISidekickRepository Sidekicks { get; }
-    
     ITournamentRepository Tournaments { get; }
     
     ITitleRepository Titles { get; }
     
     IVillainRepository Villains { get; }
-    
-    IPlayStyleRepository PlayStyles { get; }
     
     Task SaveChangesAsync();
 }

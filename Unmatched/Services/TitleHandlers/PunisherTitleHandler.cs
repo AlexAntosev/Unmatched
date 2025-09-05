@@ -32,12 +32,13 @@ public class PunisherTitleHandler : IPunisherTitleHandler
 
         if (winner is not null)
         {
-            var isAlreadyPunisher = title.Heroes.Any(h => h.Id == winner.HeroId);
+            var isAlreadyPunisher = title.HeroTitles.Any(h => h.HeroesId == winner.HeroId);
             if (!isAlreadyPunisher && winner.MatchPoints >= MinVictoryPointsForTitle)
             {
-                title.Heroes.Add(winner.Hero);
-                _unitOfWork.Titles.AddOrUpdate(title);
-                await _unitOfWork.SaveChangesAsync();
+                // add to HeroTitle rep
+                // title.Heroes.Add(winner.Hero);
+                // _unitOfWork.Titles.AddOrUpdate(title);
+                // await _unitOfWork.SaveChangesAsync();
 
                 var titleDto = _mapper.Map<TitleDto>(title);
                 return titleDto;

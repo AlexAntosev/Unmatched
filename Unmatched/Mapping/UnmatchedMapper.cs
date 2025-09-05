@@ -5,6 +5,7 @@ using AutoMapper;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Enums;
 using Unmatched.Dtos;
+using Unmatched.Dtos.Catalog;
 using Unmatched.Extensions;
 
 public class UnmatchedMapper : Profile
@@ -12,8 +13,13 @@ public class UnmatchedMapper : Profile
     public UnmatchedMapper()
     {
         CreateMap<Player, PlayerDto>().ReverseMap();
-        CreateMap<Hero, HeroDto>().ForMember(x => x.PlayStyle, c => c.MapFrom(x => x.PlayStyle ?? PlayStyle.Default(x.Id))).ReverseMap();
-        CreateMap<Sidekick, SidekickDto>().ReverseMap();
+       // CreateMap<Hero, HeroDto>().ForMember(x => x.PlayStyle, c => c.MapFrom(x => x.PlayStyle ?? PlayStyle.Default(x.Id))).ReverseMap();
+       // CreateMap<Sidekick, SidekickDto>().ReverseMap();
+        CreateMap<CatalogHeroDto, HeroDto>()
+            .ForMember(x => x.Sidekicks, c => c.Ignore())
+            .ForMember(x => x.Titles, c => c.Ignore())
+            .ForMember(x => x.PlayStyle, c => c.Ignore())
+            .ReverseMap();
         CreateMap<Map, MapDto>().ReverseMap();
         CreateMap<Match, MatchDto>().ReverseMap();
         CreateMap<Match, MatchLogDto>()
@@ -29,13 +35,12 @@ public class UnmatchedMapper : Profile
             .ForMember(x => x.MatchPoints, c => c.MapFrom(x => x.MatchPoints))
             .ForMember(x => x.SidekickName, c => c.Ignore())
             .ReverseMap()
-            .ForMember(x => x.Player, c => c.Ignore())
-            .ForMember(x => x.Hero, c => c.Ignore());
+            .ForMember(x => x.Player, c => c.Ignore());
         CreateMap<Tournament, TournamentDto>().ReverseMap();
         CreateMap<Title, TitleDto>().ReverseMap();
-        CreateMap<Hero, HeroTitleAssignDto>().ForMember(x => x.IsAssigned, c => c.Ignore());
+        //CreateMap<Hero, HeroTitleAssignDto>().ForMember(x => x.IsAssigned, c => c.Ignore());
         CreateMap<Villain, VillainDto>().ReverseMap();
-        CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
+       // CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
         CreateMap<Favorite, FavoriteStatisticsDto>()
             .ForMember(x => x.FavoriteId, c => c.MapFrom(x => x.Id))
             .ForMember(x => x.Fights, c => c.Ignore())
@@ -44,8 +49,7 @@ public class UnmatchedMapper : Profile
             .ForMember(x => x.TotalMatches, c => c.Ignore())
             .ForMember(x => x.TotalWins, c => c.Ignore())
             .ReverseMap()
-            .ForMember(x => x.Player, c => c.Ignore())
-            .ForMember(x => x.Hero, c => c.Ignore());
+            .ForMember(x => x.Player, c => c.Ignore());
     }
 
     private string TryGetMapName(Map? map)

@@ -2,17 +2,13 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using Unmatched.Common.EntityFramework;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
 
-public class RatingRepository : BaseRepository<Rating>, IRatingRepository
+public class RatingRepository(UnmatchedDbContext dbContext) : BaseRepository<Rating, UnmatchedDbContext>(dbContext), IRatingRepository
 {
-    public RatingRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     public Task ClearAllRatingsAsync()
     {
         throw new NotImplementedException();

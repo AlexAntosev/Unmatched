@@ -1,13 +1,15 @@
-﻿namespace Unmatched.EntityFramework.Repositories;
+﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
-using Unmatched.EntityFramework.Context;
 
-public class HeroRepository : BaseRepository<Hero>, IHeroRepository
+using Microsoft.EntityFrameworkCore;
+
+using Unmatched.CatalogService.EntityFramework.Context;
+using Unmatched.CatalogService.EntityFramework.Entities;
+using Unmatched.Common.EntityFramework;
+
+public class HeroRepository : BaseRepository<Hero, UnmatchedDbContext>, IHeroRepository
 {
     public HeroRepository(UnmatchedDbContext dbContext)
         : base(dbContext)

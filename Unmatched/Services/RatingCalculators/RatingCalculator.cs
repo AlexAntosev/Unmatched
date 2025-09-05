@@ -8,9 +8,12 @@ public class RatingCalculator : IRatingCalculator
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public RatingCalculator(IUnitOfWork unitOfWork)
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
+    public RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHeroCache)
     {
         _unitOfWork = unitOfWork;
+        _catalogHeroCache = catalogHeroCache;
     }
 
     public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent)
@@ -23,8 +26,8 @@ public class RatingCalculator : IRatingCalculator
             : fighter;
 
         var matchContext = new MatchContextDto(
-            await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId),
-            await _unitOfWork.Heroes.GetByIdAsync(looser.HeroId),
+            await _catalogHeroCache.GetAsync(winner.HeroId),
+            await _catalogHeroCache.GetAsync(looser.HeroId),
             winner,
             looser,
             (await _unitOfWork.Ratings.GetByHeroIdAsync(winner.HeroId))?.Points ?? 0,
@@ -43,8 +46,8 @@ public class RatingCalculator : IRatingCalculator
 
     private int CalculateForLooser(MatchContextDto matchContext)
     {
-        var maxLooserSidekicksHp = matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
-        var maxWinnerSidekicksHp = matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxLooserSidekicksHp = 0;// matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxWinnerSidekicksHp = 0;// matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
 
         var forSidekickHp = maxLooserSidekicksHp == 0
             ? 50
@@ -61,8 +64,8 @@ public class RatingCalculator : IRatingCalculator
 
     private int CalculateForWinner(MatchContextDto matchContext)
     {
-        var maxLooserSidekicksHp = matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
-        var maxWinnerSidekicksHp = matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxLooserSidekicksHp = 0;// matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxWinnerSidekicksHp = 0;// matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
 
         var forLooserSidekick = maxLooserSidekicksHp == 0
             ? 40

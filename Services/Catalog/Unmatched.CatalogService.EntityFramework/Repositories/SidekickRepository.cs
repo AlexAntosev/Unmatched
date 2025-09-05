@@ -1,10 +1,10 @@
-﻿namespace Unmatched.EntityFramework.Repositories;
+﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
-using Unmatched.EntityFramework.Context;
+using Unmatched.CatalogService.EntityFramework.Context;
+using Unmatched.CatalogService.EntityFramework.Entities;
+using Unmatched.Common.EntityFramework;
 
-public class SidekickRepository : BaseRepository<Sidekick>, ISidekickRepository
+public class SidekickRepository : BaseRepository<Sidekick, UnmatchedDbContext>, ISidekickRepository
 {
     public SidekickRepository(UnmatchedDbContext dbContext)
         : base(dbContext)

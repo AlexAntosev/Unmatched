@@ -9,9 +9,12 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public FirstTournamentRatingCalculator(IUnitOfWork unitOfWork)
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
+    public FirstTournamentRatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHeroCache)
     {
         _unitOfWork = unitOfWork;
+        _catalogHeroCache = catalogHeroCache;
     }
 
     public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage)
@@ -23,7 +26,7 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
             ? opponent
             : fighter;
 
-        var winnerHeroMaxHp = (await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId)).Hp;
+        var winnerHeroMaxHp = (await _catalogHeroCache.GetAsync()).First(h => h.Id == winner.HeroId).Hp;
         var winnerPoints = Convert.ToInt32(Math.Round(stage.GetCoefficient() * (80 + 40 * ((double)winner.HpLeft / winnerHeroMaxHp)), 0));
 
         return new Dictionary<Guid, int>

@@ -18,13 +18,16 @@ public class MatchService : IMatchService
     private readonly IRusherTitleHandler _rusherTitleHandler;
     private readonly IPunisherTitleHandler _punisherTitleHandler;
 
+    private readonly ICatalogHeroCache _catalogHeroCache;
+
     public MatchService(
         IMatchHandlerFactory matchHandlerFactory,
         IMapper mapper,
         IUnitOfWork unitOfWork,
         IStreakTitleHandler streakTitleHandler,
         IRusherTitleHandler rusherTitleHandler,
-        IPunisherTitleHandler punisherTitleHandler)
+        IPunisherTitleHandler punisherTitleHandler,
+        ICatalogHeroCache catalogHeroCache)
     {
         _matchHandlerFactory = matchHandlerFactory;
         _mapper = mapper;
@@ -32,6 +35,7 @@ public class MatchService : IMatchService
         _streakTitleHandler = streakTitleHandler;
         _rusherTitleHandler = rusherTitleHandler;
         _punisherTitleHandler = punisherTitleHandler;
+        _catalogHeroCache = catalogHeroCache;
     }
     
     public async Task<SaveMatchResultDto> AddAsync(Match match)
@@ -52,8 +56,9 @@ public class MatchService : IMatchService
             titlesEarned.Add(punisherTitleEarned);
         }
 
-        var winnerHero = await _unitOfWork.Heroes.GetByIdAsync(match.Fighters.First(f => f.IsWinner).HeroId);
-        var looserHero = await _unitOfWork.Heroes.GetByIdAsync(match.Fighters.First(f => !f.IsWinner).HeroId);
+        var heroes = await _catalogHeroCache.GetAsync();
+        var winnerHero = heroes.First(h => h.Id == match.Fighters.First(f => f.IsWinner).HeroId);
+        var looserHero = heroes.First(h => h.Id == match.Fighters.First(f => !f.IsWinner).HeroId);
         var result = new SaveMatchResultDto
             {
                 WinnerHeroName = winnerHero.Name,

@@ -10,6 +10,8 @@ using Unmatched.EntityFramework.Context;
 
 namespace Unmatched.EntityFramework.Migrations
 {
+    using Unmatched.Data.Entities;
+
     [DbContext(typeof(UnmatchedDbContext))]
     partial class UnmatchedDbContextModelSnapshot : ModelSnapshot
     {
@@ -22,17 +24,11 @@ namespace Unmatched.EntityFramework.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("HeroTitle", b =>
+            modelBuilder.Entity<HeroTitle>(b =>
                 {
-                    b.Property<Guid>("HeroesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TitlesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("HeroesId", "TitlesId");
-
-                    b.HasIndex("TitlesId");
+                    b.HasKey(ht => new { ht.HeroesId, ht.TitlesId });
+                    b.Property(ht => ht.HeroesId).HasColumnType("uniqueidentifier");
+                    b.Property(ht => ht.TitlesId).HasColumnType("uniqueidentifier");
 
                     b.ToTable("HeroTitle");
                 });
@@ -390,14 +386,8 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("Villains");
                 });
 
-            modelBuilder.Entity("HeroTitle", b =>
+            modelBuilder.Entity("Unmatched.Data.Entities.HeroTitle", b =>
                 {
-                    b.HasOne("Unmatched.Data.Entities.Hero", null)
-                        .WithMany()
-                        .HasForeignKey("HeroesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Unmatched.Data.Entities.Title", null)
                         .WithMany()
                         .HasForeignKey("TitlesId")

@@ -21,44 +21,44 @@ public class StreakTitleHandler : IStreakTitleHandler
             return;
         }
 
-        var heroesStreaks = new Dictionary<Hero, int>();
-        var heroes = await _unitOfWork.Heroes.GetAsync();
-        var fighters = await _unitOfWork.Fighters.GetAsync();
-        
-        foreach (var hero in heroes)
-        {
-            var heroFights = fighters.Where(f => f.HeroId == hero.Id);
-            var heroStreak = 0;
-            var winsCounter = 0;
-            foreach (var heroFight in heroFights)
-            {
-                if (heroFight.IsWinner)
-                {
-                    winsCounter++;
-
-                    if (winsCounter > heroStreak)
-                    {
-                        heroStreak = winsCounter;
-                    }
-                }
-
-                if (!heroFight.IsWinner)
-                {
-                    winsCounter = 0;
-                }
-            }
-            
-            heroesStreaks.Add(hero, heroStreak);
-        }
-
-        var heroWithBestStreak = heroesStreaks.OrderByDescending(h => h.Value).FirstOrDefault();
-
-        title.Heroes = new List<Hero>
-            {
-                heroWithBestStreak.Key
-            };
-        title.Comment = $"({heroWithBestStreak.Value} wins in a row)";
-        _unitOfWork.Titles.AddOrUpdate(title);
+        // var heroesStreaks = new Dictionary<Hero, int>();
+        // var heroes = await _unitOfWork.Heroes.GetAsync();
+        // var fighters = await _unitOfWork.Fighters.GetAsync();
+        //
+        // foreach (var hero in heroes)
+        // {
+        //     var heroFights = fighters.Where(f => f.HeroId == hero.Id);
+        //     var heroStreak = 0;
+        //     var winsCounter = 0;
+        //     foreach (var heroFight in heroFights)
+        //     {
+        //         if (heroFight.IsWinner)
+        //         {
+        //             winsCounter++;
+        //
+        //             if (winsCounter > heroStreak)
+        //             {
+        //                 heroStreak = winsCounter;
+        //             }
+        //         }
+        //
+        //         if (!heroFight.IsWinner)
+        //         {
+        //             winsCounter = 0;
+        //         }
+        //     }
+        //     
+        //     heroesStreaks.Add(hero, heroStreak);
+        // }
+        //
+        // var heroWithBestStreak = heroesStreaks.OrderByDescending(h => h.Value).FirstOrDefault();
+        //
+        // title.Heroes = new List<Hero>
+        //     {
+        //         heroWithBestStreak.Key
+        //     };
+        // title.Comment = $"({heroWithBestStreak.Value} wins in a row)";
+        // _unitOfWork.Titles.AddOrUpdate(title);
         await _unitOfWork.SaveChangesAsync();
     }
 }

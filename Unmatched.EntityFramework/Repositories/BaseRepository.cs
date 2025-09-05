@@ -2,18 +2,18 @@
 
 using Microsoft.EntityFrameworkCore;
 
-using Unmatched.Data.Repositories;
-using Unmatched.EntityFramework.Context;
+using Unmatched.Common.EntityFramework;
 
-public abstract class BaseRepository<TEntity> : IRepository<TEntity>
+/// <summary>
+/// Do not leave BaseRepository as common class. Every microservice must have its own implementation. This is temp for active dev stage.
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
+/// <param name="dbContext"></param>
+public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IRepository<TEntity>
     where TEntity : class
+    where TContext : DbContext
 {
-    public BaseRepository(UnmatchedDbContext dbContext)
-    {
-        DbContext = dbContext;
-    }
-
-    protected UnmatchedDbContext DbContext { get; }
+    protected TContext DbContext { get; } = dbContext;
 
     public async Task<TEntity> AddAsync(TEntity model)
     {

@@ -1,8 +1,11 @@
 ﻿namespace Unmatched.Registration;
 
 using System.Reflection;
+
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Unmatched.Services;
+using Unmatched.Services.Catalog;
 using Unmatched.Services.MatchHandlers;
 using Unmatched.Services.RatingCalculators;
 using Unmatched.Services.Statistics;
@@ -15,7 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
     }
 
-    public static void RegisterServices(this IServiceCollection services)
+    public static void RegisterServices(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddTransient<IRatingCalculator, RatingCalculator>();
         services.AddTransient<IUnrankedRatingCalculator, UnrankedRatingCalculator>();
@@ -38,6 +41,14 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
         services.AddTransient<IFavoriteService, FavoriteService>();
         services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
-        services.AddTransient<IPlayStyleService, PlayStyleService>();
+        //services.AddTransient<IPlayStyleService, PlayStyleService>();
+
+        services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
+
+        services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
+            {
+                var baseUrl = configuration["Services:CatalogService:BaseUrl"];
+                client.BaseAddress = new Uri(baseUrl);
+            });
     }
 }

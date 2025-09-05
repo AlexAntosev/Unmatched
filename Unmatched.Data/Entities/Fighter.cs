@@ -6,7 +6,7 @@ public class Fighter
 {
     public int? CardsLeft { get; set; }
 
-    public virtual Hero Hero { get; set; }
+    //public virtual Hero Hero { get; set; }
 
     public Guid HeroId { get; set; }
 

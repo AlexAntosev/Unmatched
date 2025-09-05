@@ -31,20 +31,20 @@ public class RusherTitleHandler : IRusherTitleHandler
 
         var winner = match.Fighters.FirstOrDefault(f => f.IsWinner);
 
-        if (winner is not null)
-        {
-            var winnerHero = await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId);
-            var isAlreadyRusher = title.Heroes.Any(h => h.Id == winner.HeroId);
-            if (!isAlreadyRusher && winner.CardsLeft >= MinCardsForTitleRatio * winnerHero.DeckSize)
-            {
-                title.Heroes.Add(winnerHero);
-                _unitOfWork.Titles.AddOrUpdate(title);
-                await _unitOfWork.SaveChangesAsync();
-
-                var titleDto = _mapper.Map<TitleDto>(title);
-                return titleDto;
-            }
-        }
+        // if (winner is not null)
+        // {
+        //     var winnerHero = await _unitOfWork.Heroes.GetByIdAsync(winner.HeroId);
+        //     var isAlreadyRusher = title.Heroes.Any(h => h.Id == winner.HeroId);
+        //     if (!isAlreadyRusher && winner.CardsLeft >= MinCardsForTitleRatio * winnerHero.DeckSize)
+        //     {
+        //         title.Heroes.Add(winnerHero);
+        //         _unitOfWork.Titles.AddOrUpdate(title);
+        //         await _unitOfWork.SaveChangesAsync();
+        //
+        //         var titleDto = _mapper.Map<TitleDto>(title);
+        //         return titleDto;
+        //     }
+        // }
 
         return null;
     }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 public class Rating
 {
-    public virtual Hero Hero { get; set; }
+    //public virtual Hero Hero { get; set; }
 
     public Guid HeroId { get; set; }
 

@@ -2,20 +2,17 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using Unmatched.Common.EntityFramework;
 using Unmatched.Data.Entities;
 using Unmatched.Data.Repositories;
 using Unmatched.EntityFramework.Context;
 
-public class FighterRepository : BaseRepository<Fighter>, IFighterRepository
+public class FighterRepository(UnmatchedDbContext dbContext) : BaseRepository<Fighter, UnmatchedDbContext>(dbContext), IFighterRepository
 {
-    public FighterRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     public async Task<List<Fighter>> GetByMatchIdAsync(Guid matchId)
     {
-        return await DbContext.Fighters.Include(x => x.Player).Include(x => x.Hero).ThenInclude(h => h.Sidekicks).Where(x => matchId == x.MatchId).ToListAsync();
+        //return await DbContext.Fighters.Include(x => x.Player).Include(x => x.Hero).ThenInclude(h => h.Sidekicks).Where(x => matchId == x.MatchId).ToListAsync();
+        return await DbContext.Fighters.Include(x => x.Player).Where(x => matchId == x.MatchId).ToListAsync();
     }
 
     public async Task<List<Fighter>> GetFromFinishedMatchesAsync()
