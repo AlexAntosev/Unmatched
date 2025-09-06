@@ -5,11 +5,12 @@ import { HeroComponent } from './heroes/hero/hero.component';
 import { PlayersComponent } from './players/players.component';
 import { MatchComponent } from './matches/match/match.component';
 import { MatchesComponent } from './matches/matches.component';
+import { AllMatchesComponent } from './matches/all-matches/all-matches.component';
 
 const routes: Routes = [
   {
     path: 'matches',
-    component: MatchesComponent,
+    component: AllMatchesComponent,
   },
   {
     path: 'match',

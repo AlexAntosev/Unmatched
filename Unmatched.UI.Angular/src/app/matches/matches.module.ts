@@ -7,15 +7,16 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepperModule } from '@angular/material/stepper';
-import {MatInputModule} from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatchComponent } from './match/match.component';
 import { MatchesComponent } from './matches.component';
 import { MatchesGrid } from './matches-grid';
 import { SharedModule } from '../shared/shared.module';
+import { AllMatchesComponent } from './all-matches/all-matches.component';
 
 @NgModule({
-  declarations: [MatchComponent, MatchesComponent],
+  declarations: [MatchComponent, MatchesComponent, AllMatchesComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -28,9 +29,9 @@ import { SharedModule } from '../shared/shared.module';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    SharedModule
+    SharedModule,
   ],
-  exports: [MatchComponent],
+  exports: [MatchComponent, MatchesComponent],
   providers: [MatchesGrid],
 })
 export class MatchesModule {}

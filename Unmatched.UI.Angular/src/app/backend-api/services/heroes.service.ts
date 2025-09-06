@@ -11,6 +11,7 @@ import { map, filter } from 'rxjs/operators';
 
 import { HeroDto } from '../models/hero-dto';
 import { HeroStatisticsDto } from '../models/hero-statistics-dto';
+import { PlayStyleDto } from '../models/play-style-dto';
 
 @Injectable({
   providedIn: 'root',
@@ -173,6 +174,62 @@ export class HeroesService extends BaseService {
 
     return this.apiHeroesStatisticsHeroIdGet$Response(params,context).pipe(
       map((r: StrictHttpResponse<HeroStatisticsDto>) => r.body as HeroStatisticsDto)
+    );
+  }
+
+  /**
+   * Path part for operation apiHeroesPlaystyleHeroIdPut
+   */
+  static readonly ApiHeroesPlaystyleHeroIdPutPath = '/api/Heroes/playstyle/{heroId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `apiHeroesPlaystyleHeroIdPut()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  apiHeroesPlaystyleHeroIdPut$Response(params: {
+    heroId: string;
+    body?: PlayStyleDto
+  },
+  context?: HttpContext
+
+): Observable<StrictHttpResponse<void>> {
+
+    const rb = new RequestBuilder(this.rootUrl, HeroesService.ApiHeroesPlaystyleHeroIdPutPath, 'put');
+    if (params) {
+      rb.path('heroId', params.heroId, {});
+      rb.body(params.body, 'application/json');
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'text',
+      accept: '*/*',
+      context: context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      })
+    );
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `apiHeroesPlaystyleHeroIdPut$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  apiHeroesPlaystyleHeroIdPut(params: {
+    heroId: string;
+    body?: PlayStyleDto
+  },
+  context?: HttpContext
+
+): Observable<void> {
+
+    return this.apiHeroesPlaystyleHeroIdPut$Response(params,context).pipe(
+      map((r: StrictHttpResponse<void>) => r.body as void)
     );
   }
 

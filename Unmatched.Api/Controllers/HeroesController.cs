@@ -10,32 +10,29 @@ namespace Unmatched.Api.Controllers;
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json)]    
 [Produces(MediaTypeNames.Application.Json)]
-public class HeroesController : ControllerBase
+public class HeroesController(IHeroService heroService, IHeroStatisticsService heroStatisticsService, IPlayStyleService playStyleService) : ControllerBase
 {
-    private readonly IHeroService _heroService;
-    private readonly IHeroStatisticsService _heroStatisticsService;
-
-    public HeroesController(IHeroService heroService, IHeroStatisticsService heroStatisticsService)
-    {
-        _heroService = heroService;
-        _heroStatisticsService = heroStatisticsService;
-    }
-
     [HttpGet]
     public Task<IEnumerable<HeroDto>> Get()
     {
-        return _heroService.GetAsync();
+        return heroService.GetAsync();
     }
 
     [HttpGet("statistics")]
     public Task<IEnumerable<HeroStatisticsDto>> GetStatistics()
     {
-        return _heroStatisticsService.GetHeroesStatisticsAsync();
+        return heroStatisticsService.GetHeroesStatisticsAsync();
     }
 
     [HttpGet("statistics/{heroId}")]
     public Task<HeroStatisticsDto> GetStatistics(Guid heroId)
     {
-        return _heroStatisticsService.GetHeroStatisticsAsync(heroId);
+        return heroStatisticsService.GetHeroStatisticsAsync(heroId);
+    }
+
+    [HttpPut("playstyle/{heroId}")]
+    public async Task UpdatePlaystyle(Guid heroId, PlayStyleDto playStyle)
+    {
+        await playStyleService.AddOrUpdateAsync(heroId, playStyle);
     }
 }

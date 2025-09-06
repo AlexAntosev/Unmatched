@@ -34,10 +34,41 @@
       <h5>Sidekick(s) Hp: {{ sidekick.hp }}</h5>
     </div>
     <div *ngIf="playstyle">
-      <!-- <h5>Attack: <Epic Rating="@playStyle.Attack" Max="3" RatingChanged="@((int rate) => PlayStyleAttackChanged(rate, playStyle))" /></h5>
-            <h5>Defence: <Epic Rating="@playStyle.Defence" Max="3" RatingChanged="@((int rate) => PlayStyleDefenceChanged(rate, playStyle))"/></h5>
-            <h5>Trickery: <Epic Rating="@playStyle.Trickery" Max="3" RatingChanged="@((int rate) => PlayStyleTrickeryChanged(rate, playStyle))"/></h5>
-            <h5>Difficulty: <Epic Rating="@playStyle.Difficulty" Max="3" RatingChanged="@((int rate) => PlayStyleDifficultyChanged(rate, playStyle))"/></h5> -->
+      <h5>
+        Attack:
+        <rate
+          [rating]="playstyle.attack ? playstyle.attack : 0"
+          [max]="3"
+          (ratingChanged)="playStyleAttackChanged($event)"
+        />
+      </h5>
+      <h5>
+        Defence:
+        <rate
+          [rating]="playstyle.defence ? playstyle.defence : 0"
+          [max]="3"
+          (ratingChanged)="playStyleDefenceChanged($event)"
+        />
+      </h5>
+      <h5>
+        Trickery:
+        <rate
+          [rating]="playstyle.trickery ? playstyle.trickery : 0"
+          [max]="3"
+          (ratingChanged)="playStyleTrickeryChanged($event)"
+        />
+      </h5>
+      <h5>
+        Difficulty:
+        <rate
+          [rating]="playstyle.difficulty ? playstyle.difficulty : 0"
+          [max]="3"
+          (ratingChanged)="playStyleDifficultyChanged($event)"
+        />
+      </h5>
     </div>
+  </div>
+  <div>
+    <matches [matchesSbj$]="matchesSbj$"></matches>
   </div>
 </div>

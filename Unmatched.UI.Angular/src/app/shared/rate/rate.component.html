@@ -1,0 +1,8 @@
+<div style="display: flex">
+  <div *ngFor="let star of createRange(max)">
+    <span style="cursor: pointer" (click)="updateRating(star)">
+      <span *ngIf="star <= rating" style="font-size: 28px">★</span>
+      <span *ngIf="star > rating" style="font-size: 28px">☆</span>
+    </span>
+  </div>
+</div>

@@ -72,4 +72,57 @@ export class MatchesService extends BaseService {
     );
   }
 
+  /**
+   * Path part for operation apiMatchesHeroIdGet
+   */
+  static readonly ApiMatchesHeroIdGetPath = '/api/Matches/{heroId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `apiMatchesHeroIdGet()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  apiMatchesHeroIdGet$Response(params: {
+    heroId: string;
+  },
+  context?: HttpContext
+
+): Observable<StrictHttpResponse<Array<MatchLogDto>>> {
+
+    const rb = new RequestBuilder(this.rootUrl, MatchesService.ApiMatchesHeroIdGetPath, 'get');
+    if (params) {
+      rb.path('heroId', params.heroId, {});
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'json',
+      accept: 'application/json',
+      context: context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return r as StrictHttpResponse<Array<MatchLogDto>>;
+      })
+    );
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `apiMatchesHeroIdGet$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  apiMatchesHeroIdGet(params: {
+    heroId: string;
+  },
+  context?: HttpContext
+
+): Observable<Array<MatchLogDto>> {
+
+    return this.apiMatchesHeroIdGet$Response(params,context).pipe(
+      map((r: StrictHttpResponse<Array<MatchLogDto>>) => r.body as Array<MatchLogDto>)
+    );
+  }
+
 }

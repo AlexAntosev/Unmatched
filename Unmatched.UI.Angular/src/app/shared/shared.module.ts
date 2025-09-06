@@ -4,10 +4,11 @@ import { AppRoutingModule } from '../app-routing.module';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { GridComponent } from './grid/grid.component';
+import { RateComponent } from './rate/rate.component';
 
 @NgModule({
-  declarations: [GridComponent],
+  declarations: [GridComponent, RateComponent],
   imports: [BrowserModule, AppRoutingModule, MatTableModule, MatSortModule],
-  exports: [GridComponent],
+  exports: [GridComponent, RateComponent],
 })
 export class SharedModule {}

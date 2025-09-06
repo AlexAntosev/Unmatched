@@ -5,7 +5,6 @@ import { FormBuilder, Validators } from '@angular/forms';
   selector: 'match',
   standalone: false,
   templateUrl: './match.component.html',
-  styleUrl: './match.component.css',
 })
 export class MatchComponent {
   private _formBuilder = inject(FormBuilder);
