@@ -1,17 +1,14 @@
 @echo off
 set docker_compose_file=docker-compose.yml
 
-rem Stop specific services
-docker-compose -f %docker_compose_file% stop ms catalogservice
+rem Down and remove existing Docker containers (if any)
+docker-compose down
 
-rem Remove stopped containers
-docker-compose -f %docker_compose_file% rm -f ms catalogservice
+rem Build Docker image
+docker-compose build
 
-rem Rebuild
-docker-compose -f %docker_compose_file% build ms catalogservice
+rem Build and run Docker containers using Docker Compose
+docker-compose up -d
 
-rem Start
-docker-compose -f %docker_compose_file% up -d ms catalogservice
-
-rem Show logs
-docker-compose -f %docker_compose_file% logs -f ms catalogservice
+rem Display container logs (optional)
+docker-compose logs -f

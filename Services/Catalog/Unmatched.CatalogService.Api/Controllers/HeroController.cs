@@ -19,4 +19,12 @@ public class HeroController(IUnitOfWork unitOfWork, IMapper mapper) : Controller
         var result = heroes.Select(mapper.Map<HeroDto>);
         return result;
     }
+
+    [HttpGet("{id}")]
+    public async Task<HeroDto> Get(Guid id)
+    {
+        var hero = await unitOfWork.Heroes.GetByIdAsync(id);
+        var result = mapper.Map<HeroDto>(hero);
+        return result;
+    }
 }
