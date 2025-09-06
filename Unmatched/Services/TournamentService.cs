@@ -62,12 +62,13 @@ public class TournamentService : ITournamentService
     
     public async Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament)
     {
-        var currentStageWinners = tournament.Matches.
+        var currentStageMatches = await _unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
+        var currentStageWinners = currentStageMatches.
             Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .Select(f => f.Hero)
+            .Select(f => _mapper.Map<HeroDto>(f.Hero))
             .ToList();
-        
+
         tournament.CurrentStage++;
         
         await CreatePlannedMatchesAsync(tournament, currentStageWinners);
@@ -75,10 +76,11 @@ public class TournamentService : ITournamentService
     
     public async Task CreateThirdPlaceDeciderMatchAsync(TournamentDto tournament)
     {
-        var currentStageLosers = tournament.Matches.
+        var currentStageMatches = await _unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
+        var currentStageLosers = currentStageMatches.
             Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => !f.IsWinner))
-            .Select(f => f.Hero)
+            .Select(f => _mapper.Map<HeroDto>(f.Hero))
             .ToList();
         
         tournament.CurrentStage++;
@@ -88,10 +90,11 @@ public class TournamentService : ITournamentService
     
     public async Task CreateGrandFinalMatchesAsync(TournamentDto tournament)
     {
-        var currentStageWinners = tournament.Matches.
+        var currentStageMatches = await _unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
+        var currentStageWinners = currentStageMatches.
             Where(m => m.Stage == tournament.CurrentStage - 1 && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .Select(f => f.Hero)
+            .Select(f => _mapper.Map<HeroDto>(f.Hero))
             .ToList();
         
         tournament.CurrentStage++;
