@@ -1,8 +1,7 @@
 ﻿namespace Unmatched.UI.BlazorServer;
 
 using System;
-
-using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public class NotificationService
 {

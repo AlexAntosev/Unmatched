@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Unmatched.MatchService.EntityFramework\Unmatched.MatchService.EntityFramework.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dto\" />
-  </ItemGroup>
-
 </Project>

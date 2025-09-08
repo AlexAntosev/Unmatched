@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Dtos;
 
 using System;
+using Unmatched.Dtos.Player;
 
 public class FavoriteStatisticsDto : IComparable<FavoriteStatisticsDto>
 {

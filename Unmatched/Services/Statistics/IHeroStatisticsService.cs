@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.Statistics;
 
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public interface IHeroStatisticsService
 {

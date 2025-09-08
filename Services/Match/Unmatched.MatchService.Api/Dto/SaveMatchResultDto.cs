@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Dtos;
+﻿namespace Unmatched.MatchService.Api.Dto;
 
 public class SaveMatchResultDto
 {
@@ -10,5 +10,5 @@ public class SaveMatchResultDto
     
     public int LooserMatchPoints { get; set; }
     
-    public List<TitleDto> TitlesEarned { get; set; }
+    public List<string> TitlesEarned { get; set; }
 }

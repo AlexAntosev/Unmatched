@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Unmatched.EntityFramework.Context;
 
 #nullable disable
 
 namespace Unmatched.EntityFramework.Migrations
 {
-    using Unmatched.Data.Entities;
+    using Unmatched.MatchService.Domain.Entities;
+    using Unmatched.MatchService.EntityFramework.Context;
 
     [DbContext(typeof(UnmatchedDbContext))]
     partial class UnmatchedDbContextModelSnapshot : ModelSnapshot

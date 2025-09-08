@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Unmatched.HttpClients;
+using Unmatched.HttpClients.Contracts;
 using Unmatched.Services;
 using Unmatched.Services.Contracts;
 using Unmatched.Services.Statistics;
@@ -22,13 +23,14 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IHeroService, HeroService>();
         services.AddTransient<IMapService, MapService>();
         services.AddTransient<IPlayStyleService, PlayStyleService>();
+        services.AddTransient<IPlayerService, PlayerService>();
+        services.AddTransient<IFavoriteService, FavoriteService>();
 
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();
         services.AddTransient<ITitleService, TitleService>();
         services.AddTransient<ITournamentService, TournamentService>();
-        services.AddTransient<IPlayerService, PlayerService>();
-        services.AddTransient<IFavoriteService, FavoriteService>();
+
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
             {

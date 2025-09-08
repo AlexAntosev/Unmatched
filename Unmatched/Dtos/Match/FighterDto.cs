@@ -1,4 +1,6 @@
-﻿namespace Unmatched.Dtos;
+﻿using Unmatched.Dtos.Player;
+
+namespace Unmatched.Dtos.Match;
 
 public class FighterDto
 {
@@ -20,7 +22,7 @@ public class FighterDto
 
     public Guid MatchId { get; set; }
     
-    public PlayerDto? Player { get; set; }
+    //public PlayerDto? Player { get; set; }
 
     public Guid PlayerId { get; set; }
     
@@ -53,7 +55,7 @@ public class FighterDto
         }
     }
 
-    public string HeroImageUrl => $"/{Hero?.Name ?? "Unknown"}.png";
+    public string HeroImageUrl { get; set; }
 
-    public string PlayerImageUrl => $"/{Player?.Name ?? "Unknown"}.png";
+    public string PlayerImageUrl { get; set; }
 }

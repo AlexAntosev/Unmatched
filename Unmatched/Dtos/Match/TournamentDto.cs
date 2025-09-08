@@ -1,5 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
+using Unmatched.Dtos.Match;
 using Unmatched.Enums;
 
 public class TournamentDto
@@ -15,6 +16,4 @@ public class TournamentDto
     public Stage InitialStage { get; set; }
     
     public Stage CurrentStage { get; set; }
-    
-    public List<MatchDto> Matches { get; set; }
 }

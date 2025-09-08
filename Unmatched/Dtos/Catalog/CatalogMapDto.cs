@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Dtos;
+﻿namespace Unmatched.Dtos.Catalog;
 
 public class CatalogMapDto
 {

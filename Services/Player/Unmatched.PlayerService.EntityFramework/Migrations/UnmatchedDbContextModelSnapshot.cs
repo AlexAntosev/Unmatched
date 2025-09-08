@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Unmatched.EntityFramework.Context;
 
 #nullable disable
 
 namespace Unmatched.EntityFramework.Migrations
 {
-    using Unmatched.Data.Entities;
+    using Unmatched.PlayerService.EntityFramework.Context;
 
     [DbContext(typeof(UnmatchedDbContext))]
     partial class UnmatchedDbContextModelSnapshot : ModelSnapshot
@@ -23,15 +22,6 @@ namespace Unmatched.EntityFramework.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity<HeroTitle>(b =>
-                {
-                    b.HasKey(ht => new { ht.HeroesId, ht.TitlesId });
-                    b.Property(ht => ht.HeroesId).HasColumnType("uniqueidentifier");
-                    b.Property(ht => ht.TitlesId).HasColumnType("uniqueidentifier");
-
-                    b.ToTable("HeroTitle");
-                });
 
             modelBuilder.Entity("Unmatched.Data.Entities.Favorite", b =>
                 {

@@ -3,6 +3,7 @@
 using System;
 
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public interface IPlayerStatisticsService
 {

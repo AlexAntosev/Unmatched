@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Dtos;
+﻿namespace Unmatched.Dtos.Player;
 
 public class PlayerDto
 {
@@ -6,5 +6,5 @@ public class PlayerDto
 
     public string Name { get; set; }
     
-    public string ImageUrl => $"/{Name}.png";
+    public string ImageUrl { get; set; }
 }

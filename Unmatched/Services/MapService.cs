@@ -3,7 +3,7 @@
 using AutoMapper;
 
 using Unmatched.Dtos;
-using Unmatched.HttpClients;
+using Unmatched.HttpClients.Contracts;
 using Unmatched.Services.Contracts;
 
 public class MapService(IMapper mapper, ICatalogClient catalogClient) : IMapService

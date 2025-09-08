@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Services.Contracts;
 
-using Unmatched.Dtos;
+using Unmatched.Dtos.Player;
 
 public interface IPlayerService
 {
