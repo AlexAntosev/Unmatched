@@ -61,5 +61,6 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7efc09ca_002D0cd4_002D4551_002Db4d5_002Dc6bf5d3d46e5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Unmatched.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::2C001D46-BC3B-4F94-9DD3-76BC76036AF2::net9.0::Unmatched.Tests.MapperTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::53030840-440B-41DD-B366-64D0112C80E5::net9.0::Unmatched.CatalogService.Tests.MapperTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

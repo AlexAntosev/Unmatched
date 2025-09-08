@@ -1,6 +1,8 @@
-﻿namespace Unmatched.Common.EntityFramework;
+﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
 using Microsoft.EntityFrameworkCore;
+
+using Unmatched.CatalogService.Domain.Repositories;
 
 /// <summary>
 /// Do not leave BaseRepository as common class. Every microservice must have its own implementation. This is temp for active dev stage.
@@ -38,6 +40,19 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
         AddOrUpdate(model, modelId);
     }
 
+    public async Task AddOrUpdateAsync(TEntity model)
+    {
+        var existing = await GetByIdAsync(GetId(model));
+        if (existing == null)
+        {
+            await AddAsync(model);
+        }
+        else
+        {
+            DbContext.Entry(existing).CurrentValues.SetValues(model);
+        }
+    }
+
     protected abstract Guid GetId(TEntity model);
 
     public Task AddRangeAsync(IEnumerable<TEntity> models)
@@ -62,9 +77,9 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
         DbContext.Set<TEntity>().RemoveRange(entities);
     }
 
-    public virtual Task<List<TEntity>> GetAsync()
+    public virtual async Task<IReadOnlyList<TEntity>> GetAsync()
     {
-        return DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
+        return await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
     }
 
     public virtual async Task<TEntity?> GetByIdAsync(Guid id)

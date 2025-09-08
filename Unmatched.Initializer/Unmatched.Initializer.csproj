@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Unmatched.Data\Unmatched.Data.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="Data\heroes.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

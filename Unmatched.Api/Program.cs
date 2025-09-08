@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Unmatched.EntityFramework.Registration;
 using Unmatched.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,8 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.RegisterMapping();
-builder.Services.RegisterDbContext(builder.Configuration);
-builder.Services.RegisterRepositories();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>

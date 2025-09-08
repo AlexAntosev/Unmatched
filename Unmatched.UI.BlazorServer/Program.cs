@@ -1,6 +1,5 @@
 using Syncfusion.Blazor;
 
-using Unmatched.EntityFramework.Registration;
 using Unmatched.Initializer.Registration;
 using Unmatched.Registration;
 using Unmatched.UI.BlazorServer;
@@ -13,8 +12,6 @@ builder.Services.AddServerSideBlazor();
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.RegisterMapping();
 builder.Services.RegisterInitializers();
-builder.Services.RegisterDbContext(builder.Configuration);
-builder.Services.RegisterRepositories();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<NotificationService>();
@@ -36,5 +33,4 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-app.Services.Migrate();
 app.Run();

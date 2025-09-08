@@ -1,16 +1,18 @@
 ﻿@page "/match/{id}"
-@using Unmatched.Dtos
-@using Unmatched.Services
-@using Unmatched.Constants
-@using Unmatched.Data.Enums
-@using Unmatched.Extensions
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
+@using Unmatched.Constants
+@using Unmatched.Dtos
+@using Unmatched.Enums
+@using Unmatched.Extensions
+@using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject IMatchService MatchService
 @inject IHeroService HeroService
 @inject ITournamentService TournamentService
 @inject IPlayerService PlayerService
 @inject IMapService MapService
+@inject IFavoriteService FavoriteService
 @inject NavigationManager NavManager
 @inject NotificationService NotificationService
 
@@ -177,8 +179,8 @@
             var random = new Random();
             var andyTurn = random.Next(1, 3);
             var olexTurn = 3 - andyTurn; // in two player game there are Turn 1 and Turn 2. Sum is 3. So <seconds player turn> = 3 - <first player turn>
-            var favouriteAndyHero = await HeroService.GetFavouriteHeroAsync(andy.Id);
-            var favouriteOlexHero = await HeroService.GetFavouriteHeroAsync(olex.Id);
+            var favouriteAndyHero = await FavoriteService.GetFavouriteHeroAsync(andy.Id);
+            var favouriteOlexHero = await FavoriteService.GetFavouriteHeroAsync(olex.Id);
             var defaultFighters = new List<FighterDto>()
                 {
                     new()

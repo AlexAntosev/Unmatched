@@ -1,4 +1,5 @@
 using Unmatched.CatalogService.Api.Registration;
+using Unmatched.CatalogService.Domain.Registration;
 using Unmatched.CatalogService.EntityFramework.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();
+builder.Services.RegisterServices();
 builder.Services.RegisterMapping();
 
 builder.Services.AddControllers();

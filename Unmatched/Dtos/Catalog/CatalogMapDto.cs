@@ -1,0 +1,10 @@
+﻿namespace Unmatched.Dtos;
+
+public class CatalogMapDto
+{
+    public Guid Id { get; set; }
+
+    public string Name { get; set; }
+
+    public string ImageUrl => $"/{Name.Replace(" ", string.Empty)}.png";
+}

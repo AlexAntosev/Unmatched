@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
+using Unmatched.CatalogService.Domain.Entities;
+using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
-using Unmatched.CatalogService.EntityFramework.Entities;
-using Unmatched.Common.EntityFramework;
 
 public class HeroRepository : BaseRepository<Hero, UnmatchedDbContext>, IHeroRepository
 {
@@ -31,8 +31,8 @@ public class HeroRepository : BaseRepository<Hero, UnmatchedDbContext>, IHeroRep
         return model.Id;
     }
 
-    public override Task<List<Hero>> GetAsync()
+    public override async Task<IReadOnlyList<Hero>> GetAsync()
     {
-        return DbContext.Set<Hero>().Include(x => x.Sidekicks).AsNoTracking().ToListAsync();
+        return await DbContext.Set<Hero>().Include(x => x.Sidekicks).AsNoTracking().ToListAsync();
     }
 }

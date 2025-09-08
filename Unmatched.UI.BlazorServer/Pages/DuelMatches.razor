@@ -1,8 +1,9 @@
-﻿@using Unmatched.Dtos
-@using Unmatched.Constants
-@using System.Dynamic
+﻿@using System.Dynamic
 @using Microsoft.AspNetCore.Components
+@using Unmatched.Constants
+@using Unmatched.Dtos
 @using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject IMatchService MatchService
 
 <SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">

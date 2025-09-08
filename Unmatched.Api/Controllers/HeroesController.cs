@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Unmatched.Dtos;
-using Unmatched.Services;
+using Unmatched.Services.Contracts;
 using Unmatched.Services.Statistics;
 
 namespace Unmatched.Api.Controllers

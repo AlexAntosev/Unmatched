@@ -1,17 +1,11 @@
-﻿using Unmatched.Common.EntityFramework;
+﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
-namespace Unmatched.CatalogService.EntityFramework.Repositories;
-
+using Unmatched.CatalogService.Domain.Entities;
+using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
-using Unmatched.CatalogService.EntityFramework.Entities;
 
-public class MapRepository : BaseRepository<Map, UnmatchedDbContext>, IMapRepository
+public class MapRepository(UnmatchedDbContext dbContext) : BaseRepository<Map, UnmatchedDbContext>(dbContext), IMapRepository
 {
-    public MapRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     public Guid GetIdByName(string name)
     {
         return DbContext.Maps.First(x => x.Name.Equals(name)).Id;

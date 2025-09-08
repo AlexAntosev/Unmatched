@@ -4,16 +4,12 @@ using System;
 
 using Microsoft.EntityFrameworkCore;
 
+using Unmatched.CatalogService.Domain.Entities;
+using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
-using Unmatched.CatalogService.EntityFramework.Entities;
-using Unmatched.Common.EntityFramework;
 
-public class PlayStyleRepository : BaseRepository<PlayStyle, UnmatchedDbContext>, IPlayStyleRepository
+public class PlayStyleRepository(UnmatchedDbContext dbContext) : BaseRepository<PlayStyle, UnmatchedDbContext>(dbContext), IPlayStyleRepository
 {
-    public PlayStyleRepository(UnmatchedDbContext dbContext) : base(dbContext)
-    {
-    }
-    
     public async Task<PlayStyle?> GetByHeroIdAsync(Guid heroId)
     {
         var entity = await DbContext.PlayStyles.FirstOrDefaultAsync(p => p.HeroId == heroId);

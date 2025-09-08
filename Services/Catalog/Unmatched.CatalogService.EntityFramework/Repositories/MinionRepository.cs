@@ -1,17 +1,11 @@
-﻿using Unmatched.Common.EntityFramework;
+﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
-namespace Unmatched.CatalogService.EntityFramework.Repositories;
-
+using Unmatched.CatalogService.Domain.Entities;
+using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
-using Unmatched.CatalogService.EntityFramework.Entities;
 
-public class MinionRepository : BaseRepository<Minion, UnmatchedDbContext>, IMinionRepository
+public class MinionRepository(UnmatchedDbContext dbContext) : BaseRepository<Minion, UnmatchedDbContext>(dbContext), IMinionRepository
 {
-    public MinionRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     protected override Guid GetId(Minion model)
     {
         return model.Id;

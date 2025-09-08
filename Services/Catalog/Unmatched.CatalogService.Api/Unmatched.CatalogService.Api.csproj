@@ -15,10 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dto\" />
-  </ItemGroup>
-
-  <ItemGroup>    <ProjectReference Include="..\Unmatched.CatalogService.EntityFramework\Unmatched.CatalogService.EntityFramework.csproj" />
+    <ProjectReference Include="..\Unmatched.CatalogService.Domain\Unmatched.CatalogService.Domain.csproj" />
+    <ProjectReference Include="..\Unmatched.CatalogService.EntityFramework\Unmatched.CatalogService.EntityFramework.csproj" />
   </ItemGroup>
 
 </Project>

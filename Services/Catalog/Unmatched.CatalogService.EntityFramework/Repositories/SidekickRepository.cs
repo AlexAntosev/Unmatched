@@ -1,16 +1,11 @@
 ﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
+using Unmatched.CatalogService.Domain.Entities;
+using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
-using Unmatched.CatalogService.EntityFramework.Entities;
-using Unmatched.Common.EntityFramework;
 
-public class SidekickRepository : BaseRepository<Sidekick, UnmatchedDbContext>, ISidekickRepository
+public class SidekickRepository(UnmatchedDbContext dbContext) : BaseRepository<Sidekick, UnmatchedDbContext>(dbContext), ISidekickRepository
 {
-    public SidekickRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     protected override Guid GetId(Sidekick model)
     {
         return model.Id;

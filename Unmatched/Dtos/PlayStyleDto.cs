@@ -10,16 +10,13 @@ public class PlayStyleDto
 
     public Guid HeroId { get; set; }
 
-    public Guid Id { get; set; }
-
     public int Trickery { get; set; }
 
     public static PlayStyleDto Default(Guid heroId)
     {
         return new PlayStyleDto()
             {
-                HeroId = heroId,
-                Id = Guid.NewGuid()
+                HeroId = heroId
             };
     }
 }

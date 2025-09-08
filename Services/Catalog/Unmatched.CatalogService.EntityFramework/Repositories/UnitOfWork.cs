@@ -1,5 +1,6 @@
 ﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
+using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
 
 public class UnitOfWork(UnmatchedDbContext context) : IUnitOfWork

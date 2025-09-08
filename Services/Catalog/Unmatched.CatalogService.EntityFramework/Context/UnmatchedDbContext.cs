@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-using Unmatched.CatalogService.EntityFramework.Entities;
+using Unmatched.CatalogService.Domain.Entities;
 
 public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDbContext>
 {

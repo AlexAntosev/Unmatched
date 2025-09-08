@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-using Unmatched.Data.Enums;
+using Unmatched.Enums;
 
 public class MatchDto
 {

@@ -15,11 +15,5 @@ public class HeroDto
 
     public string Name { get; set; }
 
-    //public virtual ICollection<Sidekick> Sidekicks { get; set; }
-
     public string Color { get; set; }
-
-    //public virtual ICollection<Title> Titles { get; set; }
-
-    //public virtual PlayStyle? PlayStyle { get; set; }
 }

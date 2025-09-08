@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.Statistics;
 
 using System;
+
 using Unmatched.Dtos;
 
 public interface IMapStatisticsService
