@@ -24,11 +24,9 @@ public class FighterDto
 
     public int? MatchPoints { get; set; }
 
-    public PlayerDto? Player { get; set; }
-
     public Guid PlayerId { get; set; }
 
-    public string PlayerImageUrl => $"/{Player?.Name ?? "Unknown"}.png";
+    public string PlayerImageUrl { get; set; } // => $"/{Player?.Name ?? "Unknown"}.png";
 
     public int? SidekickHpLeft { get; set; }
 
@@ -49,11 +47,6 @@ public class FighterDto
             CardsLeft = Hero.DeckSize;
             ActionsMade = null;
             TimeSpentInSeconds = null;
-        }
-
-        if (Player is not null)
-        {
-            PlayerId = Player.Id;
         }
     }
 }

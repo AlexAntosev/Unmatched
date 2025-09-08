@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Constants
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 @using Unmatched.Dtos.Player
 @using Unmatched.Enums
 @using Unmatched.Extensions
@@ -186,13 +187,13 @@
                 {
                     new()
                         {
-                            Player = andy,
+                            PlayerId = andy.Id,
                             Turn = andyTurn,
                             Hero = favouriteAndyHero
                         },
                     new()
                         {
-                            Player = olex,
+                            PlayerId = olex.Id,
                             Turn = olexTurn,
                             Hero = favouriteOlexHero
                         }

@@ -1,16 +1,16 @@
-﻿using Unmatched.Dtos.Player;
-
-namespace Unmatched.Dtos.Match;
+﻿namespace Unmatched.Dtos.Match;
 
 public class FighterDto
 {
+    public int? ActionsMade { get; set; }
+
     public int? CardsLeft { get; set; }
-    
+
     public HeroDto? Hero { get; set; }
 
     public Guid HeroId { get; set; }
-    
-    public int? MatchPoints { get; set; }
+
+    public string HeroImageUrl { get; set; }
 
     public int? HpLeft { get; set; }
 
@@ -21,20 +21,20 @@ public class FighterDto
     public int? ItemsUsed { get; set; }
 
     public Guid MatchId { get; set; }
-    
-    //public PlayerDto? Player { get; set; }
+
+    public int? MatchPoints { get; set; }
 
     public Guid PlayerId { get; set; }
-    
-    public string? SidekickName { get; set; }
+
+    public string PlayerImageUrl { get; set; }
 
     public int? SidekickHpLeft { get; set; }
 
-    public int? Turn { get; set; }
-    
-    public int? ActionsMade { get; set; }
-    
+    public string? SidekickName { get; set; }
+
     public int? TimeSpentInSeconds { get; set; }
+
+    public int? Turn { get; set; }
 
     public void SetDefaultData()
     {
@@ -48,14 +48,5 @@ public class FighterDto
             ActionsMade = null;
             TimeSpentInSeconds = null;
         }
-
-        if (Player is not null)
-        {
-            PlayerId = Player.Id;
-        }
     }
-
-    public string HeroImageUrl { get; set; }
-
-    public string PlayerImageUrl { get; set; }
 }
