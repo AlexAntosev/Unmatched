@@ -2,102 +2,59 @@
 
 using AutoMapper;
 
+using Unmatched.MatchService.Domain.Catalog;
+using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class TitleService : ITitleService
+public class TitleService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCache catalogHeroCache) : ITitleService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-
-    public TitleService(IUnitOfWork unitOfWork, IMapper mapper)
-    {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-    
     public async Task AddAsync(TitleDto titleDto)
     {
-        var title = _mapper.Map<Title>(titleDto);
-        await _unitOfWork.Titles.AddAsync(title);
-        await _unitOfWork.SaveChangesAsync();
-    }
-    
-    public async Task<IEnumerable<TitleDto>> GetAsync()
-    {
-        var entities = await _unitOfWork.Titles.GetAsync();
-        var titles = _mapper.Map<IEnumerable<TitleDto>>(entities);
-
-        return titles;
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        await _unitOfWork.Titles.Delete(id);
-        await _unitOfWork.SaveChangesAsync();
+        var title = mapper.Map<TitleEntity>(titleDto);
+        await unitOfWork.Titles.AddAsync(title);
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task AssignAsync(Guid titleId, Guid heroId)
     {
-        // var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
-        // var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
-        //
-        // if (title.Heroes.All(h => h.Id != hero.Id))
-        // {
-        //     title.Heroes.Add(hero);
-        //     _unitOfWork.Titles.AddOrUpdate(title);
-        //     await _unitOfWork.SaveChangesAsync();
-        // }
+        var title = await unitOfWork.Titles.GetByIdAsync(titleId);
+        var hero = await catalogHeroCache.GetAsync(heroId);
+
+        if (title != null
+         && title.HeroTitles.All(h => h.HeroesId != hero.Id))
+        {
+            title.HeroTitles.Add(
+                new HeroTitleEntity
+                    {
+                        HeroesId = heroId,
+                        TitlesId = titleId
+                    });
+            await unitOfWork.Titles.AddOrUpdateAsync(title);
+            await unitOfWork.SaveChangesAsync();
+        }
     }
 
-    public async Task UnassignAsync(Guid titleId, Guid heroId)
+    public async Task DeleteAsync(Guid id)
     {
-        // var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
-        // var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
-        //
-        // if (title.Heroes.Any(h => h.Id == hero.Id))
-        // {
-        //     title.Heroes.Remove(hero);
-        //     _unitOfWork.Titles.AddOrUpdate(title);
-        //     await _unitOfWork.SaveChangesAsync();
-        // }
+        await unitOfWork.Titles.Delete(id);
+        await unitOfWork.SaveChangesAsync();
     }
 
-    public async Task MergeAsync(Guid titleId, IEnumerable<Guid> heroesIds)
+    public async Task<IEnumerable<TitleDto>> GetAsync()
     {
-        // var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
-        //
-        // foreach (var titleHero in title.Heroes)
-        // {
-        //     if (heroesIds.All(id => id != titleHero.Id))
-        //     {
-        //         title.Heroes.Remove(titleHero);
-        //     }
-        // }
-        //
-        // foreach (var heroId in heroesIds)
-        // {
-        //     if (title.Heroes.Any(h => h.Id == heroId))
-        //     {
-        //         continue;
-        //     }
-        //
-        //     if (title.Heroes.All(h => h.Id != heroId))
-        //     {
-        //         var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
-        //         title.Heroes.Add(hero);
-        //     }
-        // }
-        //
-        // await _unitOfWork.SaveChangesAsync();
+        var entities = await unitOfWork.Titles.GetAsync();
+        var titles = mapper.Map<IEnumerable<TitleDto>>(entities);
+
+        return titles;
     }
 
     public async Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId)
     {
-        var entities = await _catalogHeroCache.GetAsync();
-        var title = await _unitOfWork.Titles.GetByIdAsync(titleId);
+        var entities = await catalogHeroCache.GetAsync();
+        var title = await unitOfWork.Titles.GetByIdAsync(titleId);
 
-        var heroes = _mapper.Map<IEnumerable<HeroTitleAssignDto>>(entities);
+        var heroes = mapper.Map<IEnumerable<HeroTitleAssignDto>>(entities);
 
         foreach (var hero in heroes)
         {
@@ -108,5 +65,51 @@ public class TitleService : ITitleService
         }
 
         return heroes;
+    }
+
+    public async Task MergeAsync(Guid titleId, IEnumerable<Guid> heroesIds)
+    {
+        var title = await unitOfWork.Titles.GetByIdAsync(titleId);
+
+        foreach (var titleHero in title.HeroTitles)
+        {
+            if (heroesIds.All(id => id != titleHero.HeroesId))
+            {
+                title.HeroTitles.Remove(titleHero);
+            }
+        }
+
+        foreach (var heroId in heroesIds)
+        {
+            if (title.HeroTitles.Any(h => h.HeroesId == heroId))
+            {
+                continue;
+            }
+
+            if (title.HeroTitles.All(h => h.HeroesId != heroId))
+            {
+                title.HeroTitles.Add(
+                    new HeroTitleEntity
+                        {
+                            HeroesId = heroId,
+                            TitlesId = titleId
+                        });
+            }
+        }
+
+        await unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task UnassignAsync(Guid titleId, Guid heroId)
+    {
+        var title = await unitOfWork.Titles.GetByIdAsync(titleId);
+
+        var heroTitleToRemove = title?.HeroTitles.FirstOrDefault(h => h.HeroesId == heroId);
+        if (heroTitleToRemove != null)
+        {
+            title.HeroTitles.Remove(heroTitleToRemove);
+            await unitOfWork.Titles.AddOrUpdateAsync(title);
+            await unitOfWork.SaveChangesAsync();
+        }
     }
 }

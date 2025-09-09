@@ -5,5 +5,5 @@ using Unmatched.MatchService.Domain.Enums;
 
 public interface IFirstTournamentRatingCalculator
 {
-    Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage);
+    Task<Dictionary<Guid, int>> CalculateAsync(FighterEntity fighter, FighterEntity opponent, Stage stage);
 }

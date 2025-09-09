@@ -1,8 +1,10 @@
 ﻿namespace Unmatched.MatchService.Domain.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Rating
+[Table("Rating")]
+public class RatingEntity
 {
     public Guid HeroId { get; set; }
 

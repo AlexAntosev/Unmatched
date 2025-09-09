@@ -14,7 +14,7 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         _ratingCalculator = ratingCalculator;
     }
     
-    protected override async Task InnerHandleAsync(Match match)
+    protected override async Task InnerHandleAsync(MatchEntity match)
     {
         var matchPoints = await _ratingCalculator.CalculateAsync(match.Fighters.First(), match.Fighters.Last(), match.Stage.Value);
         
@@ -23,7 +23,7 @@ public class FirstTournamentMatchHandler : BaseMatchHandler
         await UnitOfWork.SaveChangesAsync();
     }
 
-    protected override void InnerValidate(Match match)
+    protected override void InnerValidate(MatchEntity match)
     {
         if (match.Stage is null)
         {

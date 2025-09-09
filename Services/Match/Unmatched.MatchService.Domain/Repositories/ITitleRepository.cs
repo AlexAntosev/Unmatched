@@ -2,9 +2,9 @@
 
 using Unmatched.MatchService.Domain.Entities;
 
-public interface ITitleRepository : IRepository<Title>
+public interface ITitleRepository : IRepository<TitleEntity>
 {
-    Task<IEnumerable<Title>> GetByHeroId(Guid heroId);
+    Task<IEnumerable<TitleEntity>> GetByHeroId(Guid heroId);
     
-    Task<Title?> GetByNameAsync(string name);
+    Task<TitleEntity?> GetByNameAsync(string name);
 }

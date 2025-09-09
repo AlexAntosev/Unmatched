@@ -1,10 +1,11 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
+using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 
 public interface IMatchService
 {
-    Task<SaveMatchResultDto> AddAsync(Match match);
+    Task<SaveMatchResultDto> AddAsync(MatchEntity match);
     
     Task<SaveMatchResultDto> AddAsync(MatchDto match);
 

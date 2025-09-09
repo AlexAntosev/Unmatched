@@ -1,7 +1,5 @@
 ﻿namespace Unmatched.MatchService.Api.Dto;
 
-using Unmatched.Dtos.Match;
-
 public class FighterDto
 {
     public int? ActionsMade { get; set; }
@@ -11,8 +9,6 @@ public class FighterDto
     public FighterHeroDto? Hero { get; set; }
 
     public Guid HeroId { get; set; }
-
-    public string HeroImageUrl => $"/{Hero?.Name ?? "Unknown"}.png";
 
     public int? HpLeft { get; set; }
 
@@ -27,8 +23,6 @@ public class FighterDto
     public int? MatchPoints { get; set; }
 
     public Guid PlayerId { get; set; }
-
-    public string PlayerImageUrl { get; set; } // => $"/{Player?.Name ?? "Unknown"}.png";
 
     public int? SidekickHpLeft { get; set; }
 

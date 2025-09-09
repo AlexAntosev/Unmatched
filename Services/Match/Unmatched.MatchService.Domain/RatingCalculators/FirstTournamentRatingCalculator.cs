@@ -18,7 +18,7 @@ public class FirstTournamentRatingCalculator : IFirstTournamentRatingCalculator
         _catalogHeroCache = catalogHeroCache;
     }
 
-    public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent, Stage stage)
+    public async Task<Dictionary<Guid, int>> CalculateAsync(FighterEntity fighter, FighterEntity opponent, Stage stage)
     {
         var winner = fighter.IsWinner
             ? fighter

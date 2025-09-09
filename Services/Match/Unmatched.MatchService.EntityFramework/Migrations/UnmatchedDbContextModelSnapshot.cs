@@ -24,7 +24,7 @@ namespace Unmatched.EntityFramework.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity<HeroTitle>(b =>
+            modelBuilder.Entity<HeroTitleEntity>(b =>
                 {
                     b.HasKey(ht => new { ht.HeroesId, ht.TitlesId });
                     b.Property(ht => ht.HeroesId).HasColumnType("uniqueidentifier");

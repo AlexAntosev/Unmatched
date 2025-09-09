@@ -3,6 +3,7 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Constants;
+using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
@@ -20,7 +21,7 @@ public class RusherTitleHandler : IRusherTitleHandler
         _mapper = mapper;
     }
     
-    public async Task<TitleDto?> HandleAsync(Match match)
+    public async Task<TitleDto?> HandleAsync(MatchEntity match)
     {
         var title = await _unitOfWork.Titles.GetByNameAsync(Titles.Rusher);
         if (title is null)

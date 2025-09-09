@@ -3,6 +3,7 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Constants;
+using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
@@ -19,7 +20,7 @@ public class PunisherTitleHandler : IPunisherTitleHandler
         _mapper = mapper;
     }
     
-    public async Task<TitleDto?> HandleAsync(Match match)
+    public async Task<TitleDto?> HandleAsync(MatchEntity match)
     {
         var title = await _unitOfWork.Titles.GetByNameAsync(Titles.Punisher);
         if (title is null)

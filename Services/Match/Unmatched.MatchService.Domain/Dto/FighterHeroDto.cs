@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Api.Dto;
+﻿namespace Unmatched.MatchService.Domain.Dto;
 
 public class FighterHeroDto
 {

@@ -5,51 +5,38 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class MatchHandlerFactory : IMatchHandlerFactory
+public class MatchHandlerFactory(
+    IUnitOfWork unitOfWork,
+    IRatingCalculator ratingCalculator,
+    IFirstTournamentRatingCalculator firstTournamentRatingCalculator,
+    IUnrankedRatingCalculator unrankedRatingCalculator) : IMatchHandlerFactory
 {
-    private readonly IFirstTournamentRatingCalculator _firstTournamentRatingCalculator;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IRatingCalculator _ratingCalculator;
-    private readonly IUnrankedRatingCalculator _unrankedRatingCalculator;
+    private IEnumerable<TournamentEntity> TournamentsCache => unitOfWork.Tournaments.Get();
 
-    public MatchHandlerFactory(
-        IUnitOfWork unitOfWork,
-        IRatingCalculator ratingCalculator,
-        IFirstTournamentRatingCalculator firstTournamentRatingCalculator,
-        IUnrankedRatingCalculator unrankedRatingCalculator)
-    {
-        _unitOfWork = unitOfWork;
-        _ratingCalculator = ratingCalculator;
-        _firstTournamentRatingCalculator = firstTournamentRatingCalculator;
-        _unrankedRatingCalculator = unrankedRatingCalculator;
-    }
-
-    private IEnumerable<Tournament> TournamentsCache => _unitOfWork.Tournaments.Query(true).ToList();
-
-    public IMatchHandler Create(Match match) => match switch
+    public IMatchHandler Create(MatchEntity match) => match switch
     {
         _ when IsUnranked(match) =>
-            new UnrankedMatchHandler(_unitOfWork, _unrankedRatingCalculator),
+            new UnrankedMatchHandler(unitOfWork, unrankedRatingCalculator),
         _ when IsFirstTournament(match) =>
-            new FirstTournamentMatchHandler(_unitOfWork, _firstTournamentRatingCalculator),
+            new FirstTournamentMatchHandler(unitOfWork, firstTournamentRatingCalculator),
         _ when IsGoldenHalatLeague(match) || IsSilverhandTournament(match) => 
-            new GoldenHalatLeagueMatchHandler(_unitOfWork, _ratingCalculator),
-        _ =>  new GoldenHalatLeagueMatchHandler(_unitOfWork, _ratingCalculator)
+            new GoldenHalatLeagueMatchHandler(unitOfWork, ratingCalculator),
+        _ =>  new GoldenHalatLeagueMatchHandler(unitOfWork, ratingCalculator)
     };
 
-    private static bool IsUnranked(Match match) 
+    private static bool IsUnranked(MatchEntity match) 
         => match.TournamentId == null;
     
-    private bool IsFirstTournament(Match match)
+    private bool IsFirstTournament(MatchEntity match)
         => TournamentPredicateInternal(match, TournamentNames.UnmatchedFirstTournament);
 
-    private bool IsGoldenHalatLeague(Match match)
+    private bool IsGoldenHalatLeague(MatchEntity match)
         => TournamentPredicateInternal(match, TournamentNames.GoldenHalatLeague);
 
-    private bool IsSilverhandTournament(Match match) 
+    private bool IsSilverhandTournament(MatchEntity match) 
         => TournamentPredicateInternal(match, TournamentNames.SilverhandTournament);
 
-    private bool TournamentPredicateInternal(Match match, string targetTournamentName)
+    private bool TournamentPredicateInternal(MatchEntity match, string targetTournamentName)
     {
         if (match.TournamentId is null)
         {

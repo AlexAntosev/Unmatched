@@ -2,17 +2,17 @@
 
 using Unmatched.MatchService.Domain.Entities;
 
-public interface IMatchRepository : IRepository<Match>
+public interface IMatchRepository : IRepository<MatchEntity>
 {
-    Match Update(Match model);
+    MatchEntity Update(MatchEntity model);
     
-    Task<List<Match>> GetFinishedAsync();
+    Task<List<MatchEntity>> GetFinishedAsync();
     
-    Task<List<Match>> GetFinishedByHeroIdAsync(Guid heroId);
+    Task<List<MatchEntity>> GetFinishedByHeroIdAsync(Guid heroId);
     
-    Task<List<Match>> GetFinishedByMapIdAsync(Guid mapId);
+    Task<List<MatchEntity>> GetFinishedByMapIdAsync(Guid mapId);
     
-    Task<List<Match>> GetFinishedByPlayerIdAsync(Guid playerId);
+    Task<List<MatchEntity>> GetFinishedByPlayerIdAsync(Guid playerId);
     
-    Task<List<Match>> GetByTournamentAsync(Guid id);
+    Task<List<MatchEntity>> GetByTournamentAsync(Guid id);
 }

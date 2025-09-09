@@ -1,12 +1,9 @@
-﻿namespace Unmatched.MatchService.Domain.Entities;
-
-using System.ComponentModel.DataAnnotations;
+﻿namespace Unmatched.MatchService.Domain.Dto;
 
 using Unmatched.MatchService.Domain.Enums;
 
-public class Tournament
+public class TournamentDto
 {
-    [Key]
     public Guid Id { get; set; }
 
     public string Name { get; set; }
@@ -18,6 +15,4 @@ public class Tournament
     public Stage InitialStage { get; set; }
     
     public Stage CurrentStage { get; set; }
-    
-    public virtual ICollection<Match> Matches { get; set; }
 }

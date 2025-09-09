@@ -25,7 +25,7 @@ public class RatingService : IRatingService
         }
     }
     
-    private async Task<IEnumerable<Match>> GetMatchesAsync()
+    private async Task<IEnumerable<MatchEntity>> GetMatchesAsync()
     {
         var matches = await _unitOfWork.Matches.GetAsync();
         return matches;

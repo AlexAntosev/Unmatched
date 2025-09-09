@@ -1,7 +1,6 @@
-﻿namespace Unmatched.Dtos;
+﻿namespace Unmatched.MatchService.Api.Dto;
 
 using System;
-
 
 public class HeroTitleAssignDto
 {

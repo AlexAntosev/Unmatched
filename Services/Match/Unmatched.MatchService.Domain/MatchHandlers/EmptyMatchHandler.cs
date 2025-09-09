@@ -16,14 +16,14 @@ public class EmptyMatchHandler : BaseMatchHandler
         _logger = loggerFactory.CreateLogger<EmptyMatchHandler>();
     }
 
-    protected override Task InnerHandleAsync(Match match)
+    protected override Task InnerHandleAsync(MatchEntity match)
     {
         _logger.LogError("Match was not handled due to handler was not found.");
         
         return Task.CompletedTask;
     }
 
-    protected override void InnerValidate(Match match)
+    protected override void InnerValidate(MatchEntity match)
     {
     }
 }

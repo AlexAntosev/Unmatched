@@ -5,8 +5,6 @@ using Moq;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
-using Match = Unmatched.MatchService.Domain.Entities.Match;
-
 public class BaseMatchHandlerTests
 {
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
@@ -14,7 +12,7 @@ public class BaseMatchHandlerTests
     [Fact]
     public async Task HandleAsync_NoFighters_ThrowException()
     {
-        var match = new Match();
+        var match = new MatchEntity();
 
         var baseHandler = new TestMatchHandler(_unitOfWork.Object);
         
@@ -24,9 +22,9 @@ public class BaseMatchHandlerTests
     [Fact]
     public async Task  HandleAsync_NotEnoughFighters_ThrowException()
     {
-        var match = new Match
+        var match = new MatchEntity
             {
-                Fighters = new List<Fighter>()
+                Fighters = new List<FighterEntity>()
                     {
                         new()
                     }

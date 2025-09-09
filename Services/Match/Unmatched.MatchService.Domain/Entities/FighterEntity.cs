@@ -1,8 +1,10 @@
 ﻿namespace Unmatched.MatchService.Domain.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Fighter
+[Table("Fighter")]
+public class FighterEntity
 {
     public int? CardsLeft { get; set; }
 
@@ -17,7 +19,7 @@ public class Fighter
 
     public int? ItemsUsed { get; set; }
 
-    public virtual Match Match { get; set; }
+    public virtual MatchEntity Match { get; set; }
     
     public Guid MatchId { get; set; }
 

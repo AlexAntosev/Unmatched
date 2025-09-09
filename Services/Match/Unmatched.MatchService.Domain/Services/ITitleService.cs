@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
+using Unmatched.MatchService.Domain.Dto;
+
 public interface ITitleService
 {
     Task AddAsync(TitleDto title);

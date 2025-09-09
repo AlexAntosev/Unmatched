@@ -2,7 +2,7 @@
 
 using Unmatched.MatchService.Domain.Entities;
 
-public interface ITournamentRepository : IRepository<Tournament>
+public interface ITournamentRepository : IRepository<TournamentEntity>
 {
     Guid GetIdByName(string name);
 }

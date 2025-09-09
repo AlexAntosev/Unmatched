@@ -6,11 +6,11 @@ using Unmatched.MatchService.Domain.Repositories;
 
 public class TestMatchHandler : BaseMatchHandler
 {
-    protected override async Task InnerHandleAsync(Match match)
+    protected override async Task InnerHandleAsync(MatchEntity match)
     {
     }
 
-    protected override void InnerValidate(Match match)
+    protected override void InnerValidate(MatchEntity match)
     {
     }
 

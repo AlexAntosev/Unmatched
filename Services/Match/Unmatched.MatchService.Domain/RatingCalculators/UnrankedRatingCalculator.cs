@@ -4,7 +4,7 @@ using Unmatched.MatchService.Domain.Entities;
 
 public class UnrankedRatingCalculator : IUnrankedRatingCalculator
 {
-    public async Task<Dictionary<Guid, int>> CalculateAsync(Fighter fighter, Fighter opponent)
+    public async Task<Dictionary<Guid, int>> CalculateAsync(FighterEntity fighter, FighterEntity opponent)
     {
         var winner = fighter.IsWinner
             ? fighter

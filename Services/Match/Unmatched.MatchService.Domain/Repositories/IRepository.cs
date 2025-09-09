@@ -16,11 +16,11 @@ public interface IRepository<T>
 
     void DeleteAll();
 
+    IReadOnlyList<T> Get();
+
     Task<IReadOnlyList<T>> GetAsync();
 
     Task<T?> GetByIdAsync(Guid id);
-
-    IQueryable<T> Query(bool noTrack = false);
 
     Task SaveChangesAsync();
 }

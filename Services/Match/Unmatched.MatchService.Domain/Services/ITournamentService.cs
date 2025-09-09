@@ -2,6 +2,8 @@
 
 using System;
 
+using Unmatched.MatchService.Domain.Dto;
+
 public interface ITournamentService
 {
     Task<TournamentDto> AddAsync(TournamentDto dto);

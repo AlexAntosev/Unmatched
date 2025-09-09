@@ -17,6 +17,5 @@ public interface IUnitOfWork : IDisposable
 
     ITitleRepository Titles { get; }
 
-
     Task SaveChangesAsync();
 }

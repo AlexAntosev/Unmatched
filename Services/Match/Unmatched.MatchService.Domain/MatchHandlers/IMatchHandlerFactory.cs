@@ -4,5 +4,5 @@ using Unmatched.MatchService.Domain.Entities;
 
 public interface IMatchHandlerFactory
 {
-    public IMatchHandler Create(Match match);
+    public IMatchHandler Create(MatchEntity match);
 }

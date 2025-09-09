@@ -1,6 +1,6 @@
-﻿namespace Unmatched.Dtos.Match;
+﻿namespace Unmatched.MatchService.Domain.Dto;
 
-using Unmatched.Enums;
+using Unmatched.MatchService.Domain.Enums;
 
 public class MatchDto
 {
@@ -9,8 +9,8 @@ public class MatchDto
     public DateTime Date { get; set; }
 
     public Guid Id { get; set; }
-
-    public Guid MapId { get; set; }
+    
+    public Guid? MapId { get; set; }
     
     public IEnumerable<FighterDto> Fighters { get; set; }
 

@@ -6,11 +6,11 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.EntityFramework.Context;
 
-public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Match, UnmatchedDbContext>(dbContext), IMatchRepository
+public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<MatchEntity, UnmatchedDbContext>(dbContext), IMatchRepository
 {
-    public Match Update(Match model)
+    public MatchEntity Update(MatchEntity model)
     {
-        var local = DbContext.Set<Match>()
+        var local = DbContext.Set<MatchEntity>()
             .Local
             .FirstOrDefault(entry => entry.Id.Equals(model.Id));
 
@@ -23,12 +23,12 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
         return model;
     }
 
-    public async Task<List<Match>> GetFinishedAsync()
+    public async Task<List<MatchEntity>> GetFinishedAsync()
     {
         return await DbContext.Matches.Include(x => x.Tournament).Include(x => x.Fighters).Where(m => !m.IsPlanned).AsNoTracking().ToListAsync();
     }
 
-    public async Task<List<Match>> GetFinishedByHeroIdAsync(Guid heroId)
+    public async Task<List<MatchEntity>> GetFinishedByHeroIdAsync(Guid heroId)
     {
         return await DbContext.Matches
             .Include(x => x.Fighters)
@@ -39,7 +39,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
             .ToListAsync();
     }
 
-    public async Task<List<Match>> GetFinishedByMapIdAsync(Guid mapId)
+    public async Task<List<MatchEntity>> GetFinishedByMapIdAsync(Guid mapId)
     {
         return await DbContext.Matches
             .Include(x => x.Fighters)
@@ -50,7 +50,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
             .ToListAsync();
     }
 
-    public async Task<List<Match>> GetFinishedByPlayerIdAsync(Guid playerId)
+    public async Task<List<MatchEntity>> GetFinishedByPlayerIdAsync(Guid playerId)
     {
         return await DbContext.Matches
             .Include(x => x.Fighters)
@@ -61,7 +61,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
             .ToListAsync();
     }
 
-    public async Task<List<Match>> GetByTournamentAsync(Guid id)
+    public async Task<List<MatchEntity>> GetByTournamentAsync(Guid id)
     {
         // return await DbContext.Matches.Include(x => x.Map)
         //     .Include(x => x.Tournament)
@@ -81,20 +81,20 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
             .ToListAsync();
     }
 
-    protected override Guid GetId(Match model)
+    protected override Guid GetId(MatchEntity model)
     {
         return model.Id;
     }
 
-    public override async Task<IReadOnlyList<Match>> GetAsync()
+    public override async Task<IReadOnlyList<MatchEntity>> GetAsync()
     {
-        return await DbContext.Set<Match>().Include(x => x.Fighters).AsNoTracking().ToListAsync();
+        return await DbContext.Set<MatchEntity>().Include(x => x.Fighters).AsNoTracking().ToListAsync();
         //return DbContext.Set<Match>().Include(x => x.Fighters).ThenInclude(x => x.Hero).AsNoTracking().ToListAsync();
     }
-    public override async Task<Match?> GetByIdAsync(Guid id)
+    public override async Task<MatchEntity?> GetByIdAsync(Guid id)
     {
         //var entity = await DbContext.Set<Match>().Include(x => x.Map).Include(x => x.Fighters).ThenInclude(x => x.Hero).ThenInclude(x => x.Sidekicks).Include(x => x.Fighters).ThenInclude(x => x.Player).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-        var entity = await DbContext.Set<Match>().Include(x => x.Fighters).Include(x => x.Fighters).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var entity = await DbContext.Set<MatchEntity>().Include(x => x.Fighters).Include(x => x.Fighters).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         return entity;
     }
 }

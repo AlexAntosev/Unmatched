@@ -12,4 +12,11 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogHeroDto>>();
     }
+
+    public async Task<IEnumerable<CatalogMapDto>> GetMapsAsync()
+    {
+        var response = await httpClient.GetAsync("/map");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogMapDto>>();
+    }
 }

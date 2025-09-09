@@ -4,5 +4,5 @@ using Unmatched.MatchService.Domain.Entities;
 
 public interface IMatchHandler : IDisposable
 {
-    Task HandleAsync(Match match);
+    Task HandleAsync(MatchEntity match);
 }

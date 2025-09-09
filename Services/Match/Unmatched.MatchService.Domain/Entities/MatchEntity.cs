@@ -5,7 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Unmatched.MatchService.Domain.Enums;
 
-public class Match 
+[Table("Match")]
+public class MatchEntity 
 {
     public string? Comment { get; set; }
 
@@ -16,10 +17,10 @@ public class Match
 
     public Guid? MapId { get; set; }
     
-    [ForeignKey(nameof(Fighter.MatchId))]
-    public virtual ICollection<Fighter> Fighters { get; set; }
+    [ForeignKey(nameof(FighterEntity.MatchId))]
+    public virtual ICollection<FighterEntity> Fighters { get; set; }
 
-    public virtual Tournament? Tournament { get; set; }
+    public virtual TournamentEntity? Tournament { get; set; }
 
     public Guid? TournamentId { get; set; }
     

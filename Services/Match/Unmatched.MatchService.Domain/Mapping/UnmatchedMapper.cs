@@ -10,6 +10,7 @@ public class UnmatchedMapper : Profile
 {
     public UnmatchedMapper()
     {
+        CreateMap<>()
     }
 
     private string TryGetMapName(Map? map)
@@ -17,7 +18,7 @@ public class UnmatchedMapper : Profile
         return map?.Name ?? "<forgotten>";
     }
 
-    private string TryGetTournamentName(Tournament? tournament, Stage? stage)
+    private string TryGetTournamentName(TournamentEntity? tournament, Stage? stage)
     {
         var tournamentName = tournament?.Name ?? "<unranked>";
         if (stage is not null)

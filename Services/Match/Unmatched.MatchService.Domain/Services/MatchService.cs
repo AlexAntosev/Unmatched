@@ -3,6 +3,7 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Catalog;
+using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
@@ -38,7 +39,7 @@ public class MatchService : IMatchService
         _catalogHeroCache = catalogHeroCache;
     }
     
-    public async Task<SaveMatchResultDto> AddAsync(Match match)
+    public async Task<SaveMatchResultDto> AddAsync(MatchEntity match)
     {
         var handler = _matchHandlerFactory.Create(match);
         await handler.HandleAsync(match);
@@ -65,7 +66,7 @@ public class MatchService : IMatchService
                 WinnerMatchPoints = match.Fighters.First(f => f.IsWinner).MatchPoints.Value,
                 LooserHeroName = looserHero.Name,
                 LooserMatchPoints = match.Fighters.First(f => !f.IsWinner).MatchPoints.Value,
-                TitlesEarned = titlesEarned
+                TitlesEarned = titlesEarned.Select(x => x.Name).ToList()
             };
 
         return result;
@@ -73,14 +74,14 @@ public class MatchService : IMatchService
 
     public Task<SaveMatchResultDto> AddAsync(MatchDto matchDto)
     {
-        var match = _mapper.Map<Match>(matchDto);
+        var match = _mapper.Map<MatchEntity>(matchDto);
 
         return AddAsync(match);
     }
 
     public Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto)
     {
-        var match = _mapper.Map<Match>(matchDto);
+        var match = _mapper.Map<MatchEntity>(matchDto);
 
         return AddAsync(match);
     }
@@ -127,11 +128,11 @@ public class MatchService : IMatchService
 
     public async Task UpdateEpicAsync(Guid matchId, int epic)
     {
-        var match = _unitOfWork.Matches.Query().FirstOrDefault(m => m.Id == matchId);
+        var match = await _unitOfWork.Matches.GetByIdAsync(matchId);
         if (match is not null)
         {
             match.Epic = epic;
-            _unitOfWork.Matches.AddOrUpdate(match);
+            await _unitOfWork.Matches.AddOrUpdateAsync(match);
             await _unitOfWork.SaveChangesAsync();
         }
     }

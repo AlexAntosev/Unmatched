@@ -12,17 +12,17 @@ public abstract class BaseMatchHandler : IMatchHandler
         UnitOfWork = unitOfWork;
     }
 
-    public Task HandleAsync(Match match)
+    public Task HandleAsync(MatchEntity match)
     {
         Validate(match);
         return InnerHandleAsync(match);
     }
 
-    protected abstract Task InnerHandleAsync(Match match);
+    protected abstract Task InnerHandleAsync(MatchEntity match);
     
-    protected abstract void InnerValidate(Match match);
+    protected abstract void InnerValidate(MatchEntity match);
 
-    protected async Task<Match> CreateMatch(Match match, Dictionary<Guid, int> matchPoints)
+    protected async Task<MatchEntity> CreateMatch(MatchEntity match, Dictionary<Guid, int> matchPoints)
     {
         foreach (var fighter in match.Fighters)
         {
@@ -32,7 +32,7 @@ public abstract class BaseMatchHandler : IMatchHandler
         match.IsPlanned = false;
         var createdMatch = match.Id == Guid.Empty ? await UnitOfWork.Matches.AddAsync(match) : UnitOfWork.Matches.Update(match);
 
-        var updatedHeroRatings = new List<Rating>();
+        var updatedHeroRatings = new List<RatingEntity>();
         foreach (var heroMatchPoints in matchPoints)
         {
             var rating = await UpdateHeroRatingAsync(heroMatchPoints.Key, heroMatchPoints.Value);
@@ -47,7 +47,7 @@ public abstract class BaseMatchHandler : IMatchHandler
         return createdMatch;
     }
     
-    private void Validate(Match match)
+    private void Validate(MatchEntity match)
     {
         if (IsNotEnoughFighters(match.Fighters))
         {
@@ -62,17 +62,17 @@ public abstract class BaseMatchHandler : IMatchHandler
         InnerValidate(match);
     }
     
-    private static bool IsNotEnoughFighters(ICollection<Fighter>? fighters) 
+    private static bool IsNotEnoughFighters(ICollection<FighterEntity>? fighters) 
         => fighters is null || fighters.Count < 2;
     
-    private static bool IsNotOneWinner(ICollection<Fighter> fighters) 
+    private static bool IsNotOneWinner(ICollection<FighterEntity> fighters) 
         => fighters.Count(f => f.IsWinner) != 1;
 
-    private async Task<Rating> UpdateHeroRatingAsync(Guid heroId, int matchPoint)
+    private async Task<RatingEntity> UpdateHeroRatingAsync(Guid heroId, int matchPoint)
     {
         var rating = await UnitOfWork.Ratings.GetByHeroIdAsync(heroId)
-         ?? new Rating
-                {
+         ?? new RatingEntity
+         {
                     HeroId = heroId
                 };
         

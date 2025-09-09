@@ -1,6 +1,9 @@
-﻿namespace Unmatched.MatchService.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class PlayStyle
+namespace Unmatched.MatchService.Domain.Entities;
+
+[Table("PlayStyle")]
+public class PlayStyleEntity
 {
     public int Attack { get; set; }
 
@@ -12,9 +15,9 @@ public class PlayStyle
 
     public int Trickery { get; set; }
 
-    public static PlayStyle Default(Guid heroId)
+    public static PlayStyleEntity Default(Guid heroId)
     {
-        return new PlayStyle
+        return new PlayStyleEntity
             {
                 HeroId = heroId
             };

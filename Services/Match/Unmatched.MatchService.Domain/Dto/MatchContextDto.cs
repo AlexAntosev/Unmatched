@@ -8,8 +8,8 @@ class MatchContextDto
     public MatchContextDto(
         CatalogHeroDto winnerReferenceHero,
         CatalogHeroDto looserReferenceHero,
-        Fighter winnerFighter,
-        Fighter looserFighter,
+        FighterEntity winnerFighter,
+        FighterEntity looserFighter,
         int winnerPointsBeforeMatch,
         int looserPointsBeforeMatch)
     {
@@ -21,13 +21,13 @@ class MatchContextDto
         LooserPointsBeforeMatch = looserPointsBeforeMatch;
     }
 
-    public Fighter LooserFighter { get; }
+    public FighterEntity LooserFighter { get; }
 
     public int LooserPointsBeforeMatch { get; }
 
     public CatalogHeroDto LooserReferenceHero { get; }
 
-    public Fighter WinnerFighter { get; }
+    public FighterEntity WinnerFighter { get; }
 
     public int WinnerPointsBeforeMatch { get; }
 

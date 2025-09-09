@@ -58,6 +58,11 @@ public abstract class BaseInMemoryRepository<TEntity> : IRepository<TEntity>
         _cache.Clear();
     }
 
+    public IReadOnlyList<TEntity> Get()
+    {
+        return _cache.Clone();
+    }
+
     public async Task<IReadOnlyList<TEntity>> GetAsync()
     {
         return await Task.FromResult(_cache.Clone());
@@ -71,11 +76,6 @@ public abstract class BaseInMemoryRepository<TEntity> : IRepository<TEntity>
     protected TEntity? GetById(Guid id)
     {
         return _cache.Find(x => GetId(x) == id);
-    }
-
-    public IQueryable<TEntity> Query(bool noTrack = false)
-    {
-        return noTrack ? _cache.Clone().AsQueryable() : _cache.AsQueryable();
     }
 
     public Task SaveChangesAsync()

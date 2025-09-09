@@ -2,9 +2,9 @@
 
 using Unmatched.MatchService.Domain.Entities;
 
-public interface IRatingRepository : IRepository<Rating>
+public interface IRatingRepository : IRepository<RatingEntity>
 {
-    Task<Rating?> GetByHeroIdAsync(Guid heroId);
+    Task<RatingEntity?> GetByHeroIdAsync(Guid heroId);
 
     Task ClearAllRatingsAsync();
 }

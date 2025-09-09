@@ -38,25 +38,25 @@ public class UnmatchedDbContext : DbContext
     {
     }
 
-    public DbSet<Fighter> Fighters { get; set; }
+    public DbSet<FighterEntity> Fighters { get; set; }
 
-    public DbSet<HeroTitle> HeroTitles { get; set; }
-
-
-    public DbSet<Match> Matches { get; set; }
+    public DbSet<HeroTitleEntity> HeroTitles { get; set; }
 
 
-    public DbSet<Rating> Ratings { get; set; }
+    public DbSet<MatchEntity> Matches { get; set; }
 
 
-    public DbSet<Tournament> Tournaments { get; set; }
+    public DbSet<RatingEntity> Ratings { get; set; }
 
-    public DbSet<Title> Titles { get; set; }
+
+    public DbSet<TournamentEntity> Tournaments { get; set; }
+
+    public DbSet<TitleEntity> Titles { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<HeroTitle>(b =>
+        modelBuilder.Entity<HeroTitleEntity>(b =>
             {
                 b.HasKey(ht => new { ht.HeroesId, ht.TitlesId });
                 b.ToTable("HeroTitle");

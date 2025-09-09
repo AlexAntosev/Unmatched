@@ -4,11 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 using Unmatched.MatchService.Domain.Repositories;
 
-/// <summary>
-/// Do not leave BaseRepository as common class. Every microservice must have its own implementation. This is temp for active dev stage.
-/// </summary>
-/// <typeparam name="TEntity"></typeparam>
-/// <param name="dbContext"></param>
 public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IRepository<TEntity>
     where TEntity : class
     where TContext : DbContext
@@ -77,6 +72,11 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
         DbContext.Set<TEntity>().RemoveRange(entities);
     }
 
+    public IReadOnlyList<TEntity> Get()
+    {
+        return DbContext.Set<TEntity>().AsNoTracking().ToList();
+    }
+
     public virtual async Task<IReadOnlyList<TEntity>> GetAsync()
     {
         return await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
@@ -86,11 +86,6 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
     {
         var entity = (await DbContext.Set<TEntity>().AsNoTracking().ToListAsync()).FirstOrDefault(x => GetId(x) == id);
         return entity;
-    }
-
-    public virtual IQueryable<TEntity> Query(bool noTrack = false)
-    {
-        return noTrack ? DbContext.Set<TEntity>().AsNoTracking() : DbContext.Set<TEntity>();
     }
 
     public Task SaveChangesAsync()

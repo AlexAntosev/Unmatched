@@ -10,8 +10,6 @@ public class FighterDto
 
     public Guid HeroId { get; set; }
 
-    public string HeroImageUrl { get; set; }
-
     public int? HpLeft { get; set; }
 
     public Guid Id { get; set; }
@@ -25,8 +23,6 @@ public class FighterDto
     public int? MatchPoints { get; set; }
 
     public Guid PlayerId { get; set; }
-
-    public string PlayerImageUrl { get; set; }
 
     public int? SidekickHpLeft { get; set; }
 

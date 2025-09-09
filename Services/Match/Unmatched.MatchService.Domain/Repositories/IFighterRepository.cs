@@ -2,15 +2,15 @@
 
 using Unmatched.MatchService.Domain.Entities;
 
-public interface IFighterRepository : IRepository<Fighter>
+public interface IFighterRepository : IRepository<FighterEntity>
 {
-    Task<List<Fighter>> GetByMatchIdAsync(Guid matchId);
+    Task<List<FighterEntity>> GetByMatchIdAsync(Guid matchId);
     
-    Task<List<Fighter>> GetFromFinishedMatchesAsync();
+    Task<List<FighterEntity>> GetFromFinishedMatchesAsync();
     
-    Task<List<Fighter>> GetFromFinishedMatchesByHeroIdAsync(Guid heroId);
+    Task<List<FighterEntity>> GetFromFinishedMatchesByHeroIdAsync(Guid heroId);
     
-    Task<List<Fighter>> GetFromFinishedMatchesByPlayerIdAsync(Guid playerId);
+    Task<List<FighterEntity>> GetFromFinishedMatchesByPlayerIdAsync(Guid playerId);
 
-    Task<List<Fighter>> GetFromFinishedMatchesByHeroAndPlayerIdAsync(Guid heroId, Guid playerId);
+    Task<List<FighterEntity>> GetFromFinishedMatchesByHeroAndPlayerIdAsync(Guid heroId, Guid playerId);
 }
