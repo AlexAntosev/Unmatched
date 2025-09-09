@@ -5,6 +5,7 @@ WORKDIR /src
 # copy csproj files and restore as distinct layers
 COPY ["Services/Catalog/Unmatched.CatalogService.Api/Unmatched.CatalogService.Api.csproj", "Unmatched.CatalogService.Api/"]
 COPY ["Services/Catalog/Unmatched.CatalogService.EntityFramework/Unmatched.CatalogService.EntityFramework.csproj", "Unmatched.CatalogService.EntityFramework/"]
+COPY ["Services/Catalog/Unmatched.CatalogService.Domain/Unmatched.CatalogService.Domain.csproj", "Unmatched.CatalogService.Domain/"]
 
 RUN dotnet restore "Unmatched.CatalogService.Api/Unmatched.CatalogService.Api.csproj"
 

@@ -37,5 +37,20 @@ public static class ServiceCollectionExtensions
                 var baseUrl = configuration["Services:CatalogService:BaseUrl"];
                 client.BaseAddress = new Uri(baseUrl);
             });
+        services.AddHttpClient<IMatchClient, MatchClient>(client =>
+            {
+                var baseUrl = configuration["Services:MatchService:BaseUrl"];
+                client.BaseAddress = new Uri(baseUrl);
+            });
+        services.AddHttpClient<IPlayerClient, PlayerClient>(client =>
+            {
+                var baseUrl = configuration["Services:PlayerService:BaseUrl"];
+                client.BaseAddress = new Uri(baseUrl);
+            });
+        services.AddHttpClient<IStatisticsClient, StatisticsClient>(client =>
+            {
+                var baseUrl = configuration["Services:StatisticsService:BaseUrl"];
+                client.BaseAddress = new Uri(baseUrl);
+            });
     }
 }
