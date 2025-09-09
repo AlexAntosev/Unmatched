@@ -1,7 +1,7 @@
 ﻿namespace Unmatched.Services.Contracts;
 
 using System;
-using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public interface ITournamentService
 {

@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-public class HeroDto
+public class UiHeroDto
 {
     public int DeckSize { get; set; }
 
@@ -12,11 +12,9 @@ public class HeroDto
 
     public string Name { get; set; }
 
-    public IEnumerable<SidekickDto> Sidekicks { get; set; }
+    public IEnumerable<UiSidekickDto> Sidekicks { get; set; }
     
     public string Color { get; set; }
-    
-    public IEnumerable<TitleDto> Titles { get; set; }
     
     public string ImageUrl => $"/{Name}.png";
     

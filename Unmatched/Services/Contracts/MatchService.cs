@@ -1,37 +1,48 @@
 ﻿namespace Unmatched.Services.Contracts;
 
+using AutoMapper;
+
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 using Unmatched.HttpClients.Contracts;
 
-public class MatchService(IMatchClient matchClient) : IMatchService
+public class MatchService(IMatchClient matchClient, IMapper mapper) : IMatchService
 {
-    public Task<SaveMatchResultDto> AddAsync(MatchDto match)
+    public async Task<SaveMatchResultDto> AddAsync(UiMatchDto match)
     {
-        return matchClient.AddAsync(match);
+        var dto = mapper.Map<MatchDto>(match);
+        return await matchClient.AddAsync(dto);
     }
 
-    public Task<SaveMatchResultDto> UpdateAsync(MatchDto match)
+    public async Task<SaveMatchResultDto> UpdateAsync(UiMatchDto match)
     {
-        return matchClient.UpdateAsync(match);
+        var dto = mapper.Map<MatchDto>(match);
+        return await matchClient.UpdateAsync(dto);
     }
 
-    public Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    public async Task<IEnumerable<UiMatchLogDto>> GetMatchLogAsync()
     {
-        return matchClient.GetMatchLogAsync();
+        var dtos = await matchClient.GetMatchLogAsync();
+        var result = mapper.Map<IEnumerable<UiMatchLogDto>>(dtos);
+        return result;
     }
 
-    public Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id)
+    public async Task<IEnumerable<UiMatchDto>> GetByTournamentIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var dtos = await matchClient.GetByTournamentIdAsync(id);
+        var result = mapper.Map<IEnumerable<UiMatchDto>>(dtos);
+        return result;
     }
 
-    public Task<MatchDto> GetAsync(Guid id)
+    public async Task<UiMatchDto> GetAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var dto = await matchClient.GetAsync(id);
+        var result = mapper.Map<UiMatchDto>(dto);
+        return result;
     }
 
     public Task UpdateEpicAsync(Guid matchId, int epic)
     {
-        throw new NotImplementedException();
+        return matchClient.UpdateEpicAsync(matchId, epic);
     }
 }

@@ -7,7 +7,7 @@
 
 @code {
     [Parameter]
-    public IEnumerable<IGrouping<string, FighterDto>>? HeroesMatches
+    public IEnumerable<IGrouping<string, UiFighterDto>>? HeroesMatches
     {
         get => _heroesMatches;
         set
@@ -27,7 +27,7 @@
     private List<string>? backgroundColors = new();
     private int dataCount;
 
-    private IEnumerable<IGrouping<string, FighterDto>>? _heroesMatches;
+    private IEnumerable<IGrouping<string, UiFighterDto>>? _heroesMatches;
     
     protected override async Task OnInitializedAsync()
     {
@@ -50,7 +50,7 @@
         await base.OnAfterRenderAsync(firstRender);
     }
     
-    private List<string> GetDataLabels(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    private List<string> GetDataLabels(IEnumerable<IGrouping<string, UiFighterDto>> heroesFights)
     {
         var labels = new List<string>();
         foreach (var heroFights in heroesFights)
@@ -61,7 +61,7 @@
         return labels;
     }
     
-    private List<IChartDataset> GetDataSets(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    private List<IChartDataset> GetDataSets(IEnumerable<IGrouping<string, UiFighterDto>> heroesFights)
     {
         var datasets = new List<IChartDataset>
             {
@@ -71,7 +71,7 @@
         return datasets;
     }
     
-    private PieChartDataset GetDataset(IEnumerable<IGrouping<string, FighterDto>> heroesFights)
+    private PieChartDataset GetDataset(IEnumerable<IGrouping<string, UiFighterDto>> heroesFights)
     {
         var data = new List<double>();
         foreach (var heroFights in heroesFights)

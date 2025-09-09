@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Constants
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
 @inject IMatchService MatchService
@@ -69,10 +70,11 @@
 </SfGrid>
 
 @code {
-    private List<MatchLogDto> _matchLogEntries = new();
+    private List<UiMatchLogDto> _matchLogEntries = new();
     
     [Parameter]
-    public List<MatchLogDto> MatchLogEntries {
+    public List<UiMatchLogDto> MatchLogEntries
+    {
         get => _matchLogEntries;
         set
         {

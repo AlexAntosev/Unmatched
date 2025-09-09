@@ -9,6 +9,7 @@
 @using Unmatched.Extensions
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
+nmatched.Services.Contracts
 @inject IMatchService MatchService
 @inject IHeroService HeroService
 @inject ITournamentService TournamentService
@@ -45,7 +46,7 @@
                 <div>
                     <label for="Map">Map:</label>
                     <div style=" display: flex; flex-direction: row;">
-                        <InputSelect Value="@_match.MapId" ValueExpression="@(() => _match.MapId)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
+                        <InputSelect Value="@_match.Map?.Id" ValueExpression="@(() => _match.Map!.Id)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
                             @foreach (var map in _maps)
                             {
                                 <option value="@map.Id"> @map.Name</option>
@@ -96,14 +97,14 @@
     public string Id { get; set; }
 
     private List<PlayerDto> _players = new();
-    private List<HeroDto> _heroes = new();
+    private List<UiHeroDto> _heroes = new();
     private List<MapDto> _maps = new();
     private List<TournamentDto> _tournaments = new();
     private List<(Stage?, string)> _stages = new();
 
-    MatchDto _match = new()
+    UiMatchDto _match = new()
         {
-            Fighters = new List<FighterDto>()
+            Fighters = new List<UiFighterDto>()
                 {
                     new(),
                     new()
@@ -146,7 +147,7 @@
                 _match.TournamentId = defaultTournament.Id;
             }
 
-            MatchDto match;
+            UiMatchDto match;
             if (Guid.TryParse(Id, out var id)
              && id != Guid.Empty)
             {
@@ -169,9 +170,9 @@
         }
     }
 
-    private async Task<MatchDto> GenerateDefaultMatch()
+    private async Task<UiMatchDto> GenerateDefaultMatch()
     {
-        var match = new MatchDto();
+        var match = new UiMatchDto();
         var andy = _players.FirstOrDefault(x => x.Name == PlayerNames.Andrii);
         var olex = _players.FirstOrDefault(x => x.Name == PlayerNames.Oleksandr);
 
@@ -183,7 +184,7 @@
             var olexTurn = 3 - andyTurn; // in two player game there are Turn 1 and Turn 2. Sum is 3. So <seconds player turn> = 3 - <first player turn>
             var favouriteAndyHero = await FavoriteService.GetFavouriteHeroAsync(andy.Id);
             var favouriteOlexHero = await FavoriteService.GetFavouriteHeroAsync(olex.Id);
-            var defaultFighters = new List<FighterDto>()
+            var defaultFighters = new List<UiFighterDto>()
                 {
                     new()
                         {
@@ -206,7 +207,6 @@
         match.Date = DateTime.UtcNow;
         match.TournamentId = _tournaments.FirstOrDefault(x => x.Name == TournamentNames.GoldenHalatLeague)?.Id;
         var map = _maps.FirstOrDefault(x => x.Name == MapNames.Castle);
-        match.MapId = map?.Id ?? Guid.Empty;
         match.Map = map;
         return match;
     }
@@ -293,7 +293,6 @@
     {
         var map = _maps.First(h => h.Id == mapId);
         _match.Map = map;
-        _match.MapId = mapId;
     }
     
     private void RerenderComponent()

@@ -9,7 +9,7 @@ using Unmatched.HttpClients.Contracts;
 
 public class FavoriteService(IMapper mapper, IFavoriteClient favoriteClient, ICatalogClient catalogClient) : IFavoriteService
 {
-    public async Task<HeroDto?> GetFavouriteHeroAsync(Guid playerId)
+    public async Task<UiHeroDto?> GetFavouriteHeroAsync(Guid playerId)
     {
         var heroId = await favoriteClient.GetFavouriteHeroIdAsync(playerId);
 
@@ -17,7 +17,7 @@ public class FavoriteService(IMapper mapper, IFavoriteClient favoriteClient, ICa
             ? await catalogClient.GetHeroAsync(heroId.Value)
             : null;
 
-        var hero = mapper.Map<HeroDto>(catalogHero);
+        var hero = mapper.Map<UiHeroDto>(catalogHero);
         // fill heroDto with other stuff
 
         return hero;

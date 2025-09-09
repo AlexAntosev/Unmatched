@@ -11,5 +11,5 @@ public interface IMapStatisticsService
 
     Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId);
 
-    Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId);
+    Task<IEnumerable<UiMatchLogDto>> GetMapMatchesAsync(Guid mapId);
 }

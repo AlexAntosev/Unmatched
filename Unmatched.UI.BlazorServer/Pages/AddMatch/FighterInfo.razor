@@ -1,4 +1,5 @@
-﻿@using Action = System.Action
+﻿@using AutoMapper
+@using Action = System.Action
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Constants
 @using Unmatched.Dtos
@@ -6,6 +7,7 @@
 @using Unmatched.Dtos.Player
 @using Unmatched.Extensions
 @inject NotificationService NotificationService
+@inject IMapper Mapper
 
 <EditForm Model=@Fighter>
     <fieldset class="wrapper" style="@WinnerStyle()">
@@ -85,13 +87,13 @@
     public string Title { get; set; }
 
     [Parameter]
-    public List<HeroDto> Heroes { get; set; } = new();
+    public List<UiHeroDto> Heroes { get; set; } = new();
 
     [Parameter]
     public List<PlayerDto> Players { get; set; } = new();
 
     [Parameter]
-    public FighterDto Fighter { get; set; } = new();
+    public UiFighterDto Fighter { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,11 +109,10 @@
     private void PlayerChanged(Guid playerId) 
     {
         var player = Players.First(h => h.Id == playerId);
-        Fighter.Player = player;
         Fighter.PlayerId = player.Id;
     }
 
-    private void SetHeroInfo(HeroDto hero)
+    private void SetHeroInfo(UiHeroDto hero)
     {
         Fighter.Hero = hero;
         Fighter.HpLeft = hero.Hp;
@@ -130,7 +131,7 @@
         SetHeroInfo(randomHero);
     }
     
-    private void RandomizeFighter(FighterDto targetFighter, FighterDto? exceptFighter = null)
+    private void RandomizeFighter(UiFighterDto targetFighter, UiFighterDto? exceptFighter = null)
     {
         var exceptPlayers = new List<Guid>();
         if (exceptFighter is not null)
@@ -147,7 +148,6 @@
         var randomPlayerId = availablePlayers.GetRandomItem();
         var randomPlayer = Players.First(x => x.Id == randomPlayerId);
 
-        targetFighter.Player = randomPlayer;
         targetFighter.PlayerId = randomPlayer.Id;
         
         var exceptHeroes = new List<Guid>();

@@ -74,14 +74,14 @@
     public string Id { get; set; }
 
     private List<PlayerDto> _players = new();
-    private List<HeroDto> _heroes = new();
+    private List<UiHeroDto> _heroes = new();
     private List<MapDto> _maps = new();
     private List<VillainDto> _villains = new();
     private List<MinionDto> _minions = new();
 
     AdventureDto _adventure = new()
         {
-            Fighters = new List<FighterDto>()
+            Fighters = new List<UiFighterDto>()
                 {
                     new(),
                     new()

@@ -19,7 +19,7 @@ namespace Unmatched.Api.Controllers
         }
 
         [HttpGet]
-        public Task<IEnumerable<HeroDto>> Get()
+        public Task<IEnumerable<UiHeroDto>> Get()
         {
             return _heroService.GetAsync();
         }

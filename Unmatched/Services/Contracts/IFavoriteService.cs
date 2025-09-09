@@ -10,5 +10,5 @@ public interface IFavoriteService
     //
     // Task UpdateChosenOneAsync(Guid playerId, Guid favoriteId, bool isChosenOne);
 
-    Task<HeroDto?> GetFavouriteHeroAsync(Guid playerId);
+    Task<UiHeroDto?> GetFavouriteHeroAsync(Guid playerId);
 }

@@ -1,18 +1,19 @@
 ﻿namespace Unmatched.Services.Contracts;
 
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public interface IMatchService
 {
-    Task<SaveMatchResultDto> AddAsync(MatchDto match);
+    Task<SaveMatchResultDto> AddAsync(UiMatchDto match);
 
-    Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto);
+    Task<SaveMatchResultDto> UpdateAsync(UiMatchDto matchDto);
 
-    Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
+    Task<IEnumerable<UiMatchLogDto>> GetMatchLogAsync();
 
-    Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id);
+    Task<IEnumerable<UiMatchDto>> GetByTournamentIdAsync(Guid id);
 
-    Task<MatchDto> GetAsync(Guid id);
+    Task<UiMatchDto> GetAsync(Guid id);
     
     Task UpdateEpicAsync(Guid matchId, int epic);
 }

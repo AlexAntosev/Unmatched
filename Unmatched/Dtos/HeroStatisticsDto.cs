@@ -2,7 +2,7 @@
 
 public class HeroStatisticsDto : IComparable<HeroStatisticsDto>
 {
-    public HeroDto? Hero { get; set; }
+    public UiHeroDto? Hero { get; set; }
     public Guid HeroId { get; set; }
 
     public double Kd

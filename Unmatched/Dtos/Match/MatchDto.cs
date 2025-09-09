@@ -1,4 +1,4 @@
-﻿namespace Unmatched.Dtos;
+﻿namespace Unmatched.Dtos.Match;
 
 using Unmatched.Enums;
 
@@ -13,8 +13,6 @@ public class MatchDto
     public MapDto? Map { get; set; }
 
     public Guid MapId { get; set; }
-
-    public TournamentDto? Tournament { get; set; }
     
     public IEnumerable<FighterDto> Fighters { get; set; }
 

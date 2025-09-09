@@ -1,24 +1,26 @@
-﻿namespace Unmatched.MatchService.Api.Dto;
+﻿namespace Unmatched.Dtos;
 
-using Unmatched.MatchService.Domain.Enums;
+using Unmatched.Enums;
 
-public class MatchDto
+public class UiMatchDto
 {
     public string Comment { get; set; }
 
     public DateTime Date { get; set; }
 
     public Guid Id { get; set; }
-    
-    public Guid? MapId { get; set; }
-    
-    public IEnumerable<FighterDto> Fighters { get; set; }
+
+    public MapDto? Map { get; set; }
+
+   // public Guid MapId { get; set; }
+
+    public IEnumerable<UiFighterDto> Fighters { get; set; }
 
     public Guid? TournamentId { get; set; }
-    
+
     public bool IsPlanned { get; set; }
-    
+
     public Stage? Stage { get; set; }
-    
+
     public int? Epic { get; set; }
 }

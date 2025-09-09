@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Dtos;
 
 using System;
+using Unmatched.Dtos.Match;
 
 public class AdventureDto
 {
@@ -14,7 +15,7 @@ public class AdventureDto
 
     public Guid MapId { get; set; }
     
-    public IEnumerable<FighterDto> Fighters { get; set; }
+    public IEnumerable<UiFighterDto> Fighters { get; set; }
     
     public VillainDto Villain { get; set; }
     

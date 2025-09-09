@@ -13,12 +13,3 @@ public interface ICatalogClient
 
     Task<Guid> UpdatePlayStyleAsync(PlayStyleDto playStyle);
 }
-
-public interface IMatchClient
-{
-    Task<SaveMatchResultDto> AddAsync(MatchDto match);
-
-    Task<SaveMatchResultDto> UpdateAsync(MatchDto match);
-
-    Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
-}

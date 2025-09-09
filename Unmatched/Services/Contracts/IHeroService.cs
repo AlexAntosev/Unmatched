@@ -4,5 +4,5 @@ using Unmatched.Dtos;
 
 public interface IHeroService
 {
-    Task<IEnumerable<HeroDto>> GetAsync();
+    Task<IEnumerable<UiHeroDto>> GetAsync();
 }

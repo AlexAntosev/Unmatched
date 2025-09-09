@@ -25,8 +25,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPlayStyleService, PlayStyleService>();
         services.AddTransient<IPlayerService, PlayerService>();
         services.AddTransient<IFavoriteService, FavoriteService>();
-
         services.AddTransient<IMatchService, MatchService>();
+
         services.AddTransient<IRatingService, RatingService>();
         services.AddTransient<ITitleService, TitleService>();
         services.AddTransient<ITournamentService, TournamentService>();

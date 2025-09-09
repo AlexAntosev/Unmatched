@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Dtos;
 
 using System;
+using Unmatched.Dtos.Match;
 using Unmatched.Dtos.Player;
 
 public class FavoriteStatisticsDto : IComparable<FavoriteStatisticsDto>
@@ -9,7 +10,7 @@ public class FavoriteStatisticsDto : IComparable<FavoriteStatisticsDto>
     
     public Guid HeroId { get; set; }
 
-    public HeroDto? Hero { get; set; }
+    public UiHeroDto? Hero { get; set; }
     
     public Guid PlayerId { get; set; }
 
