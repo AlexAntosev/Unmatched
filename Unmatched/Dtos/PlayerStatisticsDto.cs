@@ -5,7 +5,7 @@ using Unmatched.Dtos.Player;
 
 public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
 {
-    public PlayerDto? Player { get; set; }
+    public UiPlayerDto? Player { get; set; }
     public Guid PlayerId { get; set; }
 
     public double Kd

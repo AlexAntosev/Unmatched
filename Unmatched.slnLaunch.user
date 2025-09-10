@@ -23,5 +23,20 @@
         "DebugTarget": "http"
       }
     ]
+  },
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Services\\Catalog\\Unmatched.CatalogService.Api\\Unmatched.CatalogService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Services\\Match\\Unmatched.MatchService.Api\\Unmatched.MatchService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      }
+    ]
   }
 ]

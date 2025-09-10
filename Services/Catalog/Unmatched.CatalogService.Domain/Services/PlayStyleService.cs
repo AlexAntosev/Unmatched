@@ -11,6 +11,7 @@ public class PlayStyleService(IUnitOfWork unitOfWork, IMapper mapper, IKafkaProd
     public async Task<PlayStyle?> AddOrUpdateAsync(PlayStyle playStyle)
     {
         await unitOfWork.PlayStyles.AddOrUpdateAsync(playStyle);
+        await unitOfWork.SaveChangesAsync();
         var addedEntity = await unitOfWork.PlayStyles.GetByIdAsync(playStyle.Id);
 
         await producer.PublishAsync("playstyle-updated", mapper.Map<PlayStyleUpdated>(addedEntity));

@@ -13,7 +13,7 @@ public class KafkaProducer : IKafkaProducer
     public KafkaProducer(IConfiguration configuration)
     {
         var bootstrapServers = configuration["Services:Kafka:Url"];
-        var config = new ProducerConfig { BootstrapServers = bootstrapServers };
+        var config = new ProducerConfig { BootstrapServers = bootstrapServers};
         _producer = new ProducerBuilder<string, string>(config).Build();
     }
 

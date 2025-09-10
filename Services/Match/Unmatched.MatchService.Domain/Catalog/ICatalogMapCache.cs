@@ -2,7 +2,6 @@
 
 using Unmatched.MatchService.Domain.Dto.Catalog;
 
-public interface ICatalogMapCache : IInMemoryCachedService
+public interface ICatalogMapCache : ICachedService<CatalogMapDto>
 {
-    Task<IEnumerable<CatalogMapDto>> GetAsync();
 }

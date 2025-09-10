@@ -4,5 +4,5 @@ using Unmatched.CatalogService.Domain.Entities;
 
 public interface ISidekickRepository : IRepository<Sidekick>
 {
-    IEnumerable<Sidekick> GetByHero(Guid heroId);
+    Task<IEnumerable<Sidekick>> GetByHeroAsync(Guid heroId);
 }

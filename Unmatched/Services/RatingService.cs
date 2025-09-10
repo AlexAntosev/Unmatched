@@ -4,7 +4,7 @@ namespace Unmatched.Services;
 
 using Unmatched.HttpClients.Contracts;
 
-public class RatingService(IRatingClient client) : IRatingService
+public class RatingService(IMatchClient client) : IRatingService
 {
     public Task RecalculateAsync()
     {

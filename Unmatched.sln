@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.StatisticsService
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.PlayerService.Api", "Services\Player\Unmatched.PlayerService.Api\Unmatched.PlayerService.Api.csproj", "{42EDF8BA-AAD2-42B1-B7EB-8E656C07E2F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.PlayerService.Tests", "Services\Player\Unmatched.PlayerService.Tests\Unmatched.PlayerService.Tests.csproj", "{4F049C60-BAFF-4E35-9782-9CA96930128E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{42EDF8BA-AAD2-42B1-B7EB-8E656C07E2F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42EDF8BA-AAD2-42B1-B7EB-8E656C07E2F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42EDF8BA-AAD2-42B1-B7EB-8E656C07E2F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F049C60-BAFF-4E35-9782-9CA96930128E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F049C60-BAFF-4E35-9782-9CA96930128E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F049C60-BAFF-4E35-9782-9CA96930128E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F049C60-BAFF-4E35-9782-9CA96930128E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +164,7 @@ Global
 		{DA516F5C-6FE9-4206-9F39-B8B66D58BFC9} = {8FFA85B0-8B75-42E5-B6E4-D3DD27970758}
 		{668F116C-E1B3-40F7-9A6C-B8557AA7B698} = {98423306-E2C4-425C-AF63-C6934C12EBEA}
 		{42EDF8BA-AAD2-42B1-B7EB-8E656C07E2F2} = {8FFA85B0-8B75-42E5-B6E4-D3DD27970758}
+		{4F049C60-BAFF-4E35-9782-9CA96930128E} = {8FFA85B0-8B75-42E5-B6E4-D3DD27970758}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6A473A4-ACF5-4F7E-8C31-5E054EAF240D}

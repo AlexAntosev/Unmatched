@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("Title")]
+[Table("Titles")]
 public class TitleEntity
 {
     [Key]

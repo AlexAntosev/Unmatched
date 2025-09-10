@@ -42,7 +42,7 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
 
     public async Task AddOrUpdateAsync(TEntity model)
     {
-        var existing = await GetByIdAsync(GetId(model));
+        var existing = await DbContext.Set<TEntity>().FindAsync(GetId(model));
         if (existing == null)
         {
             await AddAsync(model);

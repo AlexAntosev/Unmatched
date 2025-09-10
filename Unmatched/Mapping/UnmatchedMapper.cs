@@ -5,6 +5,7 @@ using AutoMapper;
 using Unmatched.Dtos;
 using Unmatched.Dtos.Catalog;
 using Unmatched.Dtos.Match;
+using Unmatched.Dtos.Player;
 
 public class UnmatchedMapper : Profile
 {
@@ -22,6 +23,7 @@ public class UnmatchedMapper : Profile
               .ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore()).ReverseMap();
           CreateMap<MatchDto, UiMatchDto>().ReverseMap();
           CreateMap<MatchLogDto, UiMatchLogDto>().ReverseMap();
+          CreateMap<PlayerDto, UiPlayerDto>().ReverseMap();
 
           CreateMap<CatalogMapDto, MapDto>()
               .ForMember(x => x.ImageUrl, c => c.Ignore())

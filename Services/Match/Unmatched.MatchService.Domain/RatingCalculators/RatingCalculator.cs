@@ -5,18 +5,8 @@ using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class RatingCalculator : IRatingCalculator
+public class RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHeroCache) : IRatingCalculator
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    private readonly ICatalogHeroCache _catalogHeroCache;
-
-    public RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHeroCache)
-    {
-        _unitOfWork = unitOfWork;
-        _catalogHeroCache = catalogHeroCache;
-    }
-
     public async Task<Dictionary<Guid, int>> CalculateAsync(FighterEntity fighter, FighterEntity opponent)
     {
         var winner = fighter.IsWinner
@@ -27,12 +17,12 @@ public class RatingCalculator : IRatingCalculator
             : fighter;
 
         var matchContext = new MatchContext(
-            await _catalogHeroCache.GetAsync(winner.HeroId),
-            await _catalogHeroCache.GetAsync(looser.HeroId),
+            await catalogHeroCache.GetAsync(winner.HeroId),
+            await catalogHeroCache.GetAsync(looser.HeroId),
             winner,
             looser,
-            (await _unitOfWork.Ratings.GetByHeroIdAsync(winner.HeroId))?.Points ?? 0,
-            (await _unitOfWork.Ratings.GetByHeroIdAsync(looser.HeroId))?.Points ?? 0);
+            (await unitOfWork.Ratings.GetByHeroIdAsync(winner.HeroId))?.Points ?? 0,
+            (await unitOfWork.Ratings.GetByHeroIdAsync(looser.HeroId))?.Points ?? 0);
 
         return new Dictionary<Guid, int>
             {

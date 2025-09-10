@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Unmatched.MatchService.Domain.Enums;
 
-[Table("Tournament")]
+[Table("Tournaments")]
 public class TournamentEntity
 {
     [Key]

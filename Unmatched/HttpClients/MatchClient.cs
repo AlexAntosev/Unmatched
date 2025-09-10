@@ -2,9 +2,12 @@
 
 namespace Unmatched.HttpClients;
 
+using System.Net.Http;
+using System.Net.Http.Json;
+
 using Unmatched.Dtos.Match;
 
-public class MatchClient : IMatchClient
+public class MatchClient(HttpClient httpClient) : IMatchClient
 {
     public Task<SaveMatchResultDto> AddAsync(MatchDto match)
     {
@@ -16,9 +19,11 @@ public class MatchClient : IMatchClient
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
     {
-        throw new NotImplementedException();
+        var response = await httpClient.GetAsync("/match/log");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<MatchLogDto>>();
     }
 
     public Task UpdateEpicAsync(Guid matchId, int epic)
@@ -32,6 +37,11 @@ public class MatchClient : IMatchClient
     }
 
     public Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task RecalculateAsync()
     {
         throw new NotImplementedException();
     }

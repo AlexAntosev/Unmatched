@@ -4,7 +4,7 @@ using Unmatched.PlayerService.Domain.Repositories;
 
 public class FavoriteService(IUnitOfWork unitOfWork) : IFavoriteService
 {
-    public async Task<Guid?> GetFavouriteHeroAsync(Guid playerId)
+    public async Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId)
     {
         var favourites = (await unitOfWork.Favorites.GetByPlayerIdAsync(playerId)).OrderByDescending(x => x.IsChosenOne).ThenByDescending(x => x.Favour).ToArray();
 
@@ -13,28 +13,29 @@ public class FavoriteService(IUnitOfWork unitOfWork) : IFavoriteService
         return favouriteHeroId;
     }
 
-    public async Task UpdateChosenOneAsync(Guid playerId, Guid favoriteId, bool isChosenOne)
+    public async Task<Guid?> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
     {
+
         var chosenOne = unitOfWork.Favorites.Query().FirstOrDefault(m => m.IsChosenOne && m.PlayerId == playerId);
         if (chosenOne is not null)
         {
             chosenOne.IsChosenOne = false;
             unitOfWork.Favorites.AddOrUpdate(chosenOne);
-            await unitOfWork.SaveChangesAsync();
         }
 
-        var favorite = unitOfWork.Favorites.Query().FirstOrDefault(m => m.Id == favoriteId);
+        var favorite = unitOfWork.Favorites.Query().FirstOrDefault(m => m.PlayerId == playerId && m.HeroId == heroId);
         if (favorite is not null)
         {
             favorite.IsChosenOne = isChosenOne;
             unitOfWork.Favorites.AddOrUpdate(favorite);
-            await unitOfWork.SaveChangesAsync();
         }
+        await unitOfWork.SaveChangesAsync();
+        return favorite?.HeroId;
     }
 
-    public async Task UpdateFavourAsync(Guid favoriteId, int favour)
+    public async Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour)
     {
-        var favorite = unitOfWork.Favorites.Query().FirstOrDefault(m => m.Id == favoriteId);
+        var favorite = unitOfWork.Favorites.Query().FirstOrDefault(m => m.PlayerId == playerId && m.HeroId == heroId);
         if (favorite is not null)
         {
             favorite.Favour = favour;

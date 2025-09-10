@@ -3,7 +3,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("Fighter")]
+[Table("Fighters")]
 public class FighterEntity
 {
     public int? CardsLeft { get; set; }

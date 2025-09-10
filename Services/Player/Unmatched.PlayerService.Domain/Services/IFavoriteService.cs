@@ -4,9 +4,9 @@ using System;
 
 public interface IFavoriteService
 {
-    Task UpdateFavourAsync(Guid favoriteId, int favour);
+    Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour);
     
-    Task UpdateChosenOneAsync(Guid playerId, Guid favoriteId, bool isChosenOne);
+    Task<Guid?> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne);
 
-    Task<Guid?> GetFavouriteHeroAsync(Guid playerId);
+    Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId);
 }

@@ -11,7 +11,7 @@
         [Fact]
         public void AssertMappings()
         {
-            var config = new MapperConfiguration(cfg => cfg.AddProfile<CatalogMapper>(), new LoggerFactory());
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<ApiMapper>(), new LoggerFactory());
             config.AssertConfigurationIsValid();
         }
     }

@@ -2,9 +2,14 @@
 
 using Unmatched.MatchService.Domain.Dto.Catalog;
 
-public class CatalogMapCache(ICatalogClient client) : ICatalogMapCache
+public class CatalogMapCache(ICatalogClient client) : InMemoryCachedService<CatalogMapDto>, ICatalogMapCache
 {
-    public Task<IEnumerable<CatalogMapDto>> GetAsync()
+    protected override Guid GetId(CatalogMapDto entity)
+    {
+        return entity.Id;
+    }
+
+    protected override Task<IEnumerable<CatalogMapDto>> LoadCacheAsync()
     {
         return client.GetMapsAsync();
     }

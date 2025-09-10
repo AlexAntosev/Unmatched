@@ -24,8 +24,8 @@
 </div>
 
 @code {
-    private List<PlayerDto> _players = new ();
-    private readonly PlayerDto _addPlayerForm = new();
+    private List<UiPlayerDto> _players = new ();
+    private readonly UiPlayerDto _addPlayerForm = new();
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
     
@@ -90,7 +90,7 @@
         return name is null || name == string.Empty || _players.Any(t => t.Name == name);
     }
     
-    private async Task AddPlayerAsync(PlayerDto player)
+    private async Task AddPlayerAsync(UiPlayerDto player)
     {
         try
         {

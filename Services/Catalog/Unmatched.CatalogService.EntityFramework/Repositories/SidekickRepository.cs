@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.CatalogService.Domain.Entities;
 using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
@@ -11,8 +13,8 @@ public class SidekickRepository(UnmatchedDbContext dbContext) : BaseRepository<S
         return model.Id;
     }
 
-    public IEnumerable<Sidekick> GetByHero(Guid heroId)
+    public async Task<IEnumerable<Sidekick>> GetByHeroAsync(Guid heroId)
     {
-        return DbContext.Sidekicks.Where(x => x.HeroId == heroId).ToList();
+        return await DbContext.Sidekicks.Where(x => x.HeroId == heroId).ToListAsync();
     }
 }

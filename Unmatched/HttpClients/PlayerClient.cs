@@ -10,4 +10,19 @@ public class PlayerClient : IPlayerClient
     {
         throw new NotImplementedException();
     }
+
+    public Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour)
+    {
+        throw new NotImplementedException();
+    }
 }

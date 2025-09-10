@@ -4,15 +4,13 @@ using Unmatched.MatchService.Domain.Dto.Catalog;
 
 public class CatalogHeroCache(ICatalogClient catalogClient) : InMemoryCachedService<CatalogHeroDto>, ICatalogHeroCache
 {
-    public Task<IEnumerable<CatalogHeroDto>> GetAsync()
+    protected override Guid GetId(CatalogHeroDto entity)
     {
-        return catalogClient.GetHeroesAsync();
+        return entity.Id;
     }
 
-    public async Task<CatalogHeroDto> GetAsync(Guid id)
+    protected override Task<IEnumerable<CatalogHeroDto>> LoadCacheAsync()
     {
-        var all =  await catalogClient.GetHeroesAsync();
-        var hero = all.FirstOrDefault(x => x.Id == id);
-        return hero;
+        return catalogClient.GetHeroesAsync();
     }
 }

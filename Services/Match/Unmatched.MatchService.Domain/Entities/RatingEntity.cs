@@ -3,7 +3,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("Rating")]
+[Table("Ratings")]
 public class RatingEntity
 {
     public Guid HeroId { get; set; }

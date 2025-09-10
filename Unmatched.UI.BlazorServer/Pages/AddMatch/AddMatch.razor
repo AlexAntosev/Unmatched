@@ -46,7 +46,7 @@ nmatched.Services.Contracts
                 <div>
                     <label for="Map">Map:</label>
                     <div style=" display: flex; flex-direction: row;">
-                        <InputSelect Value="@_match.Map?.Id" ValueExpression="@(() => _match.Map!.Id)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
+                        <InputSelect Value="@_match.Map.Id" ValueExpression="@(() => _match.Map.Id)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
                             @foreach (var map in _maps)
                             {
                                 <option value="@map.Id"> @map.Name</option>
@@ -96,7 +96,7 @@ nmatched.Services.Contracts
     [Parameter]
     public string Id { get; set; }
 
-    private List<PlayerDto> _players = new();
+    private List<UiPlayerDto> _players = new();
     private List<UiHeroDto> _heroes = new();
     private List<MapDto> _maps = new();
     private List<TournamentDto> _tournaments = new();

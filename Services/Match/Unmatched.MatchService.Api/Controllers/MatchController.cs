@@ -77,15 +77,3 @@ public class MatchController(ILogger<MatchController> logger, IMapper mapper, IM
         }
     }
 }
-
-[ApiController]
-[Route("[controller]")]
-public class RatingController(IRatingService ratingService) : ControllerBase
-{
-    [HttpPost("recalculate")]
-    public async Task<ActionResult> Recalculate()
-    {
-        await ratingService.RecalculateAsync();
-        return Ok();
-    }
-}

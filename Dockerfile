@@ -10,9 +10,8 @@ WORKDIR /src
 
 # Copy only project files first (layer caching for faster restores)
 COPY ["Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj", "Unmatched.UI.BlazorServer/"]
-COPY ["Unmatched.EntityFramework/Unmatched.EntityFramework.csproj", "Unmatched.EntityFramework/"]
 COPY ["Unmatched/Unmatched.csproj", "Unmatched/"]
-COPY ["Unmatched.Data/Unmatched.Data.csproj", "Unmatched.Data/"]
+
 
 # Restore NuGet packages (runs only if csproj files changed)
 RUN dotnet restore "Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj"

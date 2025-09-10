@@ -2,7 +2,7 @@
 
 namespace Unmatched.MatchService.Domain.Entities;
 
-[Table("PlayStyle")]
+[Table("PlayStyles")]
 public class PlayStyleEntity
 {
     public int Attack { get; set; }

@@ -12,7 +12,7 @@ public class UiMatchDto
 
     public MapDto? Map { get; set; }
 
-   // public Guid MapId { get; set; }
+    public Guid MapId { get; set; }
 
     public IEnumerable<UiFighterDto> Fighters { get; set; }
 

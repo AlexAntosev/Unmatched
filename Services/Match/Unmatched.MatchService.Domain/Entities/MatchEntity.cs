@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Unmatched.MatchService.Domain.Enums;
 
-[Table("Match")]
+[Table("Matches")]
 public class MatchEntity 
 {
     public string? Comment { get; set; }

@@ -4,7 +4,7 @@ using Unmatched.Dtos.Player;
 
 public interface IPlayerService
 {
-    Task<IEnumerable<PlayerDto>> GetAsync();
+    Task<IEnumerable<UiPlayerDto>> GetAsync();
     
-    Task AddAsync(PlayerDto dto);
+    Task AddAsync(UiPlayerDto dto);
 }

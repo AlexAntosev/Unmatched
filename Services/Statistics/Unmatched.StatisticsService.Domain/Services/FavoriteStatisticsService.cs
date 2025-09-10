@@ -54,11 +54,4 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
 
         return statistics;
     }
-
-    public async Task AddOrUpdateAsync(FavoriteStatisticsDto favoriteStatisticsDto)
-    {
-        var entity = _mapper.Map<Favorite>(favoriteStatisticsDto);
-        _unitOfWork.Favorites.AddOrUpdate(entity);
-        await _unitOfWork.SaveChangesAsync();
-    }
 }

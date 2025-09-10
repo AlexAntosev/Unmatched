@@ -19,4 +19,11 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogMapDto>>();
     }
+
+    public async Task<IEnumerable<CatalogSidekickDto>> GetSidekicksAsync()
+    {
+        var response = await httpClient.GetAsync($"/sidekick");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogSidekickDto>>();
+    }
 }
