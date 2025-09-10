@@ -11,11 +11,11 @@ public class UnmatchedMapper : Profile
 {
     public UnmatchedMapper()
     {
-        CreateMap<MatchEntity, MatchDto>().ReverseMap();
-        CreateMap<MatchEntity, MatchLogDto>().ReverseMap();
-        CreateMap<FighterEntity, FighterDto>().ReverseMap();
-        CreateMap<TitleEntity, TitleDto>().ReverseMap();
-        CreateMap<TournamentEntity, TournamentDto>().ReverseMap();
+        CreateMap<MatchEntity, Match>().ReverseMap();
+        CreateMap<MatchEntity, MatchLog>().ReverseMap();
+        CreateMap<FighterEntity, Fighter>().ReverseMap();
+        CreateMap<TitleEntity, Title>().ReverseMap();
+        CreateMap<TournamentEntity, Tournament>().ReverseMap();
     }
 
     //private string TryGetMapName(Map? map)

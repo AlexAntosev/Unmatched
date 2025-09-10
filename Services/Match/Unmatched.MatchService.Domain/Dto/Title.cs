@@ -2,7 +2,7 @@
 
 using System;
 
-public class TitleDto
+public class Title
 {
     public Guid Id { get; set; }
     

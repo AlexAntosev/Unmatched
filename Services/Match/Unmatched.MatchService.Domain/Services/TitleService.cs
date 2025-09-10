@@ -9,7 +9,7 @@ using Unmatched.MatchService.Domain.Repositories;
 
 public class TitleService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCache catalogHeroCache) : ITitleService
 {
-    public async Task AddAsync(TitleDto titleDto)
+    public async Task AddAsync(Title titleDto)
     {
         var title = mapper.Map<TitleEntity>(titleDto);
         await unitOfWork.Titles.AddAsync(title);
@@ -41,20 +41,20 @@ public class TitleService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCa
         await unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<TitleDto>> GetAsync()
+    public async Task<IEnumerable<Title>> GetAsync()
     {
         var entities = await unitOfWork.Titles.GetAsync();
-        var titles = mapper.Map<IEnumerable<TitleDto>>(entities);
+        var titles = mapper.Map<IEnumerable<Title>>(entities);
 
         return titles;
     }
 
-    public async Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId)
+    public async Task<IEnumerable<HeroTitleAssign>> GetHeroesForTitleAssign(Guid titleId)
     {
         var entities = await catalogHeroCache.GetAsync();
         var title = await unitOfWork.Titles.GetByIdAsync(titleId);
 
-        var heroes = mapper.Map<IEnumerable<HeroTitleAssignDto>>(entities);
+        var heroes = mapper.Map<IEnumerable<HeroTitleAssign>>(entities);
 
         foreach (var hero in heroes)
         {

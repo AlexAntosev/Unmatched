@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.Dto;
 
-public class FighterSidekickDto
+public class FighterSidekick
 {
     public int Hp { get; set; }
 

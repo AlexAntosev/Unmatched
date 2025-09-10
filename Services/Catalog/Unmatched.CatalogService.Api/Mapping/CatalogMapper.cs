@@ -13,6 +13,7 @@ public class CatalogMapper : Profile
     {
         CreateMap<Hero, HeroDto>().ReverseMap();
         CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
+        CreateMap<Map, MapDto>().ReverseMap();
     }
 }
 

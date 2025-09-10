@@ -3,9 +3,9 @@
 using Unmatched.MatchService.Domain.Dto.Catalog;
 using Unmatched.MatchService.Domain.Entities;
 
-class MatchContextDto
+class MatchContext
 {
-    public MatchContextDto(
+    public MatchContext(
         CatalogHeroDto winnerReferenceHero,
         CatalogHeroDto looserReferenceHero,
         FighterEntity winnerFighter,

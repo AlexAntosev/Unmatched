@@ -5,5 +5,5 @@ using Unmatched.MatchService.Domain.Entities;
 
 public interface IPunisherTitleHandler
 {
-    Task<TitleDto?> HandleAsync(MatchEntity match);
+    Task<Title?> HandleAsync(MatchEntity match);
 }

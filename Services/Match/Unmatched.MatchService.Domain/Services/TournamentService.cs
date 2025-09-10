@@ -16,27 +16,27 @@ public class TournamentService(
     ICatalogHeroCache catalogHeroCache,
     ICatalogMapCache catalogMapCache) : ITournamentService
 {
-    public async Task<TournamentDto> AddAsync(TournamentDto dto)
+    public async Task<Tournament> AddAsync(Tournament dto)
     {
         var tournament = mapper.Map<TournamentEntity>(dto);
         var created = await unitOfWork.Tournaments.AddAsync(tournament);
         await unitOfWork.SaveChangesAsync();
-        var createdDto = mapper.Map<TournamentDto>(created);
+        var createdDto = mapper.Map<Tournament>(created);
         return createdDto;
     }
 
-    public async Task<IEnumerable<TournamentDto>> GetAsync()
+    public async Task<IEnumerable<Tournament>> GetAsync()
     {
         var entities = await unitOfWork.Tournaments.GetAsync();
-        var tournaments = mapper.Map<IEnumerable<TournamentDto>>(entities);
+        var tournaments = mapper.Map<IEnumerable<Tournament>>(entities);
 
         return tournaments;
     }
 
-    public async Task<TournamentDto> GetAsync(Guid id)
+    public async Task<Tournament> GetAsync(Guid id)
     {
         var entity = await unitOfWork.Tournaments.GetByIdAsync(id);
-        var tournament = mapper.Map<TournamentDto>(entity);
+        var tournament = mapper.Map<Tournament>(entity);
 
         return tournament;
     }
@@ -47,21 +47,21 @@ public class TournamentService(
         await unitOfWork.SaveChangesAsync();
     }
     
-    public async Task CreateInitialPlannedMatchesAsync(TournamentDto tournament)
+    public async Task CreateInitialPlannedMatchesAsync(Tournament tournament)
     {
         var heroesEntities = await catalogHeroCache.GetAsync();
-        var heroes = mapper.Map<List<FighterHeroDto>>(heroesEntities);
+        var heroes = mapper.Map<List<FighterHero>>(heroesEntities);
         heroes = heroes.Shuffle().Take(tournament.CurrentStage.GetFightersCount()).ToList();
         await CreatePlannedMatchesAsync(tournament, heroes);
     }
     
-    public async Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament)
+    public async Task CreateNextStagePlannedMatchesAsync(Tournament tournament)
     {
         var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
         var currentStageWinners = currentStageMatches.
             Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .Select(f => mapper.Map<FighterHeroDto>(catalogHeroCache.GetAsync(f.HeroId)))
+            .Select(f => mapper.Map<FighterHero>(catalogHeroCache.GetAsync(f.HeroId)))
             .ToList();
         
         tournament.CurrentStage++;
@@ -69,13 +69,13 @@ public class TournamentService(
         await CreatePlannedMatchesAsync(tournament, currentStageWinners);
     }
     
-    public async Task CreateThirdPlaceDeciderMatchAsync(TournamentDto tournament)
+    public async Task CreateThirdPlaceDeciderMatchAsync(Tournament tournament)
     {
         var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
         var currentStageLosers = currentStageMatches.
             Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => !f.IsWinner))
-            .Select(f => mapper.Map<FighterHeroDto>(catalogHeroCache.GetAsync(f.HeroId)))
+            .Select(f => mapper.Map<FighterHero>(catalogHeroCache.GetAsync(f.HeroId)))
             .ToList();
         
         tournament.CurrentStage++;
@@ -83,13 +83,13 @@ public class TournamentService(
         await CreatePlannedMatchesAsync(tournament, currentStageLosers);
     }
     
-    public async Task CreateGrandFinalMatchesAsync(TournamentDto tournament)
+    public async Task CreateGrandFinalMatchesAsync(Tournament tournament)
     {
         var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
         var currentStageWinners = currentStageMatches.
             Where(m => m.Stage == tournament.CurrentStage - 1 && !m.IsPlanned)
             .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .Select(f => mapper.Map<FighterHeroDto>(catalogHeroCache.GetAsync(f.HeroId)))
+            .Select(f => mapper.Map<FighterHero>(catalogHeroCache.GetAsync(f.HeroId)))
             .ToList();
         
         tournament.CurrentStage++;
@@ -99,10 +99,10 @@ public class TournamentService(
         {
             var finalists = currentStageWinners.Clone();
 
-            var participants = new List<FighterDto>();
+            var participants = new List<Fighter>();
             foreach (var hero in finalists)
             {
-                var participant = new FighterDto
+                var participant = new Fighter
                     {
                         Hero = hero,
                         HeroId = hero.Id
@@ -110,7 +110,7 @@ public class TournamentService(
                 participants.Add(participant);
             }
 
-            var generatedMatches = new List<MatchDto>();
+            var generatedMatches = new List<Match>();
             for (var i = 0; i < participants.Count; i += 2)
             {
                 var players = new List<Guid>()
@@ -143,11 +143,11 @@ public class TournamentService(
                 }
               
             
-                var match = new MatchDto
+                var match = new Match
                     {
                         Id = Guid.Empty,
                         Stage = tournament.CurrentStage,
-                        Fighters = new List<FighterDto>
+                        Fighters = new List<Fighter>
                             {
                                 fighter,
                                 opponent
@@ -166,7 +166,7 @@ public class TournamentService(
         await CreatePlannedMatchesAsync(tournament, currentStageWinners);
     }
     
-    private async Task UpdateAsync(Guid id, IEnumerable<MatchDto> matches, Stage stage)
+    private async Task UpdateAsync(Guid id, IEnumerable<Match> matches, Stage stage)
     {
         var matchEntities = mapper.Map<IEnumerable<MatchEntity>>(matches);
 
@@ -183,15 +183,15 @@ public class TournamentService(
         await unitOfWork.SaveChangesAsync();
     }
     
-    private async Task CreatePlannedMatchesAsync(TournamentDto tournament, List<FighterHeroDto> heroes)
+    private async Task CreatePlannedMatchesAsync(Tournament tournament, List<FighterHero> heroes)
     {
         var maps = (await catalogMapCache.GetAsync()).ToList();
 
         heroes = heroes.Shuffle();
-        var participants = new List<FighterDto>();
+        var participants = new List<Fighter>();
         foreach (var hero in heroes)
         {
-            var participant = new FighterDto
+            var participant = new Fighter
                 {
                     Hero = hero,
                     HeroId = hero.Id
@@ -199,7 +199,7 @@ public class TournamentService(
             participants.Add(participant);
         }
 
-        var generatedMatches = new List<MatchDto>();
+        var generatedMatches = new List<Match>();
         for (var i = 0; i < participants.Count; i += 2)
         {
             var players = new List<Guid>()
@@ -220,11 +220,11 @@ public class TournamentService(
             opponent.PlayerId = players.GetAndRemoveRandomItem();
             opponent.Turn = turns.GetAndRemoveRandomItem();
             
-            var match = new MatchDto
+            var match = new Match
                 {
                     Id = Guid.Empty,
                     Stage = tournament.CurrentStage,
-                    Fighters = new List<FighterDto>
+                    Fighters = new List<Fighter>
                         {
                             fighter,
                             opponent

@@ -37,7 +37,7 @@ public class HeroController(IMapper mapper, IHeroService heroService, IPlayStyle
     }
 
     [HttpPut("{heroId}/playstyle")]
-    public async Task<ActionResult<Guid>> UpdatePlayStyle(PlayStyleDto playStyle)
+    public async Task<ActionResult<Guid>> UpdatePlayStyle(Guid heroId, [FromBody] PlayStyleDto playStyle)
     {
         var addedPlayStyle = await playStyleService.AddOrUpdateAsync(mapper.Map<PlayStyle>(playStyle));
         if (addedPlayStyle != null)

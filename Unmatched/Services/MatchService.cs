@@ -1,4 +1,6 @@
-﻿namespace Unmatched.Services.Contracts;
+﻿using Unmatched.Services.Contracts;
+
+namespace Unmatched.Services;
 
 using AutoMapper;
 

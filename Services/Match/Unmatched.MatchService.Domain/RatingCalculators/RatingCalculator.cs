@@ -26,7 +26,7 @@ public class RatingCalculator : IRatingCalculator
             ? opponent
             : fighter;
 
-        var matchContext = new MatchContextDto(
+        var matchContext = new MatchContext(
             await _catalogHeroCache.GetAsync(winner.HeroId),
             await _catalogHeroCache.GetAsync(looser.HeroId),
             winner,
@@ -45,7 +45,7 @@ public class RatingCalculator : IRatingCalculator
             };
     }
 
-    private int CalculateForLooser(MatchContextDto matchContext)
+    private int CalculateForLooser(MatchContext matchContext)
     {
         var maxLooserSidekicksHp = 0;// matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
         var maxWinnerSidekicksHp = 0;// matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
@@ -63,7 +63,7 @@ public class RatingCalculator : IRatingCalculator
         return result;
     }
 
-    private int CalculateForWinner(MatchContextDto matchContext)
+    private int CalculateForWinner(MatchContext matchContext)
     {
         var maxLooserSidekicksHp = 0;// matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
         var maxWinnerSidekicksHp = 0;// matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;

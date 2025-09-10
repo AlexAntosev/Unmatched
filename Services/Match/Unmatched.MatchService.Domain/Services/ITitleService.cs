@@ -4,9 +4,9 @@ using Unmatched.MatchService.Domain.Dto;
 
 public interface ITitleService
 {
-    Task AddAsync(TitleDto title);
+    Task AddAsync(Title title);
 
-    Task<IEnumerable<TitleDto>> GetAsync();
+    Task<IEnumerable<Title>> GetAsync();
 
     Task DeleteAsync(Guid id);
 
@@ -16,5 +16,5 @@ public interface ITitleService
     
     Task MergeAsync(Guid titleId, IEnumerable<Guid> heroesIds);
 
-    Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssign(Guid titleId);
+    Task<IEnumerable<HeroTitleAssign>> GetHeroesForTitleAssign(Guid titleId);
 }

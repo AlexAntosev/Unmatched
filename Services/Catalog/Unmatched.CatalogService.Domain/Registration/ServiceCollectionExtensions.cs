@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IKafkaProducer, KafkaProducer>();
 
         services.AddTransient<IHeroService, HeroService>();
+        services.AddTransient<IMapService, MapService>();
         services.AddTransient<IPlayStyleService, PlayStyleService>();
     }
 }

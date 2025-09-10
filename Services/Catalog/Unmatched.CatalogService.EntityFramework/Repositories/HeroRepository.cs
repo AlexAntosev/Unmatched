@@ -9,13 +9,8 @@ using Unmatched.CatalogService.Domain.Entities;
 using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
 
-public class HeroRepository : BaseRepository<Hero, UnmatchedDbContext>, IHeroRepository
+public class HeroRepository(UnmatchedDbContext dbContext) : BaseRepository<Hero, UnmatchedDbContext>(dbContext), IHeroRepository
 {
-    public HeroRepository(UnmatchedDbContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     public override IQueryable<Hero> Query(bool noTrack = false)
     {
         return noTrack ? DbContext.Heroes.Include(x => x.Sidekicks).AsNoTracking() : DbContext.Heroes.Include(x => x.Sidekicks);

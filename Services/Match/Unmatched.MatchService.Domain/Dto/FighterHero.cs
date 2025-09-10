@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.Dto;
 
-public class FighterHeroDto
+public class FighterHero
 {
     public int DeckSize { get; set; }
 
@@ -10,7 +10,7 @@ public class FighterHeroDto
 
     public string Name { get; set; }
 
-    public IEnumerable<FighterSidekickDto> Sidekicks { get; set; }
+    public IEnumerable<FighterSidekick> Sidekicks { get; set; }
 
     public string Color { get; set; }
 }

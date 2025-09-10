@@ -2,7 +2,7 @@
 
 using Unmatched.MatchService.Domain.Enums;
 
-public class MatchDto
+public class Match
 {
     public string Comment { get; set; }
 
@@ -12,7 +12,7 @@ public class MatchDto
     
     public Guid? MapId { get; set; }
     
-    public IEnumerable<FighterDto> Fighters { get; set; }
+    public IEnumerable<Fighter> Fighters { get; set; }
 
     public Guid? TournamentId { get; set; }
     

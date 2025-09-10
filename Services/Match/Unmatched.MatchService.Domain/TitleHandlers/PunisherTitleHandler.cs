@@ -7,22 +7,13 @@ using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class PunisherTitleHandler : IPunisherTitleHandler
+public class PunisherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper) : IPunisherTitleHandler
 {
     private const double MinVictoryPointsForTitle = 1000;
-    
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
-    public PunisherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public async Task<Title?> HandleAsync(MatchEntity match)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-    
-    public async Task<TitleDto?> HandleAsync(MatchEntity match)
-    {
-        var title = await _unitOfWork.Titles.GetByNameAsync(Titles.Punisher);
+        var title = await unitOfWork.Titles.GetByNameAsync(Titles.Punisher);
         if (title is null)
         {
             return null;
@@ -33,14 +24,19 @@ public class PunisherTitleHandler : IPunisherTitleHandler
         if (winner is not null)
         {
             var isAlreadyPunisher = title.HeroTitles.Any(h => h.HeroesId == winner.HeroId);
-            if (!isAlreadyPunisher && winner.MatchPoints >= MinVictoryPointsForTitle)
+            if (!isAlreadyPunisher
+             && winner.MatchPoints >= MinVictoryPointsForTitle)
             {
-                // add to HeroTitle rep
-                // title.Heroes.Add(winner.Hero);
-                // _unitOfWork.Titles.AddOrUpdate(title);
-                // await _unitOfWork.SaveChangesAsync();
+                title.HeroTitles.Add(
+                    new HeroTitleEntity()
+                        {
+                            HeroesId = winner.HeroId,
+                            TitlesId = title.Id
+                        });
+                await unitOfWork.Titles.AddOrUpdateAsync(title);
+                await unitOfWork.SaveChangesAsync();
 
-                var titleDto = _mapper.Map<TitleDto>(title);
+                var titleDto = mapper.Map<Title>(title);
                 return titleDto;
             }
         }

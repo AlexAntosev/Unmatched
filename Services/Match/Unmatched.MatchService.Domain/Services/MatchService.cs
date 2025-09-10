@@ -38,16 +38,17 @@ public class MatchService : IMatchService
         _punisherTitleHandler = punisherTitleHandler;
         _catalogHeroCache = catalogHeroCache;
     }
-    
-    public async Task<SaveMatchResultDto> AddAsync(MatchEntity match)
+
+    public async Task<SaveMatchResult> AddOrUpdateAsync(Match matchDto)
     {
+        var match = _mapper.Map<MatchEntity>(matchDto);
         var handler = _matchHandlerFactory.Create(match);
         await handler.HandleAsync(match);
         await _streakTitleHandler.HandleAsync();
         var rusherTitleEarned = await _rusherTitleHandler.HandleAsync(match);
         var punisherTitleEarned = await _punisherTitleHandler.HandleAsync(match);
 
-        var titlesEarned = new List<TitleDto>();
+        var titlesEarned = new List<Title>();
         if (rusherTitleEarned is not null)
         {
             titlesEarned.Add(rusherTitleEarned);
@@ -60,7 +61,7 @@ public class MatchService : IMatchService
         var heroes = await _catalogHeroCache.GetAsync();
         var winnerHero = heroes.First(h => h.Id == match.Fighters.First(f => f.IsWinner).HeroId);
         var looserHero = heroes.First(h => h.Id == match.Fighters.First(f => !f.IsWinner).HeroId);
-        var result = new SaveMatchResultDto
+        var result = new SaveMatchResult
             {
                 WinnerHeroName = winnerHero.Name,
                 WinnerMatchPoints = match.Fighters.First(f => f.IsWinner).MatchPoints.Value,
@@ -72,31 +73,17 @@ public class MatchService : IMatchService
         return result;
     }
 
-    public Task<SaveMatchResultDto> AddAsync(MatchDto matchDto)
-    {
-        var match = _mapper.Map<MatchEntity>(matchDto);
-
-        return AddAsync(match);
-    }
-
-    public Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto)
-    {
-        var match = _mapper.Map<MatchEntity>(matchDto);
-
-        return AddAsync(match);
-    }
-
-    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    public async Task<IEnumerable<MatchLog>> GetMatchLogAsync()
     {
         var allMatches = await _unitOfWork.Matches.GetFinishedAsync();
 
-        var matchLogs = new List<MatchLogDto>();
+        var matchLogs = new List<MatchLog>();
         foreach (var match in allMatches)
         {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
+            var matchLog = _mapper.Map<MatchLog>(match);
 
             var fighters = (await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId))
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
+                .Select(fighter => _mapper.Map<Fighter>(fighter))
                 .ToArray();
             matchLog.Fighters = fighters;
 
@@ -106,11 +93,11 @@ public class MatchService : IMatchService
         return matchLogs;
     }
 
-    public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id)
+    public async Task<IEnumerable<Match>> GetByTournamentIdAsync(Guid id)
     {
         var entities = await _unitOfWork.Matches.GetByTournamentAsync(id);
 
-        var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
+        var matches = _mapper.Map<IEnumerable<Match>>(entities);
         foreach (var match in matches)
         {
             match.Fighters = match.Fighters.OrderBy(f => f.Turn);
@@ -119,10 +106,10 @@ public class MatchService : IMatchService
         return matches;
     }
 
-    public async Task<MatchDto> GetAsync(Guid id)
+    public async Task<Match> GetAsync(Guid id)
     {
         var entity = await _unitOfWork.Matches.GetByIdAsync(id);
-        var match = _mapper.Map<MatchDto>(entity);
+        var match = _mapper.Map<Match>(entity);
         return match;
     }
 

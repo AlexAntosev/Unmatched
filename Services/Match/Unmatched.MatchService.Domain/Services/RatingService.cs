@@ -1,18 +1,12 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
-using Unmatched.MatchService.Domain.Entities;
+using AutoMapper;
+
+using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class RatingService : IRatingService
+public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, IMapper mapper) : IRatingService
 {
-    private readonly IMatchService _matchService;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public RatingService(IMatchService matchService, IUnitOfWork unitOfWork)
-    {
-        _matchService = matchService;
-        _unitOfWork = unitOfWork;
-    }
     public async Task RecalculateAsync()
     {
         var matches = await GetMatchesAsync();
@@ -21,22 +15,22 @@ public class RatingService : IRatingService
         
         foreach (var match in matches)
         {
-            await _matchService.AddAsync(match);
+            await matchService.AddOrUpdateAsync(match);
         }
     }
     
-    private async Task<IEnumerable<MatchEntity>> GetMatchesAsync()
+    private async Task<IEnumerable<Match>> GetMatchesAsync()
     {
-        var matches = await _unitOfWork.Matches.GetAsync();
-        return matches;
+        var matches = await unitOfWork.Matches.GetAsync();
+        return matches.Select(mapper.Map<Match>);
     }
 
     private async Task ClearDataAsync()
     {
-        _unitOfWork.Matches.DeleteAll();
-        _unitOfWork.Fighters.DeleteAll();
-        _unitOfWork.Ratings.DeleteAll();
+        unitOfWork.Matches.DeleteAll();
+        unitOfWork.Fighters.DeleteAll();
+        unitOfWork.Ratings.DeleteAll();
 
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 }

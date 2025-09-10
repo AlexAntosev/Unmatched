@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.Dto;
 
-public class SaveMatchResultDto
+public class SaveMatchResult
 {
     public string WinnerHeroName { get; set; }
     

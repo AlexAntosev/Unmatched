@@ -2,7 +2,7 @@
 
 using Unmatched.MatchService.Domain.Enums;
 
-public class TournamentDto
+public class Tournament
 {
     public Guid Id { get; set; }
 

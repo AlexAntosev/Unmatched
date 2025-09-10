@@ -2,7 +2,7 @@
 
 using System;
 
-public class HeroTitleAssignDto
+public class HeroTitleAssign
 {
     public Guid Id { get; set; }
 

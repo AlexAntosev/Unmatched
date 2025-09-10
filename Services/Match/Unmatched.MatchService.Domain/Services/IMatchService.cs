@@ -5,17 +5,13 @@ using Unmatched.MatchService.Domain.Entities;
 
 public interface IMatchService
 {
-    Task<SaveMatchResultDto> AddAsync(MatchEntity match);
-    
-    Task<SaveMatchResultDto> AddAsync(MatchDto match);
+    Task<SaveMatchResult> AddOrUpdateAsync(Match match);
 
-    Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto);
+    Task<IEnumerable<MatchLog>> GetMatchLogAsync();
 
-    Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
+    Task<IEnumerable<Match>> GetByTournamentIdAsync(Guid id);
 
-    Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id);
-
-    Task<MatchDto> GetAsync(Guid id);
+    Task<Match> GetAsync(Guid id);
     
     Task UpdateEpicAsync(Guid matchId, int epic);
 }

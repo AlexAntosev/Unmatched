@@ -3,7 +3,7 @@
 using System;
 using Unmatched.Dtos.Match;
 
-public class AdventureDto
+public class UiAdventureDto
 {
     public string Comment { get; set; }
 

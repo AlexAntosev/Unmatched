@@ -6,19 +6,19 @@ using Unmatched.MatchService.Domain.Dto;
 
 public interface ITournamentService
 {
-    Task<TournamentDto> AddAsync(TournamentDto dto);
+    Task<Tournament> AddAsync(Tournament dto);
 
-    Task<IEnumerable<TournamentDto>> GetAsync();
+    Task<IEnumerable<Tournament>> GetAsync();
     
-    Task<TournamentDto> GetAsync(Guid id);
+    Task<Tournament> GetAsync(Guid id);
 
     Task DeleteAsync(Guid id);
 
-    Task CreateInitialPlannedMatchesAsync(TournamentDto tournament);
+    Task CreateInitialPlannedMatchesAsync(Tournament tournament);
 
-    Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament);
+    Task CreateNextStagePlannedMatchesAsync(Tournament tournament);
 
-    Task CreateThirdPlaceDeciderMatchAsync(TournamentDto tournament);
+    Task CreateThirdPlaceDeciderMatchAsync(Tournament tournament);
 
-    Task CreateGrandFinalMatchesAsync(TournamentDto tournament);
+    Task CreateGrandFinalMatchesAsync(Tournament tournament);
 }

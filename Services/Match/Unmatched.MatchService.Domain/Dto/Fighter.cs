@@ -1,12 +1,12 @@
 ﻿namespace Unmatched.MatchService.Domain.Dto;
 
-public class FighterDto
+public class Fighter
 {
     public int? ActionsMade { get; set; }
 
     public int? CardsLeft { get; set; }
 
-    public FighterHeroDto? Hero { get; set; }
+    public FighterHero? Hero { get; set; }
 
     public Guid HeroId { get; set; }
 

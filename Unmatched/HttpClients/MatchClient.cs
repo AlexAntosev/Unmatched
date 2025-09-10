@@ -31,7 +31,7 @@ public class MatchClient : IMatchClient
         throw new NotImplementedException();
     }
 
-    public Task<MatchDto> GetByTournamentIdAsync(Guid id)
+    public Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }

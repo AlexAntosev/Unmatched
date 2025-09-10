@@ -1,12 +1,12 @@
 ﻿namespace Unmatched.MatchService.Domain.Dto;
 
-public class MatchLogDto
+public class MatchLog
 {
     public string Comment { get; set; }
 
     public DateTime Date { get; set; }
 
-    public IEnumerable<FighterDto> Fighters { get; set; }
+    public IEnumerable<Fighter> Fighters { get; set; }
 
     public string MapName { get; set; }
 
