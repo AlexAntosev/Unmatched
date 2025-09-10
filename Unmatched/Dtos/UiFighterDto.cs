@@ -26,7 +26,7 @@ public class UiFighterDto
 
     public Guid PlayerId { get; set; }
 
-    public string PlayerImageUrl { get; set; }
+    public string PlayerImageUrl => $"/{Hero?.Name ?? "Unknown"}.png"; //need player name
 
     public int? SidekickHpLeft { get; set; }
 
