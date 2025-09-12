@@ -225,9 +225,6 @@ nmatched.Services.Contracts
                 return;
             }
 
-            // temporary solution to avoid EF exception of tracking Map during update
-            match.Map = null;
-
             SaveMatchResultDto result; 
             if (id == Guid.Empty)
             {

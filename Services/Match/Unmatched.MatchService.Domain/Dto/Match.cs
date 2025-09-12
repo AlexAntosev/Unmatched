@@ -1,5 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.Dto;
 
+using Unmatched.MatchService.Domain.Dto.Catalog;
 using Unmatched.MatchService.Domain.Enums;
 
 public class Match
@@ -10,7 +11,7 @@ public class Match
 
     public Guid Id { get; set; }
     
-    public Guid? MapId { get; set; }
+    public CatalogMapDto? Map { get; set; }
     
     public IEnumerable<Fighter> Fighters { get; set; }
 

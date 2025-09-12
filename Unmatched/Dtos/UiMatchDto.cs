@@ -8,11 +8,9 @@ public class UiMatchDto
 
     public DateTime Date { get; set; }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; set; }// = Guid.NewGuid();
 
     public MapDto? Map { get; set; }
-
-    public Guid MapId { get; set; }
 
     public IEnumerable<UiFighterDto> Fighters { get; set; }
 

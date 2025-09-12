@@ -1,6 +1,6 @@
-﻿namespace Unmatched.CatalogService.Api.Dto;
+﻿namespace Unmatched.Dtos.Catalog;
 
-public class SidekickDto
+public class CatalogSidekickDto
 {
     public int Count { get; set; }
 

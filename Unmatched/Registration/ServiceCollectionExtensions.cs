@@ -27,9 +27,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFavoriteService, FavoriteService>();
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();
+        services.AddTransient<ITournamentService, TournamentService>();
 
-       // services.AddTransient<ITitleService, TitleService>();
-       // services.AddTransient<ITournamentService, TournamentService>();
+        // services.AddTransient<ITitleService, TitleService>();
 
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>

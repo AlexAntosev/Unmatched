@@ -37,7 +37,7 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
 
     public async Task AddOrUpdateAsync(TEntity model)
     {
-        var existing = await GetByIdAsync(GetId(model));
+        var existing = await GetByIdTrackedInternalAsync(GetId(model));
         if (existing == null)
         {
             await AddAsync(model);
@@ -85,6 +85,12 @@ public abstract class BaseRepository<TEntity, TContext>(TContext dbContext) : IR
     public virtual async Task<TEntity?> GetByIdAsync(Guid id)
     {
         var entity = (await DbContext.Set<TEntity>().AsNoTracking().ToListAsync()).FirstOrDefault(x => GetId(x) == id);
+        return entity;
+    }
+
+    private async Task<TEntity?> GetByIdTrackedInternalAsync(Guid id)
+    {
+        var entity = await DbContext.Set<TEntity>().FindAsync(id);
         return entity;
     }
 

@@ -14,19 +14,3 @@ public class FighterHeroResolver(ICatalogHeroCache heroCache, IMapper mapper) : 
         return mapper.Map<FighterHero>(heroCache.GetAsync(source.HeroId).GetAwaiter().GetResult());
     }
 }
-
-public class MapNameResolver(ICatalogMapCache mapCache, IMapper mapper) : IValueResolver<MatchEntity, MatchLog, string>
-{
-
-    public string Resolve(MatchEntity source, MatchLog destination, string destMember, ResolutionContext context)
-    {
-        var mapName = "<forgotten>";
-        if (source.MapId != null)
-        {
-            var map = mapCache.GetAsync(source.MapId.Value).GetAwaiter().GetResult();
-            mapName = map?.Name ?? mapName;
-        }
-
-        return mapName;
-    }
-}

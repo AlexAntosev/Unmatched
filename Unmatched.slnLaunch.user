@@ -25,7 +25,7 @@
     ]
   },
   {
-    "Name": "New Profile",
+    "Name": "Match and catalog",
     "Projects": [
       {
         "Path": "Services\\Catalog\\Unmatched.CatalogService.Api\\Unmatched.CatalogService.Api.csproj",

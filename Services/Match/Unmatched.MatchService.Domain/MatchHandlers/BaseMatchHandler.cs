@@ -41,7 +41,7 @@ public abstract class BaseMatchHandler : IMatchHandler
 
         foreach (var updatedHeroRating in updatedHeroRatings)
         {
-            UnitOfWork.Ratings.AddOrUpdate(updatedHeroRating);
+            await UnitOfWork.Ratings.AddOrUpdateAsync(updatedHeroRating);
         }
 
         return createdMatch;

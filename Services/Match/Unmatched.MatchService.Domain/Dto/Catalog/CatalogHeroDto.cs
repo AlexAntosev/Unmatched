@@ -15,4 +15,6 @@ public class CatalogHeroDto
     public string Name { get; set; }
 
     public string Color { get; set; }
+
+    public IEnumerable<CatalogSidekickDto> Sidekicks { get; set; }
 }

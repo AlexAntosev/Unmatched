@@ -26,8 +26,6 @@ public class FighterDto
 
     public int? SidekickHpLeft { get; set; }
 
-    public string? SidekickName { get; set; }
-
     public int? TimeSpentInSeconds { get; set; }
 
     public int? Turn { get; set; }

@@ -153,7 +153,7 @@ public class TournamentService(
                                 opponent
                             },
                         TournamentId = tournament.Id,
-                        MapId = maps.GetAndRemoveRandomItem().Id,
+                        Map = maps.GetAndRemoveRandomItem(),
                         IsPlanned = true
                     };
                 generatedMatches.Add(match);
@@ -230,7 +230,7 @@ public class TournamentService(
                             opponent
                         },
                     TournamentId = tournament.Id,
-                    MapId = maps.GetAndRemoveRandomItem().Id,
+                    Map = maps.GetAndRemoveRandomItem(),
                     IsPlanned = true
                 };
             generatedMatches.Add(match);

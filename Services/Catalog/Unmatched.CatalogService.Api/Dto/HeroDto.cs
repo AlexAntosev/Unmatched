@@ -16,4 +16,6 @@ public class HeroDto
     public string Name { get; set; }
 
     public string Color { get; set; }
+
+    public IEnumerable<SidekickDto> Sidekicks { get; set; }
 }

@@ -21,9 +21,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICatalogSidekickCache, CatalogSidekickCache>();
 
         services.AddTransient<IMatchService, MatchService>();
+        services.AddTransient<ITournamentService, TournamentService>();
+
         services.AddTransient<IRatingCalculator, RatingCalculator>();
         services.AddTransient<IUnrankedRatingCalculator, UnrankedRatingCalculator>();
         services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
+
         services.AddTransient<IStreakTitleHandler, StreakTitleHandler>();
         services.AddTransient<IRusherTitleHandler, RusherTitleHandler>();
         services.AddTransient<IPunisherTitleHandler, PunisherTitleHandler>();

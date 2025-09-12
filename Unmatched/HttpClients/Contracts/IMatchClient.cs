@@ -17,4 +17,8 @@ public interface IMatchClient
     Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id);
 
     Task RecalculateAsync();
+
+    Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
+
+    Task<TournamentDto> GetTournamentAsync(Guid id);
 }

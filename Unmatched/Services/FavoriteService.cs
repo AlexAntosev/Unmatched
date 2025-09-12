@@ -16,6 +16,10 @@ public class FavoriteService(IMapper mapper, IPlayerClient playerClient, ICatalo
             ? await catalogClient.GetHeroAsync(heroId.Value)
             : null;
 
+        var sidekicks = heroId != null
+            ? await catalogClient.GetHeroAsync(heroId.Value)
+            : null;
+
         var hero = mapper.Map<UiHeroDto>(catalogHero);
         // fill heroDto with other stuff
 

@@ -1,28 +1,40 @@
-﻿using Unmatched.HttpClients.Contracts;
+﻿namespace Unmatched.HttpClients;
 
-namespace Unmatched.HttpClients;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 using Unmatched.Dtos.Player;
+using Unmatched.HttpClients.Contracts;
 
-public class PlayerClient : IPlayerClient
+public class PlayerClient(HttpClient httpClient) : IPlayerClient
 {
-    public Task<IEnumerable<PlayerDto>> GetAllAsync()
+    public async Task<IEnumerable<PlayerDto>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var response = await httpClient.GetAsync("/player");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<PlayerDto>>();
     }
 
-    public Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId)
+    public async Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId)
     {
-        throw new NotImplementedException();
+        var response = await httpClient.GetAsync($"/player/{playerId}/favor");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<Guid?>();
     }
 
-    public Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
+    public async Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
     {
-        throw new NotImplementedException();
+        var content = new StringContent(JsonSerializer.Serialize(isChosenOne), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"/player/{playerId}/hero/{heroId}/chosen", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<Guid>();
     }
 
-    public Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour)
+    public async Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour)
     {
-        throw new NotImplementedException();
+        var content = new StringContent(JsonSerializer.Serialize(favour), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"/player/{playerId}/hero/{heroId}/favor", content);
+        response.EnsureSuccessStatusCode();
     }
 }
