@@ -14,11 +14,5 @@ public interface ITournamentService
 
     Task DeleteAsync(Guid id);
 
-    Task CreateInitialPlannedMatchesAsync(Tournament tournament);
-
-    Task CreateNextStagePlannedMatchesAsync(Tournament tournament);
-
-    Task CreateThirdPlaceDeciderMatchAsync(Tournament tournament);
-
-    Task CreateGrandFinalMatchesAsync(Tournament tournament);
+    Task CreateNextStagePlannedMatchesAsync(Guid tournamentId);
 }

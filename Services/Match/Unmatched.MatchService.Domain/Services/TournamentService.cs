@@ -5,6 +5,7 @@ using AutoMapper;
 using Unmatched.MatchService.Domain.Catalog;
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Dto;
+using Unmatched.MatchService.Domain.Dto.Catalog;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Extensions;
@@ -46,124 +47,62 @@ public class TournamentService(
         await unitOfWork.Tournaments.Delete(id);
         await unitOfWork.SaveChangesAsync();
     }
-    
-    public async Task CreateInitialPlannedMatchesAsync(Tournament tournament)
-    {
-        var heroesEntities = await catalogHeroCache.GetAsync();
-        var heroes = mapper.Map<List<FighterHero>>(heroesEntities);
-        heroes = heroes.Shuffle().Take(tournament.CurrentStage.GetFightersCount()).ToList();
-        await CreatePlannedMatchesAsync(tournament, heroes);
-    }
-    
-    public async Task CreateNextStagePlannedMatchesAsync(Tournament tournament)
-    {
-        var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
-        var currentStageWinners = currentStageMatches.
-            Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
-            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .Select(f => mapper.Map<FighterHero>(catalogHeroCache.GetAsync(f.HeroId)))
-            .ToList();
-        
-        tournament.CurrentStage++;
-        
-        await CreatePlannedMatchesAsync(tournament, currentStageWinners);
-    }
-    
-    public async Task CreateThirdPlaceDeciderMatchAsync(Tournament tournament)
-    {
-        var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
-        var currentStageLosers = currentStageMatches.
-            Where(m => m.Stage == tournament.CurrentStage && !m.IsPlanned)
-            .Select(m => m.Fighters.FirstOrDefault(f => !f.IsWinner))
-            .Select(f => mapper.Map<FighterHero>(catalogHeroCache.GetAsync(f.HeroId)))
-            .ToList();
-        
-        tournament.CurrentStage++;
-        
-        await CreatePlannedMatchesAsync(tournament, currentStageLosers);
-    }
-    
-    public async Task CreateGrandFinalMatchesAsync(Tournament tournament)
-    {
-        var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
-        var currentStageWinners = currentStageMatches.
-            Where(m => m.Stage == tournament.CurrentStage - 1 && !m.IsPlanned)
-            .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
-            .Select(f => mapper.Map<FighterHero>(catalogHeroCache.GetAsync(f.HeroId)))
-            .ToList();
-        
-        tournament.CurrentStage++;
 
-        var maps = (await catalogMapCache.GetAsync()).ToList();
-        for (var j = 0; j < 2; j++)
+    public async Task CreateNextStagePlannedMatchesAsync(Guid tournamentId)
+    {
+        var tournament = await unitOfWork.Tournaments.GetByIdAsync(tournamentId);
+        if (tournament == null)
         {
-            var finalists = currentStageWinners.Clone();
-
-            var participants = new List<Fighter>();
-            foreach (var hero in finalists)
-            {
-                var participant = new Fighter
-                    {
-                        Hero = hero,
-                        HeroId = hero.Id
-                    };
-                participants.Add(participant);
-            }
-
-            var generatedMatches = new List<Match>();
-            for (var i = 0; i < participants.Count; i += 2)
-            {
-                var players = new List<Guid>()
-                    {
-                        AndriiAndOlexPlayerIds.Andrii,
-                        AndriiAndOlexPlayerIds.Olex
-                    };
-                var turns = new List<int>
-                    {
-                        1,
-                        2
-                    };
-            
-                var fighter = participants[i];
-                var opponent = participants[i + 1];
-
-                if (j == 0)
-                {
-                    fighter.PlayerId = players[0];
-                    fighter.Turn = turns[0];
-                    opponent.PlayerId = players[1];
-                    opponent.Turn = turns[1];
-                }
-                else
-                {
-                    fighter.PlayerId = players[1];
-                    fighter.Turn = turns[1];
-                    opponent.PlayerId = players[0];
-                    opponent.Turn = turns[0];
-                }
-              
-            
-                var match = new Match
-                    {
-                        Id = Guid.Empty,
-                        Stage = tournament.CurrentStage,
-                        Fighters = new List<Fighter>
-                            {
-                                fighter,
-                                opponent
-                            },
-                        TournamentId = tournament.Id,
-                        Map = maps.GetAndRemoveRandomItem(),
-                        IsPlanned = true
-                    };
-                generatedMatches.Add(match);
-            }
-
-            await UpdateAsync(tournament.Id, generatedMatches, tournament.CurrentStage);
+            throw new KeyNotFoundException($"No tournament with key {tournamentId}");
         }
-        
-        
-        await CreatePlannedMatchesAsync(tournament, currentStageWinners);
+
+        var currentStageMatches = await unitOfWork.Matches.GetByTournamentAsync(tournament.Id);
+
+        if (currentStageMatches.Any(m => m.IsPlanned))
+        {
+            throw new InvalidOperationException("Cannot generate matches for the next stage. Current stage is still in progress. Please finish current stage first.");
+        }
+
+        IEnumerable<CatalogHeroDto> catalogHeroes;
+
+        if (currentStageMatches.Any() == false)
+        {
+            var allCatalogHeroes = await catalogHeroCache.GetAsync();
+            catalogHeroes = allCatalogHeroes.ToList().Shuffle().Take(tournament.CurrentStage.GetFightersCount()).ToList();
+        }
+        else
+        {
+            var getHeroTasks = tournament.CurrentStage switch
+                {
+                    Stage.SemiFinals => currentStageMatches.Where(m => m.Stage == tournament.CurrentStage)
+                        .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner == false))
+                        .Select(f => catalogHeroCache.GetAsync(f.HeroId))
+                        .ToList(),
+                    Stage.ThirdPlaceDecider => currentStageMatches.Where(m => m.Stage == tournament.CurrentStage - 1)
+                        .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
+                        .Select(f => catalogHeroCache.GetAsync(f.HeroId))
+                        .ToList(),
+                    _ => currentStageMatches.Where(m => m.Stage == tournament.CurrentStage)
+                        .Select(m => m.Fighters.FirstOrDefault(f => f.IsWinner))
+                        .Select(f => catalogHeroCache.GetAsync(f.HeroId))
+                        .ToList()
+                };
+
+            catalogHeroes = (await Task.WhenAll(getHeroTasks))!;
+            tournament.CurrentStage++;
+        }
+
+        var heroes = catalogHeroes.Select(mapper.Map<FighterHero>).ToList();
+
+
+        await CreatePlannedMatchesAsync(mapper.Map<Tournament>(tournament), heroes);
+
+        // temp solution for bo3 grand final
+        if (tournament.CurrentStage == Stage.GrandFinals)
+        {
+            await CreatePlannedMatchesAsync(mapper.Map<Tournament>(tournament), heroes);
+            await CreatePlannedMatchesAsync(mapper.Map<Tournament>(tournament), heroes);
+        }
     }
     
     private async Task UpdateAsync(Guid id, IEnumerable<Match> matches, Stage stage)
@@ -178,7 +117,7 @@ public class TournamentService(
         var tournament = await unitOfWork.Tournaments.GetByIdAsync(id);
         
         tournament.CurrentStage = stage;
-        unitOfWork.Tournaments.AddOrUpdate(tournament);
+        await unitOfWork.Tournaments.AddOrUpdateAsync(tournament);
         
         await unitOfWork.SaveChangesAsync();
     }

@@ -32,4 +32,19 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
         var dtos = mapper.Map<IEnumerable<TournamentDto>>(tournaments);
         return Ok(dtos);
     }
+
+    [HttpPost("generate/{tournamentId}")]
+    public async Task<ActionResult> GenerateNextStage(Guid tournamentId)
+    {
+        await tournamentService.CreateNextStagePlannedMatchesAsync(tournamentId);
+        return Ok();
+    }
+
+    [HttpPost("create")]
+    public async Task<ActionResult<TournamentDto>> GenerateNextStage([FromBody] TournamentDto tournament)
+    {
+        var model = mapper.Map<Domain.Dto.Tournament>(tournament);
+        var addedResult = await tournamentService.AddAsync(model);
+        return Ok(mapper.Map<TournamentDto>(addedResult));
+    }
 }

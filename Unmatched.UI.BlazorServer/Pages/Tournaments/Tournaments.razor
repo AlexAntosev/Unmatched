@@ -127,7 +127,7 @@ ons
 
             tournament.CurrentStage = tournament.InitialStage;
             var created = await TournamentService.AddAsync(tournament);
-            await TournamentService.CreateInitialPlannedMatchesAsync(created);
+            await TournamentService.GenerateMatchesAsync(created.Id);
             _tournaments = (await TournamentService.GetAsync()).ToList();
         }
         finally

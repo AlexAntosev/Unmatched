@@ -35,19 +35,7 @@
 
     private async Task OnGenerateMatchesClick()
     {
-        if (TournamentModel.CurrentStage == Stage.SemiFinals)
-        {
-            await TournamentService.CreateThirdPlaceDeciderMatchAsync(TournamentModel);
-            return;
-        }
-        
-        if (TournamentModel.CurrentStage == Stage.ThirdPlaceDecider)
-        {
-            await TournamentService.CreateGrandFinalMatchesAsync(TournamentModel);
-            return;
-        }
-
-        await TournamentService.CreateNextStagePlannedMatchesAsync(TournamentModel);
+        await TournamentService.GenerateMatchesAsync(TournamentModel.Id);
     }
 }
 

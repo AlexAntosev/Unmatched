@@ -9,7 +9,7 @@ public class TournamentService(IMatchClient matchClient) : ITournamentService
 {
     public Task<TournamentDto> AddAsync(TournamentDto dto)
     {
-        throw new NotImplementedException();
+        return matchClient.AddTournamentAsync(dto);
     }
 
     public Task<IEnumerable<TournamentDto>> GetAsync()
@@ -27,23 +27,8 @@ public class TournamentService(IMatchClient matchClient) : ITournamentService
         throw new NotImplementedException();
     }
 
-    public Task CreateInitialPlannedMatchesAsync(TournamentDto tournament)
+    public Task GenerateMatchesAsync(Guid tournamentId)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task CreateNextStagePlannedMatchesAsync(TournamentDto tournament)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task CreateThirdPlaceDeciderMatchAsync(TournamentDto tournament)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task CreateGrandFinalMatchesAsync(TournamentDto tournament)
-    {
-        throw new NotImplementedException();
+        return matchClient.GenerateTournamentNextStageAsync(tournamentId);
     }
 }

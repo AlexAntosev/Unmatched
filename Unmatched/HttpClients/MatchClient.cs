@@ -15,8 +15,6 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
 {
     public async Task<SaveMatchResultDto> AddAsync(MatchDto match)
     {
-
-
         var content = new StringContent(JsonSerializer.Serialize(match), Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync($"/match", content);
         response.EnsureSuccessStatusCode();
@@ -75,6 +73,20 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
     public async Task<TournamentDto> GetTournamentAsync(Guid id)
     {
         var response = await httpClient.GetAsync($"/tournament/{id}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TournamentDto>();
+    }
+
+    public async Task GenerateTournamentNextStageAsync(Guid tournamentId)
+    {
+        var response = await httpClient.PostAsync($"/tournament/generate/{tournamentId}", null);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<TournamentDto> AddTournamentAsync(TournamentDto tournament)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(tournament), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"/tournament/create", content);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<TournamentDto>();
     }

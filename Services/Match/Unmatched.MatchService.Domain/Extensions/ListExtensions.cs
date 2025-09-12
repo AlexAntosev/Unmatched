@@ -14,13 +14,14 @@ public static class ListExtensions
     {
         var random = new Random();
         var shuffled = new List<T>();
-        
-        var listCount = list.Count;
+
+        var listCopy = list.Clone();
+        var listCount = listCopy.Count;
         for (var i = 0; i < listCount; i++)
         {
-            var randomIndex = random.Next(0, list.Count);
-            shuffled.Add(list[randomIndex]);
-            list.Remove(list[randomIndex]);
+            var randomIndex = random.Next(0, listCopy.Count);
+            shuffled.Add(listCopy[randomIndex]);
+            listCopy.Remove(listCopy[randomIndex]);
         }
         
         return shuffled;
