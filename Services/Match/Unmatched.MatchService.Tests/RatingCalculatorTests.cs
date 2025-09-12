@@ -4,6 +4,9 @@
 // using Unmatched.Constants;
 // using Unmatched.Data.Entities;
 // using Unmatched.Data.Repositories;
+// using Unmatched.MatchService.Domain.Dto;
+// using Unmatched.MatchService.Domain.RatingCalculators;
+// using Unmatched.MatchService.Domain.Repositories;
 // using Unmatched.Services.RatingCalculators;
 //
 // public class RatingCalculatorTests
