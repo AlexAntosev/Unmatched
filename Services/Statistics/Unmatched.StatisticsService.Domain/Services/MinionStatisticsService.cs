@@ -1,5 +1,9 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
+using AutoMapper;
+
+using Unmatched.StatisticsService.Domain.Models;
+
 public class MinionStatisticsService : IMinionStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -11,13 +15,13 @@ public class MinionStatisticsService : IMinionStatisticsService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<MinionStatisticsDto>> GetMinionsStatisticsAsync()
+    public async Task<IEnumerable<MinionStats>> GetMinionsStatisticsAsync()
     {
         var minions = await _unitOfWork.Minions.GetAsync();
         var ratings = await _unitOfWork.Ratings.GetAsync();
         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
-        var statistics = new List<MinionStatisticsDto>();
+        var statistics = new List<MinionStats>();
 
         foreach (var minion in minions)
         {
@@ -25,7 +29,7 @@ public class MinionStatisticsService : IMinionStatisticsService
             var points = ratings.FirstOrDefault(x => x.HeroId.Equals(hero.Id))?.Points ?? 0;
             var fights = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
 
-            var minionStatistics = new MinionStatisticsDto
+            var minionStatistics = new MinionStats
             {
                 Minion = minionDto,
                 MinionId = minionDto.Id,
@@ -42,7 +46,7 @@ public class MinionStatisticsService : IMinionStatisticsService
         return statistics;
     }
 
-    public async Task<MinionStatisticsDto> GetMinionStatisticsAsync(Guid minionId)
+    public async Task<MinionStats> GetMinionStatisticsAsync(Guid minionId)
     {
         var minion = await _unitOfWork.Minions.GetByIdAsync(minionId);
         var minionDto = _mapper.Map<MinionDto>(minion);
@@ -53,7 +57,7 @@ public class MinionStatisticsService : IMinionStatisticsService
         var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
         var place = await GetHeroPlace(rating);
 
-        var statistics = new MinionStatisticsDto
+        var statistics = new MinionStats
         {
             Minion = minionDto,
             MinionId = minionDto.Id,

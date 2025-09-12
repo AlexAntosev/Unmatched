@@ -2,6 +2,10 @@
 
 using System;
 
+using AutoMapper;
+
+using Unmatched.StatisticsService.Domain.Models;
+
 public class PlayerStatisticsService : IPlayerStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -13,19 +17,19 @@ public class PlayerStatisticsService : IPlayerStatisticsService
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
+    public async Task<IEnumerable<PlayerStats>> GetPlayersStatisticsAsync()
     {
         var playerEntities = await _unitOfWork.Players.GetAsync();
         var players = _mapper.Map<List<PlayerDto>>(playerEntities);
         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
-        var statistics = new List<PlayerStatisticsDto>();
+        var statistics = new List<PlayerStats>();
 
         foreach (var player in players)
         {
             var playerFighters = fighters.Where(x => x.PlayerId.Equals(player.Id)).OrderByDescending(x => x.Match.Date).ToArray();
 
-            var playerStatistics = new PlayerStatisticsDto
+            var playerStatistics = new PlayerStats
                 {
                     Player = player,
                     PlayerId = player.Id,
@@ -41,13 +45,13 @@ public class PlayerStatisticsService : IPlayerStatisticsService
         return statistics;
     }
     
-    public async Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId)
+    public async Task<PlayerStats> GetPlayerStatisticsAsync(Guid playerId)
     {
         var playerEntity = await _unitOfWork.Players.GetByIdAsync(playerId);
         var player = _mapper.Map<PlayerDto>(playerEntity);
         var playerFighters = await _unitOfWork.Fighters.GetFromFinishedMatchesByPlayerIdAsync(playerId);
         
-        var statistics = new PlayerStatisticsDto
+        var statistics = new PlayerStats
             {
                 Player = player,
                 PlayerId = player.Id,

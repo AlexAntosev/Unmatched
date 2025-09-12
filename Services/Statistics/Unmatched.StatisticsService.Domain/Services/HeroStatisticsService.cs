@@ -1,5 +1,9 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
+using AutoMapper;
+
+using Unmatched.StatisticsService.Domain.Models;
+
 public class HeroStatisticsService : IHeroStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -15,13 +19,13 @@ public class HeroStatisticsService : IHeroStatisticsService
         _catalogHeroCache = catalogHeroCache;
     }
     
-    public async Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync()
+    public async Task<IEnumerable<HeroStats>> GetHeroesStatisticsAsync()
     {
         var heroes = await _catalogHeroCache.GetAsync();
         var ratings = await _unitOfWork.Ratings.GetAsync();
         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
-        var statistics = new List<HeroStatisticsDto>();
+        var statistics = new List<HeroStats>();
 
         foreach (var hero in heroes)
         {
@@ -29,7 +33,7 @@ public class HeroStatisticsService : IHeroStatisticsService
             var points = ratings.FirstOrDefault(x => x.HeroId.Equals(hero.Id))?.Points ?? 0;
             var fights = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
 
-            var heroStatistics = new HeroStatisticsDto 
+            var heroStatistics = new HeroStats 
                 {
                     Hero = heroDto,
                     HeroId = hero.Id,
@@ -46,7 +50,7 @@ public class HeroStatisticsService : IHeroStatisticsService
         return statistics;
     }
     
-    public async Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
+    public async Task<HeroStats> GetHeroStatisticsAsync(Guid heroId)
     {
         var hero = await _catalogHeroCache.GetAsync(heroId);
         var heroDto = _mapper.Map<HeroDto>(hero);
@@ -59,7 +63,7 @@ public class HeroStatisticsService : IHeroStatisticsService
         var playStyle = await _unitOfWork.PlayStyles.GetByIdAsync(heroId);
 
         heroDto.PlayStyle = _mapper.Map<PlayStyleDto>(playStyle) ?? PlayStyleDto.Default(heroId);
-        var statistics = new HeroStatisticsDto
+        var statistics = new HeroStats
             {
                 Hero = heroDto,
                 HeroId = hero.Id,

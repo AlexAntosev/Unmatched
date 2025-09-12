@@ -2,6 +2,10 @@
 
 using System;
 
+using AutoMapper;
+
+using Unmatched.StatisticsService.Domain.Models;
+
 public class MapStatisticsService : IMapStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -13,19 +17,19 @@ public class MapStatisticsService : IMapStatisticsService
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync()
+    public async Task<IEnumerable<MapStats>> GetMapsStatisticsAsync()
     {
         var mapEntities = await _unitOfWork.Maps.GetAsync();
         var maps = _mapper.Map<List<MapDto>>(mapEntities);
         var mapMatches = await _unitOfWork.Matches.GetFinishedAsync();
 
-        var statistics = new List<MapStatisticsDto>();
+        var statistics = new List<MapStats>();
 
         foreach (var map in maps)
         {
             var mapFighters = mapMatches.Where(x => x.MapId.Equals(map.Id)).OrderByDescending(x => x.Date).ToArray();
 
-            var mapStatistics = new MapStatisticsDto
+            var mapStatistics = new MapStats
                 {
                     Map = map,
                     MapId = map.Id,
@@ -38,13 +42,13 @@ public class MapStatisticsService : IMapStatisticsService
         return statistics;
     }
 
-    public async Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId)
+    public async Task<MapStats> GetMapStatisticsAsync(Guid mapId)
     {
         var mapEntity = await _unitOfWork.Maps.GetByIdAsync(mapId);
         var map = _mapper.Map<MapDto>(mapEntity);
         var mapMatches = await _unitOfWork.Matches.GetFinishedByMapIdAsync(mapId);
         
-        var statistics = new MapStatisticsDto
+        var statistics = new MapStats
             {
                 Map = map,
                 MapId = map.Id,

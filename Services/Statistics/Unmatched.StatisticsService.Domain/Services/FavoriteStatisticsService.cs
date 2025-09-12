@@ -1,5 +1,9 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
+using AutoMapper;
+
+using Unmatched.StatisticsService.Domain.Models;
+
 public class FavoriteStatisticsService : IFavoriteStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -15,14 +19,14 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
         _catalogHeroCache = catalogHeroCache;
     }
     
-    public async Task<IEnumerable<FavoriteStatisticsDto>> GetFavoritesStatisticsAsync(Guid playerId)
+    public async Task<IEnumerable<FavoriteHeroStats>> GetFavoritesStatisticsAsync(Guid playerId)
     {
         var favorites = await _unitOfWork.Favorites.GetByPlayerIdAsync(playerId);
         var heroes = await _catalogHeroCache.GetAsync();
         var player = await _unitOfWork.Players.GetByIdAsync(playerId);
         var playerDto = _mapper.Map<PlayerDto>(player);
 
-        var statistics = new List<FavoriteStatisticsDto>();
+        var statistics = new List<FavoriteHeroStats>();
         foreach (var hero in heroes)
         {
             var existingFavoriteHero = favorites.FirstOrDefault(x => x.HeroId == hero.Id);
@@ -31,7 +35,7 @@ public class FavoriteStatisticsService : IFavoriteStatisticsService
             var fights = await _unitOfWork.Fighters.GetFromFinishedMatchesByHeroAndPlayerIdAsync(hero.Id, playerId);
             var fightsDto = _mapper.Map<List<FighterDto>>(fights);
             
-            var favoriteStatistics = new FavoriteStatisticsDto 
+            var favoriteStatistics = new FavoriteHeroStats 
                 {
                     FavoriteId = existingFavoriteHero?.Id ?? Guid.NewGuid(),
                     Hero = heroDto,

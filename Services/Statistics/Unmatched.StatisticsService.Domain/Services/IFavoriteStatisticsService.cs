@@ -2,7 +2,9 @@
 
 using System;
 
+using Unmatched.StatisticsService.Domain.Models;
+
 public interface IFavoriteStatisticsService
 {
-    Task<IEnumerable<FavoriteStatisticsDto>> GetFavoritesStatisticsAsync(Guid playerId);
+    Task<IEnumerable<FavoriteHeroStats>> GetFavoritesStatisticsAsync(Guid playerId);
 }

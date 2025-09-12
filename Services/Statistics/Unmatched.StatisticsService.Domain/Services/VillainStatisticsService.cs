@@ -1,5 +1,9 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
+using AutoMapper;
+
+using Unmatched.StatisticsService.Domain.Models;
+
 public class VillainStatisticsService : IVillainStatisticsService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -11,13 +15,13 @@ public class VillainStatisticsService : IVillainStatisticsService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<VillainStatisticsDto>> GetVillainsStatisticsAsync()
+    public async Task<IEnumerable<VillainStats>> GetVillainsStatisticsAsync()
     {
         var villains = await _unitOfWork.Villains.GetAsync();
         var ratings = await _unitOfWork.Ratings.GetAsync();
         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
 
-        var statistics = new List<VillainStatisticsDto>();
+        var statistics = new List<VillainStats>();
 
         foreach (var villain in villains)
         {
@@ -25,7 +29,7 @@ public class VillainStatisticsService : IVillainStatisticsService
             var points = ratings.FirstOrDefault(x => x.HeroId.Equals(hero.Id))?.Points ?? 0;
             var fights = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
 
-            var villainStatistics = new VillainStatisticsDto
+            var villainStatistics = new VillainStats
             {
                 Villain = villainDto,
                 VillainId = villainDto.Id,
@@ -42,7 +46,7 @@ public class VillainStatisticsService : IVillainStatisticsService
         return statistics;
     }
 
-    public async Task<VillainStatisticsDto> GetVillainStatisticsAsync(Guid villainId)
+    public async Task<VillainStats> GetVillainStatisticsAsync(Guid villainId)
     {
         var villain = await _unitOfWork.Villains.GetByIdAsync(villainId);
         var villainDto = _mapper.Map<VillainDto>(villain);
@@ -53,7 +57,7 @@ public class VillainStatisticsService : IVillainStatisticsService
         var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
         var place = await GetHeroPlace(rating);
 
-        var statistics = new VillainStatisticsDto
+        var statistics = new VillainStats
         {
             Villain = villainDto,
             VillainId = villainDto.Id,

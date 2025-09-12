@@ -1,8 +1,10 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
+using Unmatched.StatisticsService.Domain.Models;
+
 public interface IVillainStatisticsService
 {
-    Task<IEnumerable<VillainStatisticsDto>> GetVillainsStatisticsAsync();
+    Task<IEnumerable<VillainStats>> GetVillainsStatisticsAsync();
     
-    Task<VillainStatisticsDto> GetVillainStatisticsAsync(Guid villainId);
+    Task<VillainStats> GetVillainStatisticsAsync(Guid villainId);
 }

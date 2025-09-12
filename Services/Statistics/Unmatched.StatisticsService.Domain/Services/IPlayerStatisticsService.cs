@@ -2,11 +2,13 @@
 
 using System;
 
+using Unmatched.StatisticsService.Domain.Models;
+
 public interface IPlayerStatisticsService
 {
-    Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync();
+    Task<IEnumerable<PlayerStats>> GetPlayersStatisticsAsync();
 
-    Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId);
+    Task<PlayerStats> GetPlayerStatisticsAsync(Guid playerId);
 
-    Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId);
+    Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId); // match
 }

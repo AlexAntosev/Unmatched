@@ -1,12 +1,14 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
+using Unmatched.StatisticsService.Domain.Models;
+
 public interface IHeroStatisticsService
 {
-    Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync();
+    Task<IEnumerable<HeroStats>> GetHeroesStatisticsAsync();
 
-    Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId);
+    Task<HeroStats> GetHeroStatisticsAsync(Guid heroId);
 
-    Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId);
+    Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId); // match
 
-    Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId);
+    Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId); // match
 }
