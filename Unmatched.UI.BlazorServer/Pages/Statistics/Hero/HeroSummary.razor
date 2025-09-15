@@ -70,7 +70,7 @@
 
     private string ShowTitles()
     {
-        if (_statistics is not null && _statistics.Titles is not null && _statistics.Titles.Any())
+        if (_statistics.Titles is not null && _statistics.Titles.Any())
         {
             return string.Join(", ", _statistics.Titles.Select(t => string.Concat(t.Name, " ", t.Comment)).ToArray());
         }
@@ -93,25 +93,25 @@
         var color = _statistics.Color;
     }
     
-    private async Task PlayStyleAttackChanged(int rate, PlayStyleDto playStyle)
+    private async Task PlayStyleAttackChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Attack = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
     
-    private async Task PlayStyleDefenceChanged(int rate, PlayStyleDto playStyle)
+    private async Task PlayStyleDefenceChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Defence = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
     
-    private async Task PlayStyleTrickeryChanged(int rate, PlayStyleDto playStyle)
+    private async Task PlayStyleTrickeryChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Trickery = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
     
-    private async Task PlayStyleDifficultyChanged(int rate, PlayStyleDto playStyle)
+    private async Task PlayStyleDifficultyChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Difficulty = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);

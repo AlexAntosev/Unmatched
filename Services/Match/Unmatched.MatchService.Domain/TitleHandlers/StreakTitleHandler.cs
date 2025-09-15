@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.TitleHandlers;
 
-using Unmatched.MatchService.Domain.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;

@@ -22,7 +22,7 @@ public class UiHeroStatisticsDto : IComparable<UiHeroStatisticsDto>
 
     public int Hp { get; set; }
 
-    public PlayStyleDto? PlayStyle { get; set; }
+    public UiPlayStyleDto? PlayStyle { get; set; }
 
     public string Color { get; set; }
 

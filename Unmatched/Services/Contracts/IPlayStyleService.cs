@@ -4,5 +4,5 @@ using Unmatched.Dtos;
 
 public interface IPlayStyleService
 {
-    Task AddOrUpdateAsync(Guid heroId, PlayStyleDto playStyleDto);
+    Task AddOrUpdateAsync(Guid heroId, UiPlayStyleDto playStyleDto);
 }

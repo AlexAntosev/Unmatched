@@ -12,9 +12,17 @@ using Unmatched.CatalogService.Domain.Services;
 public class SidekickController(IMapper mapper, ISidekickService sidekickService) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<SidekickDto>> GetSidekicks()
+    public async Task<IEnumerable<SidekickDto>> GetAll()
     {
         var sidekicks = await sidekickService.GetAsync();
+        var result = mapper.Map<IEnumerable<SidekickDto>>(sidekicks);
+        return result;
+    }
+
+    [HttpGet("hero/{heroId}")]
+    public async Task<IEnumerable<SidekickDto>> GetByHero(Guid heroId)
+    {
+        var sidekicks = await sidekickService.GetByHeroAsync(heroId);
         var result = mapper.Map<IEnumerable<SidekickDto>>(sidekicks);
         return result;
     }

@@ -1,6 +1,5 @@
 ﻿namespace Unmatched.HttpClients.Contracts;
 
-using Unmatched.Dtos;
 using Unmatched.Dtos.Catalog;
 
 public interface ICatalogClient
@@ -11,5 +10,9 @@ public interface ICatalogClient
 
     Task<IEnumerable<CatalogMapDto>> GetMapsAsync();
 
-    Task<Guid> UpdatePlayStyleAsync(PlayStyleDto playStyle);
+    Task<IEnumerable<CatalogSidekickDto>> GetSidekicksByHeroAsync(Guid heroId);
+
+    Task<Guid> UpdatePlayStyleAsync(CatalogPlayStyleDto playStyle);
+
+    Task<CatalogPlayStyleDto> GetPlayStyleByHero(Guid heroId);
 }

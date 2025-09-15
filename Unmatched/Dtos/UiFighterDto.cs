@@ -8,7 +8,7 @@ public class UiFighterDto
 
     public UiHeroDto? Hero { get; set; }
 
-    public Guid HeroId { get; set; }
+    public Guid HeroId { get; set; } // TODO: get rid of this Id
 
     public string HeroImageUrl => $"/{Hero?.Name ?? "Unknown"}.png";
 
@@ -24,9 +24,11 @@ public class UiFighterDto
 
     public int? MatchPoints { get; set; }
 
-    public Guid PlayerId { get; set; }
+    public UiPlayerDto? Player { get; set; }
 
-    public string PlayerImageUrl => $"/{Hero?.Name ?? "Unknown"}.png"; //need player name
+    public Guid PlayerId { get; set; } // TODO: get rid of this Id
+
+    public string PlayerImageUrl => $"/{Player?.Name ?? "Unknown"}.png";
 
     public int? SidekickHpLeft { get; set; }
 

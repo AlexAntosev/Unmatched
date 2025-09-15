@@ -3,8 +3,8 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Api.Dto;
+using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 using Unmatched.MatchService.Domain.Models;
-using Unmatched.MatchService.Domain.Models.Catalog;
 
 public class ApiMapper : Profile
 {
@@ -20,6 +20,7 @@ public class ApiMapper : Profile
         CreateMap<HeroTitleAssign, HeroTitleAssignDto>().ReverseMap();
         CreateMap<SaveMatchResult, SaveMatchResultDto>().ReverseMap();
         CreateMap<CatalogMapDto, MapDto>().ReverseMap();
+        CreateMap<FighterPlayer, FighterPlayerDto>().ReverseMap();
         CreateMap<Rating, RatingDto>();
         CreateMap<RatingChange, RatingChangeDto>();
     }

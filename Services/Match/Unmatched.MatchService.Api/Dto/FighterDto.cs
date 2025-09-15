@@ -22,7 +22,7 @@ public class FighterDto
 
     public int? MatchPoints { get; set; }
 
-    public Guid PlayerId { get; set; }
+    public FighterPlayerDto? Player { get; set; }
 
     public int? SidekickHpLeft { get; set; }
 

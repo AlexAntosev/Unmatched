@@ -106,10 +106,11 @@
         SetHeroInfo(hero);
     }
     
-    private void PlayerChanged(Guid playerId) 
+    private void PlayerChanged(Guid? playerId) 
     {
-        var player = Players.First(h => h.Id == playerId);
-        Fighter.PlayerId = player.Id;
+        var player = Players.FirstOrDefault(h => h.Id == playerId);
+        Fighter.Player = player;
+        Fighter.PlayerId = playerId ?? Guid.Empty;
     }
 
     private void SetHeroInfo(UiHeroDto hero)
@@ -136,7 +137,7 @@
         var exceptPlayers = new List<Guid>();
         if (exceptFighter is not null)
         {
-            exceptPlayers.Add(exceptFighter.PlayerId);
+            exceptPlayers.Add(exceptFighter.Player.Id);
         }
         
         var availablePlayers = Players
@@ -148,7 +149,8 @@
         var randomPlayerId = availablePlayers.GetRandomItem();
         var randomPlayer = Players.First(x => x.Id == randomPlayerId);
 
-        targetFighter.PlayerId = randomPlayer.Id;
+        targetFighter.Player.Id = randomPlayer.Id;
+        targetFighter.Player = randomPlayer;
         
         var exceptHeroes = new List<Guid>();
         if (exceptFighter is not null)

@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Domain.Models.Catalog;
+﻿namespace Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 
 using System;
 

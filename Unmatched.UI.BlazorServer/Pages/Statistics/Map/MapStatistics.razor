@@ -34,7 +34,7 @@
             _matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToList();
             foreach (var matchLogEntry in _matchLogEntries)
             {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == mapId);
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.Player.Id == mapId);
             }
         
             _mapChampMatches = _matchLogEntries

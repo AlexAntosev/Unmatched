@@ -2,8 +2,8 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using Unmatched.MatchService.Domain.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog;
+using Unmatched.MatchService.Domain.Communication.Player;
 using Unmatched.MatchService.Domain.Mapping;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
         services.AddSingleton<ICatalogMapCache, CatalogMapCache>();
         services.AddSingleton<ICatalogSidekickCache, CatalogSidekickCache>();
+        services.AddSingleton<IPlayerCache, PlayerCache>();
 
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();
@@ -36,6 +37,11 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
             {
                 var baseUrl = configuration["Services:CatalogService:BaseUrl"];
+                client.BaseAddress = new Uri(baseUrl);
+            });
+        services.AddHttpClient<IPlayerClient, PlayerClient>(client =>
+            {
+                var baseUrl = configuration["Services:PlayerService:BaseUrl"];
                 client.BaseAddress = new Uri(baseUrl);
             });
     }

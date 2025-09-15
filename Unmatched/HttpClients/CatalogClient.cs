@@ -31,11 +31,25 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogMapDto>>();
     }
 
-    public async Task<Guid> UpdatePlayStyleAsync(PlayStyleDto playStyle)
+    public async Task<IEnumerable<CatalogSidekickDto>> GetSidekicksByHeroAsync(Guid heroId)
+    {
+        var response = await httpClient.GetAsync($"/sidekick/hero/{heroId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogSidekickDto>>();
+    }
+
+    public async Task<Guid> UpdatePlayStyleAsync(CatalogPlayStyleDto playStyle)
     {
         var content = new StringContent(JsonSerializer.Serialize(playStyle), Encoding.UTF8, "application/json");
         var response = await httpClient.PutAsync($"/hero/{playStyle.HeroId}/playstyle", content);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<Guid>();
+    }
+
+    public async Task<CatalogPlayStyleDto> GetPlayStyleByHero(Guid heroId)
+    {
+        var response = await httpClient.GetAsync($"/hero/{heroId}/playstyle");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogPlayStyleDto>();
     }
 }

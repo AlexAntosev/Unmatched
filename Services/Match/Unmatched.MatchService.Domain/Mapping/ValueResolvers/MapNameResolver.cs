@@ -1,8 +1,7 @@
 ﻿namespace Unmatched.MatchService.Domain.Mapping.ValueResolvers;
 
 using AutoMapper;
-
-using Unmatched.MatchService.Domain.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Models;
 

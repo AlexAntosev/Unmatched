@@ -8,6 +8,8 @@ public class FighterDto
 
     public FighterHeroDto? Hero { get; set; }
 
+    public FighterPlayerDto? Player { get; set; }
+
     public Guid HeroId { get; set; }
 
     public int? HpLeft { get; set; }
@@ -21,8 +23,6 @@ public class FighterDto
     public Guid MatchId { get; set; }
 
     public int? MatchPoints { get; set; }
-
-    public Guid PlayerId { get; set; }
 
     public int? SidekickHpLeft { get; set; }
 

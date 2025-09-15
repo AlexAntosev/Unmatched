@@ -8,7 +8,7 @@ public class UiMatchDto
 
     public DateTime Date { get; set; }
 
-    public Guid Id { get; set; }// = Guid.NewGuid();
+    public Guid Id { get; set; }
 
     public MapDto? Map { get; set; }
 

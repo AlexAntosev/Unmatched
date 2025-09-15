@@ -44,11 +44,11 @@
             _matchLogEntries = (await PlayerStatisticsService.GetPlayerMatchesAsync(playerId)).OrderByDescending(x => x.Date).ToList();
             foreach (var matchLogEntry in _matchLogEntries)
             {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == playerId);
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.Player.Id == playerId);
             }
 
             _matches = _matchLogEntries
-                .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
+                .SelectMany(m => m.Fighters.Where(f => f.Player.Id == Player.PlayerId))
                 .GroupBy(f => f.Hero.Name)
                 .ToList();
 

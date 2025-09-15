@@ -1,21 +1,23 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
 using AutoMapper;
-
-using Unmatched.MatchService.Domain.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
+using Unmatched.MatchService.Domain.Communication.Player;
+using Unmatched.MatchService.Domain.Communication.Player.Dto;
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Extensions;
 using Unmatched.MatchService.Domain.Models;
-using Unmatched.MatchService.Domain.Models.Catalog;
 using Unmatched.MatchService.Domain.Repositories;
 
 public class TournamentService(
     IUnitOfWork unitOfWork,
     IMapper mapper,
     ICatalogHeroCache catalogHeroCache,
-    ICatalogMapCache catalogMapCache) : ITournamentService
+    ICatalogMapCache catalogMapCache,
+    IPlayerCache playerCache) : ITournamentService
 {
     public async Task<Tournament> AddAsync(Tournament dto)
     {
@@ -141,11 +143,12 @@ public class TournamentService(
         var generatedMatches = new List<Match>();
         for (var i = 0; i < participants.Count; i += 2)
         {
-            var players = new List<Guid>()
-                {
-                    AndriiAndOlexPlayerIds.Andrii,
-                    AndriiAndOlexPlayerIds.Olex
-                };
+            var players = new List<PlayerDto?>()
+                    {
+                        await playerCache.GetAsync(AndriiAndOlexPlayerIds.Andrii), // TODO: refactor
+                        await playerCache.GetAsync(AndriiAndOlexPlayerIds.Olex),
+                    }.Select(mapper.Map<FighterPlayer>)
+                .ToList();
             var turns = new List<int>
                 {
                     1,
@@ -153,10 +156,10 @@ public class TournamentService(
                 };
             
             var fighter = participants[i];
-            fighter.PlayerId = players.GetAndRemoveRandomItem();
+            fighter.Player = players.GetAndRemoveRandomItem();
             fighter.Turn = turns.GetAndRemoveRandomItem();
             var opponent = participants[i + 1];
-            opponent.PlayerId = players.GetAndRemoveRandomItem();
+            opponent.Player = players.GetAndRemoveRandomItem();
             opponent.Turn = turns.GetAndRemoveRandomItem();
             
             var match = new Match

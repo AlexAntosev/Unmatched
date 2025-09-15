@@ -1,7 +1,0 @@
-﻿namespace Unmatched.MatchService.Domain.Catalog;
-
-using Unmatched.MatchService.Domain.Models.Catalog;
-
-public interface ICatalogMapCache : ICachedService<CatalogMapDto>
-{
-}

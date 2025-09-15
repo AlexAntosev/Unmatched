@@ -1,6 +1,7 @@
-﻿namespace Unmatched.MatchService.Domain.Catalog;
+﻿namespace Unmatched.MatchService.Domain.Communication.Catalog;
 
-using Unmatched.MatchService.Domain.Models.Catalog;
+using Unmatched.MatchService.Domain.Cache;
+using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 
 public class CatalogHeroCache(ICatalogClient catalogClient) : InMemoryCachedService<CatalogHeroDto>, ICatalogHeroCache
 {

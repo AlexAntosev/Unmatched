@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Domain.Catalog;
+﻿namespace Unmatched.MatchService.Domain.Cache;
 
 public abstract class InMemoryCachedService<T> : ICachedService<T>
 {

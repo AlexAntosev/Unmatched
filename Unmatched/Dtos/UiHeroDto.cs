@@ -20,5 +20,5 @@ public class UiHeroDto
     
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
     
-    public PlayStyleDto PlayStyle { get; set; }
+    public UiPlayStyleDto PlayStyle { get; set; }
 }

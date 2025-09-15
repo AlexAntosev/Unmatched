@@ -33,33 +33,6 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("HeroTitle");
                 });
 
-            // modelBuilder.Entity("Unmatched.Data.Entities.Favorite", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<int>("Favour")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<Guid>("HeroId")
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<bool>("IsChosenOne")
-            //             .HasColumnType("bit");
-            //
-            //         b.Property<Guid>("PlayerId")
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.HasIndex("HeroId");
-            //
-            //         b.HasIndex("PlayerId");
-            //
-            //         b.ToTable("Favorites");
-            //     });
-
             modelBuilder.Entity("Unmatched.Data.Entities.FighterEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -113,49 +86,6 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("Fighters");
                 });
 
-            // modelBuilder.Entity("Unmatched.Data.Entities.Hero", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<string>("Color")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.Property<int>("DeckSize")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<int>("Hp")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<bool>("IsRanged")
-            //             .HasColumnType("bit");
-            //
-            //         b.Property<string>("Name")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.ToTable("Heroes");
-            //     });
-
-            // modelBuilder.Entity("Unmatched.Data.Entities.Map", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<string>("Name")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.ToTable("Maps");
-            //     });
-
             modelBuilder.Entity("Unmatched.Data.Entities.MatchEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -192,78 +122,6 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("Matches");
                 });
 
-            // modelBuilder.Entity("Unmatched.Data.Entities.Minion", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<string>("Color")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.Property<int>("DeckSize")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<int>("Hp")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<bool>("IsRanged")
-            //             .HasColumnType("bit");
-            //
-            //         b.Property<string>("Name")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.ToTable("Minions");
-            //     });
-
-            // modelBuilder.Entity("Unmatched.Data.Entities.PlayStyle", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<int>("Attack")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<int>("Defence")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<int>("Difficulty")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<Guid>("HeroId")
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<int>("Trickery")
-            //             .HasColumnType("int");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.HasIndex("HeroId")
-            //             .IsUnique();
-            //
-            //         b.ToTable("PlayStyles");
-            //     });
-            //
-            // modelBuilder.Entity("Unmatched.Data.Entities.Player", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<string>("Name")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.ToTable("Players");
-            //     });
-
             modelBuilder.Entity("Unmatched.Data.Entities.RatingEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -283,34 +141,6 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("Ratings");
                 });
 
-            // modelBuilder.Entity("Unmatched.Data.Entities.Sidekick", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<int>("Count")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<Guid?>("HeroId")
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<int>("Hp")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<bool>("IsRanged")
-            //             .HasColumnType("bit");
-            //
-            //         b.Property<string>("Name")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.HasIndex("HeroId");
-            //
-            //         b.ToTable("Sidekicks");
-            //     });
 
             modelBuilder.Entity("Unmatched.Data.Entities.TitleEntity", b =>
                 {
@@ -358,34 +188,7 @@ namespace Unmatched.EntityFramework.Migrations
                     b.ToTable("Tournaments");
                 });
 
-            // modelBuilder.Entity("Unmatched.Data.Entities.Villain", b =>
-            //     {
-            //         b.Property<Guid>("Id")
-            //             .ValueGeneratedOnAdd()
-            //             .HasColumnType("uniqueidentifier");
-            //
-            //         b.Property<string>("Color")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.Property<int>("DeckSize")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<int>("Hp")
-            //             .HasColumnType("int");
-            //
-            //         b.Property<bool>("IsRanged")
-            //             .HasColumnType("bit");
-            //
-            //         b.Property<string>("Name")
-            //             .IsRequired()
-            //             .HasColumnType("nvarchar(max)");
-            //
-            //         b.HasKey("Id");
-            //
-            //         b.ToTable("Villains");
-            //     });
-
+            
             modelBuilder.Entity("Unmatched.Data.Entities.HeroTitle", b =>
                 {
                     b.HasOne("Unmatched.Data.Entities.Title", null)
@@ -395,103 +198,25 @@ namespace Unmatched.EntityFramework.Migrations
                         .IsRequired();
                 });
 
-            // modelBuilder.Entity("Unmatched.Data.Entities.Favorite", b =>
-            //     {
-            //         b.HasOne("Unmatched.Data.Entities.Hero", "Hero")
-            //             .WithMany()
-            //             .HasForeignKey("HeroId")
-            //             .OnDelete(DeleteBehavior.Cascade)
-            //             .IsRequired();
-            //
-            //         b.HasOne("Unmatched.Data.Entities.Player", "Player")
-            //             .WithMany()
-            //             .HasForeignKey("PlayerId")
-            //             .OnDelete(DeleteBehavior.Cascade)
-            //             .IsRequired();
-            //
-            //         b.Navigation("Hero");
-            //
-            //         b.Navigation("Player");
-            //     });
-
             modelBuilder.Entity("Unmatched.Data.Entities.FighterEntity", b =>
                 {
-                    // b.HasOne("Unmatched.Data.Entities.Hero", "Hero")
-                    //     .WithMany()
-                    //     .HasForeignKey("HeroId")
-                    //     .OnDelete(DeleteBehavior.Cascade)
-                    //     .IsRequired();
-
                     b.HasOne("Unmatched.Data.Entities.MatchEntity", "Match")
                         .WithMany("Fighters")
                         .HasForeignKey("MatchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    // b.HasOne("Unmatched.Data.Entities.Player", "Player")
-                    //     .WithMany()
-                    //     .HasForeignKey("PlayerId")
-                    //     .OnDelete(DeleteBehavior.Cascade)
-                    //     .IsRequired();
-                    //
-                    // b.Navigation("Hero");
-
                     b.Navigation("Match");
-                    //
-                    // b.Navigation("Player");
                 });
 
             modelBuilder.Entity("Unmatched.Data.Entities.MatchEntity", b =>
                 {
-                    // b.HasOne("Unmatched.Data.Entities.Map", "Map")
-                    //     .WithMany()
-                    //     .HasForeignKey("MapId");
-
-                    b.HasOne("Unmatched.Data.Entities.TournamentEntity", "Tournament")
+                   b.HasOne("Unmatched.Data.Entities.TournamentEntity", "Tournament")
                         .WithMany("Matches")
                         .HasForeignKey("TournamentId");
 
-                    // b.Navigation("Map");
-
                     b.Navigation("Tournament");
                 });
-
-            // modelBuilder.Entity("Unmatched.Data.Entities.PlayStyle", b =>
-            //     {
-            //         b.HasOne("Unmatched.Data.Entities.Hero", null)
-            //             .WithOne("PlayStyle")
-            //             .HasForeignKey("Unmatched.Data.Entities.PlayStyle", "HeroId")
-            //             .OnDelete(DeleteBehavior.Cascade)
-            //             .IsRequired();
-            //     });
-
-            // modelBuilder.Entity("Unmatched.Data.Entities.RatingEntity", b =>
-            //     {
-            //         b.HasOne("Unmatched.Data.Entities.HeroEntity", "Hero")
-            //             .WithMany()
-            //             .HasForeignKey("HeroId")
-            //             .OnDelete(DeleteBehavior.Cascade)
-            //             .IsRequired();
-            //
-            //         b.Navigation("Hero");
-            //     });
-
-            // modelBuilder.Entity("Unmatched.Data.Entities.Sidekick", b =>
-            //     {
-            //         b.HasOne("Unmatched.Data.Entities.Hero", "Hero")
-            //             .WithMany("Sidekicks")
-            //             .HasForeignKey("HeroId");
-            //
-            //         b.Navigation("Hero");
-            //     });
-            //
-            // modelBuilder.Entity("Unmatched.Data.Entities.Hero", b =>
-            //     {
-            //         b.Navigation("PlayStyle")
-            //             .IsRequired();
-            //
-            //         b.Navigation("Sidekicks");
-            //     });
 
             modelBuilder.Entity("Unmatched.Data.Entities.MatchEntity", b =>
                 {

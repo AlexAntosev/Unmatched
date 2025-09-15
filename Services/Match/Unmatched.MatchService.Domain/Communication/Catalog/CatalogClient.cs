@@ -1,8 +1,7 @@
-﻿namespace Unmatched.MatchService.Domain.Catalog;
+﻿namespace Unmatched.MatchService.Domain.Communication.Catalog;
 
 using System.Net.Http.Json;
-
-using Unmatched.MatchService.Domain.Models.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 
 public class CatalogClient(HttpClient httpClient) : ICatalogClient
 {

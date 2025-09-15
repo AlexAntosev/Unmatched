@@ -5,7 +5,7 @@ using AutoMapper;
 using Unmatched.Dtos;
 using Unmatched.HttpClients.Contracts;
 
-public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, IStatisticsClient statisticsClient) : IHeroStatisticsService
+public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, IStatisticsClient statisticsClient, ICatalogClient catalogClient) : IHeroStatisticsService
 {
     public async Task<IEnumerable<UiHeroStatisticsDto>> GetHeroesStatisticsAsync()
     {
@@ -19,9 +19,13 @@ public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, ISta
         var heroStats = await statisticsClient.GetHeroStatsAsync(heroId);
         var uiModel = mapper.Map<UiHeroStatisticsDto>(heroStats);
 
-        uiModel.Sidekicks = new List<UiSidekickDto>();
-        uiModel.Titles = new List<TitleDto>();
-        uiModel.PlayStyle =null;
+        var catalogHeroSidekicks = await catalogClient.GetSidekicksByHeroAsync(heroId);
+        uiModel.Sidekicks = catalogHeroSidekicks.Select(mapper.Map<UiSidekickDto>);
+
+        uiModel.Titles = new List<TitleDto>(); //TODO
+
+        var catalogPlayStyle = await catalogClient.GetPlayStyleByHero(heroId);
+        uiModel.PlayStyle = mapper.Map<UiPlayStyleDto>(catalogPlayStyle);
 
         return uiModel;
     }
