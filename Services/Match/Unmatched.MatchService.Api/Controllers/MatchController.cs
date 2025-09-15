@@ -5,7 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 using Unmatched.MatchService.Api.Dto;
-using Unmatched.MatchService.Domain.Dto;
+using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Services;
 
 [ApiController]
@@ -43,6 +43,33 @@ public class MatchController(ILogger<MatchController> logger, IMapper mapper, IM
     public async Task<ActionResult<IEnumerable<MatchLogDto>>> Get()
     {
         var matches = await matchService.GetMatchLogAsync();
+
+        var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
+        return Ok(dtos);
+    }
+
+    [HttpGet("log/hero/{heroId}")]
+    public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetByHero(Guid heroId)
+    {
+        var matches = await matchService.GetFinishedByHeroAsync(heroId);
+
+        var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
+        return Ok(dtos);
+    }
+
+    [HttpGet("log/map/{mapId}")]
+    public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetByMap(Guid mapId)
+    {
+        var matches = await matchService.GetFinishedByMapAsync(mapId);
+
+        var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
+        return Ok(dtos);
+    }
+
+    [HttpGet("log/player/{playerId}")]
+    public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetByPlayer(Guid playerId)
+    {
+        var matches = await matchService.GetFinishedByPlayerAsync(playerId);
 
         var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
         return Ok(dtos);

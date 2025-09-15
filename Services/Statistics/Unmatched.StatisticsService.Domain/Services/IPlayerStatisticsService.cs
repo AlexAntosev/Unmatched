@@ -10,5 +10,4 @@ public interface IPlayerStatisticsService
 
     Task<PlayerStats> GetPlayerStatisticsAsync(Guid playerId);
 
-    Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId); // match
 }

@@ -2,12 +2,12 @@
 
 using AutoMapper;
 
-using Unmatched.MatchService.Domain.Dto;
-using Unmatched.MatchService.Domain.Dto.Catalog;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Extensions;
 using Unmatched.MatchService.Domain.Mapping.ValueResolvers;
+using Unmatched.MatchService.Domain.Models;
+using Unmatched.MatchService.Domain.Models.Catalog;
 
 public class DomainMapper : Profile
 {

@@ -1,8 +1,8 @@
 ﻿namespace Unmatched.MatchService.Domain.RatingCalculators;
 
 using Unmatched.MatchService.Domain.Catalog;
-using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
 
 public class RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHeroCache) : IRatingCalculator
@@ -37,8 +37,8 @@ public class RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogH
 
     private int CalculateForLooser(MatchContext matchContext)
     {
-        var maxLooserSidekicksHp = 0;// matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
-        var maxWinnerSidekicksHp = 0;// matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxLooserSidekicksHp =  matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxWinnerSidekicksHp =  matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
 
         var forSidekickHp = maxLooserSidekicksHp == 0
             ? 50
@@ -55,8 +55,8 @@ public class RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogH
 
     private int CalculateForWinner(MatchContext matchContext)
     {
-        var maxLooserSidekicksHp = 0;// matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
-        var maxWinnerSidekicksHp = 0;// matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxLooserSidekicksHp =  matchContext.LooserReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
+        var maxWinnerSidekicksHp =  matchContext.WinnerReferenceHero.Sidekicks?.Sum(x => x.Hp * x.Count) ?? 0;
 
         var forLooserSidekick = maxLooserSidekicksHp == 0
             ? 40

@@ -3,8 +3,8 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Catalog;
-using Unmatched.MatchService.Domain.Dto;
-using Unmatched.MatchService.Domain.Dto.Catalog;
+using Unmatched.MatchService.Domain.Models;
+using Unmatched.MatchService.Domain.Models.Catalog;
 
 public class FighterSidekickResolver(ICatalogSidekickCache sidekickCache, IMapper mapper) : IValueResolver<CatalogHeroDto, FighterHero, IEnumerable<FighterSidekick>>
 {

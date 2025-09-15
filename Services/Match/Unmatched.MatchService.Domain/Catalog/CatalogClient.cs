@@ -2,7 +2,7 @@
 
 using System.Net.Http.Json;
 
-using Unmatched.MatchService.Domain.Dto.Catalog;
+using Unmatched.MatchService.Domain.Models.Catalog;
 
 public class CatalogClient(HttpClient httpClient) : ICatalogClient
 {

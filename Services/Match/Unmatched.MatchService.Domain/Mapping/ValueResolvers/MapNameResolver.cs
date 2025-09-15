@@ -3,8 +3,8 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Catalog;
-using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Models;
 
 public class MapNameResolver(ICatalogMapCache mapCache, IMapper mapper) : IValueResolver<MatchEntity, MatchLog, string>
 {

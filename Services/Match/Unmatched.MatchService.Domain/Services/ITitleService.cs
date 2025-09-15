@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
-using Unmatched.MatchService.Domain.Dto;
+using Unmatched.MatchService.Domain.Models;
 
 public interface ITitleService
 {

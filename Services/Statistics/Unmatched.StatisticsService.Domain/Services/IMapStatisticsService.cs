@@ -9,6 +9,4 @@ public interface IMapStatisticsService
     Task<IEnumerable<MapStats>> GetMapsStatisticsAsync();
 
     Task<MapStats> GetMapStatisticsAsync(Guid mapId);
-
-    Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId); // match
 }

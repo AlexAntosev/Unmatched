@@ -7,8 +7,4 @@ public interface IHeroStatisticsService
     Task<IEnumerable<HeroStats>> GetHeroesStatisticsAsync();
 
     Task<HeroStats> GetHeroStatisticsAsync(Guid heroId);
-
-    Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId); // match
-
-    Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId); // match
 }

@@ -1,7 +1,7 @@
-﻿namespace Unmatched.MatchService.Domain.Dto;
+﻿namespace Unmatched.MatchService.Domain.Models;
 
-using Unmatched.MatchService.Domain.Dto.Catalog;
 using Unmatched.MatchService.Domain.Enums;
+using Unmatched.MatchService.Domain.Models.Catalog;
 
 public class Match
 {

@@ -78,56 +78,6 @@ public class HeroStatisticsService : IHeroStatisticsService
         
         return statistics;
     }
-
-    public async Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId)
-    {
-        var heroMatches = await _unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);
-
-        var matchLogs = new List<MatchLogDto>();
-        
-        foreach (var match in heroMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
-            
-            matchLog.Fighters = _mapper.Map<List<FighterDto>>(fighters);
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
-    }
-
-    public async Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId)
-    {
-        var ratingChanges = new List<RatingChangeDto>();
-        var currentRating = await _unitOfWork.Ratings.GetByHeroIdAsync(heroId);
-        ratingChanges.Add(new RatingChangeDto
-            {
-                Date = "Current",
-                Rating = currentRating?.Points ?? 0
-            });
-
-        var points = currentRating?.Points ?? 0;
-
-        var heroMatches = await _unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);
-        
-        foreach (var heroMatch in heroMatches)
-        {
-            var matchPoints = heroMatch.Fighters.FirstOrDefault(f => f.HeroId == heroId)?.MatchPoints ?? 0;
-            points -= matchPoints;
-            ratingChanges.Add(new RatingChangeDto
-                {
-                    Date = heroMatch.Date.ToShortDateString(),
-                    Rating = points
-                });
-        }
-
-        ratingChanges.Reverse();
-        
-        return ratingChanges;
-    }
     
     private async Task<int> GetHeroPlace(Rating? rating)
     {

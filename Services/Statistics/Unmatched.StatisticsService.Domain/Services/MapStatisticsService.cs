@@ -57,24 +57,4 @@ public class MapStatisticsService : IMapStatisticsService
         
         return statistics;
     }
-    
-    public async Task<IEnumerable<MatchLogDto>> GetMapMatchesAsync(Guid mapId)
-    {
-        var mapMatches = await _unitOfWork.Matches.GetFinishedByMapIdAsync(mapId);
-
-        var matchLogs = new List<MatchLogDto>();
-        
-        foreach (var match in mapMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
-            
-            matchLog.Fighters = _mapper.Map<List<FighterDto>>(fighters);
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
-    }
 }

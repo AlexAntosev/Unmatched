@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.MatchService.Domain.Catalog;
 
-using Unmatched.MatchService.Domain.Dto.Catalog;
+using Unmatched.MatchService.Domain.Models.Catalog;
 
 public interface ICatalogClient
 {

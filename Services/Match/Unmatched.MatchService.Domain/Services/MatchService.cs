@@ -3,9 +3,9 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Catalog;
-using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
+using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.TitleHandlers;
 
@@ -32,6 +32,7 @@ public class MatchService(
         {
             titlesEarned.Add(rusherTitleEarned);
         }
+
         if (punisherTitleEarned is not null)
         {
             titlesEarned.Add(punisherTitleEarned);
@@ -52,24 +53,11 @@ public class MatchService(
         return result;
     }
 
-    public async Task<IEnumerable<MatchLog>> GetMatchLogAsync()
+    public async Task<Match> GetAsync(Guid id)
     {
-        var allMatches = await unitOfWork.Matches.GetFinishedAsync();
-
-        var matchLogs = new List<MatchLog>();
-        foreach (var match in allMatches)
-        {
-            var matchLog = mapper.Map<MatchLog>(match);
-
-            var fighters = (await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId))
-                .Select(mapper.Map<Fighter>)
-                .ToArray();
-            matchLog.Fighters = fighters;
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
+        var entity = await unitOfWork.Matches.GetByIdAsync(id);
+        var match = mapper.Map<Match>(entity);
+        return match;
     }
 
     public async Task<IEnumerable<Match>> GetByTournamentIdAsync(Guid id)
@@ -81,15 +69,86 @@ public class MatchService(
         {
             match.Fighters = match.Fighters.OrderBy(f => f.Turn);
         }
-        
+
         return matches;
     }
 
-    public async Task<Match> GetAsync(Guid id)
+    public async Task<IEnumerable<MatchLog>> GetFinishedByHeroAsync(Guid heroId)
     {
-        var entity = await unitOfWork.Matches.GetByIdAsync(id);
-        var match = mapper.Map<Match>(entity);
-        return match;
+        var heroMatches = await unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);
+
+        var matchLogs = new List<MatchLog>();
+
+        foreach (var match in heroMatches)
+        {
+            var matchLog = mapper.Map<MatchLog>(match);
+
+            var fighters = await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
+
+            matchLog.Fighters = mapper.Map<List<Fighter>>(fighters);
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<MatchLog>> GetFinishedByMapAsync(Guid mapId)
+    {
+        var mapMatches = await unitOfWork.Matches.GetFinishedByMapIdAsync(mapId);
+
+        var matchLogs = new List<MatchLog>();
+
+        foreach (var match in mapMatches)
+        {
+            var matchLog = mapper.Map<MatchLog>(match);
+
+            var fighters = await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
+
+            matchLog.Fighters = mapper.Map<List<Fighter>>(fighters);
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<MatchLog>> GetFinishedByPlayerAsync(Guid playerId)
+    {
+        var playerMatches = await unitOfWork.Matches.GetFinishedByPlayerIdAsync(playerId);
+
+        var matchLogs = new List<MatchLog>();
+
+        foreach (var match in playerMatches)
+        {
+            var matchLog = mapper.Map<MatchLog>(match);
+
+            var fighters = await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
+
+            matchLog.Fighters = mapper.Map<List<Fighter>>(fighters);
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<MatchLog>> GetMatchLogAsync()
+    {
+        var allMatches = await unitOfWork.Matches.GetFinishedAsync();
+
+        var matchLogs = new List<MatchLog>();
+        foreach (var match in allMatches)
+        {
+            var matchLog = mapper.Map<MatchLog>(match);
+
+            var fighters = (await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId)).Select(mapper.Map<Fighter>).ToArray();
+            matchLog.Fighters = fighters;
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
     }
 
     public async Task UpdateEpicAsync(Guid matchId, int epic)

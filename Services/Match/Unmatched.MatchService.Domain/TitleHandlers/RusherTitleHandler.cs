@@ -4,8 +4,8 @@ using AutoMapper;
 
 using Unmatched.MatchService.Domain.Catalog;
 using Unmatched.MatchService.Domain.Constants;
-using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
 
 public class RusherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCache catalogHeroCache) : IRusherTitleHandler

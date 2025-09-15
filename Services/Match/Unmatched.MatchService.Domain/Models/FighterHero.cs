@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Domain.Dto;
+﻿namespace Unmatched.MatchService.Domain.Models;
 
 public class FighterHero
 {

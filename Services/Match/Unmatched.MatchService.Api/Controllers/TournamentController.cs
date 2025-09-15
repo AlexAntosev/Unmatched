@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 using Unmatched.MatchService.Api.Dto;
+using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Services;
 
 [ApiController]
@@ -43,7 +44,7 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
     [HttpPost("create")]
     public async Task<ActionResult<TournamentDto>> GenerateNextStage([FromBody] TournamentDto tournament)
     {
-        var model = mapper.Map<Domain.Dto.Tournament>(tournament);
+        var model = mapper.Map<Tournament>(tournament);
         var addedResult = await tournamentService.AddAsync(model);
         return Ok(mapper.Map<TournamentDto>(addedResult));
     }

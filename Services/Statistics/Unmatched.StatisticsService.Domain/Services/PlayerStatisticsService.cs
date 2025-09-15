@@ -66,21 +66,6 @@ public class PlayerStatisticsService : IPlayerStatisticsService
     
     public async Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId)
     {
-        var playerMatches = await _unitOfWork.Matches.GetFinishedByPlayerIdAsync(playerId);
-
-        var matchLogs = new List<MatchLogDto>();
-        
-        foreach (var match in playerMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
-            
-            matchLog.Fighters = _mapper.Map<List<FighterDto>>(fighters);
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
+       
     }
 }

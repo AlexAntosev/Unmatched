@@ -80,7 +80,7 @@
                         new LineChartDataset
                             {
                                 Label = Hero.Hero.Name,
-                                Data = _ratingChanges.Select(c => (double)c.Rating).ToList(),
+                                Data = _ratingChanges.Select(c => (double)c.RatingDelta).ToList(),
                                 BackgroundColor = heroColor,
                                 BorderColor = heroColor,
                                 BorderWidth = new List<double>{2},

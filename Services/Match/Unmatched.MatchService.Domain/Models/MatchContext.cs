@@ -1,7 +1,7 @@
-﻿namespace Unmatched.MatchService.Domain.Dto;
+﻿namespace Unmatched.MatchService.Domain.Models;
 
-using Unmatched.MatchService.Domain.Dto.Catalog;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Models.Catalog;
 
 class MatchContext
 {

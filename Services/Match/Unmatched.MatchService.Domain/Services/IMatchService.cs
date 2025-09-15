@@ -1,7 +1,7 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
-using Unmatched.MatchService.Domain.Dto;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Models;
 
 public interface IMatchService
 {
@@ -11,7 +11,13 @@ public interface IMatchService
 
     Task<IEnumerable<Match>> GetByTournamentIdAsync(Guid id);
 
+    Task<IEnumerable<MatchLog>> GetFinishedByHeroAsync(Guid id);
+
     Task<Match> GetAsync(Guid id);
     
     Task UpdateEpicAsync(Guid matchId, int epic);
+
+    Task<IEnumerable<MatchLog>> GetFinishedByMapAsync(Guid mapId);
+
+    Task<IEnumerable<MatchLog>> GetFinishedByPlayerAsync(Guid playerId);
 }
