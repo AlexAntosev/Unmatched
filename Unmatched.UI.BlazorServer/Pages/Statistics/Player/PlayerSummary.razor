@@ -4,10 +4,10 @@
 @using Unmatched.Dtos.Match
 
 <div style="background: linear-gradient(180deg, @(ChosenOne?.Hero?.Color ?? Colors.Default) 0%, rgba(255,255,255,1) 100%);">
-    <h3 align="center" class="page-title">@Statistics.Player?.Name</h3>
+    <h3 align="center" class="page-title">@Statistics.Name</h3>
     <div class="wrapper page-content">
         <div class="image-container">
-            <img src="@Statistics.Player?.ImageUrl"/>
+            <img src="@Statistics.ImageUrl"/>
         </div>
         <div>
             <h4> Chosen One: @ChosenOne?.Hero?.Name</h4>

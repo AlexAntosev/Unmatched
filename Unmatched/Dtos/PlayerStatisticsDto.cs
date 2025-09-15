@@ -1,12 +1,14 @@
 ﻿namespace Unmatched.Dtos;
 
 using System;
-using Unmatched.Dtos.Player;
 
 public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
 {
-    public UiPlayerDto? Player { get; set; }
     public Guid PlayerId { get; set; }
+
+    public string Name { get; set; }
+
+    public string ImageUrl => $"/{Name}.png";
 
     public double Kd
         => TotalMatches > 0
@@ -44,7 +46,7 @@ public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
                 : -1;
         }
 
-        return Player.Name.CompareTo(other.Player.Name);
+        return Name.CompareTo(other.Name);
 
     }
 }

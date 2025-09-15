@@ -4,6 +4,7 @@ namespace Unmatched.Services;
 
 using AutoMapper;
 
+using Unmatched.Dtos;
 using Unmatched.Dtos.Player;
 using Unmatched.HttpClients.Contracts;
 

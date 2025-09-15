@@ -1,4 +1,4 @@
-﻿namespace Unmatched.StatisticsService.Domain.Services;
+﻿namespace Unmatched.StatisticsService.Domain.Services.Contracts;
 
 using System;
 

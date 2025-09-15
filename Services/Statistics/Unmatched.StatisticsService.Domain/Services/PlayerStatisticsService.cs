@@ -5,6 +5,7 @@ using System;
 using AutoMapper;
 
 using Unmatched.StatisticsService.Domain.Models;
+using Unmatched.StatisticsService.Domain.Services.Contracts;
 
 public class PlayerStatisticsService : IPlayerStatisticsService
 {
@@ -62,10 +63,5 @@ public class PlayerStatisticsService : IPlayerStatisticsService
             };
         
         return statistics;
-    }
-    
-    public async Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId)
-    {
-       
     }
 }

@@ -3,6 +3,7 @@
 using AutoMapper;
 
 using Unmatched.StatisticsService.Domain.Models;
+using Unmatched.StatisticsService.Domain.Services.Contracts;
 
 public class FavoriteStatisticsService : IFavoriteStatisticsService
 {
