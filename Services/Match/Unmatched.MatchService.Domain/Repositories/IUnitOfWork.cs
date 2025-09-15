@@ -17,5 +17,7 @@ public interface IUnitOfWork : IDisposable
 
     ITitleRepository Titles { get; }
 
+    IHeroTitleRepository HeroTitles { get; }
+
     Task SaveChangesAsync();
 }

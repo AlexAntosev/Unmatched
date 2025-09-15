@@ -27,13 +27,12 @@ public class PunisherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper) : IPun
             if (!isAlreadyPunisher
              && winner.MatchPoints >= MinVictoryPointsForTitle)
             {
-                title.HeroTitles.Add(
-                    new HeroTitleEntity()
-                        {
-                            HeroesId = winner.HeroId,
-                            TitlesId = title.Id
-                        });
-                await unitOfWork.Titles.AddOrUpdateAsync(title);
+                var heroTitle = new HeroTitleEntity
+                    {
+                        HeroesId = winner.HeroId,
+                        TitlesId = title.Id
+                    };
+                await unitOfWork.HeroTitles.AddOrUpdateAsync(heroTitle);
                 await unitOfWork.SaveChangesAsync();
 
                 var titleDto = mapper.Map<Title>(title);

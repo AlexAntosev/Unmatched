@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.MatchService.Domain.TitleHandlers;
 
 using AutoMapper;
+
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
@@ -28,13 +29,12 @@ public class RusherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper, ICatalog
             if (!isAlreadyRusher
              && winner.CardsLeft >= MinCardsForTitleRatio * winnerHero.DeckSize)
             {
-                titleEntity.HeroTitles.Add(
-                    new HeroTitleEntity
-                        {
-                            HeroesId = winner.HeroId,
-                            TitlesId = titleEntity.Id
-                        });
-                await unitOfWork.Titles.AddOrUpdateAsync(titleEntity);
+                var heroTitle = new HeroTitleEntity
+                    {
+                        HeroesId = winner.HeroId,
+                        TitlesId = titleEntity.Id
+                    };
+                await unitOfWork.HeroTitles.AddOrUpdateAsync(heroTitle);
                 await unitOfWork.SaveChangesAsync();
 
                 var title = mapper.Map<Title>(titleEntity);

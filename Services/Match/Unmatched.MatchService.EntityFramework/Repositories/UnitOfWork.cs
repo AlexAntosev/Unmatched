@@ -15,6 +15,8 @@ public class UnitOfWork(UnmatchedDbContext context) : IUnitOfWork
 
     public ITitleRepository Titles { get; } = new TitleRepository(context);
 
+    public IHeroTitleRepository HeroTitles { get; } = new HeroTitleRepository(context);
+
     public Task SaveChangesAsync()
         => context.SaveChangesAsync();
 

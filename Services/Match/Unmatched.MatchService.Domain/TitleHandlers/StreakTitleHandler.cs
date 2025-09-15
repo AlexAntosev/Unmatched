@@ -47,16 +47,15 @@ public class StreakTitleHandler(IUnitOfWork unitOfWork, ICatalogHeroCache catalo
 
         var heroWithBestStreak = heroesStreaks.OrderByDescending(h => h.Value).FirstOrDefault();
 
-        title.HeroTitles = new List<HeroTitleEntity>
-            {
-                new()
-                    {
-                        HeroesId = heroWithBestStreak.Key,
-                        TitlesId = title.Id
-                    }
-            };
         title.Comment = $"({heroWithBestStreak.Value} wins in a row)";
         await unitOfWork.Titles.AddOrUpdateAsync(title);
+
+        var heroTitle = new HeroTitleEntity
+            {
+                HeroesId = heroWithBestStreak.Key,
+                TitlesId = title.Id
+        };
+        await unitOfWork.HeroTitles.AddOrUpdateAsync(heroTitle);
         await unitOfWork.SaveChangesAsync();
     }
 }
