@@ -6,21 +6,23 @@ public interface IMatchService
 {
     Task<SaveMatchResult> AddOrUpdateAsync(Match match);
 
-    Task<IEnumerable<MatchLog>> GetMatchLogAsync();
+    Task<IEnumerable<Match>> GetAllAsync();
+
+    Task<IEnumerable<Fighter>> GetAllFightersAsync();
+
+    Task<Match> GetAsync(Guid id);
 
     Task<IEnumerable<Match>> GetByTournamentIdAsync(Guid id);
 
-    Task<IEnumerable<MatchLog>> GetFinishedByHeroAsync(Guid id);
+    Task<IEnumerable<Fighter>> GetFightersByHeroAsync(Guid heroId);
 
-    Task<Match> GetAsync(Guid id);
-    
-    Task UpdateEpicAsync(Guid matchId, int epic);
+    Task<IEnumerable<MatchLog>> GetFinishedByHeroAsync(Guid id);
 
     Task<IEnumerable<MatchLog>> GetFinishedByMapAsync(Guid mapId);
 
     Task<IEnumerable<MatchLog>> GetFinishedByPlayerAsync(Guid playerId);
 
-    Task<IEnumerable<Fighter>> GetFightersByHeroAsync(Guid heroId);
+    Task<IEnumerable<MatchLog>> GetMatchLogAsync();
 
-    Task<IEnumerable<Fighter>> GetAllFightersAsync();
+    Task UpdateEpicAsync(Guid matchId, int epic);
 }

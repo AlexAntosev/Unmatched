@@ -11,6 +11,8 @@
         {
             CreateMap<CatalogHeroDto, HeroStats>()
                 .ForMember(x => x.HeroId, c => c.MapFrom(s => s.Id));
+            CreateMap<CatalogMapDto, MapStats>()
+                .ForMember(x => x.MapId, c => c.MapFrom(s => s.Id));
         }
     }
 }

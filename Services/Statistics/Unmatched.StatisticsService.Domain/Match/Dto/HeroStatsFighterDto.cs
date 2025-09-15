@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Api.Dto;
+﻿namespace Unmatched.StatisticsService.Domain.Match.Dto;
 
 /// <summary>
 ///  temp dto for hero stats service. The plan is: stats service will request all matches with regular dtos to recalculates initial snapshot, and use kafka event to update it. This Dto will be removed

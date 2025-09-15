@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
 using AutoMapper;
+
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
@@ -52,6 +53,19 @@ public class MatchService(
         return result;
     }
 
+    public async Task<IEnumerable<Match>> GetAllAsync()
+    {
+        var entities = await unitOfWork.Matches.GetAsync();
+        var matches = mapper.Map<IEnumerable<Match>>(entities);
+        return matches;
+    }
+
+    public async Task<IEnumerable<Fighter>> GetAllFightersAsync()
+    {
+        var fighterEntities = await unitOfWork.Fighters.GetAsync();
+        return fighterEntities.Select(mapper.Map<Fighter>);
+    }
+
     public async Task<Match> GetAsync(Guid id)
     {
         var entity = await unitOfWork.Matches.GetByIdAsync(id);
@@ -75,12 +89,6 @@ public class MatchService(
     public async Task<IEnumerable<Fighter>> GetFightersByHeroAsync(Guid heroId)
     {
         var fighterEntities = await unitOfWork.Fighters.GetFromFinishedMatchesByHeroIdAsync(heroId);
-        return fighterEntities.Select(mapper.Map<Fighter>);
-    }
-
-    public async Task<IEnumerable<Fighter>> GetAllFightersAsync()
-    {
-        var fighterEntities = await unitOfWork.Fighters.GetAsync();
         return fighterEntities.Select(mapper.Map<Fighter>);
     }
 

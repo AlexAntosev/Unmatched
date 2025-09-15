@@ -1,8 +1,8 @@
-﻿namespace Unmatched.StatisticsService.Domain.Models;
+﻿namespace Unmatched.StatisticsService.Api.Dto;
 
 using System;
 
-public class MapStats
+public class MapStatsDto
 {
     public Guid MapId { get; set; }
 

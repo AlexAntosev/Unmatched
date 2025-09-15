@@ -27,6 +27,7 @@ public class UnmatchedMapper : Profile
         CreateMap<MapDto, MatchMapDto>().ReverseMap();
 
         CreateMap<HeroStatisticsDto, UiHeroStatisticsDto>();
+        CreateMap<MapStatisticsDto, UiMapStatisticsDto>();
         CreateMap<CatalogPlayStyleDto, UiPlayStyleDto>().ReverseMap();
     }
 }

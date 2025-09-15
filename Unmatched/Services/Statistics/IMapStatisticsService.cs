@@ -1,15 +1,12 @@
 ﻿namespace Unmatched.Services.Statistics;
 
-using System;
-
 using Unmatched.Dtos;
-using Unmatched.Dtos.Match;
 
 public interface IMapStatisticsService
 {
-    Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync();
-
-    Task<MapStatisticsDto> GetMapStatisticsAsync(Guid mapId);
-
     Task<IEnumerable<UiMatchLogDto>> GetMapMatchesAsync(Guid mapId);
+
+    Task<IEnumerable<UiMapStatisticsDto>> GetMapsStatisticsAsync();
+
+    Task<UiMapStatisticsDto> GetMapStatisticsAsync(Guid mapId);
 }

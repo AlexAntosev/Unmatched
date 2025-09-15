@@ -2,12 +2,13 @@
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
+@using Unmatched.Dtos.Statistics
 @using Unmatched.Services.Statistics
 @inject IMapStatisticsService MapStatisticsService
 
 <div class="page-content">
-    <h3 align="center" class="page-title">@Statistics.Map?.Name</h3>
-    <img src="@Statistics.Map?.ImageUrl" />
+    <h3 align="center" class="page-title">@Statistics.Name</h3>
+    <img src="@Statistics.ImageUrl" />
     <TotalMatchesRecord Total="Statistics.TotalMatches" ></TotalMatchesRecord>
     <StatisticsRecord Title="Map champ" HeroMatches="_mapChampMatches"></StatisticsRecord>
     <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
@@ -18,7 +19,7 @@
     public string Id { get; set; } = "";
     
     private List<UiMatchLogDto> _matchLogEntries = new();
-    private MapStatisticsDto Statistics { get; set; } = new ();
+    private UiMapStatisticsDto Statistics { get; set; } = new ();
     
     private IGrouping<string, UiFighterDto>? _mapChampMatches;
     

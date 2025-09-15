@@ -40,11 +40,20 @@ public class MatchController(ILogger<MatchController> logger, IMapper mapper, IM
     }
 
     [HttpGet("log")]
-    public async Task<ActionResult<IEnumerable<MatchLogDto>>> Get()
+    public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetLog()
     {
         var matches = await matchService.GetMatchLogAsync();
 
         var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
+        return Ok(dtos);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MatchDto>>> Get()
+    {
+        var matches = await matchService.GetAllAsync();
+
+        var dtos = mapper.Map<IEnumerable<MatchDto>>(matches);
         return Ok(dtos);
     }
 

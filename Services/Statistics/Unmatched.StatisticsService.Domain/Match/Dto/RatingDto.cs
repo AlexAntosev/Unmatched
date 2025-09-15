@@ -1,4 +1,4 @@
-﻿namespace Unmatched.StatisticsService.Domain.Match;
+﻿namespace Unmatched.StatisticsService.Domain.Match.Dto;
 
 public class RatingDto
 {

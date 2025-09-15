@@ -8,11 +8,3 @@ public class MapDto
 
     public string ImageUrl => $"/{Name.Replace(" ", string.Empty)}.png";
 }
-
-public class MatchMapDto
-{
-    public Guid Id { get; set; }
-
-    public string Name { get; set; }
-
-}

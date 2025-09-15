@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Unmatched\Unmatched.csproj" />
     <ProjectReference Include="..\Unmatched.StatisticsService.Domain\Unmatched.StatisticsService.Domain.csproj" />
   </ItemGroup>
 

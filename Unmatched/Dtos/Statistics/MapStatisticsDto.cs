@@ -1,12 +1,10 @@
-﻿namespace Unmatched.Dtos;
-
-using System;
+﻿namespace Unmatched.Dtos.Statistics;
 
 public class MapStatisticsDto
 {
-    public MapDto? Map { get; set; }
-    
     public Guid MapId { get; set; }
+
+    public string Name { get; set; }
 
     public int TotalMatches { get; set; }
 }

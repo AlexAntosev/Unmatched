@@ -19,8 +19,11 @@ public static class ServiceCollectionExtensions
     public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();
+        services.AddTransient<IMapStatisticsService, MapStatisticsService>();
 
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
+        services.AddSingleton<ICatalogMapCache, CatalogMapCache>();
+
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
             {
                 var baseUrl = configuration["Services:CatalogService:BaseUrl"];

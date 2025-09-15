@@ -11,6 +11,7 @@
         {
             CreateMap<HeroStats, HeroStatsDto>();
             CreateMap<PlayerStats, PlayerStatsDto>();
+            CreateMap<MapStats, MapStatsDto>();
         }
     }
 }

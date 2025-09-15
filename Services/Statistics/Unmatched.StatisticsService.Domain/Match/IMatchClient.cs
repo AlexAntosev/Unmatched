@@ -1,12 +1,16 @@
-﻿namespace Unmatched.StatisticsService.Domain.Match;
+﻿using Unmatched.StatisticsService.Domain.Match.Dto;
+
+namespace Unmatched.StatisticsService.Domain.Match;
 
 public interface IMatchClient
 {
-    Task<IEnumerable<FighterDto>> GetAllFightersAsync();
+    Task<IEnumerable<HeroStatsFighterDto>> GetAllFightersAsync();
 
     Task<IEnumerable<RatingDto>> GetAllRatingsAsync();
 
-    Task<IEnumerable<FighterDto>> GetFightersByHeroAsync(Guid heroId);
+    Task<IEnumerable<HeroStatsFighterDto>> GetFightersByHeroAsync(Guid heroId);
 
     Task<RatingDto> GetHeroRatingAsync(Guid heroId);
+
+    Task<IEnumerable<MatchDto>> GetAllMatchesAsync();
 }

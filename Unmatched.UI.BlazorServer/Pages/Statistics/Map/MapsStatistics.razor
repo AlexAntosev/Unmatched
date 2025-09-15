@@ -1,6 +1,7 @@
 ﻿@page "/maps-statistics"
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Statistics
 @using Unmatched.Services.Statistics
 @inject NavigationManager NavManager
 @inject IMapStatisticsService MapStatisticsService
@@ -9,16 +10,16 @@
     <h1 class="page-title">Maps Statistics</h1>
     <SfGrid DataSource="@_maps" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="20"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="MapStatisticsDto"></GridEvents>
+        <GridEvents OnRecordClick="RecordClickHandler" TValue="UiMapStatisticsDto"></GridEvents>
         <GridColumns>
-            <GridColumn Field="Map.Name" HeaderText="Map" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(MapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            <GridColumn Field="Name" HeaderText="Map" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(UiMapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
         </GridColumns>
     </SfGrid>
 </div>
 
 @code {
-    private List<MapStatisticsDto> _maps = new();
+    private List<UiMapStatisticsDto> _maps = new();
 
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
@@ -27,7 +28,7 @@
         try
         {
             PreloadService.Show();
-            _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.Map.Name).ToList();
+            _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.Name).ToList();
         }
         finally
         {
@@ -35,7 +36,7 @@
         }
     }
 
-    private void RecordClickHandler(RecordClickEventArgs<MapStatisticsDto> args)
+    private void RecordClickHandler(RecordClickEventArgs<UiMapStatisticsDto> args)
     {
         var mapId = args.RowData.MapId;
         var url = $"{Urls.MapsStatistics}/{mapId}";

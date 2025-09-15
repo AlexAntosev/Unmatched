@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();
         services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
+        services.AddTransient<IMapStatisticsService, MapStatisticsService>();
 
         // services.AddTransient<ITitleService, TitleService>();
 
