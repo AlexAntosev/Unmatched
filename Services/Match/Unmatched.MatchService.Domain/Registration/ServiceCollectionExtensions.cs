@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICatalogSidekickCache, CatalogSidekickCache>();
 
         services.AddTransient<IMatchService, MatchService>();
+        services.AddTransient<IRatingService, RatingService>();
         services.AddTransient<ITournamentService, TournamentService>();
 
         services.AddTransient<IRatingCalculator, RatingCalculator>();

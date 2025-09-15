@@ -26,6 +26,6 @@ public class PlayStyleService(IUnitOfWork unitOfWork, IMapper mapper, IKafkaProd
 
     public async Task<PlayStyle?> GetAsync(Guid heroId)
     {
-        return await unitOfWork.PlayStyles.GetByHeroIdAsync(heroId);
+        return await unitOfWork.PlayStyles.GetByHeroIdAsync(heroId) ?? PlayStyle.Default(heroId);
     }
 }

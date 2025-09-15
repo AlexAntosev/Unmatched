@@ -1,6 +1,5 @@
 ﻿namespace Unmatched.MatchService.Domain.Services;
 
-using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Models;
 
 public interface IMatchService
@@ -20,4 +19,8 @@ public interface IMatchService
     Task<IEnumerable<MatchLog>> GetFinishedByMapAsync(Guid mapId);
 
     Task<IEnumerable<MatchLog>> GetFinishedByPlayerAsync(Guid playerId);
+
+    Task<IEnumerable<Fighter>> GetFightersByHeroAsync(Guid heroId);
+
+    Task<IEnumerable<Fighter>> GetAllFightersAsync();
 }

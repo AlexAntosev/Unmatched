@@ -3,39 +3,36 @@
 @using Unmatched.Services.Contracts
 @inject IPlayStyleService PlayStyleService
 
-<div style="background: linear-gradient(180deg, @Statistics.Hero.Color 0%, rgba(255,255,255,1) 100%);">
+<div style="background: linear-gradient(180deg, @Statistics.Color 0%, rgba(255,255,255,1) 100%);">
     <div style="display: flex; align-items: center; justify-content: center;" >
-        <h3 class="page-title">@Statistics.Hero.Name</h3>
+        <h3 class="page-title">@Statistics.Name</h3>
         <button style="background-color: transparent; border: 0px" onclick="@UpdateHeroColor">✎</button>
-        <input type="color" value="@Statistics.Hero.Color" onchange="@OnColorChange"/>
+        <input type="color" value="@Statistics.Color" onchange="@OnColorChange"/>
     </div>
     <div class="wrapper page-content">
         <div class="image-container">
-            @if (Statistics.Hero is not null)
-            {
-                <img src="@Statistics.Hero.ImageUrl"/>
-            }
+            <img src="@Statistics.ImageUrl"/>
         </div>
         <div>
             <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
-            <img style="margin-bottom: 0.5rem;" src="@_statistics.Hero?.MeleeRangeImageUrl" alt="@_statistics.HeroId" width="64px" height="auto"/>
-            <h5>Hp: @_statistics.Hero.Hp</h5>
-            <h5>Deck size: @_statistics.Hero.DeckSize</h5>
+            <img style="margin-bottom: 0.5rem;" src="@_statistics.MeleeRangeImageUrl" alt="@_statistics.HeroId" width="64px" height="auto"/>
+            <h5>Hp: @_statistics.Hp</h5>
+            <h5>Deck size: @_statistics.DeckSize</h5>
             <h5>Titles: @ShowTitles() </h5>
         </div>
         <div>
             @if (IsAnySidekick())
             {
-                var sidekick = _statistics.Hero.Sidekicks.First();
+                var sidekick = _statistics.Sidekicks.First();
                 <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
                 <img style="margin-bottom: 0.5rem;" src="@sidekick.MeleeRangeImageUrl" alt="@sidekick.Id" width="64px" height="auto"/>
                 <h5>@_sidekickTitle Hp: @sidekick.Hp</h5>
             }
         </div>
         <div>
-            @if (_statistics.Hero.PlayStyle is not null)
+            @if (_statistics.PlayStyle is not null)
             {
-                var playStyle = _statistics.Hero.PlayStyle;
+                var playStyle = _statistics.PlayStyle;
                 
                 <h5>Attack: <Epic Rating="@playStyle.Attack" Max="3" RatingChanged="@((int rate) => PlayStyleAttackChanged(rate, playStyle))" /></h5>
                 <h5>Defence: <Epic Rating="@playStyle.Defence" Max="3" RatingChanged="@((int rate) => PlayStyleDefenceChanged(rate, playStyle))"/></h5>
@@ -48,7 +45,7 @@
 
 @code {
     [Parameter]
-    public HeroStatisticsDto Statistics
+    public UiHeroStatisticsDto Statistics
     {
         get => _statistics;
         set
@@ -56,7 +53,7 @@
             _statistics = value;
             if (IsAnySidekick())
             {
-                var sidekicksCount = _statistics.Hero.Sidekicks.First().Count;
+                var sidekicksCount = _statistics.Sidekicks.First().Count;
                 _sidekickTitle = sidekicksCount > 1
                     ? "Sidekicks"
                     : "Sidekick";
@@ -67,7 +64,7 @@
         }
     }
     
-    private HeroStatisticsDto _statistics = new();
+    private UiHeroStatisticsDto _statistics = new();
     private string? _sidekickTitle;
     private string? _sidekicksSuffix;
 
@@ -83,17 +80,17 @@
 
     private bool IsAnySidekick()
     {
-        return _statistics.Hero.Sidekicks is not null && _statistics.Hero.Sidekicks.Any();
+        return _statistics.Sidekicks is not null && _statistics.Sidekicks.Any();
     }
 
     private void OnColorChange(ChangeEventArgs e)
     {
-        _statistics.Hero.Color = e.Value?.ToString();
+        _statistics.Color = e.Value?.ToString();
     }
     
     private void UpdateHeroColor()
     {
-        var color = _statistics.Hero.Color;
+        var color = _statistics.Color;
     }
     
     private async Task PlayStyleAttackChanged(int rate, PlayStyleDto playStyle)

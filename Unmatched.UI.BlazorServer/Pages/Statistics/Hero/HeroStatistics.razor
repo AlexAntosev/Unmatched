@@ -25,7 +25,7 @@
     private List<UiMatchLogDto> _matchLogEntries = new();
     private List<RatingChangeDto> _ratingChanges = new();
     private IGrouping<string, UiFighterDto>? _againstAntagonistMatches;
-    private HeroStatisticsDto Hero { get; set; } = new () { Hero = new() };
+    private UiHeroStatisticsDto Hero { get; set; } = new ();
     private LineChart _lineChart;
 
     [Inject] protected PreloadService PreloadService { get; set; }
@@ -70,7 +70,7 @@
     {
         var heroColor = new List<string>
             {
-                Hero.Hero.Color
+                Hero.Color
             };
         var data = new ChartData
             {
@@ -79,7 +79,7 @@
                     {
                         new LineChartDataset
                             {
-                                Label = Hero.Hero.Name,
+                                Label = Hero.Name,
                                 Data = _ratingChanges.Select(c => (double)c.RatingDelta).ToList(),
                                 BackgroundColor = heroColor,
                                 BorderColor = heroColor,

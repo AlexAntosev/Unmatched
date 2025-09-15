@@ -15,10 +15,13 @@ public class ApiMapper : Profile
         CreateMap<FighterHero, FighterHeroDto>().ReverseMap();
         CreateMap<FighterSidekick, FighterSidekickDto>().ReverseMap();
         CreateMap<Fighter, FighterDto>().ReverseMap();
+        CreateMap<Fighter, HeroStatsFighterDto>();
         CreateMap<Tournament, TournamentDto>().ReverseMap();
         CreateMap<HeroTitleAssign, HeroTitleAssignDto>().ReverseMap();
         CreateMap<SaveMatchResult, SaveMatchResultDto>().ReverseMap();
         CreateMap<CatalogMapDto, MapDto>().ReverseMap();
+        CreateMap<Rating, RatingDto>();
+        CreateMap<RatingChange, RatingChangeDto>();
     }
 }
 

@@ -6,6 +6,7 @@ using Unmatched.Dtos;
 using Unmatched.Dtos.Catalog;
 using Unmatched.Dtos.Match;
 using Unmatched.Dtos.Player;
+using Unmatched.Dtos.Statistics;
 
 public class UnmatchedMapper : Profile
 {
@@ -34,5 +35,7 @@ public class UnmatchedMapper : Profile
 
           CreateMap<MapDto, MatchMapDto>()
               .ReverseMap();
+
+          CreateMap<HeroStatisticsDto, UiHeroStatisticsDto>();
     }
 }

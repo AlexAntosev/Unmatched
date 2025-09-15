@@ -4,7 +4,11 @@ using Unmatched.MatchService.Domain.Models;
 
 public interface IRatingService
 {
-    public Task RecalculateAsync();
+    Task<Rating> GetByHeroAsync(Guid heroId);
 
     Task<List<RatingChange>> GetRatingChangesAsync(Guid heroId);
+
+    public Task RecalculateAsync();
+
+    Task<IEnumerable<Rating>> GetAllAsync();
 }

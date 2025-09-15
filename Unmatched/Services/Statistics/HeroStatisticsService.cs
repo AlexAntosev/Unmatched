@@ -5,16 +5,25 @@ using AutoMapper;
 using Unmatched.Dtos;
 using Unmatched.HttpClients.Contracts;
 
-public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient) : IHeroStatisticsService
+public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, IStatisticsClient statisticsClient) : IHeroStatisticsService
 {
-    public Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync()
+    public async Task<IEnumerable<UiHeroStatisticsDto>> GetHeroesStatisticsAsync()
     {
-        throw new NotImplementedException();
+        var heroStats = await statisticsClient.GetHeroStatsAsync();
+        var uiModels = heroStats.Select(mapper.Map<UiHeroStatisticsDto>);
+        return uiModels;
     }
 
-    public Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
+    public async Task<UiHeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
     {
-        throw new NotImplementedException();
+        var heroStats = await statisticsClient.GetHeroStatsAsync(heroId);
+        var uiModel = mapper.Map<UiHeroStatisticsDto>(heroStats);
+
+        uiModel.Sidekicks = new List<UiSidekickDto>();
+        uiModel.Titles = new List<TitleDto>();
+        uiModel.PlayStyle =null;
+
+        return uiModel;
     }
 
     public async Task<IEnumerable<UiMatchLogDto>> GetHeroMatchesAsync(Guid heroId)

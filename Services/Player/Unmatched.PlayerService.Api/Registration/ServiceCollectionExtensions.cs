@@ -1,13 +1,13 @@
 ﻿namespace Unmatched.PlayerService.Api.Registration;
 
-using System.Reflection;
-
 using Microsoft.Extensions.DependencyInjection;
+
+using Unmatched.PlayerService.Api.Mapping;
 
 public static class ServiceCollectionExtensions
 {
     public static void RegisterApiMapping(this IServiceCollection services)
     {
-        services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(cfg => { }, typeof(ApiMapper).Assembly);
     }
 }

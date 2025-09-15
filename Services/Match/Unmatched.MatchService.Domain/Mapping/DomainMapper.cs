@@ -27,6 +27,7 @@ public class DomainMapper : Profile
         CreateMap<CatalogSidekickDto, FighterSidekick>().ReverseMap();
         CreateMap<CatalogHeroDto, FighterHero>().ReverseMap();
         CreateMap<TournamentEntity, Tournament>().ReverseMap();
+        CreateMap<RatingEntity, Rating>();
     }
 
     private string TryGetTournamentName(TournamentEntity? tournament, Stage? stage)

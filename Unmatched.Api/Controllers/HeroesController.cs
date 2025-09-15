@@ -25,7 +25,7 @@ namespace Unmatched.Api.Controllers
         }
 
         [HttpGet("statistics")]
-        public Task<IEnumerable<HeroStatisticsDto>> GetStatistics()
+        public Task<IEnumerable<UiHeroStatisticsDto>> GetStatistics()
         {
             return _heroStatisticsService.GetHeroesStatisticsAsync();
         }

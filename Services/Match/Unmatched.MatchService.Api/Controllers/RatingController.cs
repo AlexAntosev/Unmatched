@@ -11,11 +11,18 @@ using Unmatched.MatchService.Domain.Services;
 [Route("[controller]")]
 public class RatingController(IRatingService ratingService, IMapper mapper) : ControllerBase
 {
-    [HttpPost("recalculate")]
-    public async Task<ActionResult> Recalculate()
+    [HttpGet("hero/{heroId}")]
+    public async Task<ActionResult<RatingDto>> GetByHero(Guid heroId)
     {
-        await ratingService.RecalculateAsync();
-        return Ok();
+        var rating = await ratingService.GetByHeroAsync(heroId);
+        return Ok(mapper.Map<RatingDto>(rating));
+    }
+
+    [HttpGet()]
+    public async Task<ActionResult<IEnumerable<RatingDto>>> Get()
+    {
+        var rating = await ratingService.GetAllAsync();
+        return Ok(rating.Select(mapper.Map<RatingDto>));
     }
 
     [HttpGet("changes/hero/{heroId}")]
@@ -23,5 +30,12 @@ public class RatingController(IRatingService ratingService, IMapper mapper) : Co
     {
         var changes = await ratingService.GetRatingChangesAsync(heroId);
         return Ok(changes.Select(mapper.Map<RatingChangeDto>));
+    }
+
+    [HttpPost("recalculate")]
+    public async Task<ActionResult> Recalculate()
+    {
+        await ratingService.RecalculateAsync();
+        return Ok();
     }
 }

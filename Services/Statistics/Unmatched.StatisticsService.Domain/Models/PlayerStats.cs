@@ -1,7 +1,12 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Models;
 
-public class PlayerStats 
+public class PlayerStats
 {
+    public double Kd
+        => TotalMatches > 0
+            ? Math.Round((double)TotalWins / TotalMatches, 2)
+            : 0;
+
     public int LastMatchPoints { get; set; }
 
     public string Name { get; set; }

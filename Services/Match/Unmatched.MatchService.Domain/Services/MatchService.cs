@@ -73,6 +73,18 @@ public class MatchService(
         return matches;
     }
 
+    public async Task<IEnumerable<Fighter>> GetFightersByHeroAsync(Guid heroId)
+    {
+        var fighterEntities = await unitOfWork.Fighters.GetFromFinishedMatchesByHeroIdAsync(heroId);
+        return fighterEntities.Select(mapper.Map<Fighter>);
+    }
+
+    public async Task<IEnumerable<Fighter>> GetAllFightersAsync()
+    {
+        var fighterEntities = await unitOfWork.Fighters.GetAsync();
+        return fighterEntities.Select(mapper.Map<Fighter>);
+    }
+
     public async Task<IEnumerable<MatchLog>> GetFinishedByHeroAsync(Guid heroId)
     {
         var heroMatches = await unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);

@@ -7,6 +7,18 @@ using Unmatched.MatchService.Domain.Repositories;
 
 public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, IMapper mapper) : IRatingService
 {
+    public async Task<IEnumerable<Rating>> GetAllAsync()
+    {
+        var ratingEntity = await unitOfWork.Ratings.GetAsync();
+        return mapper.Map<IEnumerable<Rating>>(ratingEntity);
+    }
+
+    public async Task<Rating> GetByHeroAsync(Guid heroId)
+    {
+        var ratingEntity = await unitOfWork.Ratings.GetByHeroIdAsync(heroId);
+        return mapper.Map<Rating>(ratingEntity);
+    }
+
     public async Task<List<RatingChange>> GetRatingChangesAsync(Guid heroId)
     {
         var ratingChanges = new List<RatingChange>();

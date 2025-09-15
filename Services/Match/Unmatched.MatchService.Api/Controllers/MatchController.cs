@@ -84,6 +84,24 @@ public class MatchController(ILogger<MatchController> logger, IMapper mapper, IM
         return Ok(dtos);
     }
 
+    [HttpGet("fighters/hero/{heroId}")]
+    public async Task<ActionResult<IEnumerable<HeroStatsFighterDto>>> GetFightersByHero(Guid heroId)
+    {
+        var matches = await matchService.GetFightersByHeroAsync(heroId);
+
+        var dtos = mapper.Map<IEnumerable<HeroStatsFighterDto>>(matches);
+        return Ok(dtos);
+    }
+
+    [HttpGet("fighters")]
+    public async Task<ActionResult<IEnumerable<HeroStatsFighterDto>>> GetAllFighters()
+    {
+        var matches = await matchService.GetAllFightersAsync();
+
+        var dtos = mapper.Map<IEnumerable<HeroStatsFighterDto>>(matches);
+        return Ok(dtos);
+    }
+
     [HttpPut("{id}/epic")]
     public Task UpdateEpic(Guid id, [FromBody] UpdateEpicDto epic)
     {
