@@ -39,6 +39,15 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+  statisticsservice:
+    build:
+      context: .
+      dockerfile: Services\Statistics\Unmatched.StatisticsService.Api/Dockerfile
+    ports:
+      - "5007:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
  
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
