@@ -1,5 +1,6 @@
 using Unmatched.StatisticsService.Api.Registration;
 using Unmatched.StatisticsService.Domain.Registration;
+using Unmatched.StatisticsService.EntityFramework.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.RegisterApiMapping();
 builder.Services.RegisterDomainMapping();
 builder.Services.RegisterServices(builder.Configuration);
+builder.Services.RegisterDbContext(builder.Configuration);
+builder.Services.RegisterRepositories();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -26,5 +29,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.Services.Migrate();
 
 app.Run();

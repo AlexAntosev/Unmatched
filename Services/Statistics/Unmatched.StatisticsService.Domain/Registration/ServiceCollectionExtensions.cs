@@ -2,10 +2,9 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using Unmatched.StatisticsService.Domain.Catalog;
+using Unmatched.StatisticsService.Domain.Communication.Catalog.Http;
+using Unmatched.StatisticsService.Domain.Communication.Match.Http;
 using Unmatched.StatisticsService.Domain.Mapping;
-using Unmatched.StatisticsService.Domain.Match;
 using Unmatched.StatisticsService.Domain.Services;
 using Unmatched.StatisticsService.Domain.Services.Contracts;
 

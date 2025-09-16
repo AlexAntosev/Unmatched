@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Unmatched\Unmatched.csproj" />
     <ProjectReference Include="..\Unmatched.StatisticsService.Domain\Unmatched.StatisticsService.Domain.csproj" />
+    <ProjectReference Include="..\Unmatched.StatisticsService.EntityFramework\Unmatched.StatisticsService.EntityFramework.csproj" />
   </ItemGroup>
 
 </Project>

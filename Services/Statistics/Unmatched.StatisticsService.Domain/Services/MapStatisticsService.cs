@@ -1,9 +1,8 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Services;
 
 using AutoMapper;
-
-using Unmatched.StatisticsService.Domain.Catalog;
-using Unmatched.StatisticsService.Domain.Match;
+using Unmatched.StatisticsService.Domain.Communication.Catalog.Http;
+using Unmatched.StatisticsService.Domain.Communication.Match.Http;
 using Unmatched.StatisticsService.Domain.Models;
 using Unmatched.StatisticsService.Domain.Services.Contracts;
 

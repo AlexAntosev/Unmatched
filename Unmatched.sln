@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.PlayerService.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.StatisticsService.Api", "Services\Statistics\Unmatched.StatisticsService.Api\Unmatched.StatisticsService.Api.csproj", "{100F821E-833B-48FA-BCA0-0036F5C36C70}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unmatched.StatisticsService.EntityFramework", "Services\Statistics\Unmatched.StatisticsService.EntityFramework\Unmatched.StatisticsService.EntityFramework.csproj", "{65F00EA7-3127-4D23-A76C-DB973CB45AE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,10 @@ Global
 		{100F821E-833B-48FA-BCA0-0036F5C36C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{100F821E-833B-48FA-BCA0-0036F5C36C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{100F821E-833B-48FA-BCA0-0036F5C36C70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F00EA7-3127-4D23-A76C-DB973CB45AE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F00EA7-3127-4D23-A76C-DB973CB45AE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F00EA7-3127-4D23-A76C-DB973CB45AE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F00EA7-3127-4D23-A76C-DB973CB45AE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,6 +178,7 @@ Global
 		{42EDF8BA-AAD2-42B1-B7EB-8E656C07E2F2} = {8FFA85B0-8B75-42E5-B6E4-D3DD27970758}
 		{4F049C60-BAFF-4E35-9782-9CA96930128E} = {8FFA85B0-8B75-42E5-B6E4-D3DD27970758}
 		{100F821E-833B-48FA-BCA0-0036F5C36C70} = {98423306-E2C4-425C-AF63-C6934C12EBEA}
+		{65F00EA7-3127-4D23-A76C-DB973CB45AE3} = {98423306-E2C4-425C-AF63-C6934C12EBEA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6A473A4-ACF5-4F7E-8C31-5E054EAF240D}

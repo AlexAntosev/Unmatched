@@ -1,4 +1,6 @@
-﻿namespace Unmatched.StatisticsService.Domain.Models;
+﻿namespace Unmatched.StatisticsService.EntityFramework.Entities;
+
+using System.ComponentModel.DataAnnotations;
 
 public class HeroStats
 {
@@ -6,16 +8,12 @@ public class HeroStats
 
     public int DeckSize { get; set; }
 
+    [Key]
     public Guid HeroId { get; set; }
 
     public int Hp { get; set; }
 
     public bool IsRanged { get; set; }
-
-    public double Kd
-        => TotalMatches > 0
-            ? Math.Round((double)TotalWins / TotalMatches, 2)
-            : 0;
 
     public int LastMatchPoints { get; set; }
 

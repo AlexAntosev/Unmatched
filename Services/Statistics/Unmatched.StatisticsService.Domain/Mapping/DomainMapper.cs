@@ -1,8 +1,7 @@
 ﻿namespace Unmatched.StatisticsService.Domain.Mapping
 {
     using AutoMapper;
-
-    using Unmatched.StatisticsService.Domain.Catalog.Dto;
+    using Unmatched.StatisticsService.Domain.Communication.Catalog.Http.Dto;
     using Unmatched.StatisticsService.Domain.Models;
 
     public class DomainMapper : Profile
