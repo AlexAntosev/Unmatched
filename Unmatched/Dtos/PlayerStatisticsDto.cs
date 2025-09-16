@@ -1,21 +1,18 @@
 ﻿namespace Unmatched.Dtos;
 
-using System;
-
-
 public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
 {
-    public PlayerDto? Player { get; set; }
-    public Guid PlayerId { get; set; }
+    public string ImageUrl => $"/{Name}.png";
 
-    public double Kd
-        => TotalMatches > 0
-            ? Math.Round((double)TotalWins / TotalMatches, 2)
-            : 0;
+    public double Kd { get; set; }
 
     public int LastMatchPoints { get; set; }
 
+    public string Name { get; set; }
+
     public int Place { get; set; }
+
+    public Guid PlayerId { get; set; }
 
     public int TotalLooses { get; set; }
 
@@ -36,7 +33,7 @@ public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
                 ? 1
                 : -1;
         }
-        
+
         if (TotalMatches != other.TotalMatches)
         {
             return TotalMatches > other.TotalMatches
@@ -44,7 +41,6 @@ public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
                 : -1;
         }
 
-        return Player.Name.CompareTo(other.Player.Name);
-
+        return Name.CompareTo(other.Name);
     }
 }

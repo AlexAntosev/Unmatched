@@ -1,12 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Components
-@using Unmatched.Dtos
 @using Unmatched.Constants
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 
 <div style="background: linear-gradient(180deg, @(ChosenOne?.Hero?.Color ?? Colors.Default) 0%, rgba(255,255,255,1) 100%);">
-    <h3 align="center" class="page-title">@Statistics.Player?.Name</h3>
+    <h3 align="center" class="page-title">@Statistics.Name</h3>
     <div class="wrapper page-content">
         <div class="image-container">
-            <img src="@Statistics.Player?.ImageUrl"/>
+            <img src="@Statistics.ImageUrl"/>
         </div>
         <div>
             <h4> Chosen One: @ChosenOne?.Hero?.Name</h4>
@@ -24,7 +25,7 @@
     public PlayerStatisticsDto Statistics { get; set; } = new();
 
     [Parameter]
-    public List<IGrouping<string, FighterDto>> Matches
+    public List<IGrouping<string, UiFighterDto>> Matches
     {
         get => _matches;
         set
@@ -47,10 +48,10 @@
     [Parameter]
     public FavoriteStatisticsDto? ChosenOne { get; set; }
 
-    private List<IGrouping<string, FighterDto>> _matches = new();
-    private IGrouping<string, FighterDto> _strongestHeroMatches;
-    private IGrouping<string, FighterDto> _weakestHeroMatches;
-    private List<IGrouping<string, FighterDto>> _favoritesMatches = new();
+    private List<IGrouping<string, UiFighterDto>> _matches = new();
+    private IGrouping<string, UiFighterDto> _strongestHeroMatches;
+    private IGrouping<string, UiFighterDto> _weakestHeroMatches;
+    private List<IGrouping<string, UiFighterDto>> _favoritesMatches = new();
 }
 
 <style>

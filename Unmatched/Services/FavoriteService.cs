@@ -1,45 +1,38 @@
 ﻿namespace Unmatched.Services;
 
-using System;
+using AutoMapper;
 
-using Unmatched.Data.Repositories;
+using Unmatched.Dtos;
+using Unmatched.HttpClients.Contracts;
+using Unmatched.Services.Contracts;
 
-public class FavoriteService : IFavoriteService
+public class FavoriteService(IMapper mapper, IPlayerClient playerClient, ICatalogClient catalogClient) : IFavoriteService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public async Task<UiHeroDto?> GetFavouriteHeroAsync(Guid playerId)
+    {
+        var heroId = await playerClient.GetFavouriteHeroIdAsync(playerId);
 
-    public FavoriteService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-    
-    public async Task UpdateFavourAsync(Guid favoriteId, int favour)
-    {
-        var favorite = _unitOfWork.Favorites.Query().FirstOrDefault(m => m.Id == favoriteId);
-        if (favorite is not null)
-        {
-            favorite.Favour = favour;
-            _unitOfWork.Favorites.AddOrUpdate(favorite);
-            await _unitOfWork.SaveChangesAsync();
-        }
+        var catalogHero = heroId != null
+            ? await catalogClient.GetHeroAsync(heroId.Value)
+            : null;
+
+        var sidekicks = heroId != null
+            ? await catalogClient.GetHeroAsync(heroId.Value)
+            : null;
+
+        var hero = mapper.Map<UiHeroDto>(catalogHero);
+        // fill heroDto with other stuff
+
+        return hero;
     }
 
-    public async Task UpdateChosenOneAsync(Guid playerId, Guid favoriteId, bool isChosenOne)
+    public Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
     {
-        var chosenOne = _unitOfWork.Favorites.Query().FirstOrDefault(m => m.IsChosenOne && m.PlayerId == playerId);
-        if (chosenOne is not null)
-        {
-            chosenOne.IsChosenOne = false;
-            _unitOfWork.Favorites.AddOrUpdate(chosenOne);
-            await _unitOfWork.SaveChangesAsync();
-        }
-        
-        var favorite = _unitOfWork.Favorites.Query().FirstOrDefault(m => m.Id == favoriteId);
-        if (favorite is not null)
-        {
-            favorite.IsChosenOne = isChosenOne;
-            _unitOfWork.Favorites.AddOrUpdate(favorite);
-            await _unitOfWork.SaveChangesAsync();
-        }
+        return playerClient.UpdateChosenOneAsync(playerId, heroId, isChosenOne);
+    }
+
+    public Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour)
+    {
+        return playerClient.UpdateFavourAsync(playerId, heroId, favour);
     }
 }

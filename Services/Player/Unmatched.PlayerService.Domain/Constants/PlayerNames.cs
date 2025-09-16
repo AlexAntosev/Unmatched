@@ -1,0 +1,12 @@
+﻿namespace Unmatched.PlayerService.Domain.Constants;
+
+public static class PlayerNames
+{
+    public const string Andrii = "Andrii";
+
+    public const string Ksuha = "Ksuha";
+
+    public const string Oleksandr = "Oleksandr";
+
+    public const string Tetyana = "Tetyana";
+}

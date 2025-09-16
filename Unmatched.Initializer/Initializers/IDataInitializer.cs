@@ -2,7 +2,7 @@
 
 public interface IDataInitializer
 {
-    Task InitializeHeroesAsync();
+    //Task InitializeHeroesAsync();
 
     Task InitializeMapsAsync();
 

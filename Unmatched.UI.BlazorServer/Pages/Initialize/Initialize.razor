@@ -1,8 +1,10 @@
 ﻿@page "/initialize"
-@using Unmatched.Services
-@using Unmatched.Initializer.Initializers
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Player
+@using Unmatched.Initializer.Initializers
+@using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject IPlayerService PlayerService
 
 @inject IDataInitializer DataInitializer
@@ -22,8 +24,8 @@
 </div>
 
 @code {
-    private List<PlayerDto> _players = new ();
-    private readonly PlayerDto _addPlayerForm = new();
+    private List<UiPlayerDto> _players = new ();
+    private readonly UiPlayerDto _addPlayerForm = new();
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
     
@@ -47,7 +49,7 @@
         {
             PreloadService.Show();
             
-            await DataInitializer.InitializeHeroesAsync();
+            //await DataInitializer.InitializeHeroesAsync();
             await DataInitializer.InitializeMapsAsync();
             await DataInitializer.InitializeMinionsAsync();
             await DataInitializer.InitializeVillainsAsync();
@@ -88,7 +90,7 @@
         return name is null || name == string.Empty || _players.Any(t => t.Name == name);
     }
     
-    private async Task AddPlayerAsync(PlayerDto player)
+    private async Task AddPlayerAsync(UiPlayerDto player)
     {
         try
         {

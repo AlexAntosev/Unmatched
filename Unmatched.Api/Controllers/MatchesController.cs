@@ -5,6 +5,8 @@ using System.Net.Mime;
 
 namespace Unmatched.Api.Controllers;
 
+using Unmatched.Dtos.Match;
+using Unmatched.Services.Contracts;
 using Unmatched.Services.Statistics;
 
 [Route("api/[controller]")]
@@ -14,13 +16,13 @@ using Unmatched.Services.Statistics;
 public class MatchesController(IMatchService matchService, IHeroStatisticsService heroStatisticsService) : ControllerBase
 {
     [HttpGet]
-    public Task<IEnumerable<MatchLogDto>> Get()
+    public Task<IEnumerable<UiMatchLogDto>> Get()
     {
         return matchService.GetMatchLogAsync();
     }
     
     [HttpGet("{heroId}")]
-    public Task<IEnumerable<MatchLogDto>> Get(Guid heroId)
+    public Task<IEnumerable<UiMatchLogDto>> Get(Guid heroId)
     {
         return heroStatisticsService.GetHeroMatchesAsync(heroId);
     }

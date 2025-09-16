@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Dtos;
 
-public class PlayStyleDto
+public class UiPlayStyleDto
 {
     public int Attack { get; set; }
 
@@ -13,13 +13,4 @@ public class PlayStyleDto
     public Guid Id { get; set; }
 
     public int Trickery { get; set; }
-
-    public static PlayStyleDto Default(Guid heroId)
-    {
-        return new PlayStyleDto()
-            {
-                HeroId = heroId,
-                Id = Guid.NewGuid()
-            };
-    }
 }

@@ -10,47 +10,47 @@
     <h1 class="page-title">Heroes Statistics</h1>
     <SfGrid @ref="_grid" DataSource="@_heroes" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents QueryCellInfo="CustomizeCell" OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="HeroStatisticsDto"></GridEvents>
+        <GridEvents QueryCellInfo="CustomizeCell" OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="UiHeroStatisticsDto"></GridEvents>
         <GridSortSettings>
             <GridSortColumns>
-                <GridSortColumn Field="@nameof(HeroStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
+                <GridSortColumn Field="@nameof(UiHeroStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
             </GridSortColumns>
         </GridSortSettings>
         <GridColumns>
-            <GridColumn Field=@nameof(HeroStatisticsDto.Place) Width="25" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field=@nameof(UiHeroStatisticsDto.Place) Width="25" TextAlign="TextAlign.Center"></GridColumn>
             <GridColumn Width="20">
                 <Template>
                     @{
-                        var hero = context as HeroStatisticsDto;
+                        var hero = context as UiHeroStatisticsDto;
                         <div class="image">
-                            <img src="@hero?.Hero.ImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
+                            <img src="@hero?.ImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
                         </div>
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field="Hero.Name" HeaderText="Hero" Width="120"></GridColumn>
+            <GridColumn Field="Name" HeaderText="Hero" Width="120"></GridColumn>
             <GridColumn Width="20">
                 <Template>
                     @{
-                        var hero = context as HeroStatisticsDto;
+                        var hero = context as UiHeroStatisticsDto;
                         <div class="image">
-                            <img src="@hero.Hero.MeleeRangeImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
+                            <img src="@hero.MeleeRangeImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
                         </div>
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(HeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
+            <GridColumn Field=@nameof(UiHeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(UiHeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(UiHeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(UiHeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(UiHeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
         </GridColumns>
     </SfGrid>
 </div>
 
 @code {
-    private List<HeroStatisticsDto> _heroes = new();
-    SfGrid<HeroStatisticsDto> _grid;
+    private List<UiHeroStatisticsDto> _heroes = new();
+    SfGrid<UiHeroStatisticsDto> _grid;
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
@@ -59,7 +59,7 @@
         try
         {
             PreloadService.Show();
-            _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.Hero.Name).ToList();
+            _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.Name).ToList();
         }
         finally
         {
@@ -67,7 +67,7 @@
         }
     }
 
-    private void RecordClickHandler(RecordClickEventArgs<HeroStatisticsDto> args)
+    private void RecordClickHandler(RecordClickEventArgs<UiHeroStatisticsDto> args)
     {
         var heroId = args.RowData.HeroId;
         var url = $"{Urls.HeroesStatistics}/{heroId}";
@@ -90,7 +90,7 @@
         var place = 1;
         foreach (var data in dataSource)
         {
-            if (data is HeroStatisticsDto hero)
+            if (data is UiHeroStatisticsDto hero)
             {
                 hero.Place = place;
                 place++;
@@ -98,7 +98,7 @@
         }
     }
 
-    private void CustomizeCell(QueryCellInfoEventArgs<HeroStatisticsDto> args)
+    private void CustomizeCell(QueryCellInfoEventArgs<UiHeroStatisticsDto> args)
     {
         if (args.Data.Place == 1)
         {

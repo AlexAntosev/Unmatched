@@ -16,7 +16,7 @@
                     @{
                         var player = context as PlayerStatisticsDto;
                         <div class="image">
-                            <img src="@player?.Player.ImageUrl" alt="@player.PlayerId" width="100%" height="auto"/>
+                            <img src="@player?.ImageUrl" alt="@player.PlayerId" width="100%" height="auto"/>
                         </div>
                     }
                 </Template>
@@ -40,7 +40,7 @@
         try
         {
             PreloadService.Show();
-            _players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.Player.Name).ToList();
+            _players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.Name).ToList();
         }
         finally
         {

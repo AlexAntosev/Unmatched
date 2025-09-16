@@ -1,33 +1,23 @@
-﻿namespace Unmatched.Services;
+﻿using Unmatched.Services.Contracts;
+
+namespace Unmatched.Services;
 
 using AutoMapper;
 
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
+using Unmatched.Dtos.Player;
+using Unmatched.HttpClients.Contracts;
 
-public class PlayerService : IPlayerService
+public class PlayerService(IPlayerClient playerClient, IMapper mapper) : IPlayerService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-
-    public PlayerService(IUnitOfWork unitOfWork, IMapper mapper)
+    public async Task<IEnumerable<UiPlayerDto>> GetAsync()
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-    
-    public async Task<IEnumerable<PlayerDto>> GetAsync()
-    {
-        var entities = await _unitOfWork.Players.GetAsync();
-        var players = _mapper.Map<IEnumerable<PlayerDto>>(entities);
-        return players;
+        var players = await playerClient.GetAllAsync();
+        return players.Select(mapper.Map<UiPlayerDto>);
     }
 
-    public async Task AddAsync(PlayerDto dto)
+    public Task AddAsync(UiPlayerDto dto)
     {
-        var player = _mapper.Map<Player>(dto);
-        await _unitOfWork.Players.AddAsync(player);
-        await _unitOfWork.SaveChangesAsync();
+        throw new NotImplementedException();
     }
 }

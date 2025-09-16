@@ -1,19 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Unmatched.Dtos;
-using Unmatched.Services;
-using Unmatched.Services.Statistics;
+﻿namespace Unmatched.Api.Controllers;
+
 using System.Net.Mime;
 
-namespace Unmatched.Api.Controllers;
+using Microsoft.AspNetCore.Mvc;
+
+using Unmatched.Dtos;
+using Unmatched.Services.Contracts;
+using Unmatched.Services.Statistics;
 
 [Route("api/[controller]")]
 [ApiController]
-[Consumes(MediaTypeNames.Application.Json)]    
+[Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 public class PlayersController(IPlayerService playerService, IPlayerStatisticsService playerStatisticsService) : ControllerBase
 {
     [HttpGet]
-    public Task<IEnumerable<PlayerDto>> Get()
+    public Task<IEnumerable<UiPlayerDto>> Get()
     {
         return playerService.GetAsync();
     }

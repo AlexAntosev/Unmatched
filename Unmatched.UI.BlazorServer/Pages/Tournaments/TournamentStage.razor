@@ -1,8 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
-@using Unmatched.Services
-@using Unmatched.Data.Enums
+@using Unmatched.Dtos.Match
+@using Unmatched.Enums
 @using Unmatched.Extensions
+@using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject IMatchService MatchService
 @inject ITournamentService TournamentService
 
@@ -29,23 +31,11 @@
     public Stage Stage { get; set; }
 
     [Parameter]
-    public List<MatchDto> TournamentMatches { get; set; } = new();
+    public List<UiMatchDto> TournamentMatches { get; set; } = new();
 
     private async Task OnGenerateMatchesClick()
     {
-        if (TournamentModel.CurrentStage == Stage.SemiFinals)
-        {
-            await TournamentService.CreateThirdPlaceDeciderMatchAsync(TournamentModel);
-            return;
-        }
-        
-        if (TournamentModel.CurrentStage == Stage.ThirdPlaceDecider)
-        {
-            await TournamentService.CreateGrandFinalMatchesAsync(TournamentModel);
-            return;
-        }
-
-        await TournamentService.CreateNextStagePlannedMatchesAsync(TournamentModel);
+        await TournamentService.GenerateMatchesAsync(TournamentModel.Id);
     }
 }
 

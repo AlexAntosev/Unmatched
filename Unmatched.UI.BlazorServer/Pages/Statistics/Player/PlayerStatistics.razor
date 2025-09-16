@@ -1,6 +1,7 @@
 ﻿@page "/players-statistics/{id}"
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 @using Unmatched.Services.Statistics
 @inject IPlayerStatisticsService PlayerStatisticsService
 @inject IFavoriteStatisticsService FavoriteStatisticsService
@@ -18,8 +19,8 @@
     [Parameter]
     public string Id { get; set; } = "";
     
-    private List<MatchLogDto> _matchLogEntries = new();
-    private List<IGrouping<string, FighterDto>> _matches = new();
+    private List<UiMatchLogDto> _matchLogEntries = new();
+    private List<IGrouping<string, UiFighterDto>> _matches = new();
     private List<FavoriteStatisticsDto> _favorites = new();
 
     private PlayerStatisticsDto Player { get; set; } = new ();
@@ -43,11 +44,11 @@
             _matchLogEntries = (await PlayerStatisticsService.GetPlayerMatchesAsync(playerId)).OrderByDescending(x => x.Date).ToList();
             foreach (var matchLogEntry in _matchLogEntries)
             {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.PlayerId == playerId);
+                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.Player.Id == playerId);
             }
 
             _matches = _matchLogEntries
-                .SelectMany(m => m.Fighters.Where(f => f.PlayerId == Player.PlayerId))
+                .SelectMany(m => m.Fighters.Where(f => f.Player.Id == Player.PlayerId))
                 .GroupBy(f => f.Hero.Name)
                 .ToList();
 

@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Constants
+@using Unmatched.Dtos.Match
 @inject NavigationManager NavManager
 
 @if (Match is not null)
@@ -17,7 +18,7 @@
             <div class="player_icon">
                 @{
                     <div class="image">
-                        <img src="@Match.Fighters.First().PlayerImageUrl" alt="@Match.Fighters.First().PlayerId" width="100%" height="auto"/>
+                        <img src="@Match.Fighters.First().PlayerImageUrl" alt="@Match.Fighters.First().Player.Id" width="100%" height="auto"/>
                     </div>
                 }
             </div>
@@ -35,7 +36,7 @@
             <div class="player_icon">
                 @{
                     <div class="image">
-                        <img src="@Match.Fighters.Last().PlayerImageUrl" alt="@Match.Fighters.Last().PlayerId" width="100%" height="auto"/>
+                        <img src="@Match.Fighters.Last().PlayerImageUrl" alt="@Match.Fighters.Last().Player.Id" width="100%" height="auto"/>
                     </div>
                 }
             </div>
@@ -52,7 +53,7 @@
 
 @code {
     [Parameter]
-    public MatchDto Match { get; set; }
+    public UiMatchDto Match { get; set; }
     
     public string GetWinLooseColor(bool isWinner)
     {

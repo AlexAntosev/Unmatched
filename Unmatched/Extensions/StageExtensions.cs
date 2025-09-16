@@ -1,6 +1,6 @@
 ﻿namespace Unmatched.Extensions;
 
-using Unmatched.Data.Enums;
+using Unmatched.Enums;
 
 public static class StageExtensions
 {

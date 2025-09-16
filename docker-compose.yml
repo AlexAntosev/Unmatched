@@ -1,13 +1,82 @@
 version: '3.8'
 
 services:
-  web:
-    image: unmatched-image
+  ms:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
+    depends_on:
+      - catalogservice
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+  catalogservice:
+    build:
+      context: .
+      dockerfile: Services/Catalog/Unmatched.CatalogService.Api/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+  matchservice:
+    build:
+      context: .
+      dockerfile: Services/Match/Unmatched.MatchService.Api/Dockerfile
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+  playerservice:
+    build:
+      context: .
+      dockerfile: Services/Player/Unmatched.PlayerService.Api/Dockerfile
+    ports:
+      - "5004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+  statisticsservice:
+    build:
+      context: .
+      dockerfile: Services/Statistics/Unmatched.StatisticsService.Api/Dockerfile
+    ports:
+      - "5007:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=ms.Unmatched.Statistics;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+ 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8088:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      - kafka

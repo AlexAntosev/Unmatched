@@ -2,147 +2,43 @@
 
 using AutoMapper;
 
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
+using Unmatched.HttpClients.Contracts;
 
-public class HeroStatisticsService : IHeroStatisticsService
+public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, IStatisticsClient statisticsClient, ICatalogClient catalogClient) : IHeroStatisticsService
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    private readonly IMapper _mapper;
-
-    public HeroStatisticsService(IUnitOfWork unitOfWork, IMapper mapper)
+    public async Task<IEnumerable<UiHeroStatisticsDto>> GetHeroesStatisticsAsync()
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-    
-    public async Task<IEnumerable<HeroStatisticsDto>> GetHeroesStatisticsAsync()
-    {
-        var heroes = await _unitOfWork.Heroes.GetAsync();
-        var ratings = await _unitOfWork.Ratings.GetAsync();
-        var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
-
-        var statistics = new List<HeroStatisticsDto>();
-
-        foreach (var hero in heroes)
-        {
-            var heroDto = _mapper.Map<HeroDto>(hero);
-            var points = ratings.FirstOrDefault(x => x.HeroId.Equals(hero.Id))?.Points ?? 0;
-            var fights = fighters.Where(x => x.HeroId.Equals(hero.Id)).OrderByDescending(x => x.Match.Date).ToArray();
-
-            var heroStatistics = new HeroStatisticsDto 
-                {
-                    Hero = heroDto,
-                    HeroId = hero.Id,
-                    Points = points,
-                    TotalMatches = fights.Length,
-                    TotalWins = fights.Count(x => x.IsWinner),
-                    TotalLooses = fights.Count(x => x.IsWinner == false),
-                    LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0
-                };
-
-            statistics.Add(heroStatistics);
-        }
-
-        return statistics;
-    }
-    
-    public async Task<HeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
-    {
-        var hero = await _unitOfWork.Heroes.GetByIdAsync(heroId);
-        var heroDto = _mapper.Map<HeroDto>(hero);
-        var fights = await _unitOfWork.Fighters.GetFromFinishedMatchesByHeroIdAsync(heroId);
-        var rating = await _unitOfWork.Ratings.GetByHeroIdAsync(hero.Id);
-        var points = rating?.Points ?? 0;
-        var titles = await _unitOfWork.Titles.GetByHeroId(heroId);
-        var titlesDto = _mapper.Map<IEnumerable<TitleDto>>(titles);
-        var place = await GetHeroPlace(rating);
-        var playStyle = await _unitOfWork.PlayStyles.GetByHeroIdAsync(heroId);
-
-        heroDto.PlayStyle = _mapper.Map<PlayStyleDto>(playStyle) ?? PlayStyleDto.Default(heroId);
-        var statistics = new HeroStatisticsDto
-            {
-                Hero = heroDto,
-                HeroId = hero.Id,
-                Points = points,
-                Place = place,
-                TotalMatches = fights.Count,
-                TotalWins = fights.Count(x => x.IsWinner),
-                TotalLooses = fights.Count(x => x.IsWinner == false),
-                LastMatchPoints = fights.FirstOrDefault()?.MatchPoints ?? 0,
-                Titles = titlesDto
-            };
-        
-        return statistics;
+        var heroStats = await statisticsClient.GetHeroStatsAsync();
+        var uiModels = heroStats.Select(mapper.Map<UiHeroStatisticsDto>);
+        return uiModels;
     }
 
-    public async Task<IEnumerable<MatchLogDto>> GetHeroMatchesAsync(Guid heroId)
+    public async Task<UiHeroStatisticsDto> GetHeroStatisticsAsync(Guid heroId)
     {
-        var heroMatches = await _unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);
+        var heroStats = await statisticsClient.GetHeroStatsAsync(heroId);
+        var uiModel = mapper.Map<UiHeroStatisticsDto>(heroStats);
 
-        var matchLogs = new List<MatchLogDto>();
-        
-        foreach (var match in heroMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
+        var catalogHeroSidekicks = await catalogClient.GetSidekicksByHeroAsync(heroId);
+        uiModel.Sidekicks = catalogHeroSidekicks.Select(mapper.Map<UiSidekickDto>);
 
-            var fighters = await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
-            
-            matchLog.Fighters = _mapper.Map<List<FighterDto>>(fighters);
+        uiModel.Titles = new List<TitleDto>(); //TODO
 
-            matchLogs.Add(matchLog);
-        }
+        var catalogPlayStyle = await catalogClient.GetPlayStyleByHero(heroId);
+        uiModel.PlayStyle = mapper.Map<UiPlayStyleDto>(catalogPlayStyle);
 
-        return matchLogs;
+        return uiModel;
+    }
+
+    public async Task<IEnumerable<UiMatchLogDto>> GetHeroMatchesAsync(Guid heroId)
+    {
+        var matches = await matchClient.GetFinishedByHeroAsync(heroId);
+        return matches.Select(mapper.Map<UiMatchLogDto>);
     }
 
     public async Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId)
     {
-        var ratingChanges = new List<RatingChangeDto>();
-        var currentRating = await _unitOfWork.Ratings.GetByHeroIdAsync(heroId);
-        ratingChanges.Add(new RatingChangeDto
-            {
-                Date = "Current",
-                Rating = currentRating?.Points ?? 0
-            });
-
-        var points = currentRating?.Points ?? 0;
-
-        var heroMatches = await _unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);
-        
-        foreach (var heroMatch in heroMatches)
-        {
-            var matchPoints = heroMatch.Fighters.FirstOrDefault(f => f.HeroId == heroId)?.MatchPoints ?? 0;
-            points -= matchPoints;
-            ratingChanges.Add(new RatingChangeDto
-                {
-                    Date = heroMatch.Date.ToShortDateString(),
-                    Rating = points
-                });
-        }
-
-        ratingChanges.Reverse();
-        
-        return ratingChanges;
-    }
-    
-    private async Task<int> GetHeroPlace(Rating? rating)
-    {
-        var place = 0;
-        if (rating is null)
-        {
-            return place;
-        }
-
-        var ratings = await _unitOfWork.Ratings.GetAsync();
-
-        if (ratings.Any(r => r.Id == rating.Id))
-        {
-            place = ratings.IndexOf(rating) + 1;
-        }
-
-        return place;
+        var matches = await matchClient.GetHeroRatingChangesAsync(heroId);
+        return matches.Select(mapper.Map<RatingChangeDto>).ToList();
     }
 }

@@ -1,9 +1,8 @@
 ﻿@page "/titles"
-@using Microsoft.AspNetCore.Components
-@using Unmatched.Services
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Services.Contracts
 @inject ITitleService TitleService
-@inject IHeroService HeroService
 
 <div class="page-content">
     <h1 class="page-title">Titles</h1>
@@ -133,7 +132,7 @@
     {
         _selectedHeroesIndexes = new List<int>();
         _selectedTitleId = args.RowData.Id;
-        _heroes = (await HeroService.GetHeroesForTitleAssign(_selectedTitleId)).ToList();
+        _heroes = (await TitleService.GetHeroesForTitleAssign(_selectedTitleId)).ToList();
         await _heroesDialog.ShowAsync();
     }
 

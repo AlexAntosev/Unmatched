@@ -1,11 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Components
-@using Unmatched.Dtos
 @using Unmatched.Constants
-@using Unmatched.Services
-@using Unmatched.Services.Statistics
+@using Unmatched.Dtos
+@using Unmatched.Services.Contracts
 @inject NavigationManager NavManager
 @inject IFavoriteService FavoriteService
-@inject IFavoriteStatisticsService FavoriteStatisticsService
 
 <h4 class="page-title"> Favorites: </h4>
 <SfGrid @ref="_grid" DataSource="@FavoritesRecords" AllowPaging="true" AllowSorting="true">
@@ -44,12 +42,12 @@
         <GridColumn Field=@nameof(FavoriteStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
         <GridColumn Field=@nameof(FavoriteStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
         <GridColumn Field=@nameof(FavoriteStatisticsDto.IsChosenOne) HeaderText="Chosen One" Width="40">
-           <Template>
-               @{
-                   var record = context as FavoriteStatisticsDto;
-                   <InputCheckbox Value=record.IsChosenOne ValueExpression="@(() => record.IsChosenOne)" ValueChanged="@(isChosenOne => ChosenChanged(isChosenOne, record))" id="isChosenOne" class="form-check-input"/>
-               }
-           </Template> 
+            <Template>
+                @{
+                    var record = context as FavoriteStatisticsDto;
+                    <InputCheckbox Value=record.IsChosenOne ValueExpression="@(() => record.IsChosenOne)" ValueChanged="@(isChosenOne => ChosenChanged(isChosenOne, record))" id="isChosenOne" class="form-check-input"/>
+                }
+            </Template> 
         </GridColumn>
         <GridColumn Field=@nameof(FavoriteStatisticsDto.Favour) HeaderText="Favour" Width="50">
             <Template>
@@ -62,11 +60,11 @@
     </GridColumns>
 </SfGrid>
 
-@code {    
+@code {
     [Parameter]
     public List<FavoriteStatisticsDto> FavoritesRecords { get; set; } = new();
     SfGrid<FavoriteStatisticsDto> _grid;
-    
+
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     private void RecordClickHandler(RecordClickEventArgs<FavoriteStatisticsDto> args)
@@ -90,7 +88,7 @@
         {
             return;
         }
-        
+
         var dataSource = _grid.CurrentViewData;
         var place = 1;
         foreach (var data in dataSource)
@@ -110,24 +108,23 @@
             args.Cell.AddClass(new [] { "champion-cell" });
         }
     }
-    
+
     private async Task FavourChanged(int favour, FavoriteStatisticsDto favorite)
     {
+        await FavoriteService.UpdateFavourAsync(favorite.PlayerId, favorite.HeroId, favour);
         favorite.Favour = favour;
-        await FavoriteStatisticsService.AddOrUpdateAsync(favorite);
     }
-    
+
     private async Task ChosenChanged(bool isChosenOne, FavoriteStatisticsDto selectedFavorite)
     {
-        var previousChosen = FavoritesRecords.Where(x => x.IsChosenOne && x .HeroId != selectedFavorite.HeroId);
-        foreach (var looser in previousChosen)
+        var chosenHeroId = await FavoriteService.UpdateChosenOneAsync(selectedFavorite.PlayerId, selectedFavorite.HeroId, isChosenOne);
+
+        foreach (var favorite in FavoritesRecords)
         {
-            looser.IsChosenOne = false;
-            await FavoriteStatisticsService.AddOrUpdateAsync(looser);
+            favorite.IsChosenOne = favorite.HeroId == chosenHeroId;
         }
-        selectedFavorite.IsChosenOne = isChosenOne;
-        await FavoriteStatisticsService.AddOrUpdateAsync(selectedFavorite);
     }
+
 }
 
 <style>

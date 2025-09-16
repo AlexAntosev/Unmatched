@@ -1,7 +1,7 @@
 ﻿# ---------- Base runtime image ----------
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 8080       # HTTP
+EXPOSE 8081       
 # EXPOSE 443    # uncomment if you configure HTTPS inside container
 
 # ---------- Build stage ----------
@@ -10,9 +10,8 @@ WORKDIR /src
 
 # Copy only project files first (layer caching for faster restores)
 COPY ["Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj", "Unmatched.UI.BlazorServer/"]
-COPY ["Unmatched.EntityFramework/Unmatched.EntityFramework.csproj", "Unmatched.EntityFramework/"]
 COPY ["Unmatched/Unmatched.csproj", "Unmatched/"]
-COPY ["Unmatched.Data/Unmatched.Data.csproj", "Unmatched.Data/"]
+
 
 # Restore NuGet packages (runs only if csproj files changed)
 RUN dotnet restore "Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj"

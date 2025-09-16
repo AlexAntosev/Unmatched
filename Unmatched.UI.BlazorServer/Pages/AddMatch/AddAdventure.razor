@@ -1,9 +1,12 @@
 ﻿@page "/adventure/{id}"
-@using Unmatched.Dtos
-@using Unmatched.Services
-@using Unmatched.Extensions
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Dtos.Player
+@using Unmatched.Extensions
+@using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject IMatchService MatchService
 @inject IHeroService HeroService
 @inject IPlayerService PlayerService
@@ -70,15 +73,15 @@
     [Parameter]
     public string Id { get; set; }
 
-    private List<PlayerDto> _players = new();
-    private List<HeroDto> _heroes = new();
+    private List<UiPlayerDto> _players = new();
+    private List<UiHeroDto> _heroes = new();
     private List<MapDto> _maps = new();
     private List<VillainDto> _villains = new();
     private List<MinionDto> _minions = new();
 
-    AdventureDto _adventure = new()
+    UiAdventureDto _adventure = new()
         {
-            Fighters = new List<FighterDto>()
+            Fighters = new List<UiFighterDto>()
                 {
                     new(),
                     new()

@@ -6,5 +6,5 @@ public class RatingChangeDto
 {
     public string Date { get; set;}
     
-    public int Rating { get; set;}
+    public int RatingDelta { get; set;}
 }

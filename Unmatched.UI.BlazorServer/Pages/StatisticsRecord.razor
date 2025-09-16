@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 
 <h4> @Title: @_hero - @_total matches (@_wins wins / @_looses looses) - K/D: @_kd</h4>
 
@@ -11,7 +12,8 @@
     public bool IsAgainst { get; set; }
     
     [Parameter]
-    public IGrouping<string, FighterDto>? HeroMatches {
+    public IGrouping<string, UiFighterDto>? HeroMatches
+    {
         get => _heroMatches;
         set
         {
@@ -37,5 +39,5 @@
     private int _wins;
     private int _looses;
     private double? _kd = 0;
-    private IGrouping<string, FighterDto>? _heroMatches;
+    private IGrouping<string, UiFighterDto>? _heroMatches;
 }

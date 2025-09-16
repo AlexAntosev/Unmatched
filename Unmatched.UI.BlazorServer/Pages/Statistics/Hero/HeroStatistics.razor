@@ -4,6 +4,7 @@
 @inject IHeroStatisticsService HeroStatisticsService
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
+@using Unmatched.Dtos.Match
 
 <div style="margin-bottom: 16px">
     <HeroSummary Statistics="Hero"></HeroSummary>
@@ -21,10 +22,10 @@
     [Parameter]
     public string Id { get; set; } = "";
     
-    private List<MatchLogDto> _matchLogEntries = new();
+    private List<UiMatchLogDto> _matchLogEntries = new();
     private List<RatingChangeDto> _ratingChanges = new();
-    private IGrouping<string, FighterDto>? _againstAntagonistMatches;
-    private HeroStatisticsDto Hero { get; set; } = new () { Hero = new() };
+    private IGrouping<string, UiFighterDto>? _againstAntagonistMatches;
+    private UiHeroStatisticsDto Hero { get; set; } = new ();
     private LineChart _lineChart;
 
     [Inject] protected PreloadService PreloadService { get; set; }
@@ -69,7 +70,7 @@
     {
         var heroColor = new List<string>
             {
-                Hero.Hero.Color
+                Hero.Color
             };
         var data = new ChartData
             {
@@ -78,8 +79,8 @@
                     {
                         new LineChartDataset
                             {
-                                Label = Hero.Hero.Name,
-                                Data = _ratingChanges.Select(c => (double)c.Rating).ToList(),
+                                Label = Hero.Name,
+                                Data = _ratingChanges.Select(c => (double)c.RatingDelta).ToList(),
                                 BackgroundColor = heroColor,
                                 BorderColor = heroColor,
                                 BorderWidth = new List<double>{2},

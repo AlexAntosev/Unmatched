@@ -2,43 +2,15 @@
 
 using AutoMapper;
 
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
+using Unmatched.Dtos.Catalog;
+using Unmatched.HttpClients.Contracts;
+using Unmatched.Services.Contracts;
 
-public class PlayStyleService : IPlayStyleService
+public class PlayStyleService(ICatalogClient catalogClient, IMapper mapper) : IPlayStyleService
 {
-    private readonly IMapper _mapper;
-
-    private readonly IUnitOfWork _unitOfWork;
-
-    public PlayStyleService(IUnitOfWork unitOfWork, IMapper mapper)
+    public async Task AddOrUpdateAsync(Guid heroId, UiPlayStyleDto playStyleDto)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-
-    public async Task AddOrUpdateAsync(Guid heroId, PlayStyleDto playStyleDto)
-    {
-        var entity = _mapper.Map<PlayStyle>(playStyleDto);
-        _unitOfWork.PlayStyles.AddOrUpdate(entity);
-        await _unitOfWork.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        await _unitOfWork.PlayStyles.Delete(id);
-        await _unitOfWork.SaveChangesAsync();
-    }
-
-    public async Task<PlayStyleDto> GetByHeroIdAsync(Guid heroId)
-    {
-        var entity = await _unitOfWork.PlayStyles.GetByHeroIdAsync(heroId);
-
-        var playStyle = entity != null
-            ? _mapper.Map<PlayStyleDto>(entity)
-            : PlayStyleDto.Default(heroId);
-
-        return playStyle;
+        await catalogClient.UpdatePlayStyleAsync(mapper.Map<CatalogPlayStyleDto>(playStyleDto));
     }
 }

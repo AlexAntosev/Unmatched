@@ -1,7 +1,9 @@
 ﻿@page "/duelMatchLog"
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 @using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject IMatchService MatchService
 
 <div class="page-content">
@@ -12,7 +14,7 @@
 
 
 @code {
-    private List<MatchLogDto> _matchLogEntries = new();
+    private List<UiMatchLogDto> _matchLogEntries = new();
     
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 

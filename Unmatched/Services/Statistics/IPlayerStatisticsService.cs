@@ -3,6 +3,8 @@
 using System;
 
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
+using Unmatched.HttpClients;
 
 public interface IPlayerStatisticsService
 {
@@ -10,5 +12,5 @@ public interface IPlayerStatisticsService
 
     Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId);
 
-    Task<IEnumerable<MatchLogDto>> GetPlayerMatchesAsync(Guid playerId);
+    Task<IEnumerable<UiMatchLogDto>> GetPlayerMatchesAsync(Guid playerId);
 }

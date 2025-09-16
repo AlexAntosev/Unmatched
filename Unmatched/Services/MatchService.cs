@@ -1,133 +1,50 @@
-﻿namespace Unmatched.Services;
+﻿using Unmatched.Services.Contracts;
+
+namespace Unmatched.Services;
 
 using AutoMapper;
 
-using Unmatched.Data.Entities;
-using Unmatched.Data.Repositories;
 using Unmatched.Dtos;
-using Unmatched.Services.MatchHandlers;
-using Unmatched.Services.TitleHandlers;
+using Unmatched.Dtos.Match;
+using Unmatched.HttpClients.Contracts;
 
-public class MatchService : IMatchService
+public class MatchService(IMatchClient matchClient, IMapper mapper) : IMatchService
 {
-    private readonly IMatchHandlerFactory _matchHandlerFactory;
-    private readonly IMapper _mapper;
-    private readonly IUnitOfWork _unitOfWork;
-
-    private readonly IStreakTitleHandler _streakTitleHandler;
-    private readonly IRusherTitleHandler _rusherTitleHandler;
-    private readonly IPunisherTitleHandler _punisherTitleHandler;
-
-    public MatchService(
-        IMatchHandlerFactory matchHandlerFactory,
-        IMapper mapper,
-        IUnitOfWork unitOfWork,
-        IStreakTitleHandler streakTitleHandler,
-        IRusherTitleHandler rusherTitleHandler,
-        IPunisherTitleHandler punisherTitleHandler)
+    public async Task<SaveMatchResultDto> AddAsync(UiMatchDto match)
     {
-        _matchHandlerFactory = matchHandlerFactory;
-        _mapper = mapper;
-        _unitOfWork = unitOfWork;
-        _streakTitleHandler = streakTitleHandler;
-        _rusherTitleHandler = rusherTitleHandler;
-        _punisherTitleHandler = punisherTitleHandler;
+        var dto = mapper.Map<MatchDto>(match);
+        return await matchClient.AddAsync(dto);
     }
-    
-    public async Task<SaveMatchResultDto> AddAsync(Match match)
+
+    public async Task<SaveMatchResultDto> UpdateAsync(UiMatchDto match)
     {
-        var handler = _matchHandlerFactory.Create(match);
-        await handler.HandleAsync(match);
-        await _streakTitleHandler.HandleAsync();
-        var rusherTitleEarned = await _rusherTitleHandler.HandleAsync(match);
-        var punisherTitleEarned = await _punisherTitleHandler.HandleAsync(match);
+        var dto = mapper.Map<MatchDto>(match);
+        return await matchClient.UpdateAsync(dto);
+    }
 
-        var titlesEarned = new List<TitleDto>();
-        if (rusherTitleEarned is not null)
-        {
-            titlesEarned.Add(rusherTitleEarned);
-        }
-        if (punisherTitleEarned is not null)
-        {
-            titlesEarned.Add(punisherTitleEarned);
-        }
-
-        var winnerHero = await _unitOfWork.Heroes.GetByIdAsync(match.Fighters.First(f => f.IsWinner).HeroId);
-        var looserHero = await _unitOfWork.Heroes.GetByIdAsync(match.Fighters.First(f => !f.IsWinner).HeroId);
-        var result = new SaveMatchResultDto
-            {
-                WinnerHeroName = winnerHero.Name,
-                WinnerMatchPoints = match.Fighters.First(f => f.IsWinner).MatchPoints.Value,
-                LooserHeroName = looserHero.Name,
-                LooserMatchPoints = match.Fighters.First(f => !f.IsWinner).MatchPoints.Value,
-                TitlesEarned = titlesEarned
-            };
-
+    public async Task<IEnumerable<UiMatchLogDto>> GetMatchLogAsync()
+    {
+        var dtos = await matchClient.GetMatchLogAsync();
+        var result = mapper.Map<IEnumerable<UiMatchLogDto>>(dtos);
         return result;
     }
 
-    public Task<SaveMatchResultDto> AddAsync(MatchDto matchDto)
+    public async Task<IEnumerable<UiMatchDto>> GetByTournamentIdAsync(Guid id)
     {
-        var match = _mapper.Map<Match>(matchDto);
-
-        return AddAsync(match);
+        var dtos = await matchClient.GetByTournamentIdAsync(id);
+        var result = mapper.Map<IEnumerable<UiMatchDto>>(dtos);
+        return result;
     }
 
-    public Task<SaveMatchResultDto> UpdateAsync(MatchDto matchDto)
+    public async Task<UiMatchDto> GetAsync(Guid id)
     {
-        var match = _mapper.Map<Match>(matchDto);
-
-        return AddAsync(match);
+        var dto = await matchClient.GetAsync(id);
+        var result = mapper.Map<UiMatchDto>(dto);
+        return result;
     }
 
-    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    public Task UpdateEpicAsync(Guid matchId, int epic)
     {
-        var allMatches = await _unitOfWork.Matches.GetFinishedAsync();
-
-        var matchLogs = new List<MatchLogDto>();
-        foreach (var match in allMatches)
-        {
-            var matchLog = _mapper.Map<MatchLogDto>(match);
-
-            var fighters = (await _unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId))
-                .Select(fighter => _mapper.Map<FighterDto>(fighter))
-                .ToArray();
-            matchLog.Fighters = fighters;
-
-            matchLogs.Add(matchLog);
-        }
-
-        return matchLogs;
-    }
-
-    public async Task<IEnumerable<MatchDto>> GetByTournamentIdAsync(Guid id)
-    {
-        var entities = await _unitOfWork.Matches.GetByTournamentAsync(id);
-
-        var matches = _mapper.Map<IEnumerable<MatchDto>>(entities);
-        foreach (var match in matches)
-        {
-            match.Fighters = match.Fighters.OrderBy(f => f.Turn);
-        }
-        
-        return matches;
-    }
-
-    public async Task<MatchDto> GetAsync(Guid id)
-    {
-        var entity = await _unitOfWork.Matches.GetByIdAsync(id);
-        var match = _mapper.Map<MatchDto>(entity);
-        return match;
-    }
-
-    public async Task UpdateEpicAsync(Guid matchId, int epic)
-    {
-        var match = _unitOfWork.Matches.Query().FirstOrDefault(m => m.Id == matchId);
-        if (match is not null)
-        {
-            match.Epic = epic;
-            _unitOfWork.Matches.AddOrUpdate(match);
-            await _unitOfWork.SaveChangesAsync();
-        }
+        return matchClient.UpdateEpicAsync(matchId, epic);
     }
 }

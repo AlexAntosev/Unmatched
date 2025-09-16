@@ -1,0 +1,47 @@
+[
+  {
+    "Name": "Blazor and microservices",
+    "Projects": [
+      {
+        "Path": "Unmatched.UI.BlazorServer\\Unmatched.UI.BlazorServer.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Services\\Catalog\\Unmatched.CatalogService.Api\\Unmatched.CatalogService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Services\\Match\\Unmatched.MatchService.Api\\Unmatched.MatchService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Services\\Player\\Unmatched.PlayerService.Api\\Unmatched.PlayerService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Services\\Statistics\\Unmatched.StatisticsService.Api\\Unmatched.StatisticsService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      }
+    ]
+  },
+  {
+    "Name": "Match and catalog",
+    "Projects": [
+      {
+        "Path": "Services\\Catalog\\Unmatched.CatalogService.Api\\Unmatched.CatalogService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "Services\\Match\\Unmatched.MatchService.Api\\Unmatched.MatchService.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      }
+    ]
+  }
+]

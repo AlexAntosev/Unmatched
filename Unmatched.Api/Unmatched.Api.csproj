@@ -7,13 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Unmatched.Data\Unmatched.Data.csproj" />
-    <ProjectReference Include="..\Unmatched.EntityFramework\Unmatched.EntityFramework.csproj" />
     <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
   </ItemGroup>
 

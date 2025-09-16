@@ -1,9 +1,11 @@
 ﻿@page "/tournaments/{id}"
-@using Unmatched.Services
-@using Unmatched.Dtos
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
-@using Unmatched.Data.Enums
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Enums
+@using Unmatched.Services
+@using Unmatched.Services.Contracts
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
 
@@ -31,8 +33,8 @@
     public string Id { get; set; } = "";
 
     private TournamentDto TournamentModel { get; set; } = new ();
-    private List<MatchDto> TournamentMatches { get; set; } = new();
-    private List<MatchLogDto> LeagueMatches { get; set; } = new();
+    private List<UiMatchDto> TournamentMatches { get; set; } = new();
+    private List<UiMatchLogDto> LeagueMatches { get; set; } = new();
     
     [Inject] protected PreloadService PreloadService { get; set; }
     

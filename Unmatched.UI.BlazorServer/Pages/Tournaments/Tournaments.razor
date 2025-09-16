@@ -1,9 +1,12 @@
 ﻿@page "/tournaments"
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
-@using Unmatched.Services
-@using Unmatched.Data.Enums
+@using Unmatched.Dtos.Match
+@using Unmatched.Enums
 @using Unmatched.Extensions
+@using Unmatched.Services
+@using Unmatched.Services.Contracts
+ons
 @inject ITournamentService TournamentService
 @inject NavigationManager NavManager
 
@@ -124,7 +127,7 @@
 
             tournament.CurrentStage = tournament.InitialStage;
             var created = await TournamentService.AddAsync(tournament);
-            await TournamentService.CreateInitialPlannedMatchesAsync(created);
+            await TournamentService.GenerateMatchesAsync(created.Id);
             _tournaments = (await TournamentService.GetAsync()).ToList();
         }
         finally

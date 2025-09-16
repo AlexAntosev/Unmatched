@@ -7,6 +7,6 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterInitializers(this IServiceCollection services)
     {
-        services.AddTransient<IDataInitializer, DataInitializer>();
+       // services.AddTransient<IDataInitializer, DataInitializer>();
     }
 }
