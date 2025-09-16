@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace Unmatched.Api.Controllers;
+
+using System.Net.Mime;
+
+using Microsoft.AspNetCore.Mvc;
+
 using Unmatched.Dtos;
 using Unmatched.Services.Contracts;
 using Unmatched.Services.Statistics;
-using System.Net.Mime;
 
-namespace Unmatched.Api.Controllers;
-
-  
 [Route("api/[controller]")]
 [ApiController]
-[Consumes(MediaTypeNames.Application.Json)]    
+[Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 public class HeroesController(IHeroService heroService, IHeroStatisticsService heroStatisticsService, IPlayStyleService playStyleService) : ControllerBase
 {

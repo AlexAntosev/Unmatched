@@ -11,7 +11,7 @@ services:
       - catalogservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
   catalogservice:
     build:
       context: .
@@ -20,7 +20,7 @@ services:
       - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
   matchservice:
     build:
       context: .
@@ -29,7 +29,7 @@ services:
       - "5003:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
   playerservice:
     build:
       context: .
@@ -38,7 +38,7 @@ services:
       - "5004:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched_ms;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
   statisticsservice:
     build:
       context: .
@@ -47,7 +47,7 @@ services:
       - "5007:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=ms.Unmatched.Statistics;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched.Statistics;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
  
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
