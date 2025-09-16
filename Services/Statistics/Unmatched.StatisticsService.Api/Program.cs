@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterApiMapping();
 builder.Services.RegisterDomainMapping();
+builder.Services.RegisterEntityFrameworkMapping();
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();

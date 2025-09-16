@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Contracts.Kafka;
+﻿namespace Unmatched.StatisticsService.Domain.Communication.Match.Kafka;
 
 public class MatchCreated
 {

@@ -18,10 +18,12 @@ public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDb
     {
         _configuration = configuration;
     }
+
     public UnmatchedDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<UnmatchedDbContext>();
-        optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=ms.Unmatched.Statistics;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
+        optionsBuilder.UseSqlServer(
+            "Server=localhost\\SQLEXPRESS;Database=ms.Unmatched.Statistics;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
 
         return new UnmatchedDbContext(optionsBuilder.Options);
     }
@@ -32,11 +34,13 @@ public class UnmatchedDbContext : DbContext
     public UnmatchedDbContext()
     {
     }
-    
+
     public UnmatchedDbContext(DbContextOptions contextOptions)
         : base(contextOptions)
     {
     }
 
-    public DbSet<HeroStats> HeroStats { get; set; }
+    public DbSet<HeroStatsEntity> HeroStats { get; set; }
+
+    public DbSet<MapStatsEntity> MapStats { get; set; }
 }

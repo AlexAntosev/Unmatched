@@ -1,6 +1,8 @@
 ﻿namespace Unmatched.MatchService.Domain.Mapping;
 
 using AutoMapper;
+
+using Unmatched.MatchService.Contracts.Kafka;
 using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 using Unmatched.MatchService.Domain.Communication.Player.Dto;
 using Unmatched.MatchService.Domain.Entities;
@@ -33,6 +35,10 @@ public class DomainMapper : Profile
         CreateMap<PlayerDto, FighterPlayer>().ReverseMap();
         CreateMap<TournamentEntity, Tournament>().ReverseMap();
         CreateMap<RatingEntity, Rating>();
+
+
+        CreateMap<MatchEntity, MatchCreated>();
+        CreateMap<FighterEntity, MatchCreated.Fighter>();
     }
 
     private string TryGetTournamentName(TournamentEntity? tournament, Stage? stage)

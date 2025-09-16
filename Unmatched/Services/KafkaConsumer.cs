@@ -3,6 +3,9 @@
 using System.Text.Json;
 
 using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Unmatched.Services.Contracts;
 
 public class KafkaConsumer<T> : IKafkaConsumer<T>
@@ -35,3 +38,4 @@ public class KafkaConsumer<T> : IKafkaConsumer<T>
             });
     }
 }
+

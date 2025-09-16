@@ -3,14 +3,9 @@
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
 
-public abstract class BaseMatchHandler : IMatchHandler
+public abstract class BaseMatchHandler(IUnitOfWork unitOfWork) : IMatchHandler
 {
-    protected readonly IUnitOfWork UnitOfWork;
-
-    protected BaseMatchHandler(IUnitOfWork unitOfWork)
-    {
-        UnitOfWork = unitOfWork;
-    }
+    protected readonly IUnitOfWork UnitOfWork = unitOfWork;
 
     public Task HandleAsync(MatchEntity match)
     {

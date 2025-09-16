@@ -2,6 +2,7 @@
 
 using AutoMapper;
 
+using Unmatched.MatchService.Contracts.Kafka;
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
@@ -16,13 +17,25 @@ public class MatchService(
     IStreakTitleHandler streakTitleHandler,
     IRusherTitleHandler rusherTitleHandler,
     IPunisherTitleHandler punisherTitleHandler,
-    ICatalogHeroCache catalogHeroCache) : IMatchService
+    ICatalogHeroCache catalogHeroCache,
+    IKafkaProducer kafkaProducer) : IMatchService
 {
     public async Task<SaveMatchResult> AddOrUpdateAsync(Match matchDto)
     {
         var match = mapper.Map<MatchEntity>(matchDto);
         var handler = matchHandlerFactory.Create(match);
         await handler.HandleAsync(match);
+
+        var addedEntity = await unitOfWork.Matches.GetByIdAsync(match.Id);
+
+        var matchCreatedEvent = mapper.Map<MatchCreated>(addedEntity);
+        foreach (var fighter in matchCreatedEvent.Fighters)
+        {
+            fighter.ResultRating = (await unitOfWork.Ratings.GetByHeroIdAsync(fighter.HeroId))?.Points;
+        }
+        await kafkaProducer.PublishAsync("match-created", matchCreatedEvent);
+
+        // TODO: move title logic to title microservice
         await streakTitleHandler.HandleAsync();
         var rusherTitleEarned = await rusherTitleHandler.HandleAsync(match);
         var punisherTitleEarned = await punisherTitleHandler.HandleAsync(match);

@@ -1,18 +1,18 @@
 ﻿namespace Unmatched.StatisticsService.EntityFramework.Entities;
 
-public class PlayerStats
-{
-    public double Kd
-        => TotalMatches > 0
-            ? Math.Round((double)TotalWins / TotalMatches, 2)
-            : 0;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[Table("PlayerStats")]
+public class PlayerStatsEntity
+{
     public int LastMatchPoints { get; set; }
 
     public string Name { get; set; }
 
     public int Place { get; set; }
 
+    [Key]
     public Guid PlayerId { get; set; }
 
     public int TotalLooses { get; set; }
