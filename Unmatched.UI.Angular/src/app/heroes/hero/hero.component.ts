@@ -2,10 +2,10 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HeroesService } from '../../backend-api/services/heroes.service';
 import { BehaviorSubject, tap } from 'rxjs';
-import { HeroStatisticsDto } from '../../backend-api/models/hero-statistics-dto';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatchesService } from '../../backend-api/services/matches.service';
-import { MatchLogDto } from '../../backend-api/models/match-log-dto';
+import { UiHeroStatisticsDto } from '../../backend-api/models/ui-hero-statistics-dto';
+import { UiMatchLogDto } from '../../backend-api/models/ui-match-log-dto';
 
 @Component({
   selector: 'hero',
@@ -14,27 +14,23 @@ import { MatchLogDto } from '../../backend-api/models/match-log-dto';
   styleUrl: './hero.component.css',
 })
 export class HeroComponent {
-  public heroStatistics: HeroStatisticsDto | null = null;
-  public matchesSbj$ = new BehaviorSubject<MatchLogDto[]>([]);
-
-  public get hero() {
-    return this.heroStatistics?.hero ? this.heroStatistics.hero : null;
-  }
+  public heroStatistics: UiHeroStatisticsDto | null = null;
+  public matchesSbj$ = new BehaviorSubject<UiMatchLogDto[]>([]);
 
   public get sidekick() {
-    return this.heroStatistics?.hero?.sidekicks
-      ? this.heroStatistics.hero.sidekicks[0]
+    return this.heroStatistics?.sidekicks
+      ? this.heroStatistics.sidekicks[0]
       : null;
   }
 
   public get playstyle() {
-    return this.heroStatistics?.hero?.playStyle
-      ? this.heroStatistics.hero.playStyle
+    return this.heroStatistics?.playStyle
+      ? this.heroStatistics.playStyle
       : null;
   }
 
   public get titles() {
-    return this.heroStatistics?.hero?.titles
+    return this.heroStatistics?.titles
       ? this.heroStatistics.titles?.map((t) => t.name).join(', ')
       : null;
   }
@@ -67,7 +63,7 @@ export class HeroComponent {
     this.matchesService
       .apiMatchesHeroIdGet({ heroId: this.heroId })
       .pipe(
-        tap((matches: MatchLogDto[]) => {
+        tap((matches: UiMatchLogDto[]) => {
           this.matchesSbj$.next(matches);
         }),
         takeUntilDestroyed(this.destroyRef)

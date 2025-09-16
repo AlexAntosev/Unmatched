@@ -26,6 +26,11 @@
         "Path": "Services\\Statistics\\Unmatched.StatisticsService.Api\\Unmatched.StatisticsService.Api.csproj",
         "Action": "Start",
         "DebugTarget": "http"
+      },
+      {
+        "Path": "Unmatched.Api\\Unmatched.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
       }
     ]
   },

@@ -3,9 +3,9 @@ import { BehaviorSubject, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { GridColumn } from '../shared/grid/grid-column';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatchLogDto } from '../backend-api/models/match-log-dto';
 import { MatchesService } from '../backend-api/services/matches.service';
 import { MatchesGrid } from './matches-grid';
+import { UiMatchLogDto } from '../backend-api/models/ui-match-log-dto';
 
 @Component({
   selector: 'matches',
@@ -13,8 +13,8 @@ import { MatchesGrid } from './matches-grid';
   templateUrl: './matches.component.html',
 })
 export class MatchesComponent implements OnInit {
-  @Input() public matchesSbj$ = new BehaviorSubject<MatchLogDto[]>([]);
-  public columns: GridColumn<MatchLogDto>[] = [];
+  @Input() public matchesSbj$ = new BehaviorSubject<UiMatchLogDto[]>([]);
+  public columns: GridColumn<UiMatchLogDto>[] = [];
 
   constructor(
     private readonly router: Router,
@@ -25,7 +25,7 @@ export class MatchesComponent implements OnInit {
     this.columns = this.matchesGrid.getColumns();
   }
 
-  onRowClicked(item: MatchLogDto) {
+  onRowClicked(item: UiMatchLogDto) {
     this.router.navigate(['/match', item.matchId]);
   }
 }

@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { GridColumn } from '../shared/grid/grid-column';
 import { GridColumnType } from '../shared/grid/grid-column-type';
-import { MatchLogDto } from '../backend-api/models/match-log-dto';
+import { UiMatchLogDto } from '../backend-api/models/ui-match-log-dto';
 
 @Injectable()
 export class MatchesGrid {
-  getColumns(): GridColumn<MatchLogDto>[] {
+  getColumns(): GridColumn<UiMatchLogDto>[] {
     return [
       {
         id: 'date',
         header: 'Date',
         type: GridColumnType.Date,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           return item.date ? new Date(item.date) : new Date();
         },
       },
@@ -19,7 +19,7 @@ export class MatchesGrid {
         id: 'tournament',
         header: 'Tournament',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           return item.tournamentName;
         },
       },
@@ -27,7 +27,7 @@ export class MatchesGrid {
         id: 'map',
         header: 'Map',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           return item.mapName;
         },
       },
@@ -35,7 +35,7 @@ export class MatchesGrid {
         id: 'fighterPlayer',
         header: 'Player',
         type: GridColumnType.Image,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const fighter = this.getFighter(item);
           return fighter ? fighter.playerImageUrl : '';
         },
@@ -44,7 +44,7 @@ export class MatchesGrid {
         id: 'fighterHero',
         header: 'Hero',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const fighter = this.getFighter(item);
           return fighter?.hero ? fighter.hero.name : '';
         },
@@ -53,7 +53,7 @@ export class MatchesGrid {
         id: 'fighterHpLeft',
         header: 'Hero Hp (Sidekick)',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const fighter = this.getFighter(item);
           return fighter
             ? `${fighter.hpLeft} ${
@@ -68,7 +68,7 @@ export class MatchesGrid {
         id: 'fighterCardsLeft',
         header: 'Hero Cards',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const fighter = this.getFighter(item);
           return fighter ? fighter.cardsLeft : 0;
         },
@@ -77,7 +77,7 @@ export class MatchesGrid {
         id: 'fighterPoints',
         header: 'Points',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const fighter = this.getFighter(item);
           return fighter ? fighter.matchPoints : 0;
         },
@@ -86,7 +86,7 @@ export class MatchesGrid {
         id: 'opponentPlayer',
         header: 'Player',
         type: GridColumnType.Image,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const opponent = this.getOpponent(item);
           return opponent ? opponent.playerImageUrl : '';
         },
@@ -95,7 +95,7 @@ export class MatchesGrid {
         id: 'opponentHero',
         header: 'Hero',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const opponent = this.getOpponent(item);
           return opponent?.hero ? opponent.hero.name : '';
         },
@@ -104,7 +104,7 @@ export class MatchesGrid {
         id: 'opponentHpLeft',
         header: 'Hero Hp (Sidekick)',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const opponent = this.getOpponent(item);
           return opponent
             ? `${opponent.hpLeft} ${
@@ -119,7 +119,7 @@ export class MatchesGrid {
         id: 'opponentCardsLeft',
         header: 'Hero Cards',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const opponent = this.getOpponent(item);
           return opponent ? opponent.cardsLeft : 0;
         },
@@ -128,7 +128,7 @@ export class MatchesGrid {
         id: 'opponentPoints',
         header: 'Points',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           const opponent = this.getOpponent(item);
           return opponent ? opponent.matchPoints : 0;
         },
@@ -137,18 +137,18 @@ export class MatchesGrid {
         id: 'comment',
         header: 'Comment',
         type: GridColumnType.Text,
-        valueGetter: (item: MatchLogDto) => {
+        valueGetter: (item: UiMatchLogDto) => {
           return item.comment;
         },
       },
     ];
   }
 
-  getFighter(item: MatchLogDto) {
+  getFighter(item: UiMatchLogDto) {
     return item.fighters ? item.fighters[0] : null;
   }
 
-  getOpponent(item: MatchLogDto) {
+  getOpponent(item: UiMatchLogDto) {
     return item.fighters ? item.fighters[1] : null;
   }
 }

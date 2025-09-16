@@ -20,7 +20,7 @@ export class PlayersGrid {
         header: 'Image',
         type: GridColumnType.Image,
         valueGetter: (item: PlayerStatisticsDto) => {
-          return item.player?.imageUrl ? item.player.imageUrl.toString() : '';
+          return item.imageUrl ? item.imageUrl.toString() : '';
         },
       },
       {
@@ -28,7 +28,7 @@ export class PlayersGrid {
         header: 'Name',
         type: GridColumnType.Text,
         valueGetter: (item: PlayerStatisticsDto) => {
-          return item.player?.name ? item.player.name : 'Unknown';
+          return item.name ? item.name : 'Unknown';
         },
       },
       {
