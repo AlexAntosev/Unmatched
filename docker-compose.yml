@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Unmatched.Api/Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      - catalogservice
+      - matchservice
+      - playerservice
+      - statisticsservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
   blazor-ui:
     build:
       context: .
@@ -9,6 +23,9 @@ services:
       - "8081:8080"
     depends_on:
       - catalogservice
+      - matchservice
+      - playerservice
+      - statisticsservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
@@ -18,6 +35,8 @@ services:
       dockerfile: Services/Catalog/Unmatched.CatalogService.Api/Dockerfile
     ports:
       - "5001:8080"
+    depends_on:
+      - kafka
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
@@ -27,6 +46,8 @@ services:
       dockerfile: Services/Match/Unmatched.MatchService.Api/Dockerfile
     ports:
       - "5003:8080"
+    depends_on:
+      - kafka
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
@@ -36,6 +57,8 @@ services:
       dockerfile: Services/Player/Unmatched.PlayerService.Api/Dockerfile
     ports:
       - "5004:8080"
+    depends_on:
+      - kafka
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
@@ -45,6 +68,8 @@ services:
       dockerfile: Services/Statistics/Unmatched.StatisticsService.Api/Dockerfile
     ports:
       - "5007:8080"
+    depends_on:
+      - kafka
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched.Statistics;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
