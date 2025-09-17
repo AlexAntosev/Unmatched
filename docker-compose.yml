@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
-  ms:
+  blazor-ui:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Unmatched.UI.BlazorServer/Dockerfile
     ports:
       - "8081:8080"
     depends_on:
