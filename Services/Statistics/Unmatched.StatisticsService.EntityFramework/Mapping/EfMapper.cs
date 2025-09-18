@@ -9,8 +9,8 @@
     {
         public EfMapper()
         {
-            CreateMap<HeroStats, HeroStatsEntity>();
-            CreateMap<MapStats, MapStatsEntity>();
+            CreateMap<HeroStats, HeroStatsEntity>().ReverseMap();
+            CreateMap<MapStats, MapStatsEntity>().ReverseMap();
         }
     }
 }

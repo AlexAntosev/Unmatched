@@ -72,7 +72,7 @@ services:
       - kafka
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched.Statistics;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=Unmatched;User Id=${DB_USER};Password=${DB_PASS};TrustServerCertificate=true
  
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0

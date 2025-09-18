@@ -32,6 +32,15 @@ public abstract class BaseRepository<TModel, TEntity, TContext>(TContext dbConte
         }
     }
 
+    // TODO: refactor
+    public async Task AddOrUpdateAsync(IEnumerable<TModel> models)
+    {
+        foreach (var model in models)
+        {
+            await AddOrUpdateAsync(model);
+        }
+    }
+
     public Task AddRangeAsync(IEnumerable<TModel> models)
     {
         var entities = models.Select(MapToEntity);
@@ -42,6 +51,11 @@ public abstract class BaseRepository<TModel, TEntity, TContext>(TContext dbConte
     {
         var entities = DbContext.Set<TEntity>();
         DbContext.Set<TEntity>().RemoveRange(entities);
+    }
+
+    public Task DeleteAllAsync()
+    {
+        return DbContext.Set<TEntity>().ExecuteDeleteAsync();
     }
 
     public async Task DeleteAsync(Guid id)
@@ -76,6 +90,11 @@ public abstract class BaseRepository<TModel, TEntity, TContext>(TContext dbConte
         return model;
     }
 
+    public Task<bool> HasRecordsAsync()
+    {
+        return DbContext.Set<TEntity>().AnyAsync();
+    }
+
     public Task SaveChangesAsync()
     {
         return DbContext.SaveChangesAsync();
@@ -100,10 +119,9 @@ public abstract class BaseRepository<TModel, TEntity, TContext>(TContext dbConte
         return addedModel;
     }
 
-    private async Task<TModel?> GetByIdTrackedInternalAsync(Guid id)
+    private async Task<TEntity?> GetByIdTrackedInternalAsync(Guid id)
     {
         var entity = await DbContext.Set<TEntity>().FindAsync(id);
-        var model = MapToModel(entity);
-        return model;
+        return entity;
     }
 }

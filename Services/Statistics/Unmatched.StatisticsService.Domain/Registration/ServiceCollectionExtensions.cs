@@ -3,7 +3,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Unmatched.StatisticsService.Domain.Communication.Catalog.Http;
+using Unmatched.StatisticsService.Domain.Communication.Consumers;
 using Unmatched.StatisticsService.Domain.Communication.Match.Http;
+using Unmatched.StatisticsService.Domain.Initialize;
+using Unmatched.StatisticsService.Domain.Initialize.Coordinators;
 using Unmatched.StatisticsService.Domain.Mapping;
 using Unmatched.StatisticsService.Domain.Services;
 using Unmatched.StatisticsService.Domain.Services.Contracts;
@@ -23,6 +26,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
         services.AddSingleton<ICatalogMapCache, CatalogMapCache>();
 
+        services.AddSingleton<IHeroPlaceAdjuster, HeroPlaceAdjuster>();
+
+        services.AddTransient<IStatisticsInitializer, StatisticsInitializer>();
+        services.AddTransient<IStatsCoordinatorProvider, StatsCoordinatorProvider>();
+
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
             {
                 var baseUrl = configuration["Services:CatalogService:BaseUrl"];
@@ -34,5 +42,10 @@ public static class ServiceCollectionExtensions
                 var baseUrl = configuration["Services:MatchService:BaseUrl"];
                 client.BaseAddress = new Uri(baseUrl);
             });
+    }
+
+    public static void RegisterBackgroundServices(this IServiceCollection services)
+    {
+        services.AddHostedService<MatchCreatedConsumer>();
     }
 }

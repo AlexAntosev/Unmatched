@@ -6,5 +6,5 @@ using Unmatched.StatisticsService.Domain.Models;
 
 public interface IHeroStatsRepository : IRepository<HeroStats>
 {
-    
+    Task<HeroStats> GetByHeroAsync(Guid heroId);
 }

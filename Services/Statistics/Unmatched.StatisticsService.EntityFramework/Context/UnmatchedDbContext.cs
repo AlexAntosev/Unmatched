@@ -23,7 +23,7 @@ public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDb
     {
         var optionsBuilder = new DbContextOptionsBuilder<UnmatchedDbContext>();
         optionsBuilder.UseSqlServer(
-            "Server=localhost\\SQLEXPRESS;Database=ms.Unmatched.Statistics;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
+            "Server=localhost\\SQLEXPRESS;Database=Unmatched;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
 
         return new UnmatchedDbContext(optionsBuilder.Options);
     }

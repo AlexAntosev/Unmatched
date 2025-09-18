@@ -8,9 +8,10 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 using Unmatched.StatisticsService.Domain.Communication.Match.Kafka;
+using Unmatched.StatisticsService.Domain.Initialize.Coordinators;
 using Unmatched.StatisticsService.Domain.Repositories;
 
-public class MatchCreatedConsumer(ILogger<KafkaConsumerService> logger, IServiceScopeFactory scopeFactory, IConfiguration configuration) : KafkaConsumerService(
+public class MatchCreatedConsumer(ILogger<KafkaConsumerService> logger, IServiceScopeFactory scopeFactory, IConfiguration configuration, IHeroPlaceAdjuster heroPlaceAdjuster) : KafkaConsumerService(
     logger,
     scopeFactory,
     configuration)
@@ -20,7 +21,7 @@ public class MatchCreatedConsumer(ILogger<KafkaConsumerService> logger, IService
         return new()
             {
                 BootstrapServers = configuration["Services:Kafka:Url"],
-                GroupId = "match-service",
+                GroupId = "statistics-service",
                 AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnableAutoCommit = false, // safer manual commits
                 AllowAutoCreateTopics = false,
@@ -37,28 +38,38 @@ public class MatchCreatedConsumer(ILogger<KafkaConsumerService> logger, IService
     {
         using var scope = ScopeFactory.CreateScope();
         var unitOfWork= scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var heroStatsRepository= unitOfWork.HeroStats;
 
         var matchCreated = JsonSerializer.Deserialize<MatchCreated>(consumeResult.Message.Value);
 
+        var allHeroStats = await unitOfWork.HeroStats.GetAllAsync();
         foreach (var fighter in matchCreated.Fighters)
         {
-            var heroStats = await heroStatsRepository.GetAsync(fighter.HeroId);
-            heroStats.LastMatchIncludedAt = matchCreated.Date;
-            heroStats.ModifiedAt = DateTime.UtcNow;
-            heroStats.LastMatchPoints = fighter.MatchPoints ?? 0;
-            heroStats.Points = fighter.ResultRating ?? 0;
-            heroStats.TotalMatches++;
-            heroStats.Place = 999; // TODO: implement
-            if (fighter.IsWinner)
+            var heroStats = allHeroStats.FirstOrDefault(x => x.HeroId == fighter.HeroId);
+            if (heroStats != null)
             {
-                heroStats.TotalWins++;
+                heroStats.LastMatchIncludedAt = matchCreated.Date;
+                heroStats.ModifiedAt = DateTime.UtcNow;
+                heroStats.LastMatchPoints = fighter.MatchPoints ?? 0;
+                heroStats.Points = fighter.ResultRating ?? 0;
+                heroStats.TotalMatches++;
+                heroStats.Place = 999; // TODO: implement
+                if (fighter.IsWinner)
+                {
+                    heroStats.TotalWins++;
+                }
+                else
+                {
+                    heroStats.TotalLooses++;
+                }
             }
             else
             {
-                heroStats.TotalLooses++;
+                throw new KeyNotFoundException($"There is no hero stats entry found for hero: {fighter.HeroId}");
             }
         }
+
+        var updatedStats = heroPlaceAdjuster.Adjust(allHeroStats);
+        await unitOfWork.HeroStats.AddOrUpdateAsync(updatedStats);
 
         await unitOfWork.SaveChangesAsync();
     }

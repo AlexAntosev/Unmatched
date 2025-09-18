@@ -12,6 +12,7 @@ builder.Services.RegisterEntityFrameworkMapping();
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.RegisterDbContext(builder.Configuration);
 builder.Services.RegisterRepositories();
+builder.Services.RegisterBackgroundServices();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -32,5 +33,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Services.Migrate();
+await app.Services.InitializeAsync();
 
 app.Run();
