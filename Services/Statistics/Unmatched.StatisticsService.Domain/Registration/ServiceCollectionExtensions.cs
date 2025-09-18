@@ -3,8 +3,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Unmatched.StatisticsService.Domain.Communication.Catalog.Http;
-using Unmatched.StatisticsService.Domain.Communication.Consumers;
 using Unmatched.StatisticsService.Domain.Communication.Match.Http;
+using Unmatched.StatisticsService.Domain.Communication.Match.Kafka;
 using Unmatched.StatisticsService.Domain.Initialize;
 using Unmatched.StatisticsService.Domain.Initialize.Coordinators;
 using Unmatched.StatisticsService.Domain.Mapping;
@@ -30,6 +30,12 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IStatisticsInitializer, StatisticsInitializer>();
         services.AddTransient<IStatsCoordinatorProvider, StatsCoordinatorProvider>();
+
+        services.AddTransient<IStatsCoordinator, HeroStatsCoordinator>();
+        services.AddTransient<IStatsCoordinator, MapStatsCoordinator>();
+
+        services.AddTransient<IMatchCreatedHandler, MatchCreatedHeroHandler>();
+        services.AddTransient<IMatchCreatedHandler, MatchCreatedMapHandler>();
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
             {

@@ -13,30 +13,31 @@ using Unmatched.StatisticsService.Domain.Repositories;
 public class HeroStatsCoordinator(
     ILoggerFactory loggerFactory,
     IMapper mapper,
-    IUnitOfWork unitOfWork,
     ICatalogHeroCache catalogHeroCache,
     IMatchClient matchClient,
     IHeroPlaceAdjuster heroPlaceAdjuster) : IStatsCoordinator
 {
+    public IUnitOfWork UnitOfWork { get; set; }
+
     private ILogger<HeroStatsCoordinator> Logger { get; } = loggerFactory.CreateLogger<HeroStatsCoordinator>();
 
     public Task CheckAndInitializeAsync()
     {
         // TODO: implement
-        Logger.LogWarning("{methodName} is not impolemented yet", nameof(CheckAndInitializeAsync));
+        Logger.LogWarning("{methodName} is not implemented yet", nameof(CheckAndInitializeAsync));
         return Task.CompletedTask;
     }
 
     public Task<bool> HasDataAsync()
     {
-        return unitOfWork.HeroStats.HasRecordsAsync();
+        return UnitOfWork.HeroStats.HasRecordsAsync();
     }
 
     public async Task InitializeAsync(IReadOnlyCollection<MatchDto> matches)
     {
         Logger.LogInformation("Data initialization requested.");
         Logger.LogInformation("Clearing Hero statistics...");
-        await unitOfWork.HeroStats.DeleteAllAsync();
+        await UnitOfWork.HeroStats.DeleteAllAsync();
 
         var heroes = await catalogHeroCache.GetAsync();
         var ratings = await matchClient.GetAllRatingsAsync();
@@ -63,10 +64,10 @@ public class HeroStatsCoordinator(
         }
 
         statistics = heroPlaceAdjuster.Adjust(statistics).ToList();
-        
+
         Logger.LogInformation("Filling fresh Hero statistics...");
 
-        await unitOfWork.HeroStats.AddRangeAsync(statistics);
+        await UnitOfWork.HeroStats.AddRangeAsync(statistics);
 
         Logger.LogInformation("Hero stats initialization finished.");
     }

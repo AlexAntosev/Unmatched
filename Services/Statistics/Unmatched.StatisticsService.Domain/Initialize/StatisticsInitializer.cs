@@ -4,18 +4,18 @@ using Microsoft.Extensions.Logging;
 
 using Unmatched.StatisticsService.Domain.Communication.Match.Http;
 using Unmatched.StatisticsService.Domain.Communication.Match.Http.Dto;
+using Unmatched.StatisticsService.Domain.Initialize.Coordinators;
 using Unmatched.StatisticsService.Domain.Repositories;
 
-public class StatisticsInitializer(ILogger<StatisticsInitializer> logger,IUnitOfWork unitOfWork, IStatsCoordinatorProvider coordinatorProvider, IMatchClient matchClient) : IStatisticsInitializer
+public class StatisticsInitializer(ILogger<StatisticsInitializer> logger,IUnitOfWork unitOfWork, IEnumerable<IStatsCoordinator> coordinators, IMatchClient matchClient) : IStatisticsInitializer
 {
     public async Task InitializeAsync()
     {
         try
         {
-            var coordinators = coordinatorProvider.GetAll(unitOfWork);
-
             foreach (var coordinator in coordinators)
             {
+                coordinator.UnitOfWork = unitOfWork;
                 if (await coordinator.HasDataAsync() == false)
                 {
                     // IDEA: here we query all matches. But in case of huge amount of data this should be improved.

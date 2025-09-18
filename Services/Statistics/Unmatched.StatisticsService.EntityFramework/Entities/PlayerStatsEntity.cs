@@ -20,4 +20,8 @@ public class PlayerStatsEntity
     public int TotalMatches { get; set; }
 
     public int TotalWins { get; set; }
+
+    public DateTime ModifiedAt { get; set; }
+
+    public DateTime LastMatchIncludedAt { get; set; }
 }

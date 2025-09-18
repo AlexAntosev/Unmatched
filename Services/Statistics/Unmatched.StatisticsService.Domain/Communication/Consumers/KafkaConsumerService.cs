@@ -16,6 +16,8 @@ public abstract class KafkaConsumerService(ILogger<KafkaConsumerService> logger,
         var config = GetConsumerConfig(configuration);
         var topic = GetTopic(configuration);
 
+        await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
         await KafkaUtils.WaitForTopicAsync(topic, config.BootstrapServers, TimeSpan.FromSeconds(5), stoppingToken, logger);
 
         using var consumer = new ConsumerBuilder<string, string>(config).Build();

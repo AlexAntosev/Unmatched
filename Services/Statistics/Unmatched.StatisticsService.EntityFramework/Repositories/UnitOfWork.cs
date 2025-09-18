@@ -9,6 +9,8 @@ public class UnitOfWork(UnmatchedDbContext context, IMapper mapper) : IUnitOfWor
 {
     public IHeroStatsRepository HeroStats { get; } = new HeroStatsRepository(context, mapper);
 
+    public IMapStatsRepository MapStats { get; } = new MapStatsRepository(context, mapper);
+
     public void Dispose() => context.Dispose();
 
     public Task SaveChangesAsync() => context.SaveChangesAsync();
