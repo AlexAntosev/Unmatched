@@ -18,7 +18,6 @@ public class MatchCreatedHeroHandler(IHeroPlaceAdjuster heroPlaceAdjuster) : IMa
                 heroStats.LastMatchPoints = fighter.MatchPoints ?? 0;
                 heroStats.Points = fighter.ResultRating ?? 0;
                 heroStats.TotalMatches++;
-                heroStats.Place = 999; // TODO: implement
                 if (fighter.IsWinner)
                 {
                     heroStats.TotalWins++;
