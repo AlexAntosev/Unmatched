@@ -14,7 +14,7 @@ public class HeroStats
 
     public double Kd
         => TotalMatches > 0
-            ? Math.Round((double)TotalWins / TotalMatches, 2)
+            ? Math.Round((double)TotalWins / TotalLooses, 2)
             : 0;
 
     public int LastMatchPoints { get; set; }

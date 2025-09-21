@@ -32,7 +32,7 @@ public class StatisticsInitializer(ILogger<StatisticsInitializer> logger,IUnitOf
         }
         catch (Exception ex)
         {
-            logger.LogError("Failed to initialize stats data.",ex);
+            logger.LogError(ex, "Failed to initialize stats data.");
         }
     }
 

@@ -20,11 +20,28 @@ public class MapStatsCoordinator(
 
     private ILogger<MapStatsCoordinator> Logger { get; } = loggerFactory.CreateLogger<MapStatsCoordinator>();
 
-    public Task CheckAndInitializeAsync()
+    public async Task CheckAndInitializeAsync()
     {
-        // TODO: implement
-        Logger.LogWarning("{methodName} is not implemented yet", nameof(CheckAndInitializeAsync));
-        return Task.CompletedTask;
+        Logger.LogInformation("Some map data exists. Checking for new maps...");
+        var statsToAdd = new List<MapStats>();
+        var maps = await catalogMapCache.GetAsync();
+        foreach (var map in maps)
+        {
+            var existingStats = await UnitOfWork.MapStats.GetAsync(map.Id);
+            if (existingStats == null)
+            {
+                var freshStats = mapper.Map<MapStats>(map);
+                freshStats.ModifiedAt = DateTime.UtcNow;
+                statsToAdd.Add(freshStats);
+
+                Logger.LogInformation("Adding '{MapName}' map...", map.Name);
+            }
+        }
+
+        if (statsToAdd.Any())
+        {
+            await UnitOfWork.MapStats.AddRangeAsync(statsToAdd);
+        }
     }
 
     public Task<bool> HasDataAsync()

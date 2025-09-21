@@ -21,11 +21,37 @@ public class HeroStatsCoordinator(
 
     private ILogger<HeroStatsCoordinator> Logger { get; } = loggerFactory.CreateLogger<HeroStatsCoordinator>();
 
-    public Task CheckAndInitializeAsync()
+    public async Task CheckAndInitializeAsync()
     {
-        // TODO: implement
-        Logger.LogWarning("{methodName} is not implemented yet", nameof(CheckAndInitializeAsync));
-        return Task.CompletedTask;
+
+        Logger.LogInformation("Some hero data exists. Checking for new heroes...");
+        var statsToAdd = new List<HeroStats>();
+
+        var allStats = (await UnitOfWork.HeroStats.GetAllAsync()).ToList();
+
+        var heroes = await catalogHeroCache.GetAsync();
+        foreach (var hero in heroes)
+        {
+            var existingStats =await UnitOfWork.HeroStats.GetAsync(hero.Id);
+            if (allStats.Any(x => x.HeroId == hero.Id) == false)
+            {
+                var freshStats = mapper.Map<HeroStats>(hero);
+                freshStats.ModifiedAt = DateTime.UtcNow;
+                statsToAdd.Add(freshStats);
+
+                Logger.LogInformation("Adding '{HeroName}' hero...", hero.Name);
+            }
+        }
+
+        if (statsToAdd.Any())
+        {
+            Logger.LogInformation("Adding {count} heroes ...", statsToAdd.Count);
+            allStats.AddRange(statsToAdd);
+
+            Logger.LogInformation("Recalculating hero places ...");
+            allStats = heroPlaceAdjuster.Adjust(allStats).ToList();
+            await UnitOfWork.HeroStats.AddOrUpdateAsync(allStats);
+        }
     }
 
     public Task<bool> HasDataAsync()
