@@ -13,7 +13,7 @@ public class HeroStats
     public bool IsRanged { get; set; }
 
     public double Kd
-        => TotalMatches > 0
+        => TotalLooses > 0
             ? Math.Round((double)TotalWins / TotalLooses, 2)
             : 0;
 
