@@ -1,0 +1,48 @@
+name: PR Tests
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  backend-tests:
+    name: Backend (.NET) tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore Unmatched.sln
+
+      - name: Build
+        run: dotnet build Unmatched.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test Unmatched.sln --no-build --configuration Release
+
+  frontend-tests:
+    name: Frontend (Angular) tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Unmatched.UI.Angular
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Unmatched.UI.Angular/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npx ng test --watch=false --browsers=ChromeHeadless
