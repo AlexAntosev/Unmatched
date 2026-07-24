@@ -9,6 +9,14 @@ using Unmatched.HttpClients.Contracts;
 
 public class PlayerClient(HttpClient httpClient) : IPlayerClient
 {
+    public async Task<PlayerDto> AddAsync(PlayerDto dto)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync("/player", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlayerDto>();
+    }
+
     public async Task<IEnumerable<PlayerDto>> GetAllAsync()
     {
         var response = await httpClient.GetAsync("/player");
@@ -21,6 +29,13 @@ public class PlayerClient(HttpClient httpClient) : IPlayerClient
         var response = await httpClient.GetAsync($"/player/{playerId}/favor");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<Guid?>();
+    }
+
+    public async Task<IEnumerable<FavoriteDto>> GetFavoritesAsync(Guid playerId)
+    {
+        var response = await httpClient.GetAsync($"/player/{playerId}/favorites");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<FavoriteDto>>();
     }
 
     public async Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)

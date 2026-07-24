@@ -5,16 +5,16 @@ using AutoMapper;
 using Unmatched.Dtos;
 using Unmatched.HttpClients.Contracts;
 
-public class PlayerStatisticsService(IMapper mapper, IMatchClient matchClient) : IPlayerStatisticsService
+public class PlayerStatisticsService(IMapper mapper, IMatchClient matchClient, IStatisticsClient statisticsClient) : IPlayerStatisticsService
 {
     public Task<IEnumerable<PlayerStatisticsDto>> GetPlayersStatisticsAsync()
     {
-        throw new NotImplementedException();
+        return statisticsClient.GetPlayerStatsAsync();
     }
 
     public Task<PlayerStatisticsDto> GetPlayerStatisticsAsync(Guid playerId)
     {
-        throw new NotImplementedException();
+        return statisticsClient.GetPlayerStatsAsync(playerId);
     }
 
     public async Task<IEnumerable<UiMatchLogDto>> GetPlayerMatchesAsync(Guid playerId)

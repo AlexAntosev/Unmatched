@@ -38,7 +38,8 @@ public class DomainMapper : Profile
 
 
         CreateMap<MatchEntity, MatchCreated>();
-        CreateMap<FighterEntity, MatchCreated.Fighter>();
+        CreateMap<FighterEntity, MatchCreated.Fighter>()
+            .ForMember(dest => dest.ResultRating, opt => opt.Ignore());
     }
 
     private string TryGetTournamentName(TournamentEntity? tournament, Stage? stage)

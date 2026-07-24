@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 using Unmatched.PlayerService.Api.Dto;
+using Unmatched.PlayerService.Domain.Entities;
 using Unmatched.PlayerService.Domain.Services;
 
 [ApiController]
@@ -20,6 +21,22 @@ public class PlayerController(
     {
         var players = await playerService.GetAsync();
         var dtos = players.Select(mapper.Map<PlayerDto>);
+        return Ok(dtos);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<PlayerDto>> Add([FromBody] PlayerDto dto)
+    {
+        var player = mapper.Map<Player>(dto);
+        await playerService.AddAsync(player);
+        return Ok(mapper.Map<PlayerDto>(player));
+    }
+
+    [HttpGet("{playerId}/favorites")]
+    public async Task<ActionResult<IEnumerable<FavoriteDto>>> GetFavoritesAsync(Guid playerId)
+    {
+        var favorites = await favoriteService.GetFavoritesAsync(playerId);
+        var dtos = favorites.Select(mapper.Map<FavoriteDto>);
         return Ok(dtos);
     }
 

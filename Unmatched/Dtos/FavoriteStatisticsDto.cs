@@ -23,8 +23,8 @@ public class FavoriteStatisticsDto : IComparable<FavoriteStatisticsDto>
     public int Favour { get; set; }
 
     public double Kd
-        => TotalMatches > 0
-            ? Math.Round((double)TotalWins / TotalMatches, 2)
+        => TotalLooses > 0
+            ? Math.Round((double)TotalWins / TotalLooses, 2)
             : 0;
 
     public int Place { get; set; }

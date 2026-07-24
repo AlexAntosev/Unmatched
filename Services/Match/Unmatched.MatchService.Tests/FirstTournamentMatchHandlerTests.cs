@@ -34,7 +34,8 @@ public class FirstTournamentMatchHandlerTests
         var fighterHeroId = Guid.NewGuid();
         var fighter = new FighterEntity
         {
-                HeroId = fighterHeroId
+                HeroId = fighterHeroId,
+                IsWinner = true
             };
         var opponentHeroId = Guid.NewGuid();
         var opponent = new FighterEntity
@@ -84,7 +85,8 @@ public class FirstTournamentMatchHandlerTests
         var fighterHeroId = Guid.NewGuid();
         var fighter = new FighterEntity
         {
-                HeroId = fighterHeroId
+                HeroId = fighterHeroId,
+                IsWinner = true
             };
         var opponentHeroId = Guid.NewGuid();
         var opponent = new FighterEntity
@@ -136,7 +138,8 @@ public class FirstTournamentMatchHandlerTests
         var fighterHeroId = Guid.NewGuid();
         var fighter = new FighterEntity
         {
-                HeroId = fighterHeroId
+                HeroId = fighterHeroId,
+                IsWinner = true
             };
         var opponentHeroId = Guid.NewGuid();
         var opponent = new FighterEntity
@@ -199,7 +202,8 @@ public class FirstTournamentMatchHandlerTests
         var fighterHeroId = Guid.NewGuid();
         var fighter = new FighterEntity
         {
-                HeroId = fighterHeroId
+                HeroId = fighterHeroId,
+                IsWinner = true
             };
         var opponentHeroId = Guid.NewGuid();
         var opponent = new FighterEntity
@@ -248,8 +252,8 @@ public class FirstTournamentMatchHandlerTests
         _matchRepository.Setup(r => r.AddAsync(match)).ReturnsAsync(createdMatch);
         _ratingRepository.Setup(r => r.GetByHeroIdAsync(fighterHeroId)).ReturnsAsync(fighterHeroRating).Verifiable();
         _ratingRepository.Setup(r => r.GetByHeroIdAsync(opponentHeroId)).ReturnsAsync(opponentHeroRating).Verifiable();
-        _ratingRepository.Setup(r => r.AddOrUpdate(fighterHeroRating)).Verifiable();
-        _ratingRepository.Setup(r => r.AddOrUpdate(opponentHeroRating)).Verifiable();
+        _ratingRepository.Setup(r => r.AddOrUpdateAsync(fighterHeroRating)).Returns(Task.CompletedTask).Verifiable();
+        _ratingRepository.Setup(r => r.AddOrUpdateAsync(opponentHeroRating)).Returns(Task.CompletedTask).Verifiable();
         _unitOfWork.Setup(r => r.SaveChangesAsync()).Verifiable();
 
         // Act

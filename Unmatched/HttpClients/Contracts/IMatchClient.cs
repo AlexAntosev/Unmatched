@@ -9,6 +9,8 @@ public interface IMatchClient
 
     Task<TournamentDto> AddTournamentAsync(TournamentDto tournament);
 
+    Task DeleteTournamentAsync(Guid id);
+
     Task GenerateTournamentNextStageAsync(Guid tournamentId);
 
     Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();

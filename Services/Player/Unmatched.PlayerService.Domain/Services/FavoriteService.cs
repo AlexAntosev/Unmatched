@@ -1,9 +1,15 @@
 ﻿namespace Unmatched.PlayerService.Domain.Services;
 
+using Unmatched.PlayerService.Domain.Entities;
 using Unmatched.PlayerService.Domain.Repositories;
 
 public class FavoriteService(IUnitOfWork unitOfWork) : IFavoriteService
 {
+    public async Task<IEnumerable<Favorite>> GetFavoritesAsync(Guid playerId)
+    {
+        return await unitOfWork.Favorites.GetByPlayerIdAsync(playerId);
+    }
+
     public async Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId)
     {
         var favourites = (await unitOfWork.Favorites.GetByPlayerIdAsync(playerId)).OrderByDescending(x => x.IsChosenOne).ThenByDescending(x => x.Favour).ToArray();

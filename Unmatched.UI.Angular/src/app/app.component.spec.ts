@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
+import { LayoutModule } from './shared/layout/layout.module';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterModule.forRoot([])
+        LayoutModule
       ],
       declarations: [
         AppComponent
@@ -26,10 +26,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('Unmatched.UI.Angular');
   });
 
-  it('should render title', () => {
+  it('should render the layout', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, Unmatched.UI.Angular');
+    expect(compiled.querySelector('app-layout')).toBeTruthy();
   });
 });

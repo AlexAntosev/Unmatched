@@ -1,5 +1,6 @@
 ﻿namespace Unmatched.HttpClients.Contracts;
 
+using Unmatched.Dtos;
 using Unmatched.Dtos.Statistics;
 
 public interface IStatisticsClient
@@ -11,4 +12,8 @@ public interface IStatisticsClient
     Task<IEnumerable<MapStatisticsDto>> GetMapsStatisticsAsync();
 
     Task<MapStatisticsDto> GetMapsStatisticsAsync(Guid mapId);
+
+    Task<PlayerStatisticsDto> GetPlayerStatsAsync(Guid playerId);
+
+    Task<IEnumerable<PlayerStatisticsDto>> GetPlayerStatsAsync();
 }

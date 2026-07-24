@@ -1,67 +1,46 @@
-﻿// namespace Unmatched.StatisticsService.Domain.Services;
-//
-// using System;
-//
-// using AutoMapper;
-//
-// using Unmatched.StatisticsService.Domain.Models;
-// using Unmatched.StatisticsService.Domain.Services.Contracts;
-//
-// public class PlayerStatisticsService : IPlayerStatisticsService
-// {
-//     private readonly IUnitOfWork _unitOfWork;
-//     private readonly IMapper _mapper;
-//
-//     public PlayerStatisticsService(IUnitOfWork unitOfWork, IMapper mapper)
-//     {
-//         _unitOfWork = unitOfWork;
-//         _mapper = mapper;
-//     }
-//     
-//     public async Task<IEnumerable<PlayerStats>> GetPlayersStatisticsAsync()
-//     {
-//         var playerEntities = await _unitOfWork.Players.GetAsync();
-//         var players = _mapper.Map<List<PlayerDto>>(playerEntities);
-//         var fighters = await _unitOfWork.Fighters.GetFromFinishedMatchesAsync();
-//
-//         var statistics = new List<PlayerStats>();
-//
-//         foreach (var player in players)
-//         {
-//             var playerFighters = fighters.Where(x => x.PlayerId.Equals(player.Id)).OrderByDescending(x => x.Match.Date).ToArray();
-//
-//             var playerStatistics = new PlayerStats
-//                 {
-//                     Name = player,
-//                     PlayerId = player.Id,
-//                     TotalMatches = playerFighters.Length,
-//                     TotalWins = playerFighters.Count(x => x.IsWinner),
-//                     TotalLooses = playerFighters.Count(x => x.IsWinner == false),
-//                     LastMatchPoints = playerFighters.FirstOrDefault()?.MatchPoints ?? 0
-//                 };
-//
-//             statistics.Add(playerStatistics);
-//         }
-//
-//         return statistics;
-//     }
-//     
-//     public async Task<PlayerStats> GetPlayerStatisticsAsync(Guid playerId)
-//     {
-//         var playerEntity = await _unitOfWork.Players.GetByIdAsync(playerId);
-//         var player = _mapper.Map<PlayerDto>(playerEntity);
-//         var playerFighters = await _unitOfWork.Fighters.GetFromFinishedMatchesByPlayerIdAsync(playerId);
-//         
-//         var statistics = new PlayerStats
-//             {
-//                 Player = player,
-//                 PlayerId = player.Id,
-//                 TotalMatches = playerFighters.Count,
-//                 TotalWins = playerFighters.Count(x => x.IsWinner),
-//                 TotalLooses = playerFighters.Count(x => x.IsWinner == false),
-//                 LastMatchPoints = playerFighters.FirstOrDefault()?.MatchPoints ?? 0
-//             };
-//         
-//         return statistics;
-//     }
-// }
+namespace Unmatched.StatisticsService.Domain.Services;
+
+using Unmatched.StatisticsService.Domain.Communication.Match.Http;
+using Unmatched.StatisticsService.Domain.Communication.Match.Http.Dto;
+using Unmatched.StatisticsService.Domain.Communication.Player.Http;
+using Unmatched.StatisticsService.Domain.Models;
+using Unmatched.StatisticsService.Domain.Services.Contracts;
+
+public class PlayerStatisticsService(IMatchClient matchClient, IPlayerCache playerCache) : IPlayerStatisticsService
+{
+    public async Task<IEnumerable<PlayerStats>> GetPlayersStatisticsAsync()
+    {
+        var players = await playerCache.GetAsync();
+        var matches = (await matchClient.GetMatchLogAsync()).ToList();
+
+        return players.Select(player => BuildStats(player.Id, player.Name, matches)).ToList();
+    }
+
+    public async Task<PlayerStats> GetPlayerStatisticsAsync(Guid playerId)
+    {
+        var player = await playerCache.GetAsync(playerId);
+        var matches = await matchClient.GetFinishedByPlayerAsync(playerId);
+
+        return BuildStats(playerId, player?.Name ?? string.Empty, matches);
+    }
+
+    private static PlayerStats BuildStats(Guid playerId, string name, IEnumerable<MatchLogDto> matches)
+    {
+        var playerFights = matches
+            .OrderByDescending(match => match.Date)
+            .Select(match => match.Fighters.FirstOrDefault(fighter => fighter.Player?.Id == playerId))
+            .Where(fighter => fighter is not null)
+            .Select(fighter => fighter!)
+            .ToList();
+
+        return new PlayerStats
+            {
+                PlayerId = playerId,
+                Name = name,
+                TotalMatches = playerFights.Count,
+                TotalWins = playerFights.Count(fighter => fighter.IsWinner),
+                TotalLooses = playerFights.Count(fighter => fighter.IsWinner == false),
+                LastMatchPoints = playerFights.FirstOrDefault()?.MatchPoints ?? 0
+            };
+    }
+}

@@ -4,8 +4,12 @@ using Unmatched.Dtos.Player;
 
 public interface IPlayerClient
 {
+    Task<PlayerDto> AddAsync(PlayerDto dto);
+
     Task<IEnumerable<PlayerDto>> GetAllAsync();
     Task<Guid?> GetFavouriteHeroIdAsync(Guid playerId);
+
+    Task<IEnumerable<FavoriteDto>> GetFavoritesAsync(Guid playerId);
 
     Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne);
 

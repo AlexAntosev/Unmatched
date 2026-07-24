@@ -5,8 +5,6 @@
 /// </summary>
 public class HeroStatsFighterDto
 {
-    public DateTime DateTime { get; set; }
-
     public Guid HeroId { get; set; }
 
     public bool IsWinner { get; set; }

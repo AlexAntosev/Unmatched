@@ -4,6 +4,7 @@ namespace Unmatched.HttpClients;
 
 using System.Net.Http;
 using System.Net.Http.Json;
+using Unmatched.Dtos;
 using Unmatched.Dtos.Statistics;
 
 public class StatisticsClient(HttpClient httpClient) : IStatisticsClient
@@ -34,5 +35,19 @@ public class StatisticsClient(HttpClient httpClient) : IStatisticsClient
         var response = await httpClient.GetAsync($"/map/{mapId}");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<MapStatisticsDto>();
+    }
+
+    public async Task<PlayerStatisticsDto> GetPlayerStatsAsync(Guid playerId)
+    {
+        var response = await httpClient.GetAsync($"/player/{playerId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlayerStatisticsDto>();
+    }
+
+    public async Task<IEnumerable<PlayerStatisticsDto>> GetPlayerStatsAsync()
+    {
+        var response = await httpClient.GetAsync("/player");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<PlayerStatisticsDto>>();
     }
 }

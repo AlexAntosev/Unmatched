@@ -26,6 +26,12 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<TournamentDto>();
     }
 
+    public async Task DeleteTournamentAsync(Guid id)
+    {
+        var response = await httpClient.DeleteAsync($"/tournament/{id}");
+        response.EnsureSuccessStatusCode();
+    }
+
     public async Task GenerateTournamentNextStageAsync(Guid tournamentId)
     {
         var response = await httpClient.PostAsync($"/tournament/generate/{tournamentId}", null);

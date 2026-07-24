@@ -1,5 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { HeroComponent } from './hero.component';
+import { HeroesModule } from '../heroes.module';
 
 describe('HeroDetasilsComponent', () => {
   let component: HeroComponent;
@@ -7,7 +11,12 @@ describe('HeroDetasilsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [HeroComponent]
+      imports: [HeroesModule],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: ActivatedRoute, useValue: { snapshot: { params: {} } } },
+      ],
     })
     .compileComponents();
 

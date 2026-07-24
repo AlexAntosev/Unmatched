@@ -24,7 +24,7 @@ public class TournamentService(IMatchClient matchClient) : ITournamentService
 
     public Task DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return matchClient.DeleteTournamentAsync(id);
     }
 
     public Task GenerateMatchesAsync(Guid tournamentId)
