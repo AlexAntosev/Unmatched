@@ -9,6 +9,7 @@ using Polly.Extensions.Http;
 using Unmatched.StatisticsService.Domain.Communication.Catalog.Http;
 using Unmatched.StatisticsService.Domain.Communication.Match.Http;
 using Unmatched.StatisticsService.Domain.Communication.Match.Kafka;
+using Unmatched.StatisticsService.Domain.Communication.Player.Http;
 using Unmatched.StatisticsService.Domain.Initialize;
 using Unmatched.StatisticsService.Domain.Initialize.Coordinators;
 using Unmatched.StatisticsService.Domain.Mapping;
@@ -26,9 +27,11 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();
         services.AddTransient<IMapStatisticsService, MapStatisticsService>();
+        services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
 
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
         services.AddSingleton<ICatalogMapCache, CatalogMapCache>();
+        services.AddSingleton<IPlayerCache, PlayerCache>();
 
         services.AddSingleton<IHeroPlaceAdjuster, HeroPlaceAdjuster>();
 
@@ -53,6 +56,15 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<IMatchClient, MatchClient>(client =>
                 {
                     var baseUrl = configuration["Services:MatchService:BaseUrl"];
+                    client.BaseAddress = new Uri(baseUrl);
+                })
+            .AddPolicyHandler(GetRetryPolicy())
+            .AddPolicyHandler(GetCircuitBreakerPolicy());
+        ;
+
+        services.AddHttpClient<IPlayerClient, PlayerClient>(client =>
+                {
+                    var baseUrl = configuration["Services:PlayerService:BaseUrl"];
                     client.BaseAddress = new Uri(baseUrl);
                 })
             .AddPolicyHandler(GetRetryPolicy())

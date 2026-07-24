@@ -21,7 +21,7 @@
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field="Player.Name" HeaderText="Player" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(PlayerStatisticsDto.Name) HeaderText="Player" Width="120"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
             <GridColumn Field=@nameof(PlayerStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>

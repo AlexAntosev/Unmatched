@@ -39,4 +39,18 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<MatchDto>>();
     }
+
+    public async Task<IEnumerable<MatchLogDto>> GetMatchLogAsync()
+    {
+        var response = await httpClient.GetAsync("/match/log");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<MatchLogDto>>();
+    }
+
+    public async Task<IEnumerable<MatchLogDto>> GetFinishedByPlayerAsync(Guid playerId)
+    {
+        var response = await httpClient.GetAsync($"/match/log/player/{playerId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<MatchLogDto>>();
+    }
 }

@@ -13,4 +13,8 @@ public interface IMatchClient
     Task<RatingDto> GetHeroRatingAsync(Guid heroId);
 
     Task<IEnumerable<MatchDto>> GetAllMatchesAsync();
+
+    Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();
+
+    Task<IEnumerable<MatchLogDto>> GetFinishedByPlayerAsync(Guid playerId);
 }
