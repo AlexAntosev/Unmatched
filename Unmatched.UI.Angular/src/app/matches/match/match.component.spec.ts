@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MatchComponent } from './match.component';
+import { MatchesModule } from '../matches.module';
 
 describe('MatchComponent', () => {
   let component: MatchComponent;
@@ -8,7 +9,7 @@ describe('MatchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [MatchComponent]
+      imports: [MatchesModule]
     })
     .compileComponents();
 
