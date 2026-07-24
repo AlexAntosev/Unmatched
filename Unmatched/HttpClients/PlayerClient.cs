@@ -31,6 +31,13 @@ public class PlayerClient(HttpClient httpClient) : IPlayerClient
         return await response.Content.ReadFromJsonAsync<Guid?>();
     }
 
+    public async Task<IEnumerable<FavoriteDto>> GetFavoritesAsync(Guid playerId)
+    {
+        var response = await httpClient.GetAsync($"/player/{playerId}/favorites");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<FavoriteDto>>();
+    }
+
     public async Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
     {
         var content = new StringContent(JsonSerializer.Serialize(isChosenOne), Encoding.UTF8, "application/json");

@@ -30,7 +30,7 @@
         }
     }
 
-    private double CalculateKd() => _total > 0
+    private double CalculateKd() => _looses > 0
         ? Math.Round((double)_wins / _looses, 2)
         : 0;
 

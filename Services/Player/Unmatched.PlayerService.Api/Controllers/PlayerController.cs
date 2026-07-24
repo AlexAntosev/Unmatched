@@ -32,6 +32,14 @@ public class PlayerController(
         return Ok(mapper.Map<PlayerDto>(player));
     }
 
+    [HttpGet("{playerId}/favorites")]
+    public async Task<ActionResult<IEnumerable<FavoriteDto>>> GetFavoritesAsync(Guid playerId)
+    {
+        var favorites = await favoriteService.GetFavoritesAsync(playerId);
+        var dtos = favorites.Select(mapper.Map<FavoriteDto>);
+        return Ok(dtos);
+    }
+
     [HttpGet("{playerId}/favor")]
     public async Task<ActionResult<Guid?>> GetFavouriteHeroIdAsync(Guid playerId)
     {
