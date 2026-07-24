@@ -16,8 +16,9 @@ public class PlayerService(IPlayerClient playerClient, IMapper mapper) : IPlayer
         return players.Select(mapper.Map<UiPlayerDto>);
     }
 
-    public Task AddAsync(UiPlayerDto dto)
+    public async Task AddAsync(UiPlayerDto dto)
     {
-        throw new NotImplementedException();
+        var playerDto = mapper.Map<PlayerDto>(dto);
+        await playerClient.AddAsync(playerDto);
     }
 }

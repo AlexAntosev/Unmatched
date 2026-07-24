@@ -10,6 +10,7 @@
         public ApiMapper()
         {
             CreateMap<Player, PlayerDto>();
+            CreateMap<PlayerDto, Player>();
         }
     }
 }

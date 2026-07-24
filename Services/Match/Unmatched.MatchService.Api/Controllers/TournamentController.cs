@@ -48,4 +48,11 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
         var addedResult = await tournamentService.AddAsync(model);
         return Ok(mapper.Map<TournamentDto>(addedResult));
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        await tournamentService.DeleteAsync(id);
+        return Ok();
+    }
 }

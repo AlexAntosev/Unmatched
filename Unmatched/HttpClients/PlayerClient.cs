@@ -9,6 +9,14 @@ using Unmatched.HttpClients.Contracts;
 
 public class PlayerClient(HttpClient httpClient) : IPlayerClient
 {
+    public async Task<PlayerDto> AddAsync(PlayerDto dto)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync("/player", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlayerDto>();
+    }
+
     public async Task<IEnumerable<PlayerDto>> GetAllAsync()
     {
         var response = await httpClient.GetAsync("/player");
