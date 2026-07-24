@@ -33,7 +33,8 @@ public class UnrankedMatchHandlerTests
         var fighterHeroId = Guid.NewGuid();
         var fighter = new FighterEntity
         {
-                HeroId = fighterHeroId
+                HeroId = fighterHeroId,
+                IsWinner = true
             };
         var opponentHeroId = Guid.NewGuid();
         var opponent = new FighterEntity
@@ -89,7 +90,8 @@ public class UnrankedMatchHandlerTests
         var fighterHeroId = Guid.NewGuid();
         var fighter = new FighterEntity()
             {
-                HeroId = fighterHeroId
+                HeroId = fighterHeroId,
+                IsWinner = true
             };
         var opponentHeroId = Guid.NewGuid();
         var opponent = new FighterEntity
