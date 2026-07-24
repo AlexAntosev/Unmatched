@@ -1,0 +1,38 @@
+{
+  "expansion": {
+    "name": "Unmatched: Sun's Origin",
+    "releaseYear": 2024,
+    "publisher": "Restoration Games",
+    "source": "https://restorationgames.com/shop/suns-origin-unmatched/ ; https://icv2.com/articles/news/view/53777/restoration-games-announces-two-new-unmatched-sets"
+  },
+  "heroes": [
+    {
+      "name": "Oda Nobunaga",
+      "hp": 13,
+      "deckSize": 30,
+      "isRanged": false,
+      "color": "#8B1E1E",
+      "colorSourced": false,
+      "sidekicks": [
+        { "name": "Honor Guard", "hp": 6, "isRanged": false, "count": 2 }
+      ],
+      "source": "https://www.geektopiagames.com/unmatched/oda-nobunaga/ ; https://gridbeast.gg/unmatched-oda-nobunaga/",
+      "verified": true
+    },
+    {
+      "name": "Tomoe Gozen",
+      "hp": 14,
+      "deckSize": 30,
+      "isRanged": false,
+      "color": "#4B3F72",
+      "colorSourced": false,
+      "sidekicks": [],
+      "source": "https://www.geektopiagames.com/unmatched/tomoe-gozen/ ; https://gridbeast.gg/unmatched-tomoe-gozen/",
+      "verified": true
+    }
+  ],
+  "maps": [
+    { "name": "Azuchi Castle", "verified": true, "source": "https://restorationgames.com/shop/suns-origin-unmatched/" }
+  ],
+  "note": "colorSourced=false: Hp/DeckSize/IsRanged/Sidekicks/box+release data are cited from official/community sources; Color is this app's own visual-identity convention (not part of official game data) and was picked to fit the character, not sourced."
+}

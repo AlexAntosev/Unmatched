@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.CatalogService.EntityFramework.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
 using Unmatched.CatalogService.Domain.Entities;
 using Unmatched.CatalogService.Domain.Repositories;
 using Unmatched.CatalogService.EntityFramework.Context;
@@ -14,5 +16,16 @@ public class MapRepository(UnmatchedDbContext dbContext) : BaseRepository<Map, U
     protected override Guid GetId(Map model)
     {
         return model.Id;
+    }
+
+    public override IQueryable<Map> Query(bool noTrack = false)
+    {
+        var query = DbContext.Maps.Include(x => x.Expansion);
+        return noTrack ? query.AsNoTracking() : query;
+    }
+
+    public override async Task<IReadOnlyList<Map>> GetAsync()
+    {
+        return await DbContext.Set<Map>().Include(x => x.Expansion).AsNoTracking().ToListAsync();
     }
 }

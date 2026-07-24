@@ -41,13 +41,46 @@ public class UnmatchedDbContext : DbContext
     public DbSet<Hero> Heroes { get; set; }
 
     public DbSet<Map> Maps { get; set; }
-    
+
     public DbSet<Minion> Minions { get; set; }
 
     public DbSet<Sidekick> Sidekicks { get; set; }
-    
-    
+
+
     public DbSet<Villain> Villains { get; set; }
-    
+
     public DbSet<PlayStyle> PlayStyles { get; set; }
+
+    public DbSet<Expansion> Expansions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Expansion>()
+            .HasIndex(e => e.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<Hero>()
+            .HasOne(h => h.Expansion)
+            .WithMany(e => e.Heroes)
+            .HasForeignKey(h => h.ExpansionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Map>()
+            .HasOne(m => m.Expansion)
+            .WithMany(e => e.Maps)
+            .HasForeignKey(m => m.ExpansionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Villain>()
+            .HasOne(v => v.Expansion)
+            .WithMany(e => e.Villains)
+            .HasForeignKey(v => v.ExpansionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Minion>()
+            .HasOne(m => m.Expansion)
+            .WithMany(e => e.Minions)
+            .HasForeignKey(m => m.ExpansionId)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
 }

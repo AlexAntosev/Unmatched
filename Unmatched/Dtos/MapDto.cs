@@ -6,5 +6,7 @@ public class MapDto
 
     public string Name { get; set; }
 
-    public string ImageUrl => $"/{Name.Replace(" ", string.Empty)}.png";
+    public string? ImageFileName { get; set; }
+
+    public string ImageUrl => ImageFileName != null ? $"/images/maps/{ImageFileName}" : "/UnknownMap.png";
 }

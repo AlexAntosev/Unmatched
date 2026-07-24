@@ -13,6 +13,12 @@ public class MinionDto
     public int DeckSize { get; set; }
 
     public bool IsRanged { get; set; }
-    
+
     public string Color { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public string? ExpansionName { get; set; }
+
+    public string? ImageFileName { get; set; }
 }

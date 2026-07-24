@@ -8,5 +8,7 @@ public class UiMapStatisticsDto
 
     public int TotalMatches { get; set; }
 
-    public string ImageUrl => $"/{Name?.Replace(" ", string.Empty) ?? "Unknown"}.png";
+    public string? ImageFileName { get; set; }
+
+    public string ImageUrl => ImageFileName != null ? $"/images/maps/{ImageFileName}" : "/UnknownMap.png";
 }

@@ -18,4 +18,10 @@ public class HeroDto
     public string Color { get; set; }
 
     public IEnumerable<SidekickDto> Sidekicks { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public string? ExpansionName { get; set; }
+
+    public string? ImageFileName { get; set; }
 }

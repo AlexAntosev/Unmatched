@@ -15,6 +15,12 @@ public class Villain
     public int DeckSize { get; set; }
 
     public bool IsRanged { get; set; }
-    
+
     public string Color { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public virtual Expansion? Expansion { get; set; }
+
+    public string? ImageFileName { get; set; }
 }

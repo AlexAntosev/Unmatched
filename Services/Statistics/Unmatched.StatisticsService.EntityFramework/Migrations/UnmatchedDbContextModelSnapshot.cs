@@ -38,6 +38,9 @@ namespace Unmatched.StatisticsService.EntityFramework.Migrations
                     b.Property<int>("Hp")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsRanged")
                         .HasColumnType("bit");
 
@@ -79,6 +82,9 @@ namespace Unmatched.StatisticsService.EntityFramework.Migrations
                     b.Property<Guid>("MapId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastMatchIncludedAt")
                         .HasColumnType("datetime2");

@@ -18,6 +18,12 @@ public class Hero
     public virtual ICollection<Sidekick> Sidekicks { get; set; }
     
     public string Color { get; set; }
-    
+
     public virtual PlayStyle? PlayStyle { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public virtual Expansion? Expansion { get; set; }
+
+    public string? ImageFileName { get; set; }
 }

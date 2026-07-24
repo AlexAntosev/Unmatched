@@ -18,6 +18,8 @@ public class HeroStatisticsDto
 
     public string Name { get; set; }
 
+    public string? ImageFileName { get; set; }
+
     public int Place { get; set; }
 
     public int Points { get; set; }

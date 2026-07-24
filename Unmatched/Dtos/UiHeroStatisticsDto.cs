@@ -4,7 +4,9 @@ public class UiHeroStatisticsDto : IComparable<UiHeroStatisticsDto>
 {
     public Guid HeroId { get; set; }
 
-    public string ImageUrl => $"/{Name}.png";
+    public string? ImageFileName { get; set; }
+
+    public string ImageUrl => ImageFileName != null ? $"/images/heroes/{ImageFileName}" : "/Unknown.png";
 
     public bool IsRanged { get; set; }
 

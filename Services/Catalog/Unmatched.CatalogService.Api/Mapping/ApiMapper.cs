@@ -11,9 +11,13 @@ public class ApiMapper : Profile
 {
     public ApiMapper()
     {
-        CreateMap<Hero, HeroDto>().ReverseMap();
+        CreateMap<Hero, HeroDto>()
+            .ForMember(d => d.ExpansionName, o => o.MapFrom(s => s.Expansion != null ? s.Expansion.Name : null))
+            .ReverseMap();
         CreateMap<PlayStyle, PlayStyleDto>().ReverseMap();
-        CreateMap<Map, MapDto>().ReverseMap();
+        CreateMap<Map, MapDto>()
+            .ForMember(d => d.ExpansionName, o => o.MapFrom(s => s.Expansion != null ? s.Expansion.Name : null))
+            .ReverseMap();
         CreateMap<Sidekick, SidekickDto>().ReverseMap();
     }
 }

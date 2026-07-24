@@ -15,9 +15,11 @@ public class UiHeroDto
     public IEnumerable<UiSidekickDto> Sidekicks { get; set; }
     
     public string Color { get; set; }
-    
-    public string ImageUrl => $"/{Name}.png";
-    
+
+    public string? ImageFileName { get; set; }
+
+    public string ImageUrl => ImageFileName != null ? $"/images/heroes/{ImageFileName}" : "/Unknown.png";
+
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
     
     public UiPlayStyleDto PlayStyle { get; set; }
