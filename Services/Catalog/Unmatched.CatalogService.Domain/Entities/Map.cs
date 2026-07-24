@@ -8,4 +8,10 @@ public class Map
     public Guid Id { get; set; }
 
     public string Name { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public virtual Expansion? Expansion { get; set; }
+
+    public string? ImageFileName { get; set; }
 }

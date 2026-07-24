@@ -6,5 +6,7 @@ public class MapStatisticsDto
 
     public string Name { get; set; }
 
+    public string? ImageFileName { get; set; }
+
     public int TotalMatches { get; set; }
 }

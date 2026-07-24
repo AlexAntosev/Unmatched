@@ -13,7 +13,8 @@ public class HeroRepository(UnmatchedDbContext dbContext) : BaseRepository<Hero,
 {
     public override IQueryable<Hero> Query(bool noTrack = false)
     {
-        return noTrack ? DbContext.Heroes.Include(x => x.Sidekicks).AsNoTracking() : DbContext.Heroes.Include(x => x.Sidekicks);
+        var query = DbContext.Heroes.Include(x => x.Sidekicks).Include(x => x.Expansion);
+        return noTrack ? query.AsNoTracking() : query;
     }
 
     public Guid GetIdByName(string name)
@@ -28,6 +29,6 @@ public class HeroRepository(UnmatchedDbContext dbContext) : BaseRepository<Hero,
 
     public override async Task<IReadOnlyList<Hero>> GetAsync()
     {
-        return await DbContext.Set<Hero>().Include(x => x.Sidekicks).AsNoTracking().ToListAsync();
+        return await DbContext.Set<Hero>().Include(x => x.Sidekicks).Include(x => x.Expansion).AsNoTracking().ToListAsync();
     }
 }

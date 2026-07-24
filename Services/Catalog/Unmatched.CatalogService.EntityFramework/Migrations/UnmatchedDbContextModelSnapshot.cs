@@ -22,6 +22,30 @@ namespace Unmatched.EntityFramework.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Expansion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Publisher")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ReleaseYear")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Expansions");
+                });
+
             modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Hero", b =>
                 {
                     b.Property<Guid>("Id")
@@ -35,8 +59,14 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<int>("DeckSize")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("ExpansionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Hp")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsRanged")
                         .HasColumnType("bit");
@@ -47,6 +77,8 @@ namespace Unmatched.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExpansionId");
+
                     b.ToTable("Heroes");
                 });
 
@@ -56,11 +88,19 @@ namespace Unmatched.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ExpansionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExpansionId");
 
                     b.ToTable("Maps");
                 });
@@ -78,8 +118,14 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<int>("DeckSize")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("ExpansionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Hp")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsRanged")
                         .HasColumnType("bit");
@@ -89,6 +135,8 @@ namespace Unmatched.EntityFramework.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExpansionId");
 
                     b.ToTable("Minions");
                 });
@@ -164,8 +212,14 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<int>("DeckSize")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("ExpansionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Hp")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsRanged")
                         .HasColumnType("bit");
@@ -176,7 +230,39 @@ namespace Unmatched.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExpansionId");
+
                     b.ToTable("Villains");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Hero", b =>
+                {
+                    b.HasOne("Unmatched.CatalogService.Domain.Entities.Expansion", "Expansion")
+                        .WithMany("Heroes")
+                        .HasForeignKey("ExpansionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Expansion");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Map", b =>
+                {
+                    b.HasOne("Unmatched.CatalogService.Domain.Entities.Expansion", "Expansion")
+                        .WithMany("Maps")
+                        .HasForeignKey("ExpansionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Expansion");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Minion", b =>
+                {
+                    b.HasOne("Unmatched.CatalogService.Domain.Entities.Expansion", "Expansion")
+                        .WithMany("Minions")
+                        .HasForeignKey("ExpansionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Expansion");
                 });
 
             modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.PlayStyle", b =>
@@ -195,6 +281,27 @@ namespace Unmatched.EntityFramework.Migrations
                         .HasForeignKey("HeroId");
 
                     b.Navigation("Hero");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Villain", b =>
+                {
+                    b.HasOne("Unmatched.CatalogService.Domain.Entities.Expansion", "Expansion")
+                        .WithMany("Villains")
+                        .HasForeignKey("ExpansionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Expansion");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Expansion", b =>
+                {
+                    b.Navigation("Heroes");
+
+                    b.Navigation("Maps");
+
+                    b.Navigation("Minions");
+
+                    b.Navigation("Villains");
                 });
 
             modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.Hero", b =>

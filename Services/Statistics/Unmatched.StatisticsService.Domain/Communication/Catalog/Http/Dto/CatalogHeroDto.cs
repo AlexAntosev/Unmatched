@@ -17,4 +17,6 @@ public class CatalogHeroDto
     public string Color { get; set; }
 
     public IEnumerable<CatalogSidekickDto> Sidekicks { get; set; }
+
+    public string? ImageFileName { get; set; }
 }

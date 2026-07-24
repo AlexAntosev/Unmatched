@@ -12,6 +12,8 @@ public class MapStatsEntity
 
     public string Name { get; set; }
 
+    public string? ImageFileName { get; set; }
+
     public int TotalMatches { get; set; }
 
     public DateTime ModifiedAt { get; set; }

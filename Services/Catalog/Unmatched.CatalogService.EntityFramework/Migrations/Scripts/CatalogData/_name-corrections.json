@@ -1,0 +1,102 @@
+[
+  {
+    "entity": "Hero",
+    "currentName": "Sherlok Holmes",
+    "officialName": "Sherlock Holmes",
+    "source": "https://www.amazon.com/Restoration-Unmatched-Cobble-Fog/dp/B085NRHTYX (Unmatched: Cobble & Fog box listing)",
+    "verified": true
+  },
+  {
+    "entity": "Hero",
+    "currentName": "Robin hood",
+    "officialName": "Robin Hood",
+    "source": "https://restorationgames.com/shop/robin-hood-vs-bigfoot-unmatched/",
+    "verified": true
+  },
+  {
+    "entity": "Hero",
+    "currentName": "Jakyl and Hide",
+    "officialName": "Jekyll & Hyde",
+    "source": "https://www.the-unmatched.club/heroes/jekyll-hyde ; https://restorationgames.com (Unmatched: Cobble & Fog)",
+    "verified": true
+  },
+  {
+    "entity": "Hero",
+    "currentName": "Ghostrider",
+    "officialName": "Ghost Rider",
+    "source": "https://www.beastsofwar.com/board-games/marvel-heroes-are-joining-unmatched-this-month/ (Unmatched: Marvel Redemption Row)",
+    "verified": true
+  },
+  {
+    "entity": "Hero",
+    "currentName": "Ingen",
+    "officialName": "Robert Muldoon",
+    "source": "https://restorationgames.com/shop/jurassic-park-ingen-vs-raptors-unmatched/ ; https://gridbeast.gg/unmatched-robert-muldoon/ - the hero's printed name is 'Robert Muldoon' (InGen is the company/faction, not the character name)",
+    "verified": true
+  },
+  {
+    "entity": "Sidekick",
+    "currentName": "Ingen Workers",
+    "officialName": "InGen Workers",
+    "source": "https://restorationgames.com/shop/jurassic-park-ingen-vs-raptors-unmatched/ (capitalization only, per official box title 'InGen vs Raptors')",
+    "verified": true
+  },
+  {
+    "entity": "Hero",
+    "currentName": "Princess Yennenga",
+    "officialName": "Yennenga",
+    "source": "https://cdn.1j1ju.com/medias/84/1a/95-unmatched-battle-of-legends-volume-two-rulebook.pdf - official rulebook spells the hero 'YENNENGA', no 'Princess' prefix in the character name itself",
+    "verified": true
+  },
+  {
+    "entity": "Hero",
+    "currentName": "Sindbad",
+    "officialName": "Sinbad",
+    "source": "https://boardgamegeek.com/boardgame/274637/unmatched-battle-of-legends-volume-one (Battle of Legends Vol. 1 roster: King Arthur, Alice, Medusa, Sinbad)",
+    "verified": true
+  },
+  {
+    "entity": "Map",
+    "currentName": "Hells Kitchen",
+    "officialName": "Hell's Kitchen",
+    "source": "https://restorationgames.com/shop/marvel-hells-kitchen-unmatched/ (official product title uses the apostrophe)",
+    "verified": true
+  },
+  {
+    "entity": "Map",
+    "currentName": "Raptor paddock",
+    "officialName": "Raptor Paddock",
+    "source": "https://www.the-unmatched.club/maps/raptor-paddock (casing only)",
+    "verified": true
+  },
+  {
+    "entity": "Map",
+    "currentName": "T. Rex paddock",
+    "officialName": "T. Rex Paddock",
+    "source": "https://boardgamegeek.com/thread/2414350/clue-about-t-rex-hidden-in-ingen-vs-raptors-manual (casing only, matches sibling 'Raptor Paddock')",
+    "verified": true
+  },
+  {
+    "entity": "Map",
+    "currentName": "Green forest",
+    "officialName": null,
+    "source": "https://unmatched.fandom.com/wiki/Robin_Hood_vs_Bigfoot - the actual Robin Hood vs. Bigfoot box maps are 'Sherwood Forest' and 'Yukon', not 'Green forest'/'Golden forest'. These two DB entries do not match any known official Unmatched map name found so far - likely stand-in/placeholder names invented at data-entry time rather than typos of a real name.",
+    "verified": false,
+    "note": "NOT applied by the migration. Needs a human decision: rename to 'Sherwood Forest'/'Yukon' (best guess, unverified pairing) or investigate further before touching. Do not auto-correct."
+  },
+  {
+    "entity": "Map",
+    "currentName": "Golden forest",
+    "officialName": null,
+    "source": "same as 'Green forest' above",
+    "verified": false,
+    "note": "NOT applied by the migration. See 'Green forest' note."
+  },
+  {
+    "entity": "Villain",
+    "currentName": "Martain Invader",
+    "officialName": "Martian Invader",
+    "source": "https://gridbeast.gg/unmatched-adventures-tales-to-amaze-2/ (fan card database, consistently 'Martian Invader', never 'Alien'); https://officialgamerules.org/game-rules/unmatched-adventures-tales-to-amaze/ (same). One page (restorationgames.com product description) used 'Alien Invader' as descriptive prose, not the printed name - treated as lower authority than the two sources that consistently use the exact card name. User confirmed (2026-07-24) this is the Martian villain from 'Unmatched Adventures: Tales to Amaze' and that it's a typo ('Martain' -> transposed letters).",
+    "verified": true
+  }
+]

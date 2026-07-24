@@ -13,4 +13,10 @@ public class VillainDto
     public bool IsRanged { get; set; }
 
     public string Name { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public string? ExpansionName { get; set; }
+
+    public string? ImageFileName { get; set; }
 }
