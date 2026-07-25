@@ -11,7 +11,7 @@
         <div class="image-container">
             @if (Statistics.Minion is not null)
             {
-                <img src="@Statistics.Minion.ImageUrl"/>
+                <img src="@Statistics.Minion.ImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
             }
         </div>
         <div>

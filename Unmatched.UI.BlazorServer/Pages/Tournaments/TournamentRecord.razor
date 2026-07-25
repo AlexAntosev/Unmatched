@@ -11,7 +11,7 @@
             <div>
                 @{
                     <div class="image">
-                        <img src="@Match.Fighters.First().HeroImageUrl" alt="@Match.Fighters.First().Hero.Id" width="100%" height="auto"/>
+                        <img src="@Match.Fighters.First().HeroImageUrl" alt="@Match.Fighters.First().Hero.Id" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
                     </div>
                 }
             </div>
@@ -29,7 +29,7 @@
             <div>
                 @{
                     <div class="image">
-                        <img src="@Match.Fighters.Last().HeroImageUrl" alt="@Match.Fighters.Last().Hero.Id" width="100%" height="auto"/>
+                        <img src="@Match.Fighters.Last().HeroImageUrl" alt="@Match.Fighters.Last().Hero.Id" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
                     </div>
                 }
             </div>
@@ -45,7 +45,7 @@
         </div>
         <div class="map">
             <div></div>
-            <div class="fighter_name">@Match.Map.Name - @Match.Date.ToShortDateString()</div>
+            <div class="fighter_name">@Match.Map.DisplayName - @Match.Date.ToShortDateString()</div>
             <div></div>
         </div>
     </div>

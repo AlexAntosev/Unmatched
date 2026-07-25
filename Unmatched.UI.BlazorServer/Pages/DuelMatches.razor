@@ -6,6 +6,7 @@
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
 @inject IMatchService MatchService
+@inject IMapService MapService
 
 <SfGrid DataSource="@GridData" AllowPaging="true" AllowSorting="true" AllowResizing="true">
     <GridPageSettings PageSize="@PageSize"></GridPageSettings>
@@ -71,49 +72,57 @@
 
 @code {
     private List<UiMatchLogDto> _matchLogEntries = new();
-    
+    private Dictionary<string, string> _mapDisplayNames = new();
+
     [Parameter]
-    public List<UiMatchLogDto> MatchLogEntries
-    {
-        get => _matchLogEntries;
-        set
-        {
-            _matchLogEntries = value;
-            GridData = _matchLogEntries.Select(e =>
-                {
-                    dynamic d = new ExpandoObject();
-                    d.Date = e.Date;
-                    d.MatchId = e.MatchId;
-                    d.Tournament = e.TournamentName;
-                    d.Map = e.MapName;
-                    d.Epic = e.Epic ?? 0;
-                    var fighter = e.Fighters.First();
-                    d.FighterPlayerImageUrl = fighter.PlayerImageUrl;
-                    d.FighterHero = fighter.Hero.Name;
-                    d.FighterHp = $"{fighter.HpLeft}{(fighter.Hero.Sidekicks.Any() && fighter.SidekickHpLeft is not null ? $" ({fighter.SidekickHpLeft})" : "")}";
-                    d.FighterCardsLeft = fighter.CardsLeft;
-                    d.FighterActionsMade = fighter.ActionsMade;
-                    d.FighterTimeSpent = fighter.TimeSpentInSeconds;
-                    d.FighterPoints = fighter.MatchPoints;
-                    d.IsFighterWinner = fighter.IsWinner;
-                    var opponent = e.Fighters.Last();
-                    d.OpponentPlayerImageUrl = opponent.PlayerImageUrl;
-                    d.OpponentHero = opponent.Hero.Name;
-                    d.OpponentHp = $"{opponent.HpLeft}{(opponent.Hero.Sidekicks.Any() && opponent.SidekickHpLeft is not null ? $" ({opponent.SidekickHpLeft})" : "")}";
-                    d.OpponentCardsLeft = opponent.CardsLeft;
-                    d.OpponentActionsMade = opponent.ActionsMade;
-                    d.OpponentTimeSpent = opponent.TimeSpentInSeconds;
-                    d.OpponentPoints = opponent.MatchPoints;
-                    d.IsOpponentWinner = opponent.IsWinner;
-                    d.Comment = e.Comment;
-                    return d;
-                }).Cast<ExpandoObject>().ToList();
-        } }
+    public List<UiMatchLogDto> MatchLogEntries { get; set; } = new();
 
     [Parameter]
     public int PageSize { get; set; } = 20;
 
     private List<ExpandoObject> GridData { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var maps = await MapService.GetAsync();
+        _mapDisplayNames = maps
+            .GroupBy(m => m.Name)
+            .ToDictionary(g => g.Key, g => g.First().DisplayName);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _matchLogEntries = MatchLogEntries;
+        GridData = _matchLogEntries.Select(e =>
+            {
+                dynamic d = new ExpandoObject();
+                d.Date = e.Date;
+                d.MatchId = e.MatchId;
+                d.Tournament = e.TournamentName;
+                d.Map = _mapDisplayNames.GetValueOrDefault(e.MapName, e.MapName);
+                d.Epic = e.Epic ?? 0;
+                var fighter = e.Fighters.First();
+                d.FighterPlayerImageUrl = fighter.PlayerImageUrl;
+                d.FighterHero = fighter.Hero.Name;
+                d.FighterHp = $"{fighter.HpLeft}{(fighter.Hero.Sidekicks.Any() && fighter.SidekickHpLeft is not null ? $" ({fighter.SidekickHpLeft})" : "")}";
+                d.FighterCardsLeft = fighter.CardsLeft;
+                d.FighterActionsMade = fighter.ActionsMade;
+                d.FighterTimeSpent = fighter.TimeSpentInSeconds;
+                d.FighterPoints = fighter.MatchPoints;
+                d.IsFighterWinner = fighter.IsWinner;
+                var opponent = e.Fighters.Last();
+                d.OpponentPlayerImageUrl = opponent.PlayerImageUrl;
+                d.OpponentHero = opponent.Hero.Name;
+                d.OpponentHp = $"{opponent.HpLeft}{(opponent.Hero.Sidekicks.Any() && opponent.SidekickHpLeft is not null ? $" ({opponent.SidekickHpLeft})" : "")}";
+                d.OpponentCardsLeft = opponent.CardsLeft;
+                d.OpponentActionsMade = opponent.ActionsMade;
+                d.OpponentTimeSpent = opponent.TimeSpentInSeconds;
+                d.OpponentPoints = opponent.MatchPoints;
+                d.IsOpponentWinner = opponent.IsWinner;
+                d.Comment = e.Comment;
+                return d;
+            }).Cast<ExpandoObject>().ToList();
+    }
 
     private void CustomizeCell(QueryCellInfoEventArgs<ExpandoObject> args)
     {

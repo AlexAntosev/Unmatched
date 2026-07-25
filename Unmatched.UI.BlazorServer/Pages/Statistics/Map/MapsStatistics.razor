@@ -3,8 +3,11 @@
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Statistics
 @using Unmatched.Services.Statistics
+@using Unmatched.Services.Contracts
 @inject NavigationManager NavManager
 @inject IMapStatisticsService MapStatisticsService
+@inject IMapService MapService
+@inject ICollectionService CollectionService
 
 <div class="page-content">
     <h1 class="page-title">Maps Statistics</h1>
@@ -29,11 +32,39 @@
         {
             PreloadService.Show();
             _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.Name).ToList();
+
+            var catalogMaps = (await MapService.GetAsync()).ToDictionary(m => m.Id);
+            ApplyDisplayNames(catalogMaps);
+            await FilterByCollectionAsync(catalogMaps);
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    private void ApplyDisplayNames(Dictionary<Guid, MapDto> catalogMaps)
+    {
+        foreach (var map in _maps)
+        {
+            if (catalogMaps.TryGetValue(map.MapId, out var catalogMap))
+            {
+                map.Name = catalogMap.DisplayName;
+            }
+        }
+    }
+
+    private async Task FilterByCollectionAsync(Dictionary<Guid, MapDto> catalogMaps)
+    {
+        var ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
+        if (ownedExpansionIds.Count == 0)
+        {
+            return;
+        }
+
+        _maps = _maps
+            .Where(m => !catalogMaps.TryGetValue(m.MapId, out var catalogMap) || catalogMap.ExpansionId is null || ownedExpansionIds.Contains(catalogMap.ExpansionId.Value))
+            .ToList();
     }
 
     private void RecordClickHandler(RecordClickEventArgs<UiMapStatisticsDto> args)

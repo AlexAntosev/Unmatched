@@ -18,6 +18,10 @@ public class UiHeroDto
 
     public string? ImageFileName { get; set; }
 
+    public Guid? ExpansionId { get; set; }
+
+    public string? ExpansionName { get; set; }
+
     public string ImageUrl => ImageFileName != null ? $"/images/heroes/{ImageFileName}" : "/Unknown.png";
 
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";

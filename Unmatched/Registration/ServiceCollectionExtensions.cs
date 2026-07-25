@@ -28,6 +28,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();
         services.AddTransient<ITournamentService, TournamentService>();
+        services.AddTransient<IExpansionService, ExpansionService>();
+        services.AddTransient<ICollectionService, CollectionService>();
 
 
         services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();

@@ -13,7 +13,7 @@
     <fieldset class="wrapper" style="@WinnerStyle()">
         <legend class="title">@Title</legend>
         <img class="image" src="@Fighter.PlayerImageUrl"/>
-        <img class="image" src="@Fighter.HeroImageUrl"/>
+        <img class="image" src="@Fighter.HeroImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
         <div>
             <label for="players">Player:</label>
             <InputSelect 

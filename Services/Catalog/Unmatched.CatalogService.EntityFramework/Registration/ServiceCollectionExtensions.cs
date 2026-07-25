@@ -25,5 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMinionRepository, MinionRepository>();
         services.AddTransient<IVillainRepository, VillainRepository>();
         services.AddTransient<IPlayStyleRepository, PlayStyleRepository>();
+        services.AddTransient<IExpansionRepository, ExpansionRepository>();
+        services.AddTransient<IOwnedExpansionRepository, OwnedExpansionRepository>();
     }
 }

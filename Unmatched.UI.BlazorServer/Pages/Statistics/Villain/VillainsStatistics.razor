@@ -23,7 +23,7 @@
                     @{
                         var villain = context as VillainStatisticsDto;
                         <div class="image">
-                            <img src="@villain?.Villain.ImageUrl" alt="@villain.VillainId" width="100%" height="auto"/>
+                            <img src="@villain?.Villain.ImageUrl" alt="@villain.VillainId" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
                         </div>
                     }
                 </Template>

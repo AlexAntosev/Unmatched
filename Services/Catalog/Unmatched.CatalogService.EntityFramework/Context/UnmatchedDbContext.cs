@@ -53,11 +53,23 @@ public class UnmatchedDbContext : DbContext
 
     public DbSet<Expansion> Expansions { get; set; }
 
+    public DbSet<OwnedExpansion> OwnedExpansions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Expansion>()
             .HasIndex(e => e.Name)
             .IsUnique();
+
+        modelBuilder.Entity<OwnedExpansion>()
+            .HasIndex(o => o.ExpansionId)
+            .IsUnique();
+
+        modelBuilder.Entity<OwnedExpansion>()
+            .HasOne(o => o.Expansion)
+            .WithMany()
+            .HasForeignKey(o => o.ExpansionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Hero>()
             .HasOne(h => h.Expansion)

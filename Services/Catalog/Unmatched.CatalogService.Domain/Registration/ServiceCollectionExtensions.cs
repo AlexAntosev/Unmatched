@@ -20,5 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMapService, MapService>();
         services.AddTransient<ISidekickService, SidekickService>();
         services.AddTransient<IPlayStyleService, PlayStyleService>();
+        services.AddTransient<IExpansionService, ExpansionService>();
+        services.AddTransient<IOwnedExpansionService, OwnedExpansionService>();
     }
 }

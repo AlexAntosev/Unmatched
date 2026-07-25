@@ -1,0 +1,83 @@
+@page "/collection"
+@using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@inject IExpansionService ExpansionService
+@inject ICollectionService CollectionService
+
+<div class="page-content">
+    <h1 class="page-title">Collection</h1>
+    <p>Select the expansions you own. Heroes and Maps from unselected expansions will be hidden when creating a match and in statistics.</p>
+
+    @foreach (var expansion in _expansions)
+    {
+        <div style="margin-bottom: 10px;">
+            <input type="checkbox" checked="@_ownedIds.Contains(expansion.Id)"
+                   @onchange="@(e => OwnedChanged(expansion.Id, (bool)e.Value!))"
+                   id="@expansion.Id" class="form-check-input"/>
+            <label for="@expansion.Id">@expansion.Name @(expansion.ReleaseYear is not null ? $"({expansion.ReleaseYear})" : "")</label>
+            @if (expansion.HeroNames.Any() || expansion.Maps.Any())
+            {
+                <div style="margin-left: 24px; opacity: 0.75; font-size: 0.9em;">
+                    @if (expansion.HeroNames.Any())
+                    {
+                        <div>Heroes: @string.Join(", ", expansion.HeroNames)</div>
+                    }
+                    @if (expansion.Maps.Any())
+                    {
+                        <div>Maps: @string.Join(", ", expansion.Maps.Select(m => m.DisplayName))</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <p></p>
+    <button class="btn btn-primary" @onclick="OnSaveClick">Save</button>
+</div>
+
+@code {
+    private List<ExpansionDto> _expansions = new();
+    private HashSet<Guid> _ownedIds = new();
+
+    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PreloadService.Show();
+
+            _expansions = (await ExpansionService.GetAsync()).OrderBy(x => x.Name).ToList();
+            _ownedIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private void OwnedChanged(Guid expansionId, bool isOwned)
+    {
+        if (isOwned)
+        {
+            _ownedIds.Add(expansionId);
+        }
+        else
+        {
+            _ownedIds.Remove(expansionId);
+        }
+    }
+
+    private async Task OnSaveClick()
+    {
+        try
+        {
+            PreloadService.Show();
+            await CollectionService.SetOwnedExpansionIdsAsync(_ownedIds);
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+}

@@ -17,7 +17,11 @@ public class UnitOfWork(UnmatchedDbContext context) : IUnitOfWork
 
     public IPlayStyleRepository PlayStyles { get; } = new PlayStyleRepository(context);
 
-    public Task SaveChangesAsync() 
+    public IExpansionRepository Expansions { get; } = new ExpansionRepository(context);
+
+    public IOwnedExpansionRepository OwnedExpansions { get; } = new OwnedExpansionRepository(context);
+
+    public Task SaveChangesAsync()
         => context.SaveChangesAsync();
 
     public void Dispose() 

@@ -14,4 +14,5 @@ public class Urls
     public const string Titles = "/titles";
     public const string Tournaments = "/tournaments";
     public const string Initialize = "/initialize";
+    public const string Collection = "/collection";
 }
