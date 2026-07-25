@@ -2,9 +2,12 @@
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
+@using Unmatched.Services.Contracts
 @using Unmatched.Constants
 @inject NavigationManager NavManager
 @inject IHeroStatisticsService HeroStatisticsService
+@inject IHeroService HeroService
+@inject ICollectionService CollectionService
 
 <div class="page-content">
     <h1 class="page-title">Heroes Statistics</h1>
@@ -60,11 +63,27 @@
         {
             PreloadService.Show();
             _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.Place).ToList();
+            await FilterByCollectionAsync();
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    private async Task FilterByCollectionAsync()
+    {
+        var ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
+        if (ownedExpansionIds.Count == 0)
+        {
+            return;
+        }
+
+        var heroExpansionIds = (await HeroService.GetAsync()).ToDictionary(h => h.Id, h => h.ExpansionId);
+
+        _heroes = _heroes
+            .Where(h => !heroExpansionIds.TryGetValue(h.HeroId, out var expansionId) || expansionId is null || ownedExpansionIds.Contains(expansionId.Value))
+            .ToList();
     }
 
     private void RecordClickHandler(RecordClickEventArgs<UiHeroStatisticsDto> args)

@@ -20,4 +20,8 @@ public class CatalogHeroDto
     public IEnumerable<CatalogSidekickDto> Sidekicks { get; set; }
 
     public string? ImageFileName { get; set; }
+
+    public Guid? ExpansionId { get; set; }
+
+    public string? ExpansionName { get; set; }
 }

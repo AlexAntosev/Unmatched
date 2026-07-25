@@ -6,6 +6,8 @@ public class MapDto
 
     public string Name { get; set; }
 
+    public string? OfficialName { get; set; }
+
     public Guid? ExpansionId { get; set; }
 
     public string? ExpansionName { get; set; }

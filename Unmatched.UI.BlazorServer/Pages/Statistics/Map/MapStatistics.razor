@@ -4,7 +4,9 @@
 @using Unmatched.Dtos.Match
 @using Unmatched.Dtos.Statistics
 @using Unmatched.Services.Statistics
+@using Unmatched.Services.Contracts
 @inject IMapStatisticsService MapStatisticsService
+@inject IMapService MapService
 
 <div class="page-content">
     <h3 align="center" class="page-title">@Statistics.Name</h3>
@@ -32,6 +34,12 @@
             PreloadService.Show();
             var mapId = Guid.Parse(Id);
             Statistics = await MapStatisticsService.GetMapStatisticsAsync(mapId);
+
+            var catalogMap = (await MapService.GetAsync()).FirstOrDefault(m => m.Id == mapId);
+            if (catalogMap is not null)
+            {
+                Statistics.Name = catalogMap.DisplayName;
+            }
             _matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToList();
             foreach (var matchLogEntry in _matchLogEntries)
             {

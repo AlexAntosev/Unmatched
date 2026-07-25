@@ -52,4 +52,25 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<CatalogPlayStyleDto>();
     }
+
+    public async Task<IEnumerable<CatalogExpansionDto>> GetExpansionsAsync()
+    {
+        var response = await httpClient.GetAsync("/expansion");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogExpansionDto>>();
+    }
+
+    public async Task<IEnumerable<Guid>> GetOwnedExpansionIdsAsync()
+    {
+        var response = await httpClient.GetAsync("/collection");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<Guid>>();
+    }
+
+    public async Task SetOwnedExpansionIdsAsync(IEnumerable<Guid> expansionIds)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(expansionIds), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync("/collection", content);
+        response.EnsureSuccessStatusCode();
+    }
 }

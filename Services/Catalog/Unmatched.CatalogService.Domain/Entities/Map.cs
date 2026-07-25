@@ -9,6 +9,8 @@ public class Map
 
     public string Name { get; set; }
 
+    public string? OfficialName { get; set; }
+
     public Guid? ExpansionId { get; set; }
 
     public virtual Expansion? Expansion { get; set; }

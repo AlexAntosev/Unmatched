@@ -98,6 +98,9 @@ namespace Unmatched.EntityFramework.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OfficialName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ExpansionId");
@@ -139,6 +142,23 @@ namespace Unmatched.EntityFramework.Migrations
                     b.HasIndex("ExpansionId");
 
                     b.ToTable("Minions");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.OwnedExpansion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ExpansionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpansionId")
+                        .IsUnique();
+
+                    b.ToTable("OwnedExpansions");
                 });
 
             modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.PlayStyle", b =>
@@ -261,6 +281,17 @@ namespace Unmatched.EntityFramework.Migrations
                         .WithMany("Minions")
                         .HasForeignKey("ExpansionId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Expansion");
+                });
+
+            modelBuilder.Entity("Unmatched.CatalogService.Domain.Entities.OwnedExpansion", b =>
+                {
+                    b.HasOne("Unmatched.CatalogService.Domain.Entities.Expansion", "Expansion")
+                        .WithMany()
+                        .HasForeignKey("ExpansionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Expansion");
                 });

@@ -15,4 +15,10 @@ public interface ICatalogClient
     Task<Guid> UpdatePlayStyleAsync(CatalogPlayStyleDto playStyle);
 
     Task<CatalogPlayStyleDto> GetPlayStyleByHero(Guid heroId);
+
+    Task<IEnumerable<CatalogExpansionDto>> GetExpansionsAsync();
+
+    Task<IEnumerable<Guid>> GetOwnedExpansionIdsAsync();
+
+    Task SetOwnedExpansionIdsAsync(IEnumerable<Guid> expansionIds);
 }

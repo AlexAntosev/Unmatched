@@ -2,7 +2,7 @@
 
 ## Overview
 
-.NET 9 microservices backend + Angular 19 (primary UI) and Blazor Server (secondary UI).
+.NET 9 microservices backend + Angular 19 and Blazor Server frontends.
 
 - `Services/{Catalog,Match,Player,Statistics}` — one microservice per bounded context, each split into
   `*.Api` (controllers, composition root) / `*.Contracts` (DTOs shared across process boundaries) /
@@ -11,8 +11,12 @@
 - `Unmatched` — shared client library (HttpClients, Dtos, Mapping, Extensions) consumed by the UIs.
 - `Unmatched.Initializer` — startup/seed/migration jobs.
 - `Shared/Unmatched.Common.EntityFramework` — cross-service EF Core building blocks.
-- `Unmatched.UI.Angular` — primary frontend (Angular 19, Angular Material, Karma/Jasmine).
-- `Unmatched.UI.BlazorServer` — secondary frontend.
+- `Unmatched.UI.BlazorServer` — the currently functional/actively-used UI (match creation, statistics,
+  collection). Build new UI-facing features here for now.
+- `Unmatched.UI.Angular` — intended future primary frontend (Angular 19, Angular Material,
+  Karma/Jasmine), but currently incomplete: match creation is an unwired stepper stub with no working
+  Hero/Map selection, and there's no Maps pipeline through `Unmatched.Api` at all. Will replace Blazor
+  once built out — don't assume feature parity with Blazor today.
 - Kafka (via `docker-compose.yml`, services `kafka`/`zookeeper`/`kafka-ui`) for async/event communication between services.
 
 Run everything with `docker-compose.yml` or `build_and_run.bat`.

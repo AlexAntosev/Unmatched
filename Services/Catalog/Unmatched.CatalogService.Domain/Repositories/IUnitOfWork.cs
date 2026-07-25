@@ -16,8 +16,12 @@ public interface IUnitOfWork : IDisposable
     ISidekickRepository Sidekicks { get; }
     
     IVillainRepository Villains { get; }
-    
+
     IPlayStyleRepository PlayStyles { get; }
-    
+
+    IExpansionRepository Expansions { get; }
+
+    IOwnedExpansionRepository OwnedExpansions { get; }
+
     Task SaveChangesAsync();
 }
