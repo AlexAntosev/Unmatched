@@ -26,7 +26,7 @@
                     @{
                         var hero = context as UiHeroStatisticsDto;
                         <div class="image">
-                            <img src="@hero?.ImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
+                            <img src="@hero?.ImageUrl" alt="@hero.HeroId" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
                         </div>
                     }
                 </Template>

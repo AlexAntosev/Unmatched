@@ -11,7 +11,7 @@
         <div class="image-container">
             @if (Statistics.Villain is not null)
             {
-                <img src="@Statistics.Villain.ImageUrl"/>
+                <img src="@Statistics.Villain.ImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
             }
         </div>
         <div>

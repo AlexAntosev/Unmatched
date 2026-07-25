@@ -23,7 +23,7 @@
                     @{
                         var minion = context as MinionStatisticsDto;
                         <div class="image">
-                            <img src="@minion?.Minion.ImageUrl" alt="@minion.MinionId" width="100%" height="auto"/>
+                            <img src="@minion?.Minion.ImageUrl" alt="@minion.MinionId" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
                         </div>
                     }
                 </Template>
