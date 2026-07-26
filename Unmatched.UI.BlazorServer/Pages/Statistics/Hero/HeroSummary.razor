@@ -1,52 +1,53 @@
-﻿@using Unmatched.Dtos
+@using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Services
+@using Unmatched.UI.BlazorServer.Shared.Statistics
 @inject IPlayStyleService PlayStyleService
 @inject IHeroService HeroService
 @inject IHeroStatisticsService HeroStatisticsService
 @inject IImageUploadService ImageUploadService
 
-<div style="background: linear-gradient(180deg, @Statistics.Color 0%, rgba(255,255,255,1) 100%);">
-    <div style="display: flex; align-items: center; justify-content: center;" >
-        <h3 class="page-title">@Statistics.Name</h3>
-        <button style="background-color: transparent; border: 0px" onclick="@UpdateHeroColor">✎</button>
+<EntityDetailHeader Name="@Statistics.Name" Color="@Statistics.Color" ImageUrl="@BustCache(_statistics.ImageUrl)" OnFileSelected="OnImageSelectedAsync">
+    <TitleExtra>
         <input type="color" value="@Statistics.Color" onchange="@OnColorChange"/>
-    </div>
-    <div class="wrapper page-content">
-        <div class="image-container">
-            <EditableImage ImageUrl="@BustCache(_statistics.ImageUrl)" AltText="@_statistics.Name" OnFileSelected="OnImageSelectedAsync" />
+    </TitleExtra>
+    <ExtraContent>
+        <div class="hero-summary-columns">
+            <div>
+                <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
+                    <StatCard Value="@_statistics.Place.ToString()" Label="Place"/>
+                    <StatCard Value="@_statistics.Points.ToString()" Label="Points"/>
+                    <StatCard Value="@_statistics.Hp.ToString()" Label="Hp"/>
+                    <StatCard Value="@_statistics.DeckSize.ToString()" Label="Deck size"/>
+                </div>
+                <img style="margin-bottom: 0.5rem;" src="@_statistics.MeleeRangeImageUrl" alt="@_statistics.HeroId" height="48" width="auto"/>
+                <h5>Titles: @ShowTitles()</h5>
+            </div>
+            <div>
+                @if (IsAnySidekick())
+                {
+                    var sidekick = _statistics.Sidekicks.First();
+                    <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
+                    <img style="margin-bottom: 0.5rem;" src="@sidekick.MeleeRangeImageUrl" alt="@sidekick.Id" height="48" width="auto"/>
+                    <StatCard Value="@sidekick.Hp.ToString()" Label="@($"{_sidekickTitle} Hp")"/>
+                }
+            </div>
+            <div>
+                @if (_statistics.PlayStyle is not null)
+                {
+                    var playStyle = _statistics.PlayStyle;
+
+                    <h5>Attack: <Epic Rating="@playStyle.Attack" Max="3" RatingChanged="@((int rate) => PlayStyleAttackChanged(rate, playStyle))"/></h5>
+                    <h5>Defence: <Epic Rating="@playStyle.Defence" Max="3" RatingChanged="@((int rate) => PlayStyleDefenceChanged(rate, playStyle))"/></h5>
+                    <h5>Trickery: <Epic Rating="@playStyle.Trickery" Max="3" RatingChanged="@((int rate) => PlayStyleTrickeryChanged(rate, playStyle))"/></h5>
+                    <h5>Difficulty: <Epic Rating="@playStyle.Difficulty" Max="3" RatingChanged="@((int rate) => PlayStyleDifficultyChanged(rate, playStyle))"/></h5>
+                }
+            </div>
         </div>
-        <div>
-            <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
-            <img style="margin-bottom: 0.5rem;" src="@_statistics.MeleeRangeImageUrl" alt="@_statistics.HeroId" width="64px" height="auto"/>
-            <h5>Hp: @_statistics.Hp</h5>
-            <h5>Deck size: @_statistics.DeckSize</h5>
-            <h5>Titles: @ShowTitles() </h5>
-        </div>
-        <div>
-            @if (IsAnySidekick())
-            {
-                var sidekick = _statistics.Sidekicks.First();
-                <h5>@_sidekickTitle: @sidekick.Name @_sidekicksSuffix</h5>
-                <img style="margin-bottom: 0.5rem;" src="@sidekick.MeleeRangeImageUrl" alt="@sidekick.Id" width="64px" height="auto"/>
-                <h5>@_sidekickTitle Hp: @sidekick.Hp</h5>
-            }
-        </div>
-        <div>
-            @if (_statistics.PlayStyle is not null)
-            {
-                var playStyle = _statistics.PlayStyle;
-                
-                <h5>Attack: <Epic Rating="@playStyle.Attack" Max="3" RatingChanged="@((int rate) => PlayStyleAttackChanged(rate, playStyle))" /></h5>
-                <h5>Defence: <Epic Rating="@playStyle.Defence" Max="3" RatingChanged="@((int rate) => PlayStyleDefenceChanged(rate, playStyle))"/></h5>
-                <h5>Trickery: <Epic Rating="@playStyle.Trickery" Max="3" RatingChanged="@((int rate) => PlayStyleTrickeryChanged(rate, playStyle))"/></h5>
-                <h5>Difficulty: <Epic Rating="@playStyle.Difficulty" Max="3" RatingChanged="@((int rate) => PlayStyleDifficultyChanged(rate, playStyle))"/></h5>
-            }
-        </div>
-    </div>
-</div>
+    </ExtraContent>
+</EntityDetailHeader>
 
 @code {
     [Parameter]
@@ -68,7 +69,7 @@
             }
         }
     }
-    
+
     private UiHeroStatisticsDto _statistics = new();
     private string? _sidekickTitle;
     private string? _sidekicksSuffix;
@@ -106,54 +107,28 @@
     {
         _statistics.Color = e.Value?.ToString();
     }
-    
-    private void UpdateHeroColor()
-    {
-        var color = _statistics.Color;
-    }
-    
+
     private async Task PlayStyleAttackChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Attack = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
-    
+
     private async Task PlayStyleDefenceChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Defence = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
-    
+
     private async Task PlayStyleTrickeryChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Trickery = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
-    
+
     private async Task PlayStyleDifficultyChanged(int rate, UiPlayStyleDto playStyle)
     {
         playStyle.Difficulty = rate;
         await PlayStyleService.AddOrUpdateAsync(_statistics.HeroId, playStyle);
     }
 }
-
-<style>
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      column-gap: 32px;
-      row-gap: 4px;
-    }
-    
-    .image-container {
-        width: 250px;
-        height: 200px;
-        text-align: center;
-        display: block;
-    }
-    
-    .container img {
-        margin: auto;
-        display: block;
-    }             
-</style>

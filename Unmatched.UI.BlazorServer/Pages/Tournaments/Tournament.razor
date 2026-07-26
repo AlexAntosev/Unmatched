@@ -6,6 +6,7 @@
 @using Unmatched.Enums
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
 
@@ -24,7 +25,7 @@
     }
     else
     {
-        <DuelMatches MatchLogEntries="LeagueMatches"></DuelMatches>
+        <MatchLogGrid MatchLogEntries="LeagueMatches"></MatchLogGrid>
     }
 </div>
 

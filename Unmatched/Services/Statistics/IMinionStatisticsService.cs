@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.Statistics;
 
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public interface IMinionStatisticsService
 {
@@ -9,4 +10,6 @@ public interface IMinionStatisticsService
     Task<MinionStatisticsDto> GetMinionStatisticsAsync(Guid minionId);
 
     Task<string> UpdateImageAsync(Guid minionId, string imageFileName);
+
+    Task<IEnumerable<UiMatchLogDto>> GetMinionMatchesAsync(Guid minionId);
 }

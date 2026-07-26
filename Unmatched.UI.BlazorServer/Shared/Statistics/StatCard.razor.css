@@ -1,0 +1,39 @@
+.stat-card {
+    background-color: var(--um-surface-raised);
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    padding: var(--um-space-3) var(--um-space-4);
+    min-width: 96px;
+    text-align: center;
+    border-top: 3px solid var(--um-border);
+}
+
+.stat-card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.stat-card-label {
+    font-size: 0.75rem;
+    color: var(--um-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: var(--um-space-1);
+}
+
+.stat-card-win {
+    border-top-color: var(--um-winner);
+}
+
+.stat-card-win .stat-card-value {
+    color: var(--um-winner);
+}
+
+.stat-card-loss {
+    border-top-color: var(--um-looser);
+}
+
+.stat-card-loss .stat-card-value {
+    color: var(--um-looser);
+}

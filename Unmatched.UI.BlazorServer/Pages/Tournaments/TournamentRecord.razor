@@ -79,20 +79,24 @@
     .match-main {
         height: 116px;
         width: 255px;
-        border: 2px solid black;
+        border: 2px solid var(--um-border);
+        border-radius: var(--um-radius-sm);
         margin: 4px;
-        background-color: #d3d3d4;
+        background-color: var(--um-surface-raised);
+        overflow: hidden;
     }
     .fighter {
-        border: 1px solid black;
-        background-color: #d3d3d4;
+        border: 1px solid var(--um-border);
+        background-color: var(--um-surface-raised);
+        color: var(--um-text);
         display: grid;
         grid-template-columns: 35px 35px 150px 15px;
         padding: 2px;
     }
     .map {
-        border: 1px solid black;
-        background-color: #d3d3d4;
+        border: 1px solid var(--um-border);
+        background-color: var(--um-surface-raised);
+        color: var(--um-text-muted);
         display: grid;
         padding: 2px;
     }

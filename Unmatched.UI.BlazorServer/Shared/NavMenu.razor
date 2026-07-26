@@ -10,65 +10,74 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <RatingRecalculationWarning/>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" @onclick="()=>expandStatisticsSubNav = !expandStatisticsSubNav">
-                <span class="oi oi-bar-chart" aria-hidden="true"></span> Statistics
+        <NavSubMenu Title="Statistics" IconClass="bi bi-bar-chart-line">
+            <NavLink class="nav-link" href="@Urls.HeroesStatistics">
+                <span class="bi bi-shield" aria-hidden="true"></span> Heroes
             </NavLink>
-            @if (expandStatisticsSubNav)
-            {
-                <NavLink class="nav-link" href="@Urls.HeroesStatistics">
-                    <span class="oi oi-shield" aria-hidden="false"></span> Heroes
-                </NavLink>
-                <NavLink class="nav-link" href="@Urls.PlayersStatistics">
-                    <span class="oi oi-people" aria-hidden="true"></span> Players
-                </NavLink>
-                <NavLink class="nav-link" href="@Urls.MapsStatistics">
-                    <span class="oi oi-map" aria-hidden="true"></span> Maps
-                </NavLink>
-                <NavLink class="nav-link" href="@Urls.MinionsStatistics">
-                    <span class="oi oi-bug" aria-hidden="true"></span> Minions
-                </NavLink>
-                <NavLink class="nav-link" href="@Urls.VillainsStatistics">
-                    <span class="oi oi-eye" aria-hidden="true"></span> Villains
-                </NavLink>
-            }
-        </div>
+            <NavLink class="nav-link" href="@Urls.PlayersStatistics">
+                <span class="bi bi-people" aria-hidden="true"></span> Players
+            </NavLink>
+            <NavLink class="nav-link" href="@Urls.MapsStatistics">
+                <span class="bi bi-map" aria-hidden="true"></span> Maps
+            </NavLink>
+            <NavLink class="nav-link" href="@Urls.MinionsStatistics">
+                <span class="bi bi-bug" aria-hidden="true"></span> Minions
+            </NavLink>
+            <NavLink class="nav-link" href="@Urls.VillainsStatistics">
+                <span class="bi bi-eye" aria-hidden="true"></span> Villains
+            </NavLink>
+        </NavSubMenu>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="@Urls.Collection">
-                <span class="oi oi-box" aria-hidden="true"></span> Collection
+                <span class="bi bi-box-seam" aria-hidden="true"></span> Collection
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="@Urls.AddMatch">
-                <span class="oi oi-plus" aria-hidden="true"></span> Add match
+                <span class="bi bi-plus-circle" aria-hidden="true"></span> Add match
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="@Urls.DuelMatchLog">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Duel Match log
+        <NavSubMenu Title="Match Log" IconClass="bi bi-list-ul">
+            <NavLink class="nav-link" href="@Urls.MatchLog" Match="NavLinkMatch.All">
+                <span class="bi bi-collection" aria-hidden="true"></span> All
             </NavLink>
-        </div>
+            <NavLink class="nav-link" href="@($"{Urls.MatchLog}?mode=OneVsOne")">
+                <span class="bi bi-person" aria-hidden="true"></span> 1v1
+            </NavLink>
+            <NavLink class="nav-link" href="@($"{Urls.MatchLog}?mode=TeamVsTeam")">
+                <span class="bi bi-people" aria-hidden="true"></span> 2v2
+            </NavLink>
+            <NavLink class="nav-link" href="@($"{Urls.MatchLog}?mode=FreeForAll")">
+                <span class="bi bi-shuffle" aria-hidden="true"></span> Free-for-all
+            </NavLink>
+            <NavLink class="nav-link" href="@($"{Urls.MatchLog}?mode=Cooperative")">
+                <span class="bi bi-shield-shaded" aria-hidden="true"></span> Co-op
+            </NavLink>
+        </NavSubMenu>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="@Urls.Titles">
-                <span class="oi oi-badge" aria-hidden="true"></span> Titles
+                <span class="bi bi-award" aria-hidden="true"></span> Titles
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="@Urls.Tournaments">
-                <span class="oi oi-flag" aria-hidden="true"></span> Tournaments
+                <span class="bi bi-flag" aria-hidden="true"></span> Tournaments
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="@Urls.Initialize">
-                <span class="oi oi-cloud-download" aria-hidden="true"></span> Initialize default data
+                <span class="bi bi-cloud-download" aria-hidden="true"></span> Initialize default data
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="@Urls.Admin">
+                <span class="bi bi-gear" aria-hidden="true"></span> Admin
             </NavLink>
         </div>
     </nav>
 </div>
 
 @code {
-    
-    private bool expandStatisticsSubNav;
 
     private bool collapseNavMenu = true;
 

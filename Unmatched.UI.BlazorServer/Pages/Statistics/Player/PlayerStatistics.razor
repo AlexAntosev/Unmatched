@@ -4,6 +4,7 @@
 @using Unmatched.Dtos.Match
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IPlayerStatisticsService PlayerStatisticsService
 @inject IFavoriteStatisticsService FavoriteStatisticsService
 
@@ -12,7 +13,7 @@
 </div>
 <div class="page-content">
     <TotalMatchesRecord Total="Player.TotalMatches" Wins="Player.TotalWins" Looses="Player.TotalLooses" Kd="Player.Kd"></TotalMatchesRecord>
-    <DuelMatches MatchLogEntries="_matchLogEntries" PageSize="10"></DuelMatches>
+    <MatchLogGrid MatchLogEntries="_matchLogEntries" PageSize="10"></MatchLogGrid>
     <Favorites FavoritesRecords="_favorites"></Favorites>
     <MonsterMatchupTable Title="Against Villains" Rows="_villainMatchups"></MonsterMatchupTable>
     <MonsterMatchupTable Title="Against Minions" Rows="_minionMatchups"></MonsterMatchupTable>

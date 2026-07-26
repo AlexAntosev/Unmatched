@@ -1,0 +1,53 @@
+/*
+  Unmatched design tokens. Every color/spacing/radius value used across the app should
+  come from here (or from Unmatched.Constants.Colors, mirrored below for win/loss so
+  C# and CSS never drift apart) instead of being hardcoded per-page.
+*/
+:root {
+    /* Brand-driven palette: near-black base + white, one sharp accent, matching the
+       Unmatched logo's high-contrast angular look. */
+    --um-bg: #121214;
+    --um-surface: #1c1c20;
+    --um-surface-raised: #232328;
+    --um-border: #323238;
+
+    --um-text: #f2f2f4;
+    --um-text-muted: #9a9aa2;
+
+    --um-accent: #e63946;
+    --um-accent-hover: #ff4d5b;
+    --um-accent-text: #ffffff;
+    --um-warning: #ffc107;
+
+    /* Mirrors Unmatched.Constants.Colors - keep in sync with Unmatched/Constants/Colors.cs */
+    --um-winner: #90ee90;
+    --um-looser: #ffa293;
+    --um-planned: #d3d3d4;
+    --um-champion: gold;
+    --um-second-place: silver;
+    --um-leader: #cd7f32;
+
+    --um-radius-sm: 4px;
+    --um-radius-md: 8px;
+    --um-radius-lg: 16px;
+
+    --um-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --um-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+
+    --um-font-display: "Unmatched", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --um-font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    --um-space-1: 4px;
+    --um-space-2: 8px;
+    --um-space-3: 12px;
+    --um-space-4: 16px;
+    --um-space-5: 24px;
+    --um-space-6: 32px;
+    --um-space-7: 48px;
+    --um-space-8: 64px;
+
+    /* Reference breakpoints (Phase 9 responsive pass) - Bootstrap's own grid breakpoints,
+       named here so every @media query in the app targets the same three tiers. */
+    --um-breakpoint-mobile: 576px;
+    --um-breakpoint-tablet: 992px;
+}

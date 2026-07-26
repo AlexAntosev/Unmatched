@@ -13,6 +13,10 @@ public interface IMatchRepository : IRepository<MatchEntity>
     Task<List<MatchEntity>> GetFinishedByMapIdAsync(Guid mapId);
     
     Task<List<MatchEntity>> GetFinishedByPlayerIdAsync(Guid playerId);
-    
+
+    Task<List<MatchEntity>> GetFinishedByVillainIdAsync(Guid villainId);
+
+    Task<List<MatchEntity>> GetFinishedByMinionIdAsync(Guid minionId);
+
     Task<List<MatchEntity>> GetByTournamentAsync(Guid id);
 }

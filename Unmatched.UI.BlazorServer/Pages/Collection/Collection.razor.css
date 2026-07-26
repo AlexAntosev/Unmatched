@@ -1,0 +1,24 @@
+.collection-hint {
+    color: var(--um-text-muted);
+    max-width: 60ch;
+}
+
+.collection-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--um-space-2);
+    margin-bottom: var(--um-space-4);
+}
+
+.collection-item {
+    padding: var(--um-space-3);
+    background: var(--um-surface);
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+}
+
+.collection-item-details {
+    margin-left: 28px;
+    color: var(--um-text-muted);
+    font-size: 0.9em;
+}

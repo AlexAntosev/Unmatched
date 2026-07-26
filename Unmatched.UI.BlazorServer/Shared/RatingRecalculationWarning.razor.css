@@ -1,0 +1,14 @@
+.recalculation-warning ::deep a {
+    color: var(--um-warning);
+    background-color: color-mix(in srgb, var(--um-warning) 12%, transparent);
+    border-radius: var(--um-radius-sm);
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    line-height: 3rem;
+}
+
+.recalculation-warning ::deep a:hover {
+    background-color: color-mix(in srgb, var(--um-warning) 22%, transparent);
+    color: var(--um-warning);
+}

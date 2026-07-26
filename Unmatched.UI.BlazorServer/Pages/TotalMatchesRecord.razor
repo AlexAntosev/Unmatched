@@ -1,23 +1,26 @@
-﻿@using Microsoft.AspNetCore.Components
-@if (Wins is not null && Looses is not null && Kd is not null)
-{
-    <h4> Total Matches: @Total (@Wins wins / @Looses looses) - K/D: @Kd</h4>
-}
-else
-{
-    <h4> Total Matches: @Total</h4>
-}
+@using Microsoft.AspNetCore.Components
+@using Unmatched.UI.BlazorServer.Shared.Statistics
+
+<div class="d-flex align-items-center gap-3 flex-wrap page-content">
+    <StatCard Value="@Total.ToString()" Label="Total Matches"/>
+    @if (Wins is not null && Looses is not null && Kd is not null)
+    {
+        <StatCard Value="@(Wins!.ToString())" Label="Wins" Variant="win"/>
+        <StatCard Value="@(Looses!.ToString())" Label="Looses" Variant="loss"/>
+        <StatCard Value="@(Kd!.ToString())" Label="K/D"/>
+    }
+</div>
 
 @code {
     [Parameter]
     public int Total { get; set; }
-    
+
     [Parameter]
     public int? Wins { get; set; }
-    
+
     [Parameter]
     public int? Looses { get; set; }
-    
+
     [Parameter]
     public double? Kd { get; set; }
 }

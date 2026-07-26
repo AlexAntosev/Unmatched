@@ -2,7 +2,7 @@
 
 public class Urls
 {
-    public const string DuelMatchLog = "/duelMatchLog";
+    public const string MatchLog = "/match-log";
     public const string HeroesStatistics = "/heroes-statistics";
     public const string PlayersStatistics = "/players-statistics";
     public const string MapsStatistics = "/maps-statistics";
@@ -14,4 +14,5 @@ public class Urls
     public const string Tournaments = "/tournaments";
     public const string Initialize = "/initialize";
     public const string Collection = "/collection";
+    public const string Admin = "/admin";
 }

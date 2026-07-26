@@ -5,15 +5,17 @@
 @using Unmatched.Dtos.Statistics
 @using Unmatched.Services.Statistics
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMapStatisticsService MapStatisticsService
 @inject IMapService MapService
 
+<div style="margin-bottom: 16px">
+    <MapSummary Statistics="Statistics"></MapSummary>
+</div>
 <div class="page-content">
-    <h3 align="center" class="page-title">@Statistics.Name</h3>
-    <img src="@Statistics.ImageUrl" onerror="this.onerror=null;this.src='/UnknownMap.png'" />
     <TotalMatchesRecord Total="Statistics.TotalMatches" ></TotalMatchesRecord>
     <StatisticsRecord Title="Map champ" HeroMatches="_mapChampMatches"></StatisticsRecord>
-    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
+    <MatchLogGrid MatchLogEntries="_matchLogEntries"></MatchLogGrid>
 </div>
 
 @code {

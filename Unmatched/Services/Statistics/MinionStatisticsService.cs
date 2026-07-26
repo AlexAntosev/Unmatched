@@ -1,9 +1,12 @@
 namespace Unmatched.Services.Statistics;
 
+using AutoMapper;
+
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 using Unmatched.HttpClients.Contracts;
 
-public class MinionStatisticsService(IStatisticsClient statisticsClient) : IMinionStatisticsService
+public class MinionStatisticsService(IMapper mapper, IMatchClient matchClient, IStatisticsClient statisticsClient) : IMinionStatisticsService
 {
     public async Task<IEnumerable<MinionStatisticsDto>> GetMinionsStatisticsAsync()
     {
@@ -19,5 +22,11 @@ public class MinionStatisticsService(IStatisticsClient statisticsClient) : IMini
     {
         var updated = await statisticsClient.UpdateMinionImageAsync(minionId, imageFileName);
         return updated.ImageFileName!;
+    }
+
+    public async Task<IEnumerable<UiMatchLogDto>> GetMinionMatchesAsync(Guid minionId)
+    {
+        var matches = await matchClient.GetFinishedByMinionAsync(minionId);
+        return matches.Select(mapper.Map<UiMatchLogDto>);
     }
 }

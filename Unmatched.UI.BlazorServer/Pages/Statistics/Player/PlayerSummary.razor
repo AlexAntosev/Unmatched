@@ -1,28 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Components
-@using Unmatched.Constants
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
 @using Unmatched.Services.Contracts
 @using Unmatched.UI.BlazorServer.Services
+@using Unmatched.UI.BlazorServer.Shared.Statistics
 @inject IPlayerService PlayerService
 @inject IImageUploadService ImageUploadService
 
-<div style="background: linear-gradient(180deg, @(ChosenOne?.Hero?.Color ?? Colors.Default) 0%, rgba(255,255,255,1) 100%);">
-    <h3 align="center" class="page-title">@Statistics.Name</h3>
-    <div class="wrapper page-content">
-        <div class="image-container">
-            <EditableImage ImageUrl="@BustCache(Statistics.ImageUrl)" AltText="@Statistics.Name" OnFileSelected="OnImageSelectedAsync" />
+<EntityDetailHeader Name="@Statistics.Name" Color="@ChosenOne?.Hero?.Color" ImageUrl="@BustCache(Statistics.ImageUrl)" OnFileSelected="OnImageSelectedAsync">
+    <ExtraContent>
+        <div class="player-summary-columns">
+            <div>
+                <h4>Chosen One: @ChosenOne?.Hero?.Name</h4>
+                <StatisticsRecord Title="Strongest Hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
+                <StatisticsRecord Title="Weakest Hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
+            </div>
+            <div>
+                <HeroesMatchesPieChart HeroesMatches="_favoritesMatches"></HeroesMatchesPieChart>
+            </div>
         </div>
-        <div>
-            <h4> Chosen One: @ChosenOne?.Hero?.Name</h4>
-            <StatisticsRecord Title="Strongest Hero" HeroMatches="_strongestHeroMatches"></StatisticsRecord>
-            <StatisticsRecord Title="Weakest Hero" HeroMatches="_weakestHeroMatches"></StatisticsRecord>
-        </div>
-        <div>
-            <HeroesMatchesPieChart HeroesMatches="_favoritesMatches"></HeroesMatchesPieChart>
-        </div>
-    </div>
-</div>
+    </ExtraContent>
+</EntityDetailHeader>
 
 @code {
     [Parameter]
@@ -70,24 +68,3 @@
         StateHasChanged();
     }
 }
-
-<style>
-    .wrapper {
-      display: grid;
-      grid-template-columns: 1fr 3fr 1fr;
-      column-gap: 32px;
-      row-gap: 4px;
-    } 
-    
-    .image-container {
-        width: 250px;
-        height: 200px;
-        text-align: center;
-        display: block;
-    }
-    
-    .container img {
-        margin: auto;
-        display: block;
-    }          
-</style>

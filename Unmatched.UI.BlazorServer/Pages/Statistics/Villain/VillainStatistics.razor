@@ -1,6 +1,9 @@
 @page "/villains-statistics/{id}"
 @using Unmatched.Dtos
+@using Unmatched.Dtos.Match
 @using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Pages.Statistics
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IVillainStatisticsService VillainStatisticsService
 @using Microsoft.AspNetCore.Components
 
@@ -9,6 +12,8 @@
 </div>
 <div class="page-content" style="margin-bottom: 16px">
     <TotalMatchesRecord Total="Villain.TotalMatches" Wins="Villain.TotalWins" Looses="Villain.TotalLooses" Kd="Villain.Kd"></TotalMatchesRecord>
+    <MonsterMatchupTable Title="Against Heroes" Rows="_heroMatchups"></MonsterMatchupTable>
+    <MatchLogGrid MatchLogEntries="_matchLogEntries"></MatchLogGrid>
 </div>
 
 @code {
@@ -16,6 +21,8 @@
     public string Id { get; set; } = "";
 
     private VillainStatisticsDto Villain { get; set; } = new();
+    private List<UiMatchLogDto> _matchLogEntries = new();
+    private List<MonsterMatchupRow> _heroMatchups = new();
 
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
@@ -31,6 +38,19 @@
             }
 
             Villain = await VillainStatisticsService.GetVillainStatisticsAsync(villainId);
+            _matchLogEntries = (await VillainStatisticsService.GetVillainMatchesAsync(villainId)).OrderByDescending(x => x.Date).ToList();
+
+            _heroMatchups = _matchLogEntries
+                .SelectMany(m => m.Fighters)
+                .GroupBy(f => f.Hero?.Name ?? "Unknown")
+                .Select(g => new MonsterMatchupRow
+                    {
+                        Name = g.Key,
+                        Total = g.Count(),
+                        Wins = g.Count(f => f.IsWinner),
+                        Looses = g.Count(f => !f.IsWinner)
+                    })
+                .ToList();
         }
         finally
         {

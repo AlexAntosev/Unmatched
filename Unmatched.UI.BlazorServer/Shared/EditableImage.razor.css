@@ -57,7 +57,7 @@
     content: "";
     width: 14px;
     height: 14px;
-    border: 2px solid #999;
+    border: 2px solid var(--um-text-muted);
     border-top-color: transparent;
     border-radius: 50%;
     animation: editable-image-spin 0.6s linear infinite;
@@ -71,5 +71,5 @@
 
 .editable-image-error {
     font-size: 11px;
-    color: #c0392b;
+    color: var(--um-accent);
 }

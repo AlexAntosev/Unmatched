@@ -84,6 +84,24 @@ public class MatchController(ILogger<MatchController> logger, IMapper mapper, IM
         return Ok(dtos);
     }
 
+    [HttpGet("log/villain/{villainId}")]
+    public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetByVillain(Guid villainId)
+    {
+        var matches = await matchService.GetFinishedByVillainAsync(villainId);
+
+        var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
+        return Ok(dtos);
+    }
+
+    [HttpGet("log/minion/{minionId}")]
+    public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetByMinion(Guid minionId)
+    {
+        var matches = await matchService.GetFinishedByMinionAsync(minionId);
+
+        var dtos = mapper.Map<IEnumerable<MatchLogDto>>(matches);
+        return Ok(dtos);
+    }
+
     [HttpGet("tournament/{tournamentId}")]
     public async Task<ActionResult<IEnumerable<MatchLogDto>>> GetByTournament(Guid tournamentId)
     {

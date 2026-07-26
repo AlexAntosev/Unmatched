@@ -1,0 +1,16 @@
+<div class="stat-card stat-card-@Variant">
+    <div class="stat-card-value">@Value</div>
+    <div class="stat-card-label">@Label</div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    /// <summary>neutral | win | loss</summary>
+    [Parameter]
+    public string Variant { get; set; } = "neutral";
+}

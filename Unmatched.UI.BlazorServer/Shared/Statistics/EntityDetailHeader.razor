@@ -1,0 +1,44 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Unmatched.UI.BlazorServer.Services
+
+<div class="entity-detail-header" style="--entity-color: @Color">
+    <div class="entity-detail-header-title">
+        <h3 class="page-title">@Name</h3>
+        @TitleExtra
+    </div>
+    <div class="entity-detail-header-body page-content">
+        <div class="entity-detail-header-image">
+            @if (OnFileSelected.HasDelegate)
+            {
+                <EditableImage ImageUrl="@ImageUrl" AltText="@Name" OnFileSelected="OnFileSelected"/>
+            }
+            else
+            {
+                <img src="@ImageUrl" alt="@Name" class="entity-detail-header-static-image" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+            }
+        </div>
+        @ExtraContent
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>Optional - entities without a Color concept (e.g. Map) fall back to a neutral surface tone.</summary>
+    [Parameter]
+    public string? Color { get; set; }
+
+    [Parameter, EditorRequired]
+    public string ImageUrl { get; set; } = string.Empty;
+
+    /// <summary>Optional - when omitted, the image renders read-only (no edit affordance).</summary>
+    [Parameter]
+    public EventCallback<IBrowserFile> OnFileSelected { get; set; }
+
+    [Parameter]
+    public RenderFragment? TitleExtra { get; set; }
+
+    [Parameter]
+    public RenderFragment? ExtraContent { get; set; }
+}

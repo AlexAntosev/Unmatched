@@ -9,11 +9,8 @@
 @inject IPlayerService PlayerService
 
 @inject IDataInitializer DataInitializer
-@inject IRatingService RatingService
-@inject RatingRecalculationStateNotifier RecalculationStateNotifier
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
-<button class="btn btn-primary" @onclick="RecalculateRating">Rating Recalculation</button>
 
 <div>
     <EditForm Model=@_addPlayerForm>
@@ -61,23 +58,7 @@
             PreloadService.Hide();
         }
     }
-    
-    
-    private async Task RecalculateRating()
-    {
-        try
-        {
-            PreloadService.Show();
 
-            await RatingService.RecalculateAsync();
-            RecalculationStateNotifier.NotifyChanged();
-        }
-        finally
-        {
-            PreloadService.Hide();
-        }
-    }
-    
     private async Task OnAddPlayerClick()
     {
         if (IsInvalidName(_addPlayerForm.Name))

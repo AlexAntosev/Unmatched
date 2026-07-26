@@ -3,25 +3,20 @@
 @using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Services
+@using Unmatched.UI.BlazorServer.Shared.Statistics
 @inject IVillainService VillainService
 @inject IVillainStatisticsService VillainStatisticsService
 @inject IImageUploadService ImageUploadService
 
-<div style="background: linear-gradient(180deg, @Statistics.Color 0%, rgba(255,255,255,1) 100%);">
-    <div style="display: flex; align-items: center; justify-content: center;">
-        <h3 class="page-title">@Statistics.Name</h3>
-    </div>
-    <div class="wrapper page-content">
-        <div class="image-container">
-            <EditableImage ImageUrl="@BustCache(Statistics.ImageUrl)" AltText="@Statistics.Name" OnFileSelected="OnImageSelectedAsync" />
+<EntityDetailHeader Name="@Statistics.Name" Color="@Statistics.Color" ImageUrl="@BustCache(Statistics.ImageUrl)" OnFileSelected="OnImageSelectedAsync">
+    <ExtraContent>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <img src="@Statistics.MeleeRangeImageUrl" alt="@Statistics.Name" height="48" width="auto"/>
+            <StatCard Value="@Statistics.Hp.ToString()" Label="Hp"/>
+            <StatCard Value="@Statistics.DeckSize.ToString()" Label="Deck size"/>
         </div>
-        <div>
-            <img style="margin-bottom: 0.5rem;" src="@Statistics.MeleeRangeImageUrl" alt="@Statistics.Name" width="64px" height="auto"/>
-            <h5>Hp: @Statistics.Hp</h5>
-            <h5>Deck size: @Statistics.DeckSize</h5>
-        </div>
-    </div>
-</div>
+    </ExtraContent>
+</EntityDetailHeader>
 
 @code {
     [Parameter]
@@ -42,24 +37,3 @@
         StateHasChanged();
     }
 }
-
-<style>
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      column-gap: 32px;
-      row-gap: 4px;
-    }
-
-    .image-container {
-        width: 250px;
-        height: 200px;
-        text-align: center;
-        display: block;
-    }
-
-    .container img {
-        margin: auto;
-        display: block;
-    }
-</style>

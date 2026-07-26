@@ -25,6 +25,10 @@ public interface IMatchClient
 
     Task<IEnumerable<MatchLogDto>> GetFinishedByPlayerAsync(Guid playerId);
 
+    Task<IEnumerable<MatchLogDto>> GetFinishedByVillainAsync(Guid villainId);
+
+    Task<IEnumerable<MatchLogDto>> GetFinishedByMinionAsync(Guid minionId);
+
     Task<IEnumerable<RatingChangeDto>> GetHeroRatingChangesAsync(Guid heroId);
 
     Task<IEnumerable<MatchLogDto>> GetMatchLogAsync();

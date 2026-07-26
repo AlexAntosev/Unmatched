@@ -1,6 +1,7 @@
 ﻿namespace Unmatched.Services.Statistics;
 
 using Unmatched.Dtos;
+using Unmatched.Dtos.Match;
 
 public interface IVillainStatisticsService
 {
@@ -9,4 +10,6 @@ public interface IVillainStatisticsService
     Task<VillainStatisticsDto> GetVillainStatisticsAsync(Guid villainId);
 
     Task<string> UpdateImageAsync(Guid villainId, string imageFileName);
+
+    Task<IEnumerable<UiMatchLogDto>> GetVillainMatchesAsync(Guid villainId);
 }

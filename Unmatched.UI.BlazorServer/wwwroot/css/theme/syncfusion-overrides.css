@@ -1,0 +1,83 @@
+/*
+  Overrides the Syncfusion Bootstrap5 theme (_content/Syncfusion.Blazor.Themes/bootstrap5.css)
+  to match the Unmatched design tokens. Kept isolated from bootstrap-overrides.css since
+  Syncfusion's variable names/scoping are specific to this package version (22.2.11) and
+  should never be hand-edited in the vendor file itself.
+*/
+.e-grid {
+    background-color: var(--um-surface);
+    border-color: var(--um-border);
+    color: var(--um-text);
+}
+
+.e-grid .e-gridheader,
+.e-grid .e-columnheader {
+    background-color: var(--um-surface-raised);
+    border-color: var(--um-border);
+}
+
+.e-grid .e-headercell,
+.e-grid .e-headercell .e-headertext {
+    background-color: var(--um-surface-raised);
+    color: var(--um-text);
+    font-weight: 600;
+}
+
+.e-grid .e-row {
+    background-color: var(--um-surface);
+    color: var(--um-text);
+}
+
+.e-grid .e-row:nth-child(even) {
+    background-color: var(--um-surface-raised);
+}
+
+.e-grid .e-row:hover {
+    background-color: rgba(230, 57, 70, 0.12);
+}
+
+.e-grid.e-gridhover .e-row:hover .e-rowcell {
+    background-color: rgba(230, 57, 70, 0.12) !important;
+    color: var(--um-text) !important;
+}
+
+.e-grid .e-rowcell {
+    border-color: var(--um-border);
+    color: var(--um-text) !important;
+}
+
+.e-grid .e-gridcontent,
+.e-grid .e-content {
+    background-color: var(--um-surface);
+}
+
+.e-pager {
+    background-color: var(--um-surface);
+    color: var(--um-text);
+    border-color: var(--um-border);
+}
+
+.e-pager .e-currentitem,
+.e-pager .e-numericitem.e-currentitem {
+    background-color: var(--um-accent) !important;
+    color: var(--um-accent-text) !important;
+}
+
+.e-input-group input.e-input,
+.e-combobox .e-input-group,
+.e-dropdownlist .e-input-group {
+    background-color: var(--um-surface-raised);
+    color: var(--um-text);
+    border-color: var(--um-border);
+}
+
+.e-popup.e-popup-open .e-list-item {
+    color: var(--um-text);
+    background-color: var(--um-surface);
+}
+
+.e-popup.e-popup-open .e-list-item.e-hover,
+.e-popup.e-popup-open .e-list-item.e-active {
+    background-color: var(--um-accent);
+    color: var(--um-accent-text);
+}

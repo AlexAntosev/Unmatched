@@ -1,0 +1,20 @@
+/*
+  Applies the Unmatched brand font (wwwroot/css/fonts/Unmatched.otf) deliberately to display
+  elements only - page titles and stat headline numbers - since display faces are usually
+  illegible at body text sizes. Body copy stays on the existing Helvetica/system stack
+  (--um-font-body).
+*/
+@font-face {
+    font-family: "Unmatched";
+    src: url("../fonts/Unmatched.otf");
+    font-display: swap;
+}
+
+h1, h2, h3,
+.page-title,
+.um-display,
+.stat-card-value {
+    font-family: var(--um-font-display);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}

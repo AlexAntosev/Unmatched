@@ -64,6 +64,30 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
             .ToListAsync();
     }
 
+    public async Task<List<MatchEntity>> GetFinishedByVillainIdAsync(Guid villainId)
+    {
+        return await DbContext.Matches
+            .Include(x => x.Fighters)
+            .Include(x => x.Tournament)
+            .Include(x => x.Villain).ThenInclude(v => v.Minions)
+            .Where(m => m.Villain != null && m.Villain.VillainId == villainId && !m.IsPlanned)
+            .OrderByDescending(m => m.Date)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<List<MatchEntity>> GetFinishedByMinionIdAsync(Guid minionId)
+    {
+        return await DbContext.Matches
+            .Include(x => x.Fighters)
+            .Include(x => x.Tournament)
+            .Include(x => x.Villain).ThenInclude(v => v.Minions)
+            .Where(m => m.Villain != null && m.Villain.Minions.Any(mn => mn.MinionId == minionId) && !m.IsPlanned)
+            .OrderByDescending(m => m.Date)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<List<MatchEntity>> GetByTournamentAsync(Guid id)
     {
         return await DbContext.Matches

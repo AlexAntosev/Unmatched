@@ -21,7 +21,7 @@
 @inject NavigationManager NavManager
 @inject NotificationService NotificationService
 
-<div style="height: 100%; background: linear-gradient(90deg, @(_match.Fighters.FirstOrDefault()?.Hero?.Color ?? "white") 0%, @(_match.Fighters.LastOrDefault()?.Hero?.Color ?? "white") 100%);">
+<div class="page-content add-match-page">
     <Modal @ref="matchSavedPopup" Title="Match successfully saved!">
         <BodyTemplate>
         </BodyTemplate>
@@ -30,151 +30,173 @@
         </FooterTemplate>
     </Modal>
 
-    <div class="row">
-        <div class="column start">
-            <label for="gameMode">Mode:</label>
-            <InputSelect Value="@_match.GameMode" ValueExpression="@(() => _match.GameMode)" name="gameMode" id="gameMode" class="form-select transparent rounded-form" ValueChanged="@((GameMode value) => GameModeChanged(value))">
-                <option value="@GameMode.OneVsOne">1 на 1</option>
-                <option value="@GameMode.TeamVsTeam">2 на 2</option>
-                <option value="@GameMode.FreeForAll">Втрьох (вільний бій)</option>
-                <option value="@GameMode.Cooperative">Кооп проти гри</option>
-            </InputSelect>
+    @if (_saveError is not null)
+    {
+        <div class="alert alert-danger alert-dismissible mb-3" role="alert">
+            @_saveError
+            <button type="button" class="btn-close" @onclick="() => _saveError = null"></button>
         </div>
-    </div>
+    }
 
-    @if (_match.GameMode == GameMode.OneVsOne)
-    {
-        <div class="row">
-            <div class="triple-column center">
-                <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.First()"></FighterInfo>
-            </div>
-            <div class="triple-column center">
-                <img src="Vs.png"/>
-            </div>
-            <div class="triple-column center">
-                <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.Last()"></FighterInfo>
-            </div>
-        </div>
-    }
-    else if (_match.GameMode == GameMode.TeamVsTeam)
-    {
-        <div class="row">
-            <div class="triple-column center">
-                <h4>Команда 1</h4>
-                <label>
-                    <input type="checkbox" checked="@Team1Won" @onchange="@((ChangeEventArgs e) => SetTeamWinner(1, (bool)e.Value!))"/>
-                    Ця команда перемогла
-                </label>
-                @foreach (var fighter in TeamFighters(1))
-                {
-                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
-                }
-            </div>
-            <div class="triple-column center">
-                <img src="Vs.png"/>
-            </div>
-            <div class="triple-column center">
-                <h4>Команда 2</h4>
-                <label>
-                    <input type="checkbox" checked="@Team2Won" @onchange="@((ChangeEventArgs e) => SetTeamWinner(2, (bool)e.Value!))"/>
-                    Ця команда перемогла
-                </label>
-                @foreach (var fighter in TeamFighters(2))
-                {
-                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
-                }
+    <EditForm EditContext="@_editContext" OnValidSubmit="OnAddNewMatchClickAsync">
+        <ValidationSummary/>
+
+        <div class="card add-match-card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Game Mode</h5>
+                <InputSelect Value="@_match.GameMode" ValueExpression="@(() => _match.GameMode)" name="gameMode" id="gameMode" class="form-select" ValueChanged="@((GameMode value) => GameModeChanged(value))">
+                    <option value="@GameMode.OneVsOne">1 на 1</option>
+                    <option value="@GameMode.TeamVsTeam">2 на 2</option>
+                    <option value="@GameMode.FreeForAll">Втрьох (вільний бій)</option>
+                    <option value="@GameMode.Cooperative">Кооп проти гри</option>
+                </InputSelect>
             </div>
         </div>
-    }
-    else if (_match.GameMode == GameMode.FreeForAll)
-    {
-        <div class="row">
-            <button type="button" class="btn btn-secondary rounded-form" @onclick="AddFighter">+ Add player</button>
-            @foreach (var fighter in _match.Fighters)
+
+    <div class="card add-match-card mb-3" style="--fighters-color-a: @(_match.Fighters.FirstOrDefault()?.Hero?.Color ?? "var(--um-surface-raised)"); --fighters-color-b: @(_match.Fighters.LastOrDefault()?.Hero?.Color ?? "var(--um-surface-raised)");">
+        <div class="card-body add-match-fighters-card">
+            <h5 class="card-title">Participants</h5>
+
+            @if (_match.GameMode == GameMode.OneVsOne)
             {
-                <div class="triple-column center">
-                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false" ShowPlacementInput="true"></FighterInfo>
-                    <button type="button" class="btn btn-secondary rounded-form" @onclick="() => RemoveFighter(fighter)">Remove</button>
+                <div class="add-match-duel">
+                    <div class="add-match-fighter-slot">
+                        <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.First()"></FighterInfo>
+                    </div>
+                    <div class="add-match-vs">
+                        <img src="Vs.png" alt="vs"/>
+                    </div>
+                    <div class="add-match-fighter-slot">
+                        <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.Last()"></FighterInfo>
+                    </div>
+                </div>
+            }
+            else if (_match.GameMode == GameMode.TeamVsTeam)
+            {
+                <div class="add-match-duel">
+                    <div class="add-match-fighter-slot">
+                        <h6>Команда 1</h6>
+                        <label class="add-match-team-winner">
+                            <input type="checkbox" checked="@Team1Won" @onchange="@((ChangeEventArgs e) => SetTeamWinner(1, (bool)e.Value!))"/>
+                            Ця команда перемогла
+                        </label>
+                        @foreach (var fighter in TeamFighters(1))
+                        {
+                            <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
+                        }
+                    </div>
+                    <div class="add-match-vs">
+                        <img src="Vs.png" alt="vs"/>
+                    </div>
+                    <div class="add-match-fighter-slot">
+                        <h6>Команда 2</h6>
+                        <label class="add-match-team-winner">
+                            <input type="checkbox" checked="@Team2Won" @onchange="@((ChangeEventArgs e) => SetTeamWinner(2, (bool)e.Value!))"/>
+                            Ця команда перемогла
+                        </label>
+                        @foreach (var fighter in TeamFighters(2))
+                        {
+                            <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
+                        }
+                    </div>
+                </div>
+            }
+            else if (_match.GameMode == GameMode.FreeForAll)
+            {
+                <button type="button" class="btn btn-secondary mb-2" @onclick="AddFighter">+ Add player</button>
+                <div class="add-match-ffa">
+                    @foreach (var fighter in _match.Fighters)
+                    {
+                        <div class="add-match-fighter-slot">
+                            <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false" ShowPlacementInput="true"></FighterInfo>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => RemoveFighter(fighter)">Remove</button>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_match.GameMode == GameMode.Cooperative)
+            {
+                <div class="add-match-coop">
+                    <div>
+                        <label class="add-match-team-winner">
+                            <input type="checkbox" checked="@_playersWon" @onchange="@((ChangeEventArgs e) => SetPlayersWon((bool)e.Value!))"/>
+                            Гравці перемогли?
+                        </label>
+                        <button type="button" class="btn btn-secondary mb-2 d-block" @onclick="AddFighter">+ Add player</button>
+                        <div class="add-match-ffa">
+                            @foreach (var fighter in _match.Fighters)
+                            {
+                                <div class="add-match-fighter-slot">
+                                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => RemoveFighter(fighter)">Remove</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <VillainInfo Villains="_villains" Minions="_minions" MatchVillain="@(_match.Villain ??= new UiMatchVillainDto())"></VillainInfo>
+                    </div>
                 </div>
             }
         </div>
-    }
-    else if (_match.GameMode == GameMode.Cooperative)
-    {
-        <div class="row">
-            <div class="column center">
-                <label>
-                    <input type="checkbox" checked="@_playersWon" @onchange="@((ChangeEventArgs e) => SetPlayersWon((bool)e.Value!))"/>
-                    Гравці перемогли?
-                </label>
-                <button type="button" class="btn btn-secondary rounded-form" @onclick="AddFighter">+ Add player</button>
-                @foreach (var fighter in _match.Fighters)
-                {
-                    <div class="triple-column center">
-                        <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
-                        <button type="button" class="btn btn-secondary rounded-form" @onclick="() => RemoveFighter(fighter)">Remove</button>
-                    </div>
-                }
-            </div>
-            <div class="column center">
-                <VillainInfo Villains="_villains" Minions="_minions" MatchVillain="@(_match.Villain ??= new UiMatchVillainDto())"></VillainInfo>
-            </div>
-        </div>
-    }
+    </div>
 
-    <div class="row">
-        <div class="column end">
-            <EditForm Model=@_match>
+    <div class="card add-match-card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Match Details</h5>
+            <div class="add-match-details">
                 <div>
-                    <label for="Map">Map:</label>
-                    <div style=" display: flex; flex-direction: row;">
-                        <InputSelect Value="@_match.Map.Id" ValueExpression="@(() => _match.Map.Id)" name="Map" id="maps" class="form-select transparent rounded-form" ValueChanged="@((Guid value) => SetMapInfo(value))">
-                            @foreach (var map in _maps)
+                    <div class="mb-2">
+                        <label for="Map">Map:</label>
+                        <div class="add-match-map-picker">
+                            <InputSelect Value="@_match.Map.Id" ValueExpression="@(() => _match.Map.Id)" name="Map" id="maps" class="form-select" ValueChanged="@((Guid value) => SetMapInfo(value))">
+                                @foreach (var map in _maps)
+                                {
+                                    <option value="@map.Id"> @map.DisplayName</option>
+                                }
+                            </InputSelect>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="RandomizeMap">🎲</button>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="Tournament">Tournament:</label>
+                        <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select">
+                            @foreach (var tournament in _tournaments)
                             {
-                                <option value="@map.Id"> @map.DisplayName</option>
+                                <option value="@tournament.Id"> @tournament.Name</option>
                             }
-                        </InputSelect >
-                        <button style="border-width: 0; background: transparent;" @onclick="RandomizeMap">🎲</button>
+                        </InputSelect>
+                    </div>
+                    <div class="mb-2">
+                        <label for="Date">Date:</label>
+                        <InputDate @bind-Value=_match.Date name="Date" class="form-control"/>
+                    </div>
+                    <div class="mb-2">
+                        <label for="Comment">Comment:</label>
+                        <InputText @bind-Value=_match.Comment name="Comment" class="form-control"/>
+                    </div>
+                    <div class="mb-2">
+                        <label for="Stage">Stage:</label>
+                        <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select">
+                            @foreach (var stage in _stages)
+                            {
+                                <option value="@stage.Item1"> @stage.Item2</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="add-match-actions">
+                        <button type="submit" class="btn btn-primary">Add match</button>
+                        @if (_match.GameMode == GameMode.OneVsOne)
+                        {
+                            <button type="button" class="btn btn-secondary" @onclick="OnRandomizeMatchClick">Randomize</button>
+                        }
                     </div>
                 </div>
-                <div>
-                    <label for="Tournament">Tournament:</label>
-                    <InputSelect @bind-Value=_match.TournamentId name="Tournament" id="tournaments" class="form-select transparent rounded-form">
-                        @foreach (var tournament in _tournaments)
-                        {
-                            <option value="@tournament.Id"> @tournament.Name</option>
-                        }
-                    </InputSelect >
-                </div>
-                <div>
-                    <label for="Date">Date:</label>
-                    <InputDate @bind-Value=_match.Date name="Date" class="form-control transparent rounded-form"/>
-                </div>
-                <div>
-                    <label for="Comment">Comment:</label>
-                    <InputText @bind-Value=_match.Comment name="Comment" class="form-control transparent rounded-form"/>
-                </div>
-                <div>
-                    <label for="Stage">Stage:</label>
-                    <InputSelect @bind-Value=_match.Stage name="Stage" id="stages" class="form-select transparent rounded-form">
-                        @foreach (var stage in _stages)
-                        {
-                            <option value="@stage.Item1"> @stage.Item2</option>
-                        }
-                    </InputSelect >
-                </div>
-                <p></p>
-                <button class="btn btn-primary rounded-form" @onclick="OnAddNewMatchClickAsync">Add match</button>
-                @if (_match.GameMode == GameMode.OneVsOne)
-                {
-                    <button class="btn btn-secondary rounded-form" @onclick="OnRandomizeMatchClick">Randomize</button>
-                }
-            </EditForm>
-        </div>
-        <div class="column start">
-            <img style="border: 4px solid black;" src="@_match.Map?.ImageUrl" onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                <img class="add-match-map-preview" src="@_match.Map?.ImageUrl" onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+            </div>
         </div>
     </div>
+    </EditForm>
 </div>
 
 @code {
@@ -204,9 +226,19 @@
             Date = DateTime.UtcNow
         };
 
+    private EditContext _editContext;
+    private ValidationMessageStore _messageStore;
+
+    public AddMatch()
+    {
+        _editContext = new EditContext(_match);
+        _messageStore = new ValidationMessageStore(_editContext);
+    }
+
     [Inject] protected PreloadService PreloadService { get; set; }
 
     private Modal matchSavedPopup = default!;
+    private string? _saveError;
 
     private bool Team1Won => _match.Fighters.Any(f => f.Team == 1) && TeamFighters(1).All(f => f.IsWinner);
     private bool Team2Won => _match.Fighters.Any(f => f.Team == 2) && TeamFighters(2).All(f => f.IsWinner);
@@ -262,10 +294,43 @@
 
             _match = match;
             _playersWon = _match.GameMode == GameMode.Cooperative && (_match.Fighters.FirstOrDefault()?.IsWinner ?? false);
+
+            _editContext = new EditContext(_match);
+            _messageStore = new ValidationMessageStore(_editContext);
+            _editContext.OnValidationRequested += (s, e) => ValidateMatch();
         }
         finally
         {
             PreloadService.Hide();
+        }
+    }
+
+    private void ValidateMatch()
+    {
+        _messageStore.Clear();
+
+        foreach (var fighter in _match.Fighters)
+        {
+            if (fighter.PlayerId == Guid.Empty)
+            {
+                _messageStore.Add(new FieldIdentifier(fighter, nameof(fighter.PlayerId)), "Player is required.");
+            }
+
+            if (fighter.HeroId == Guid.Empty)
+            {
+                _messageStore.Add(new FieldIdentifier(fighter, nameof(fighter.HeroId)), "Hero is required.");
+            }
+        }
+
+        if (_match.Map is null || _match.Map.Id == Guid.Empty)
+        {
+            _messageStore.Add(new FieldIdentifier(_match, nameof(_match.Map)), "Map is required.");
+        }
+
+        if (_match.GameMode == GameMode.Cooperative
+         && (_match.Villain is null || _match.Villain.VillainId == Guid.Empty))
+        {
+            _messageStore.Add(new FieldIdentifier(_match.Villain ??= new UiMatchVillainDto(), nameof(_match.Villain.VillainId)), "Villain is required.");
         }
     }
 
@@ -336,6 +401,7 @@
         try
         {
             PreloadService.Show();
+            _saveError = null;
 
             PrepareMatchForSubmit();
 
@@ -369,7 +435,7 @@
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            _saveError = "Failed to save match. Please try again.";
         }
         finally
         {
@@ -410,6 +476,14 @@
                 _match.Villain ??= new UiMatchVillainDto();
                 break;
         }
+
+        RevalidateMatch();
+    }
+
+    private void RevalidateMatch()
+    {
+        ValidateMatch();
+        _editContext.NotifyValidationStateChanged();
     }
 
     private List<UiFighterDto> EnsureFighterCount(int count)
@@ -471,11 +545,13 @@
     private void AddFighter()
     {
         _match.Fighters = _match.Fighters.Append(new UiFighterDto()).ToList();
+        RevalidateMatch();
     }
 
     private void RemoveFighter(UiFighterDto fighter)
     {
         _match.Fighters = _match.Fighters.Where(f => f != fighter).ToList();
+        RevalidateMatch();
     }
 
     private void OnRandomizeMatchClick()
@@ -506,7 +582,7 @@
     private async Task OnPopupCloseClick()
     {
         await matchSavedPopup.HideAsync();
-        NavManager.NavigateTo(Urls.DuelMatchLog);
+        NavManager.NavigateTo(Urls.MatchLog);
     }
 
     private void SetMapInfo(Guid mapId)
@@ -520,20 +596,3 @@
         StateHasChanged();
     }
 }
-
-<style>
-    label {
-        opacity: 0.9 !important;
-        font-size: 20px;
-        color: white;
-        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-    }
-
-    .transparent {
-        opacity: 0.9 !important;
-    }
-
-    .rounded-form {
-        border-radius: 16px;
-    }
-</style>

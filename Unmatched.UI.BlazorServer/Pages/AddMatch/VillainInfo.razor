@@ -1,49 +1,39 @@
 @using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.DropDowns
 @using Unmatched.Dtos
 
-<EditForm Model=@MatchVillain>
-    <fieldset class="wrapper">
-        <legend class="title">Villain</legend>
-        <div>
-            <label for="villain">Villain:</label>
-            <InputSelect
-                ValueExpression="@(() => MatchVillain.VillainId)"
-                Value="@MatchVillain.VillainId"
-                ValueChanged="@((Guid value) => VillainChanged(value))"
-                name="villain" id="villain" class="form-select transparent rounded-form">
-                @foreach (var villain in Villains)
-                {
-                    <option value="@villain.Id"> @villain.Name</option>
-                }
-            </InputSelect>
-        </div>
-        <div>
-            <label for="villainHp">HP:</label>
-            <InputNumber @bind-Value=MatchVillain.HpLeft id="villainHp" class="form-control transparent rounded-form"/>
-        </div>
-        <div>
-            <label for="villainCardsLeft">Cards Left:</label>
-            <InputNumber @bind-Value=MatchVillain.CardsLeft id="villainCardsLeft" class="form-control transparent rounded-form"/>
-        </div>
-    </fieldset>
-</EditForm>
+<fieldset class="wrapper">
+    <legend class="title">Villain</legend>
+    <div>
+        <label for="villain">Villain:</label>
+        <SfComboBox TValue="Guid" TItem="VillainDto" DataSource="@Villains" Value="@MatchVillain.VillainId"
+                    ValueChanged="@((Guid value) => VillainChanged(value))"
+                    AllowFiltering="true" Placeholder="Search villain..." id="villain" CssClass="rounded-form">
+            <ComboBoxFieldSettings Value="Id" Text="Name"></ComboBoxFieldSettings>
+        </SfComboBox>
+        <ValidationMessage For="() => MatchVillain.VillainId"/>
+    </div>
+    <div>
+        <label for="villainHp">HP:</label>
+        <InputNumber @bind-Value=MatchVillain.HpLeft id="villainHp" class="form-control transparent rounded-form"/>
+    </div>
+    <div>
+        <label for="villainCardsLeft">Cards Left:</label>
+        <InputNumber @bind-Value=MatchVillain.CardsLeft id="villainCardsLeft" class="form-control transparent rounded-form"/>
+    </div>
+</fieldset>
 
 <div class="page-content">
     <label>Minions:</label>
     <button type="button" class="btn btn-secondary rounded-form" @onclick="AddMinion">+ Add minion</button>
     @foreach (var minion in MatchVillain.Minions.ToList())
     {
-        <div style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
-            <InputSelect
-                ValueExpression="@(() => minion.MinionId)"
-                Value="@minion.MinionId"
-                ValueChanged="@((Guid value) => MinionChanged(minion, value))"
-                class="form-select transparent rounded-form">
-                @foreach (var m in Minions)
-                {
-                    <option value="@m.Id"> @m.Name</option>
-                }
-            </InputSelect>
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px;">
+            <SfComboBox TValue="Guid" TItem="MinionDto" DataSource="@Minions" Value="@minion.MinionId"
+                        ValueChanged="@((Guid value) => MinionChanged(minion, value))"
+                        AllowFiltering="true" Placeholder="Search minion..." CssClass="rounded-form">
+                <ComboBoxFieldSettings Value="Id" Text="Name"></ComboBoxFieldSettings>
+            </SfComboBox>
             <label>HP:</label>
             <InputNumber @bind-Value=minion.HpLeft class="form-control transparent rounded-form"/>
             <button type="button" class="btn btn-secondary rounded-form" @onclick="() => RemoveMinion(minion)">✕</button>
@@ -89,13 +79,12 @@
 <style>
     .wrapper {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      column-gap: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      column-gap: 24px;
       row-gap: 4px;
     }
     .title {
-        grid-column-start: 1;
-        grid-column-end: 3;
+        grid-column: 1 / -1;
         grid-row-start: 1;
         grid-row-end: 2;
         text-align: center;

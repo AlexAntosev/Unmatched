@@ -1,0 +1,12 @@
+.player-summary-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: var(--um-space-6);
+    row-gap: var(--um-space-1);
+}
+
+@media (max-width: 767.98px) {
+    .player-summary-columns {
+        grid-template-columns: 1fr;
+    }
+}

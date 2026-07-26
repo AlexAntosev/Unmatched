@@ -2,6 +2,7 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IHeroStatisticsService HeroStatisticsService
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
@@ -13,7 +14,7 @@
 <div class="page-content" style="margin-bottom: 16px">
     <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
     <TotalMatchesRecord Total="Hero.TotalMatches" Wins="Hero.TotalWins" Looses="Hero.TotalLooses" Kd="Hero.Kd"></TotalMatchesRecord>
-    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
+    <MatchLogGrid MatchLogEntries="_matchLogEntries"></MatchLogGrid>
     <MonsterMatchupTable Title="Against Villains" Rows="_villainMatchups"></MonsterMatchupTable>
     <MonsterMatchupTable Title="Against Minions" Rows="_minionMatchups"></MonsterMatchupTable>
 </div>
@@ -86,7 +87,6 @@
                 .ToList();
 
             _ratingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
-            await UpdateChart();
         }
         finally
         {
@@ -147,6 +147,9 @@
     {
         if (firstRender)
         {
+            // JS interop (chart rendering) can't run during static prerendering - both
+            // Initialize and the real data Update must happen here, after the circuit exists,
+            // not in OnInitializedAsync.
             var data = new ChartData
                 {
                     Labels = _ratingChanges.Select(c => c.Date).ToList(),
@@ -156,6 +159,7 @@
             var options = new LineChartOptions();
 
             await _lineChart.InitializeAsync(data, options);
+            await UpdateChart();
         }
 
         await base.OnAfterRenderAsync(firstRender);

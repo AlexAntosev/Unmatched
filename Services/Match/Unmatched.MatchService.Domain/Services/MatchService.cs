@@ -174,6 +174,46 @@ public class MatchService(
         return matchLogs;
     }
 
+    public async Task<IEnumerable<MatchLog>> GetFinishedByVillainAsync(Guid villainId)
+    {
+        var villainMatches = await unitOfWork.Matches.GetFinishedByVillainIdAsync(villainId);
+
+        var matchLogs = new List<MatchLog>();
+
+        foreach (var match in villainMatches)
+        {
+            var matchLog = mapper.Map<MatchLog>(match);
+
+            var fighters = await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
+
+            matchLog.Fighters = mapper.Map<List<Fighter>>(fighters);
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
+    public async Task<IEnumerable<MatchLog>> GetFinishedByMinionAsync(Guid minionId)
+    {
+        var minionMatches = await unitOfWork.Matches.GetFinishedByMinionIdAsync(minionId);
+
+        var matchLogs = new List<MatchLog>();
+
+        foreach (var match in minionMatches)
+        {
+            var matchLog = mapper.Map<MatchLog>(match);
+
+            var fighters = await unitOfWork.Fighters.GetByMatchIdAsync(matchLog.MatchId);
+
+            matchLog.Fighters = mapper.Map<List<Fighter>>(fighters);
+
+            matchLogs.Add(matchLog);
+        }
+
+        return matchLogs;
+    }
+
     public async Task<IEnumerable<MatchLog>> GetMatchLogAsync()
     {
         var allMatches = await unitOfWork.Matches.GetFinishedAsync();
