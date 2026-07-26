@@ -10,4 +10,9 @@ public class RatingService(IMatchClient client) : IRatingService
     {
         return client.RecalculateAsync();
     }
+
+    public Task<bool> IsRecalculationRequiredAsync()
+    {
+        return client.IsRatingRecalculationRequiredAsync();
+    }
 }

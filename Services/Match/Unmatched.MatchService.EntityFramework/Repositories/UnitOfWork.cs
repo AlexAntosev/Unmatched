@@ -11,6 +11,8 @@ public class UnitOfWork(UnmatchedDbContext context) : IUnitOfWork
 
     public IRatingRepository Ratings { get; } = new RatingRepository(context);
 
+    public IRatingRecalculationStateRepository RatingRecalculationState { get; } = new RatingRecalculationStateRepository(context);
+
     public ITournamentRepository Tournaments { get; } = new TournamentRepository(context);
 
     public ITitleRepository Titles { get; } = new TitleRepository(context);

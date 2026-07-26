@@ -5,10 +5,12 @@
 @using Unmatched.Initializer.Initializers
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
 @inject IPlayerService PlayerService
 
 @inject IDataInitializer DataInitializer
 @inject IRatingService RatingService
+@inject RatingRecalculationStateNotifier RecalculationStateNotifier
 
 <button class="btn btn-primary" @onclick="InitializeData">Initialize Data</button>
 <button class="btn btn-primary" @onclick="RecalculateRating">Rating Recalculation</button>
@@ -66,8 +68,9 @@
         try
         {
             PreloadService.Show();
-            
+
             await RatingService.RecalculateAsync();
+            RecalculationStateNotifier.NotifyChanged();
         }
         finally
         {

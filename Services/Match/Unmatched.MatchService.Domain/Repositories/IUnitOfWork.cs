@@ -13,6 +13,8 @@ public interface IUnitOfWork : IDisposable
 
     IRatingRepository Ratings { get; }
 
+    IRatingRecalculationStateRepository RatingRecalculationState { get; }
+
     ITournamentRepository Tournaments { get; }
 
     ITitleRepository Titles { get; }

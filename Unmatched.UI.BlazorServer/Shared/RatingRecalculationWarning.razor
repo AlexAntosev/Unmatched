@@ -1,0 +1,50 @@
+@implements IDisposable
+@using Microsoft.AspNetCore.Components
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
+@inject IRatingService RatingService
+@inject NavigationManager NavigationManager
+@inject RatingRecalculationStateNotifier RecalculationStateNotifier
+
+@if (_isRecalculationRequired)
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link text-warning" href="@Urls.Initialize" title="Rating recalculation required">
+            <span class="oi oi-warning" aria-hidden="true"></span> Recalculation required
+        </NavLink>
+    </div>
+}
+
+@code {
+    private bool _isRecalculationRequired;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        RecalculationStateNotifier.Changed += OnRecalculationStateChanged;
+
+        await RefreshAsync();
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        await RefreshAsync();
+    }
+
+    private async void OnRecalculationStateChanged()
+    {
+        await RefreshAsync();
+    }
+
+    private async Task RefreshAsync()
+    {
+        _isRecalculationRequired = await RatingService.IsRecalculationRequiredAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        RecalculationStateNotifier.Changed -= OnRecalculationStateChanged;
+    }
+}

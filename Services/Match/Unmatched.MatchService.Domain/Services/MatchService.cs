@@ -26,6 +26,8 @@ public class MatchService(
         var handler = matchHandlerFactory.Create(match);
         await handler.HandleAsync(match);
 
+        await FlagRecalculationIfAddedOutOfChronologicalOrderAsync(match);
+
         var addedEntity = await unitOfWork.Matches.GetByIdAsync(match.Id);
 
         var matchCreatedEvent = mapper.Map<MatchCreated>(addedEntity);
@@ -181,6 +183,19 @@ public class MatchService(
         }
 
         return matchLogs;
+    }
+
+    private async Task FlagRecalculationIfAddedOutOfChronologicalOrderAsync(MatchEntity match)
+    {
+        var latestOtherMatchDate = (await unitOfWork.Matches.GetAsync())
+            .Where(m => m.Id != match.Id)
+            .Select(m => (DateTime?)m.Date)
+            .Max();
+
+        if (latestOtherMatchDate is not null && match.Date < latestOtherMatchDate)
+        {
+            await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(true);
+        }
     }
 
     public async Task UpdateEpicAsync(Guid matchId, int epic)

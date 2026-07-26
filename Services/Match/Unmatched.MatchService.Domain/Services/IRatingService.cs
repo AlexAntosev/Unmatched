@@ -10,5 +10,7 @@ public interface IRatingService
 
     public Task RecalculateAsync();
 
+    Task<bool> IsRecalculationRequiredAsync();
+
     Task<IEnumerable<Rating>> GetAllAsync();
 }

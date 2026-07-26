@@ -103,8 +103,15 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
 
     public async Task RecalculateAsync()
     {
-        var response = await httpClient.PutAsync("/rating/recalculate", null);
+        var response = await httpClient.PostAsync("/rating/recalculate", null);
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<bool> IsRatingRecalculationRequiredAsync()
+    {
+        var response = await httpClient.GetAsync("/rating/recalculation-required");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<bool>();
     }
 
     public async Task<SaveMatchResultDto> UpdateAsync(MatchDto match)

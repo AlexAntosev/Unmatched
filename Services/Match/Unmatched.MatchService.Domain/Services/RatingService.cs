@@ -51,6 +51,9 @@ public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, I
         return ratingChanges;
     }
 
+    public Task<bool> IsRecalculationRequiredAsync()
+        => unitOfWork.RatingRecalculationState.IsRecalculationRequiredAsync();
+
     public async Task RecalculateAsync()
     {
         var matches = await GetMatchesAsync();
@@ -61,6 +64,8 @@ public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, I
         {
             await matchService.AddOrUpdateAsync(match);
         }
+
+        await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(false);
     }
 
     private async Task ClearDataAsync()
@@ -75,6 +80,6 @@ public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, I
     private async Task<IEnumerable<Match>> GetMatchesAsync()
     {
         var matches = await unitOfWork.Matches.GetAsync();
-        return matches.Select(mapper.Map<Match>);
+        return matches.Select(mapper.Map<Match>).OrderBy(m => m.Date);
     }
 }

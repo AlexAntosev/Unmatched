@@ -33,6 +33,8 @@ public interface IMatchClient
 
     Task RecalculateAsync();
 
+    Task<bool> IsRatingRecalculationRequiredAsync();
+
     Task<SaveMatchResultDto> UpdateAsync(MatchDto match);
 
     Task UpdateEpicAsync(Guid matchId, int epic);
