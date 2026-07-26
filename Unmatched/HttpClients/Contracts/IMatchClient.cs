@@ -35,6 +35,16 @@ public interface IMatchClient
 
     Task<bool> IsRatingRecalculationRequiredAsync();
 
+    Task AddTitleAsync(TitleDto title);
+
+    Task<IEnumerable<TitleDto>> GetTitlesAsync();
+
+    Task DeleteTitleAsync(Guid id);
+
+    Task MergeTitleAsync(Guid titleId, IEnumerable<Guid> heroesIds);
+
+    Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssignAsync(Guid titleId);
+
     Task<SaveMatchResultDto> UpdateAsync(MatchDto match);
 
     Task UpdateEpicAsync(Guid matchId, int epic);

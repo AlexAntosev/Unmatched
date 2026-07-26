@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMapStatisticsService, MapStatisticsService>();
         services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
 
-        // services.AddTransient<ITitleService, TitleService>();
+        services.AddTransient<ITitleService, TitleService>();
 
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>

@@ -22,6 +22,15 @@ public class TitleRepository(UnmatchedDbContext dbContext) : BaseRepository<Titl
         return entity;
     }
 
+    public override async Task<TitleEntity?> GetByIdAsync(Guid id)
+    {
+        // tracked (not AsNoTracking): TitleService mutates HeroTitles in place (Assign/Unassign/Merge) and
+        // relies on the change tracker to detect additions/removals to this collection on SaveChangesAsync.
+        var entity = await DbContext.Titles.Include(t => t.HeroTitles).FirstOrDefaultAsync(t => t.Id == id);
+
+        return entity;
+    }
+
     protected override Guid GetId(TitleEntity model)
     {
         return model.Id;

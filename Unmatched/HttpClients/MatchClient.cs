@@ -114,6 +114,40 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<bool>();
     }
 
+    public async Task AddTitleAsync(TitleDto title)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(title), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync("/title", content);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<IEnumerable<TitleDto>> GetTitlesAsync()
+    {
+        var response = await httpClient.GetAsync("/title");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<TitleDto>>();
+    }
+
+    public async Task DeleteTitleAsync(Guid id)
+    {
+        var response = await httpClient.DeleteAsync($"/title/{id}");
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task MergeTitleAsync(Guid titleId, IEnumerable<Guid> heroesIds)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(heroesIds), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"/title/{titleId}/merge", content);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<IEnumerable<HeroTitleAssignDto>> GetHeroesForTitleAssignAsync(Guid titleId)
+    {
+        var response = await httpClient.GetAsync($"/title/{titleId}/heroes");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<HeroTitleAssignDto>>();
+    }
+
     public async Task<SaveMatchResultDto> UpdateAsync(MatchDto match)
     {
         var content = new StringContent(JsonSerializer.Serialize(match), Encoding.UTF8, "application/json");

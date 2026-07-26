@@ -23,6 +23,7 @@ public class ApiMapper : Profile
         CreateMap<FighterPlayer, FighterPlayerDto>().ReverseMap();
         CreateMap<Rating, RatingDto>();
         CreateMap<RatingChange, RatingChangeDto>();
+        CreateMap<Title, TitleDto>().ReverseMap();
     }
 }
 

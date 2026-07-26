@@ -30,6 +30,8 @@ public class DomainMapper : Profile
             .ReverseMap()
             .ForMember(x => x.PlayerId, opt => opt.MapFrom(s => s.Player!.Id));
         CreateMap<TitleEntity, Title>().ReverseMap();
+        CreateMap<CatalogHeroDto, HeroTitleAssign>()
+            .ForMember(dest => dest.IsAssigned, opt => opt.Ignore());
         CreateMap<CatalogSidekickDto, FighterSidekick>().ReverseMap();
         CreateMap<CatalogHeroDto, FighterHero>().ReverseMap();
         CreateMap<PlayerDto, FighterPlayer>().ReverseMap();
