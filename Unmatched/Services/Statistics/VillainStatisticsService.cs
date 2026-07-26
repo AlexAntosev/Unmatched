@@ -14,4 +14,10 @@ public class VillainStatisticsService(IStatisticsClient statisticsClient) : IVil
     {
         return await statisticsClient.GetVillainStatsAsync(villainId);
     }
+
+    public async Task<string> UpdateImageAsync(Guid villainId, string imageFileName)
+    {
+        var updated = await statisticsClient.UpdateVillainImageAsync(villainId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

@@ -23,4 +23,18 @@ public class HeroStatisticsService(IMapper mapper, ICatalogHeroCache catalogHero
 
         return statistics;
     }
+
+    public async Task<HeroStats?> UpdateImageAsync(Guid heroId, string imageFileName)
+    {
+        var stats = await unitOfWork.HeroStats.GetByHeroAsync(heroId);
+        if (stats is null)
+        {
+            return null;
+        }
+
+        stats.ImageFileName = imageFileName;
+        await unitOfWork.HeroStats.AddOrUpdateAsync(stats);
+        await unitOfWork.SaveChangesAsync();
+        return stats;
+    }
 }

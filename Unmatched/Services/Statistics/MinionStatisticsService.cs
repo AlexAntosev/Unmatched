@@ -14,4 +14,10 @@ public class MinionStatisticsService(IStatisticsClient statisticsClient) : IMini
     {
         return await statisticsClient.GetMinionStatsAsync(minionId);
     }
+
+    public async Task<string> UpdateImageAsync(Guid minionId, string imageFileName)
+    {
+        var updated = await statisticsClient.UpdateMinionImageAsync(minionId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

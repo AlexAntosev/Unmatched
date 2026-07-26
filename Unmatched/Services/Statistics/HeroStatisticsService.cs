@@ -41,4 +41,10 @@ public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, ISta
         var matches = await matchClient.GetHeroRatingChangesAsync(heroId);
         return matches.Select(mapper.Map<RatingChangeDto>).ToList();
     }
+
+    public async Task<string> UpdateImageAsync(Guid heroId, string imageFileName)
+    {
+        var updated = await statisticsClient.UpdateHeroImageAsync(heroId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

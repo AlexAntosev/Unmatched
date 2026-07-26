@@ -7,4 +7,6 @@ public interface IMinionStatisticsService
     Task<IEnumerable<MinionStatisticsDto>> GetMinionsStatisticsAsync();
 
     Task<MinionStatisticsDto> GetMinionStatisticsAsync(Guid minionId);
+
+    Task<string> UpdateImageAsync(Guid minionId, string imageFileName);
 }

@@ -7,4 +7,6 @@ public interface IVillainStatisticsService
     Task<IEnumerable<VillainStats>> GetVillainsStatisticsAsync();
 
     Task<VillainStats?> GetVillainStatisticsAsync(Guid villainId);
+
+    Task<VillainStats?> UpdateImageAsync(Guid villainId, string imageFileName);
 }

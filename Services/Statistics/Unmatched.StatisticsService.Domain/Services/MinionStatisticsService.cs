@@ -15,4 +15,18 @@ public class MinionStatisticsService(IUnitOfWork unitOfWork) : IMinionStatistics
     {
         return await unitOfWork.MinionStats.GetByMinionAsync(minionId);
     }
+
+    public async Task<MinionStats?> UpdateImageAsync(Guid minionId, string imageFileName)
+    {
+        var stats = await unitOfWork.MinionStats.GetByMinionAsync(minionId);
+        if (stats is null)
+        {
+            return null;
+        }
+
+        stats.ImageFileName = imageFileName;
+        await unitOfWork.MinionStats.AddOrUpdateAsync(stats);
+        await unitOfWork.SaveChangesAsync();
+        return stats;
+    }
 }

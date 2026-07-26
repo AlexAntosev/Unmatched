@@ -26,4 +26,11 @@ public class HeroController(ILogger<HeroController> logger, IHeroStatisticsServi
         var result = stats.Select(mapper.Map<HeroStatsDto>);
         return Ok(result);
     }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<HeroStatsDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var stats = await heroService.UpdateImageAsync(id, imageFileName);
+        return stats is null ? NotFound() : Ok(mapper.Map<HeroStatsDto>(stats));
+    }
 }

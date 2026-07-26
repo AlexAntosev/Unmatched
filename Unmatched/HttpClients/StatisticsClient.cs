@@ -4,6 +4,8 @@ namespace Unmatched.HttpClients;
 
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using Unmatched.Dtos;
 using Unmatched.Dtos.Statistics;
 
@@ -77,5 +79,29 @@ public class StatisticsClient(HttpClient httpClient) : IStatisticsClient
         var response = await httpClient.GetAsync("/minion");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<MinionStatisticsDto>>();
+    }
+
+    public async Task<HeroStatisticsDto> UpdateHeroImageAsync(Guid heroId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/hero/{heroId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<HeroStatisticsDto>();
+    }
+
+    public async Task<VillainStatisticsDto> UpdateVillainImageAsync(Guid villainId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/villain/{villainId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<VillainStatisticsDto>();
+    }
+
+    public async Task<MinionStatisticsDto> UpdateMinionImageAsync(Guid minionId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/minion/{minionId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<MinionStatisticsDto>();
     }
 }

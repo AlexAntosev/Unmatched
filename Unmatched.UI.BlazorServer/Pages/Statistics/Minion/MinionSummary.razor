@@ -1,8 +1,10 @@
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Services
 @inject IMinionService MinionService
+@inject IMinionStatisticsService MinionStatisticsService
 @inject IImageUploadService ImageUploadService
 
 <div style="background: linear-gradient(180deg, @Statistics.Color 0%, rgba(255,255,255,1) 100%);">
@@ -34,6 +36,7 @@
         await using var stream = file.OpenReadStream(15_000_000);
         var fileName = await ImageUploadService.SaveAsync("minions", Statistics.Name, Statistics.ImageFileName, stream, file.Name);
         await MinionService.UpdateImageAsync(Statistics.MinionId, fileName);
+        await MinionStatisticsService.UpdateImageAsync(Statistics.MinionId, fileName);
         Statistics.ImageFileName = fileName;
         _cacheBust++;
         StateHasChanged();

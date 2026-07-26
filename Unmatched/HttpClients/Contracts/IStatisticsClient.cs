@@ -24,4 +24,10 @@ public interface IStatisticsClient
     Task<MinionStatisticsDto> GetMinionStatsAsync(Guid minionId);
 
     Task<IEnumerable<MinionStatisticsDto>> GetMinionStatsAsync();
+
+    Task<HeroStatisticsDto> UpdateHeroImageAsync(Guid heroId, string imageFileName);
+
+    Task<VillainStatisticsDto> UpdateVillainImageAsync(Guid villainId, string imageFileName);
+
+    Task<MinionStatisticsDto> UpdateMinionImageAsync(Guid minionId, string imageFileName);
 }

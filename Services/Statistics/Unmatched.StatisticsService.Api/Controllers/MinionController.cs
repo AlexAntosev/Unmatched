@@ -26,4 +26,11 @@ public class MinionController(IMinionStatisticsService minionService, IMapper ma
         var result = stats.Select(mapper.Map<MinionStatsDto>);
         return Ok(result);
     }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<MinionStatsDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var stats = await minionService.UpdateImageAsync(id, imageFileName);
+        return stats is null ? NotFound() : Ok(mapper.Map<MinionStatsDto>(stats));
+    }
 }
