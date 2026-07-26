@@ -52,6 +52,13 @@ public class PlayerController(
         return NotFound();
     }
 
+    [HttpPut("{playerId}/image")]
+    public async Task<ActionResult<PlayerDto>> UpdateImage(Guid playerId, [FromBody] string imageFileName)
+    {
+        var player = await playerService.UpdateImageAsync(playerId, imageFileName);
+        return player is null ? NotFound() : Ok(mapper.Map<PlayerDto>(player));
+    }
+
     [HttpPut("{playerId}/hero/{heroId}/chosen")]
     public async Task<ActionResult<Guid>> UpdateChosenOneAsync(Guid playerId, Guid heroId, [FromBody] bool isChosenOne)
     {

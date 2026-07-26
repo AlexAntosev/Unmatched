@@ -2,12 +2,16 @@
 @using Unmatched.Constants
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
+@inject IPlayerService PlayerService
+@inject IImageUploadService ImageUploadService
 
 <div style="background: linear-gradient(180deg, @(ChosenOne?.Hero?.Color ?? Colors.Default) 0%, rgba(255,255,255,1) 100%);">
     <h3 align="center" class="page-title">@Statistics.Name</h3>
     <div class="wrapper page-content">
         <div class="image-container">
-            <img src="@Statistics.ImageUrl"/>
+            <EditableImage ImageUrl="@BustCache(Statistics.ImageUrl)" AltText="@Statistics.Name" OnFileSelected="OnImageSelectedAsync" />
         </div>
         <div>
             <h4> Chosen One: @ChosenOne?.Hero?.Name</h4>
@@ -52,6 +56,19 @@
     private IGrouping<string, UiFighterDto> _strongestHeroMatches;
     private IGrouping<string, UiFighterDto> _weakestHeroMatches;
     private List<IGrouping<string, UiFighterDto>> _favoritesMatches = new();
+    private int _cacheBust;
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("players", Statistics.Name, Statistics.ImageFileName, stream, file.Name);
+        await PlayerService.UpdateImageAsync(Statistics.PlayerId, fileName);
+        Statistics.ImageFileName = fileName;
+        _cacheBust++;
+        StateHasChanged();
+    }
 }
 
 <style>

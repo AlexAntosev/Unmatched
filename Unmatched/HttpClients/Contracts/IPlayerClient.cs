@@ -14,4 +14,6 @@ public interface IPlayerClient
     Task<Guid> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne);
 
     Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour);
+
+    Task<PlayerDto> UpdatePlayerImageAsync(Guid playerId, string imageFileName);
 }

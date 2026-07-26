@@ -15,4 +15,18 @@ public class HeroService(IUnitOfWork unitOfWork) : IHeroService
     {
         return unitOfWork.Heroes.GetByIdAsync(id);
     }
+
+    public async Task<Hero?> UpdateImageAsync(Guid id, string imageFileName)
+    {
+        var hero = await unitOfWork.Heroes.GetByIdAsync(id);
+        if (hero is null)
+        {
+            return null;
+        }
+
+        hero.ImageFileName = imageFileName;
+        unitOfWork.Heroes.AddOrUpdate(hero, id);
+        await unitOfWork.SaveChangesAsync();
+        return hero;
+    }
 }

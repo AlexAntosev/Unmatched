@@ -25,4 +25,10 @@ public interface ICatalogClient
     Task<IEnumerable<CatalogVillainDto>> GetVillainsAsync();
 
     Task<IEnumerable<CatalogMinionDto>> GetMinionsAsync();
+
+    Task<CatalogHeroDto> UpdateHeroImageAsync(Guid heroId, string imageFileName);
+
+    Task<CatalogVillainDto> UpdateVillainImageAsync(Guid villainId, string imageFileName);
+
+    Task<CatalogMinionDto> UpdateMinionImageAsync(Guid minionId, string imageFileName);
 }

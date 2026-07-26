@@ -18,7 +18,7 @@ public class MinionStatisticsDto : IComparable<MinionStatisticsDto>
 
     public string? ImageFileName { get; set; }
 
-    public string ImageUrl => ImageFileName != null ? $"/images/minions/{ImageFileName}" : $"/{Name}.png";
+    public string ImageUrl => ImageFileName != null ? $"/images/minions/{ImageFileName}" : "/Unknown.png";
 
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
 

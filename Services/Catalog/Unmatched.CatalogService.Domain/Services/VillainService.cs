@@ -14,4 +14,18 @@ public class VillainService(IUnitOfWork unitOfWork) : IVillainService
     {
         return unitOfWork.Villains.GetByIdAsync(id);
     }
+
+    public async Task<Villain?> UpdateImageAsync(Guid id, string imageFileName)
+    {
+        var villain = await unitOfWork.Villains.GetByIdAsync(id);
+        if (villain is null)
+        {
+            return null;
+        }
+
+        villain.ImageFileName = imageFileName;
+        unitOfWork.Villains.AddOrUpdate(villain, id);
+        await unitOfWork.SaveChangesAsync();
+        return villain;
+    }
 }

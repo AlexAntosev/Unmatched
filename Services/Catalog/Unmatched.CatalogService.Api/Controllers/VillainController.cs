@@ -26,4 +26,11 @@ public class VillainController(IMapper mapper, IVillainService villainService) :
         var result = mapper.Map<VillainDto>(villain);
         return result;
     }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<VillainDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var villain = await villainService.UpdateImageAsync(id, imageFileName);
+        return villain is null ? NotFound() : Ok(mapper.Map<VillainDto>(villain));
+    }
 }

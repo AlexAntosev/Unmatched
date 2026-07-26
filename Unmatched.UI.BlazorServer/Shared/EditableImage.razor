@@ -1,0 +1,64 @@
+<div class="editable-image">
+    <img src="@ImageUrl" alt="@AltText" onerror="this.onerror=null;this.src='@FallbackImageUrl'" />
+    <label class="edit-image-icon" title="Change image" @onclick:stopPropagation="true">
+        <InputFile OnChange="HandleFileSelectedAsync" accept="image/*" />
+        <span aria-hidden="true">&#9998;</span>
+    </label>
+    @if (_isUploading)
+    {
+        <div class="editable-image-spinner"></div>
+    }
+</div>
+@if (_error is not null)
+{
+    <div class="editable-image-error">@_error</div>
+}
+
+@code {
+    private const long MaxFileSizeBytes = 15_000_000;
+
+    [Parameter, EditorRequired]
+    public string ImageUrl { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? AltText { get; set; }
+
+    [Parameter]
+    public string FallbackImageUrl { get; set; } = "/Unknown.png";
+
+    /// <summary>
+    /// Invoked with the raw selected file. The caller reads its stream (via
+    /// <c>file.OpenReadStream(maxAllowedSize)</c>), performs the upload, and updates its own state.
+    /// Any exception thrown here is caught and surfaced as an inline error message.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public EventCallback<IBrowserFile> OnFileSelected { get; set; }
+
+    private bool _isUploading;
+    private string? _error;
+
+    private async Task HandleFileSelectedAsync(InputFileChangeEventArgs e)
+    {
+        _error = null;
+        _isUploading = true;
+        StateHasChanged();
+        try
+        {
+            if (e.File.Size > MaxFileSizeBytes)
+            {
+                _error = "Image is too large (max 15 MB).";
+                return;
+            }
+
+            await OnFileSelected.InvokeAsync(e.File);
+        }
+        catch (Exception)
+        {
+            _error = "Could not upload image.";
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+    }
+}

@@ -13,4 +13,10 @@ public class VillainService(IMapper mapper, ICatalogClient catalogClient) : IVil
         var entities = await catalogClient.GetVillainsAsync();
         return mapper.Map<IEnumerable<VillainDto>>(entities);
     }
+
+    public async Task<string> UpdateImageAsync(Guid villainId, string imageFileName)
+    {
+        var updated = await catalogClient.UpdateVillainImageAsync(villainId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

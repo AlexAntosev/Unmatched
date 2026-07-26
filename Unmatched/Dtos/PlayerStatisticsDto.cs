@@ -2,7 +2,9 @@
 
 public class PlayerStatisticsDto : IComparable<PlayerStatisticsDto>
 {
-    public string ImageUrl => $"/{Name}.png";
+    public string? ImageFileName { get; set; }
+
+    public string ImageUrl => ImageFileName != null ? $"/images/players/{ImageFileName}" : "/Unknown.png";
 
     public double Kd { get; set; }
 

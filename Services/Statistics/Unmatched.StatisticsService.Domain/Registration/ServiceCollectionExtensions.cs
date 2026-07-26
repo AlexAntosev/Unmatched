@@ -44,6 +44,8 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IStatsCoordinator, HeroStatsCoordinator>();
         services.AddTransient<IStatsCoordinator, MapStatsCoordinator>();
+        services.AddTransient<IStatsCoordinator, VillainStatsCoordinator>();
+        services.AddTransient<IStatsCoordinator, MinionStatsCoordinator>();
 
         services.AddTransient<IMatchCreatedHandler, MatchCreatedHeroHandler>();
         services.AddTransient<IMatchCreatedHandler, MatchCreatedMapHandler>();

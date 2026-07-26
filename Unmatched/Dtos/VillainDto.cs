@@ -15,8 +15,10 @@ public class VillainDto
     public bool IsRanged { get; set; }
     
     public string Color { get; set; }
-    
-    public string ImageUrl => $"/{Name}.png";
-    
+
+    public string? ImageFileName { get; set; }
+
+    public string ImageUrl => ImageFileName != null ? $"/images/villains/{ImageFileName}" : "/Unknown.png";
+
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
 }

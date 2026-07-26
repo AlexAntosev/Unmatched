@@ -52,4 +52,12 @@ public class PlayerClient(HttpClient httpClient) : IPlayerClient
         var response = await httpClient.PostAsync($"/player/{playerId}/hero/{heroId}/favor", content);
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task<PlayerDto> UpdatePlayerImageAsync(Guid playerId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/player/{playerId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlayerDto>();
+    }
 }

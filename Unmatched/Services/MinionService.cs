@@ -13,4 +13,10 @@ public class MinionService(IMapper mapper, ICatalogClient catalogClient) : IMini
         var entities = await catalogClient.GetMinionsAsync();
         return mapper.Map<IEnumerable<MinionDto>>(entities);
     }
+
+    public async Task<string> UpdateImageAsync(Guid minionId, string imageFileName)
+    {
+        var updated = await catalogClient.UpdateMinionImageAsync(minionId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

@@ -8,6 +8,8 @@ public class PlayerStatsDto
 
     public string Name { get; set; }
 
+    public string? ImageFileName { get; set; }
+
     public int Place { get; set; }
 
     public Guid PlayerId { get; set; }

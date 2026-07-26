@@ -1,5 +1,9 @@
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
+@inject IVillainService VillainService
+@inject IImageUploadService ImageUploadService
 
 <div style="background: linear-gradient(180deg, @Statistics.Color 0%, rgba(255,255,255,1) 100%);">
     <div style="display: flex; align-items: center; justify-content: center;">
@@ -7,7 +11,7 @@
     </div>
     <div class="wrapper page-content">
         <div class="image-container">
-            <img src="@Statistics.ImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+            <EditableImage ImageUrl="@BustCache(Statistics.ImageUrl)" AltText="@Statistics.Name" OnFileSelected="OnImageSelectedAsync" />
         </div>
         <div>
             <img style="margin-bottom: 0.5rem;" src="@Statistics.MeleeRangeImageUrl" alt="@Statistics.Name" width="64px" height="auto"/>
@@ -20,6 +24,20 @@
 @code {
     [Parameter]
     public VillainStatisticsDto Statistics { get; set; } = new();
+
+    private int _cacheBust;
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("villains", Statistics.Name, Statistics.ImageFileName, stream, file.Name);
+        await VillainService.UpdateImageAsync(Statistics.VillainId, fileName);
+        Statistics.ImageFileName = fileName;
+        _cacheBust++;
+        StateHasChanged();
+    }
 }
 
 <style>

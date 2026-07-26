@@ -14,4 +14,18 @@ public class MinionService(IUnitOfWork unitOfWork) : IMinionService
     {
         return unitOfWork.Minions.GetByIdAsync(id);
     }
+
+    public async Task<Minion?> UpdateImageAsync(Guid id, string imageFileName)
+    {
+        var minion = await unitOfWork.Minions.GetByIdAsync(id);
+        if (minion is null)
+        {
+            return null;
+        }
+
+        minion.ImageFileName = imageFileName;
+        unitOfWork.Minions.AddOrUpdate(minion, id);
+        await unitOfWork.SaveChangesAsync();
+        return minion;
+    }
 }

@@ -277,6 +277,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AWSSDK.S3" Version="4.0.101.4" />
       <PackageReference Include="Blazor.Bootstrap" Version="1.10.4" />
       <PackageReference Include="Syncfusion.Blazor" Version="22.2.11" />
       <PackageReference Include="Syncfusion.Blazor.Themes" Version="22.2.11" />

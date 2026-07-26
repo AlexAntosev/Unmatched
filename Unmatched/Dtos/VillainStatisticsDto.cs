@@ -18,7 +18,7 @@ public class VillainStatisticsDto : IComparable<VillainStatisticsDto>
 
     public string? ImageFileName { get; set; }
 
-    public string ImageUrl => ImageFileName != null ? $"/images/villains/{ImageFileName}" : $"/{Name}.png";
+    public string ImageUrl => ImageFileName != null ? $"/images/villains/{ImageFileName}" : "/Unknown.png";
 
     public string MeleeRangeImageUrl => $"/{(IsRanged ? "Ranged" : "Melee")}.png";
 

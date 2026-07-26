@@ -1,7 +1,10 @@
 ﻿@using Unmatched.Dtos
 @using Unmatched.Services
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
 @inject IPlayStyleService PlayStyleService
+@inject IHeroService HeroService
+@inject IImageUploadService ImageUploadService
 
 <div style="background: linear-gradient(180deg, @Statistics.Color 0%, rgba(255,255,255,1) 100%);">
     <div style="display: flex; align-items: center; justify-content: center;" >
@@ -11,7 +14,7 @@
     </div>
     <div class="wrapper page-content">
         <div class="image-container">
-            <img src="@Statistics.ImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+            <EditableImage ImageUrl="@BustCache(_statistics.ImageUrl)" AltText="@_statistics.Name" OnFileSelected="OnImageSelectedAsync" />
         </div>
         <div>
             <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
@@ -67,6 +70,19 @@
     private UiHeroStatisticsDto _statistics = new();
     private string? _sidekickTitle;
     private string? _sidekicksSuffix;
+    private int _cacheBust;
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("heroes", _statistics.Name, _statistics.ImageFileName, stream, file.Name);
+        await HeroService.UpdateImageAsync(_statistics.HeroId, fileName);
+        _statistics.ImageFileName = fileName;
+        _cacheBust++;
+        StateHasChanged();
+    }
 
     private string ShowTitles()
     {

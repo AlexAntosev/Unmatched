@@ -15,4 +15,10 @@ public class HeroService(IMapper mapper, ICatalogClient catalogClient) : IHeroSe
 
         return heroes;
     }
+
+    public async Task<string> UpdateImageAsync(Guid heroId, string imageFileName)
+    {
+        var updated = await catalogClient.UpdateHeroImageAsync(heroId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

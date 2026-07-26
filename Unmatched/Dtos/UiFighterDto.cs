@@ -10,11 +10,7 @@ public class UiFighterDto
 
     public Guid HeroId { get; set; } // TODO: get rid of this Id
 
-    // Match service's FighterHeroDto is its own denormalized snapshot of hero data and doesn't carry
-    // ImageFileName (unlike CatalogHeroDto) - fall back to the legacy name-based guess for match
-    // records until Match service is extended the same way Statistics was. See ImageFileName work
-    // in Catalog/Statistics for the pattern to follow.
-    public string HeroImageUrl => Hero?.ImageFileName != null ? Hero.ImageUrl : $"/{Hero?.Name ?? "Unknown"}.png";
+    public string HeroImageUrl => Hero?.ImageUrl ?? "/Unknown.png";
 
     public int? HpLeft { get; set; }
 
@@ -32,7 +28,7 @@ public class UiFighterDto
 
     public Guid PlayerId { get; set; } // TODO: get rid of this Id
 
-    public string PlayerImageUrl => $"/{Player?.Name ?? "Unknown"}.png";
+    public string PlayerImageUrl => Player?.ImageUrl ?? "/Unknown.png";
 
     public int? SidekickHpLeft { get; set; }
 

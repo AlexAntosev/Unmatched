@@ -9,4 +9,6 @@ public interface IHeroService
     Task<IEnumerable<Hero>> GetAllAsync();
 
     Task<Hero?> GetAsync(Guid id);
+
+    Task<Hero?> UpdateImageAsync(Guid id, string imageFileName);
 }
