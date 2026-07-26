@@ -1,0 +1,39 @@
+@using Unmatched.UI.BlazorServer.Pages.Statistics
+
+@if (Rows.Any())
+{
+    <div class="page-content">
+        <h5>@Title</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Matches</th>
+                    <th>Wins</th>
+                    <th>Looses</th>
+                    <th>K/D</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Rows)
+                {
+                    <tr>
+                        <td>@row.Name</td>
+                        <td>@row.Total</td>
+                        <td>@row.Wins</td>
+                        <td>@row.Looses</td>
+                        <td>@row.Kd</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public IEnumerable<MonsterMatchupRow> Rows { get; set; } = Enumerable.Empty<MonsterMatchupRow>();
+}

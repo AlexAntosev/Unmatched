@@ -1,4 +1,4 @@
-﻿@page "/minions-statistics"
+@page "/minions-statistics"
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
@@ -10,36 +10,34 @@
     <h1 class="page-title">Minions Statistics</h1>
     <SfGrid @ref="_grid" DataSource="@_minions" AllowPaging="true" AllowSorting="true">
         <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents OnDataBound="OnDataBoundHandler" OnRecordClick="RecordClickHandler" TValue="MinionStatisticsDto"></GridEvents>
+        <GridEvents OnRecordClick="RecordClickHandler" TValue="MinionStatisticsDto"></GridEvents>
         <GridSortSettings>
             <GridSortColumns>
-                <GridSortColumn Field="@nameof(MinionStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
+                <GridSortColumn Field="@nameof(MinionStatisticsDto.TotalMatches)" Direction="SortDirection.Descending"></GridSortColumn>
             </GridSortColumns>
         </GridSortSettings>
         <GridColumns>
-            <GridColumn Field=@nameof(MinionStatisticsDto.Place) Width="25" TextAlign="TextAlign.Center"></GridColumn>
             <GridColumn Width="20">
                 <Template>
                     @{
                         var minion = context as MinionStatisticsDto;
                         <div class="image">
-                            <img src="@minion?.Minion.ImageUrl" alt="@minion.MinionId" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                            <img src="@minion?.ImageUrl" alt="@minion?.Name" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
                         </div>
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field="Minion.Name" HeaderText="Minion" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(MinionStatisticsDto.Name) HeaderText="Minion" Width="120"></GridColumn>
             <GridColumn Width="20">
                 <Template>
                     @{
                         var minion = context as MinionStatisticsDto;
                         <div class="image">
-                            <img src="@minion.Minion.MeleeRangeImageUrl" alt="@minion.MinionId" width="100%" height="auto"/>
+                            <img src="@minion?.MeleeRangeImageUrl" alt="@minion?.Name" width="100%" height="auto"/>
                         </div>
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field=@nameof(MinionStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
             <GridColumn Field=@nameof(MinionStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
             <GridColumn Field=@nameof(MinionStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
             <GridColumn Field=@nameof(MinionStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
@@ -51,7 +49,7 @@
 @code {
     private List<MinionStatisticsDto> _minions = new();
     SfGrid<MinionStatisticsDto> _grid;
-    
+
     [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -59,7 +57,7 @@
         try
         {
             PreloadService.Show();
-            _minions = (await MinionStatisticsService.GetMinionsStatisticsAsync()).OrderBy(x => x.Minion.Name).ToList();
+            _minions = (await MinionStatisticsService.GetMinionsStatisticsAsync()).OrderBy(x => x.Name).ToList();
         }
         finally
         {
@@ -72,29 +70,5 @@
         var minionId = args.RowData.MinionId;
         var url = $"{Urls.MinionsStatistics}/{minionId}";
         NavManager.NavigateTo(url);
-    }
-
-    private void OnDataBoundHandler()
-    {
-        SetPlaces();
-    }
-
-    private void SetPlaces()
-    {
-        if (_grid.CurrentViewData is null)
-        {
-            return;
-        }
-        
-        var dataSource = _grid.CurrentViewData;
-        var place = 1;
-        foreach (var data in dataSource)
-        {
-            if (data is MinionStatisticsDto hero)
-            {
-                hero.Place = place;
-                place++;
-            }
-        }
     }
 }

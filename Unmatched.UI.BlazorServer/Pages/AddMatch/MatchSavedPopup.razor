@@ -1,19 +1,53 @@
-﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
+@using Unmatched.Enums
 
-<div class="row">
-    <div class="col-5 col-md-5 text-end">Winner :</div>
-    <div class="col-7 col-md-7">@Result.WinnerHeroName (@Result.WinnerMatchPoints points)</div>
-</div>
-<div class="row">
-    <div class="col-5 col-md-5 text-end">Looser :</div>
-    <div class="col-7 col-md-7">@Result.LooserHeroName (@Result.LooserMatchPoints points)</div>
-</div>
+@if (Result.GameMode == GameMode.Cooperative)
+{
+    <div class="row">
+        <div class="col-12 text-center">
+            @(Result.PlayersWon == true ? "Гравці перемогли" : "Гравці програли") проти @Result.VillainName
+        </div>
+    </div>
+}
+else if (Result.GameMode == GameMode.FreeForAll)
+{
+    @foreach (var fighter in Result.FighterResults.OrderBy(f => f.Placement))
+    {
+        <div class="row">
+            <div class="col-5 col-md-5 text-end">@fighter.Placement place:</div>
+            <div class="col-7 col-md-7">@fighter.PlayerName - @fighter.HeroName (@fighter.MatchPoints points)</div>
+        </div>
+    }
+}
+else if (Result.GameMode == GameMode.TeamVsTeam)
+{
+    @foreach (var team in Result.FighterResults.GroupBy(f => f.Team).OrderByDescending(g => g.First().IsWinner))
+    {
+        <div class="row">
+            <div class="col-5 col-md-5 text-end">@(team.First().IsWinner ? "Winner team" : "Looser team"):</div>
+            <div class="col-7 col-md-7">@string.Join(", ", team.Select(f => $"{f.PlayerName} - {f.HeroName} ({f.MatchPoints} points)"))</div>
+        </div>
+    }
+}
+else
+{
+    var winner = Result.FighterResults.FirstOrDefault(f => f.IsWinner);
+    var looser = Result.FighterResults.FirstOrDefault(f => !f.IsWinner);
+    <div class="row">
+        <div class="col-5 col-md-5 text-end">Winner :</div>
+        <div class="col-7 col-md-7">@winner?.HeroName (@winner?.MatchPoints points)</div>
+    </div>
+    <div class="row">
+        <div class="col-5 col-md-5 text-end">Looser :</div>
+        <div class="col-7 col-md-7">@looser?.HeroName (@looser?.MatchPoints points)</div>
+    </div>
+}
 @if (Result.TitlesEarned.Any())
 {
     <div class="row">
-        <div class="col-5 col-md-5 text-end">@Result.WinnerHeroName achieved :</div>
+        <div class="col-5 col-md-5 text-end">Titles achieved :</div>
         <div class="col-7 col-md-7">@Result.TitlesEarned.Select(t => $"{t} Title").Aggregate((a, x) => a + ", " + x)</div>
     </div>
 }

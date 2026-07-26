@@ -50,4 +50,32 @@ public class StatisticsClient(HttpClient httpClient) : IStatisticsClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<PlayerStatisticsDto>>();
     }
+
+    public async Task<VillainStatisticsDto> GetVillainStatsAsync(Guid villainId)
+    {
+        var response = await httpClient.GetAsync($"/villain/{villainId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<VillainStatisticsDto>();
+    }
+
+    public async Task<IEnumerable<VillainStatisticsDto>> GetVillainStatsAsync()
+    {
+        var response = await httpClient.GetAsync("/villain");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<VillainStatisticsDto>>();
+    }
+
+    public async Task<MinionStatisticsDto> GetMinionStatsAsync(Guid minionId)
+    {
+        var response = await httpClient.GetAsync($"/minion/{minionId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<MinionStatisticsDto>();
+    }
+
+    public async Task<IEnumerable<MinionStatisticsDto>> GetMinionStatsAsync()
+    {
+        var response = await httpClient.GetAsync("/minion");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<MinionStatisticsDto>>();
+    }
 }

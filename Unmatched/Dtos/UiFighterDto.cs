@@ -48,6 +48,10 @@ public class UiFighterDto
 
     public int? Turn { get; set; }
 
+    public int? Team { get; set; }
+
+    public int? Placement { get; set; }
+
     public void SetDefaultData()
     {
         if (Hero is not null)

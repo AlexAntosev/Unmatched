@@ -45,6 +45,10 @@ public class UnmatchedDbContext : DbContext
 
     public DbSet<MatchEntity> Matches { get; set; }
 
+    public DbSet<MatchVillainEntity> MatchVillains { get; set; }
+
+    public DbSet<MatchMinionEntity> MatchMinions { get; set; }
+
 
     public DbSet<RatingEntity> Ratings { get; set; }
 
@@ -62,6 +66,11 @@ public class UnmatchedDbContext : DbContext
                 b.HasKey(ht => new { ht.HeroesId, ht.TitlesId });
                 b.ToTable("HeroTitle");
             });
+
+        modelBuilder.Entity<MatchEntity>()
+            .HasOne(m => m.Villain)
+            .WithOne()
+            .HasForeignKey<MatchVillainEntity>(v => v.MatchId);
 
         base.OnModelCreating(modelBuilder);
     }

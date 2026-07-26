@@ -1,4 +1,4 @@
-﻿@page "/match/{id}"
+@page "/match/{id}"
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
 @using Unmatched.Constants
@@ -16,6 +16,8 @@
 @inject IMapService MapService
 @inject IFavoriteService FavoriteService
 @inject ICollectionService CollectionService
+@inject IVillainService VillainService
+@inject IMinionService MinionService
 @inject NavigationManager NavManager
 @inject NotificationService NotificationService
 
@@ -29,16 +31,96 @@
     </Modal>
 
     <div class="row">
-        <div class="triple-column center" >
-            <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.First()"></FighterInfo>
-        </div>
-        <div class="triple-column center">
-            <img src="Vs.png"/>
-        </div>
-        <div class="triple-column center">
-            <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.Last()"></FighterInfo>
+        <div class="column start">
+            <label for="gameMode">Mode:</label>
+            <InputSelect Value="@_match.GameMode" ValueExpression="@(() => _match.GameMode)" name="gameMode" id="gameMode" class="form-select transparent rounded-form" ValueChanged="@((GameMode value) => GameModeChanged(value))">
+                <option value="@GameMode.OneVsOne">1 на 1</option>
+                <option value="@GameMode.TeamVsTeam">2 на 2</option>
+                <option value="@GameMode.FreeForAll">Втрьох (вільний бій)</option>
+                <option value="@GameMode.Cooperative">Кооп проти гри</option>
+            </InputSelect>
         </div>
     </div>
+
+    @if (_match.GameMode == GameMode.OneVsOne)
+    {
+        <div class="row">
+            <div class="triple-column center">
+                <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.First()"></FighterInfo>
+            </div>
+            <div class="triple-column center">
+                <img src="Vs.png"/>
+            </div>
+            <div class="triple-column center">
+                <FighterInfo Title="Opponent" Players="_players" Heroes="_heroes" Fighter="@_match.Fighters.Last()"></FighterInfo>
+            </div>
+        </div>
+    }
+    else if (_match.GameMode == GameMode.TeamVsTeam)
+    {
+        <div class="row">
+            <div class="triple-column center">
+                <h4>Команда 1</h4>
+                <label>
+                    <input type="checkbox" checked="@Team1Won" @onchange="@((ChangeEventArgs e) => SetTeamWinner(1, (bool)e.Value!))"/>
+                    Ця команда перемогла
+                </label>
+                @foreach (var fighter in TeamFighters(1))
+                {
+                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
+                }
+            </div>
+            <div class="triple-column center">
+                <img src="Vs.png"/>
+            </div>
+            <div class="triple-column center">
+                <h4>Команда 2</h4>
+                <label>
+                    <input type="checkbox" checked="@Team2Won" @onchange="@((ChangeEventArgs e) => SetTeamWinner(2, (bool)e.Value!))"/>
+                    Ця команда перемогла
+                </label>
+                @foreach (var fighter in TeamFighters(2))
+                {
+                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
+                }
+            </div>
+        </div>
+    }
+    else if (_match.GameMode == GameMode.FreeForAll)
+    {
+        <div class="row">
+            <button type="button" class="btn btn-secondary rounded-form" @onclick="AddFighter">+ Add player</button>
+            @foreach (var fighter in _match.Fighters)
+            {
+                <div class="triple-column center">
+                    <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false" ShowPlacementInput="true"></FighterInfo>
+                    <button type="button" class="btn btn-secondary rounded-form" @onclick="() => RemoveFighter(fighter)">Remove</button>
+                </div>
+            }
+        </div>
+    }
+    else if (_match.GameMode == GameMode.Cooperative)
+    {
+        <div class="row">
+            <div class="column center">
+                <label>
+                    <input type="checkbox" checked="@_playersWon" @onchange="@((ChangeEventArgs e) => SetPlayersWon((bool)e.Value!))"/>
+                    Гравці перемогли?
+                </label>
+                <button type="button" class="btn btn-secondary rounded-form" @onclick="AddFighter">+ Add player</button>
+                @foreach (var fighter in _match.Fighters)
+                {
+                    <div class="triple-column center">
+                        <FighterInfo Title="Fighter" Players="_players" Heroes="_heroes" Fighter="@fighter" ShowWinnerCheckbox="false"></FighterInfo>
+                        <button type="button" class="btn btn-secondary rounded-form" @onclick="() => RemoveFighter(fighter)">Remove</button>
+                    </div>
+                }
+            </div>
+            <div class="column center">
+                <VillainInfo Villains="_villains" Minions="_minions" MatchVillain="@(_match.Villain ??= new UiMatchVillainDto())"></VillainInfo>
+            </div>
+        </div>
+    }
 
     <div class="row">
         <div class="column end">
@@ -83,7 +165,10 @@
                 </div>
                 <p></p>
                 <button class="btn btn-primary rounded-form" @onclick="OnAddNewMatchClickAsync">Add match</button>
-                <button class="btn btn-secondary rounded-form" @onclick="OnRandomizeMatchClick">Randomize</button>
+                @if (_match.GameMode == GameMode.OneVsOne)
+                {
+                    <button class="btn btn-secondary rounded-form" @onclick="OnRandomizeMatchClick">Randomize</button>
+                }
             </EditForm>
         </div>
         <div class="column start">
@@ -98,9 +183,12 @@
 
     private List<UiPlayerDto> _players = new();
     private List<UiHeroDto> _heroes = new();
+    private List<VillainDto> _villains = new();
+    private List<MinionDto> _minions = new();
     private List<MapDto> _maps = new();
     private List<TournamentDto> _tournaments = new();
     private List<(Stage?, string)> _stages = new();
+    private bool _playersWon;
 
     UiMatchDto _match = new()
         {
@@ -117,8 +205,13 @@
         };
 
     [Inject] protected PreloadService PreloadService { get; set; }
-    
+
     private Modal matchSavedPopup = default!;
+
+    private bool Team1Won => _match.Fighters.Any(f => f.Team == 1) && TeamFighters(1).All(f => f.IsWinner);
+    private bool Team2Won => _match.Fighters.Any(f => f.Team == 2) && TeamFighters(2).All(f => f.IsWinner);
+
+    private IEnumerable<UiFighterDto> TeamFighters(int team) => _match.Fighters.Where(f => f.Team == team);
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,9 +219,11 @@
         try
         {
             PreloadService.Show();
-            
+
             _players = (await PlayerService.GetAsync()).ToList();
             _heroes = (await HeroService.GetAsync()).OrderBy(x => x.Name).ToList();
+            _villains = (await VillainService.GetAsync()).OrderBy(x => x.Name).ToList();
+            _minions = (await MinionService.GetAsync()).OrderBy(x => x.Name).ToList();
             _maps = (await MapService.GetAsync()).OrderBy(x => x.Name).ToList();
             _tournaments = (await TournamentService.GetAsync()).ToList();
             _stages = new List<(Stage?, string)>
@@ -153,9 +248,10 @@
             {
                 match = await MatchService.GetAsync(id);
                 match.Date = DateTime.UtcNow;
-                match.Fighters.First().SetDefaultData();
-                match.Fighters.Last().SetDefaultData();
-
+                foreach (var fighter in match.Fighters)
+                {
+                    fighter.SetDefaultData();
+                }
             }
             else
             {
@@ -165,6 +261,7 @@
             await FilterByCollectionAsync(match);
 
             _match = match;
+            _playersWon = _match.GameMode == GameMode.Cooperative && (_match.Fighters.FirstOrDefault()?.IsWinner ?? false);
         }
         finally
         {
@@ -239,7 +336,9 @@
         try
         {
             PreloadService.Show();
-            
+
+            PrepareMatchForSubmit();
+
             var match = _match;
 
             var isValidId = Guid.TryParse(Id, out var id);
@@ -248,7 +347,7 @@
                 return;
             }
 
-            SaveMatchResultDto result; 
+            SaveMatchResultDto result;
             if (id == Guid.Empty)
             {
                 result = await MatchService.AddAsync(match);
@@ -258,7 +357,7 @@
             {
                 result = await MatchService.UpdateAsync(match);
             }
-            
+
             var parameters = new Dictionary<string, object>
                 {
                     {
@@ -278,43 +377,144 @@
         }
     }
 
+    private void PrepareMatchForSubmit()
+    {
+        if (_match.GameMode == GameMode.FreeForAll)
+        {
+            foreach (var fighter in _match.Fighters)
+            {
+                fighter.IsWinner = fighter.Placement == 1;
+            }
+        }
+    }
+
+    private void GameModeChanged(GameMode mode)
+    {
+        _match.GameMode = mode;
+        switch (mode)
+        {
+            case GameMode.OneVsOne:
+                _match.Fighters = EnsureFighterCount(2);
+                _match.Villain = null;
+                break;
+            case GameMode.TeamVsTeam:
+                _match.Fighters = EnsureFighterCount(4);
+                AssignTeams();
+                _match.Villain = null;
+                break;
+            case GameMode.FreeForAll:
+                _match.Fighters = EnsureFighterCount(3);
+                break;
+            case GameMode.Cooperative:
+                _match.Fighters = EnsureFighterCount(2);
+                _match.Villain ??= new UiMatchVillainDto();
+                break;
+        }
+    }
+
+    private List<UiFighterDto> EnsureFighterCount(int count)
+    {
+        var fighters = _match.Fighters.ToList();
+        while (fighters.Count < count)
+        {
+            fighters.Add(new UiFighterDto());
+        }
+
+        if (fighters.Count > count)
+        {
+            fighters = fighters.Take(count).ToList();
+        }
+
+        return fighters;
+    }
+
+    private void AssignTeams()
+    {
+        var fighters = _match.Fighters.ToList();
+        for (var i = 0; i < fighters.Count; i++)
+        {
+            fighters[i].Team = i < 2 ? 1 : 2;
+        }
+    }
+
+    private void SetTeamWinner(int winningTeam, bool won)
+    {
+        if (!won)
+        {
+            return;
+        }
+
+        foreach (var fighter in _match.Fighters)
+        {
+            fighter.IsWinner = fighter.Team == winningTeam;
+        }
+    }
+
+    private void SetPlayersWon(bool won)
+    {
+        _playersWon = won;
+        foreach (var fighter in _match.Fighters)
+        {
+            fighter.IsWinner = won;
+        }
+
+        if (_match.Villain is not null)
+        {
+            _match.Villain.IsWinner = !won;
+            foreach (var minion in _match.Villain.Minions)
+            {
+                minion.IsWinner = !won;
+            }
+        }
+    }
+
+    private void AddFighter()
+    {
+        _match.Fighters = _match.Fighters.Append(new UiFighterDto()).ToList();
+    }
+
+    private void RemoveFighter(UiFighterDto fighter)
+    {
+        _match.Fighters = _match.Fighters.Where(f => f != fighter).ToList();
+    }
+
     private void OnRandomizeMatchClick()
     {
         RandomizeMap();
         RandomizeFighter();
         RandomizeOpponent();
     }
-    
+
     private void RandomizeMap()
     {
         var mapId = _maps.GetRandomItem().Id;
         SetMapInfo(mapId);
     }
-    
+
     private void RandomizeFighter()
     {
         NotificationService.CallRandomizeFighter(_match.Fighters.First());
         _match.Fighters.First().Turn = 1;
     }
-    
+
     private void RandomizeOpponent()
     {
         NotificationService.CallRandomizeFighter(_match.Fighters.Last(), _match.Fighters.First());
         _match.Fighters.Last().Turn = 2;
     }
-    
+
     private async Task OnPopupCloseClick()
     {
         await matchSavedPopup.HideAsync();
         NavManager.NavigateTo(Urls.DuelMatchLog);
     }
-    
+
     private void SetMapInfo(Guid mapId)
     {
         var map = _maps.First(h => h.Id == mapId);
         _match.Map = map;
     }
-    
+
     private void RerenderComponent()
     {
         StateHasChanged();
@@ -328,11 +528,11 @@
         color: white;
         text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     }
-    
+
     .transparent {
         opacity: 0.9 !important;
     }
-    
+
     .rounded-form {
         border-radius: 16px;
     }

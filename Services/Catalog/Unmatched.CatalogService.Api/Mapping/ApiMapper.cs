@@ -21,6 +21,10 @@ public class ApiMapper : Profile
         CreateMap<Sidekick, SidekickDto>().ReverseMap();
         CreateMap<Expansion, ExpansionDto>()
             .ForMember(d => d.HeroNames, o => o.MapFrom(s => s.Heroes.Select(h => h.Name)));
+        CreateMap<Villain, VillainDto>()
+            .ForMember(d => d.ExpansionName, o => o.MapFrom(s => s.Expansion != null ? s.Expansion.Name : null));
+        CreateMap<Minion, MinionDto>()
+            .ForMember(d => d.ExpansionName, o => o.MapFrom(s => s.Expansion != null ? s.Expansion.Name : null));
     }
 }
 

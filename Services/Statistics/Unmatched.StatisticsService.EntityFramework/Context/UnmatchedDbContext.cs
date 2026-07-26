@@ -43,4 +43,8 @@ public class UnmatchedDbContext : DbContext
     public DbSet<HeroStatsEntity> HeroStats { get; set; }
 
     public DbSet<MapStatsEntity> MapStats { get; set; }
+
+    public DbSet<VillainStatsEntity> VillainStats { get; set; }
+
+    public DbSet<MinionStatsEntity> MinionStats { get; set; }
 }

@@ -8,6 +8,7 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class UnrankedMatchHandlerTests
 {
@@ -23,7 +24,7 @@ public class UnrankedMatchHandlerTests
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
 
-        _handler = new UnrankedMatchHandler(_unitOfWork.Object, _unrankedRatingCalculator.Object);
+        _handler = new UnrankedMatchHandler(_unitOfWork.Object, new GameModeValidatorFactory(), _unrankedRatingCalculator.Object);
     }
     
     [Fact]

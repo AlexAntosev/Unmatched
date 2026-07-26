@@ -1,6 +1,7 @@
 ﻿@page "/heroes-statistics/{id}"
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Pages.Statistics
 @inject IHeroStatisticsService HeroStatisticsService
 @using BlazorBootstrap
 @using Microsoft.AspNetCore.Components
@@ -13,6 +14,8 @@
     <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
     <TotalMatchesRecord Total="Hero.TotalMatches" Wins="Hero.TotalWins" Looses="Hero.TotalLooses" Kd="Hero.Kd"></TotalMatchesRecord>
     <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
+    <MonsterMatchupTable Title="Against Villains" Rows="_villainMatchups"></MonsterMatchupTable>
+    <MonsterMatchupTable Title="Against Minions" Rows="_minionMatchups"></MonsterMatchupTable>
 </div>
 <div class="page-content">
     <LineChart @ref="_lineChart" />
@@ -25,6 +28,8 @@
     private List<UiMatchLogDto> _matchLogEntries = new();
     private List<RatingChangeDto> _ratingChanges = new();
     private IGrouping<string, UiFighterDto>? _againstAntagonistMatches;
+    private List<MonsterMatchupRow> _villainMatchups = new();
+    private List<MonsterMatchupRow> _minionMatchups = new();
     private UiHeroStatisticsDto Hero { get; set; } = new ();
     private LineChart _lineChart;
 
@@ -56,6 +61,29 @@
                 .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
                 .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
                 .FirstOrDefault();
+
+            var coopMatches = _matchLogEntries.Where(m => m.Villain is not null).ToList();
+            _villainMatchups = coopMatches
+                .GroupBy(m => m.Villain!.Name ?? "Unknown")
+                .Select(g => new MonsterMatchupRow
+                    {
+                        Name = g.Key,
+                        Total = g.Count(),
+                        Wins = g.Count(m => !m.Villain!.IsWinner),
+                        Looses = g.Count(m => m.Villain!.IsWinner)
+                    })
+                .ToList();
+            _minionMatchups = coopMatches
+                .SelectMany(m => m.Villain!.Minions)
+                .GroupBy(m => m.Name ?? "Unknown")
+                .Select(g => new MonsterMatchupRow
+                    {
+                        Name = g.Key,
+                        Total = g.Count(),
+                        Wins = g.Count(m => !m.IsWinner),
+                        Looses = g.Count(m => m.IsWinner)
+                    })
+                .ToList();
 
             _ratingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
             await UpdateChart();

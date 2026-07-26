@@ -11,6 +11,8 @@
         {
             CreateMap<HeroStats, HeroStatsEntity>().ReverseMap();
             CreateMap<MapStats, MapStatsEntity>().ReverseMap();
+            CreateMap<VillainStats, VillainStatsEntity>().ReverseMap();
+            CreateMap<MinionStats, MinionStatsEntity>().ReverseMap();
         }
     }
 }

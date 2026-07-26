@@ -1,0 +1,106 @@
+@using Microsoft.AspNetCore.Components
+@using Unmatched.Dtos
+
+<EditForm Model=@MatchVillain>
+    <fieldset class="wrapper">
+        <legend class="title">Villain</legend>
+        <div>
+            <label for="villain">Villain:</label>
+            <InputSelect
+                ValueExpression="@(() => MatchVillain.VillainId)"
+                Value="@MatchVillain.VillainId"
+                ValueChanged="@((Guid value) => VillainChanged(value))"
+                name="villain" id="villain" class="form-select transparent rounded-form">
+                @foreach (var villain in Villains)
+                {
+                    <option value="@villain.Id"> @villain.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label for="villainHp">HP:</label>
+            <InputNumber @bind-Value=MatchVillain.HpLeft id="villainHp" class="form-control transparent rounded-form"/>
+        </div>
+        <div>
+            <label for="villainCardsLeft">Cards Left:</label>
+            <InputNumber @bind-Value=MatchVillain.CardsLeft id="villainCardsLeft" class="form-control transparent rounded-form"/>
+        </div>
+    </fieldset>
+</EditForm>
+
+<div class="page-content">
+    <label>Minions:</label>
+    <button type="button" class="btn btn-secondary rounded-form" @onclick="AddMinion">+ Add minion</button>
+    @foreach (var minion in MatchVillain.Minions.ToList())
+    {
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+            <InputSelect
+                ValueExpression="@(() => minion.MinionId)"
+                Value="@minion.MinionId"
+                ValueChanged="@((Guid value) => MinionChanged(minion, value))"
+                class="form-select transparent rounded-form">
+                @foreach (var m in Minions)
+                {
+                    <option value="@m.Id"> @m.Name</option>
+                }
+            </InputSelect>
+            <label>HP:</label>
+            <InputNumber @bind-Value=minion.HpLeft class="form-control transparent rounded-form"/>
+            <button type="button" class="btn btn-secondary rounded-form" @onclick="() => RemoveMinion(minion)">✕</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<VillainDto> Villains { get; set; } = new();
+
+    [Parameter]
+    public List<MinionDto> Minions { get; set; } = new();
+
+    [Parameter]
+    public UiMatchVillainDto MatchVillain { get; set; } = new();
+
+    private void VillainChanged(Guid villainId)
+    {
+        var villain = Villains.FirstOrDefault(v => v.Id == villainId);
+        MatchVillain.Villain = villain;
+        MatchVillain.SetDefaultData();
+    }
+
+    private void MinionChanged(UiMatchMinionDto matchMinion, Guid minionId)
+    {
+        var minion = Minions.FirstOrDefault(m => m.Id == minionId);
+        matchMinion.Minion = minion;
+        matchMinion.SetDefaultData();
+    }
+
+    private void AddMinion()
+    {
+        MatchVillain.Minions = MatchVillain.Minions.Append(new UiMatchMinionDto()).ToList();
+    }
+
+    private void RemoveMinion(UiMatchMinionDto matchMinion)
+    {
+        MatchVillain.Minions = MatchVillain.Minions.Where(m => m != matchMinion).ToList();
+    }
+}
+
+<style>
+    .wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 32px;
+      row-gap: 4px;
+    }
+    .title {
+        grid-column-start: 1;
+        grid-column-end: 3;
+        grid-row-start: 1;
+        grid-row-end: 2;
+        text-align: center;
+        opacity: 0.9 !important;
+        color: white;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+</style>

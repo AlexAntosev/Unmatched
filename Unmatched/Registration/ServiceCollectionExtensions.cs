@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
     public static void RegisterServices(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddTransient<IHeroService, HeroService>();
+        services.AddTransient<IVillainService, VillainService>();
+        services.AddTransient<IMinionService, MinionService>();
         services.AddTransient<IMapService, MapService>();
         services.AddTransient<IPlayStyleService, PlayStyleService>();
         services.AddTransient<IPlayerService, PlayerService>();
@@ -36,6 +38,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
         services.AddTransient<IMapStatisticsService, MapStatisticsService>();
         services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
+        services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
+        services.AddTransient<IMinionStatisticsService, MinionStatisticsService>();
 
         services.AddTransient<ITitleService, TitleService>();
 

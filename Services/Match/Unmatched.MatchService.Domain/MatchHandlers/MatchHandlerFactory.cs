@@ -2,26 +2,38 @@
 
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class MatchHandlerFactory(
     IUnitOfWork unitOfWork,
+    IGameModeValidatorFactory validatorFactory,
     IRatingCalculator ratingCalculator,
     IFirstTournamentRatingCalculator firstTournamentRatingCalculator,
-    IUnrankedRatingCalculator unrankedRatingCalculator) : IMatchHandlerFactory
+    IUnrankedRatingCalculator unrankedRatingCalculator,
+    ITeamVsTeamRatingCalculator teamVsTeamRatingCalculator,
+    IFreeForAllRatingCalculator freeForAllRatingCalculator,
+    ICooperativeRatingCalculator cooperativeRatingCalculator) : IMatchHandlerFactory
 {
     private IEnumerable<TournamentEntity> TournamentsCache => unitOfWork.Tournaments.Get();
 
     public IMatchHandler Create(MatchEntity match) => match switch
     {
+        _ when match.GameMode == GameMode.TeamVsTeam =>
+            new TeamVsTeamMatchHandler(unitOfWork, validatorFactory, teamVsTeamRatingCalculator),
+        _ when match.GameMode == GameMode.FreeForAll =>
+            new FreeForAllMatchHandler(unitOfWork, validatorFactory, freeForAllRatingCalculator),
+        _ when match.GameMode == GameMode.Cooperative =>
+            new CooperativeMatchHandler(unitOfWork, validatorFactory, cooperativeRatingCalculator),
         _ when IsUnranked(match) =>
-            new UnrankedMatchHandler(unitOfWork, unrankedRatingCalculator),
+            new UnrankedMatchHandler(unitOfWork, validatorFactory, unrankedRatingCalculator),
         _ when IsFirstTournament(match) =>
-            new FirstTournamentMatchHandler(unitOfWork, firstTournamentRatingCalculator),
-        _ when IsGoldenHalatLeague(match) || IsSilverhandTournament(match) => 
-            new GoldenHalatLeagueMatchHandler(unitOfWork, ratingCalculator),
-        _ =>  new GoldenHalatLeagueMatchHandler(unitOfWork, ratingCalculator)
+            new FirstTournamentMatchHandler(unitOfWork, validatorFactory, firstTournamentRatingCalculator),
+        _ when IsGoldenHalatLeague(match) || IsSilverhandTournament(match) =>
+            new GoldenHalatLeagueMatchHandler(unitOfWork, validatorFactory, ratingCalculator),
+        _ =>  new GoldenHalatLeagueMatchHandler(unitOfWork, validatorFactory, ratingCalculator)
     };
 
     private static bool IsUnranked(MatchEntity match) 

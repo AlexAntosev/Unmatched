@@ -12,17 +12,18 @@ public class RusherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper, ICatalog
 {
     private const double MinCardsForTitleRatio = 0.66;
 
-    public async Task<Title?> HandleAsync(MatchEntity match)
+    public async Task<List<Title>> HandleAsync(MatchEntity match)
     {
+        var titlesEarned = new List<Title>();
         var titleEntity = await unitOfWork.Titles.GetByNameAsync(Titles.Rusher);
         if (titleEntity is null)
         {
-            return null;
+            return titlesEarned;
         }
 
-        var winner = match.Fighters.FirstOrDefault(f => f.IsWinner);
+        var winners = match.Fighters.Where(f => f.IsWinner);
 
-        if (winner is not null)
+        foreach (var winner in winners)
         {
             var winnerHero = await catalogHeroCache.GetAsync(winner.HeroId);
             var isAlreadyRusher = titleEntity.HeroTitles.Any(h => h.HeroesId == winner.HeroId);
@@ -37,11 +38,10 @@ public class RusherTitleHandler(IUnitOfWork unitOfWork, IMapper mapper, ICatalog
                 await unitOfWork.HeroTitles.AddOrUpdateAsync(heroTitle);
                 await unitOfWork.SaveChangesAsync();
 
-                var title = mapper.Map<Title>(titleEntity);
-                return title;
+                titlesEarned.Add(mapper.Map<Title>(titleEntity));
             }
         }
 
-        return null;
+        return titlesEarned;
     }
 }

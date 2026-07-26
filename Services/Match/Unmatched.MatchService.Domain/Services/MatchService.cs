@@ -4,7 +4,9 @@ using AutoMapper;
 
 using Unmatched.MatchService.Contracts.Kafka;
 using Unmatched.MatchService.Domain.Communication.Catalog;
+using Unmatched.MatchService.Domain.Communication.Player;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
@@ -18,6 +20,7 @@ public class MatchService(
     IRusherTitleHandler rusherTitleHandler,
     IPunisherTitleHandler punisherTitleHandler,
     ICatalogHeroCache catalogHeroCache,
+    IPlayerCache playerCache,
     IKafkaProducer kafkaProducer) : IMatchService
 {
     public async Task<SaveMatchResult> AddOrUpdateAsync(Match matchDto)
@@ -37,31 +40,35 @@ public class MatchService(
         }
         await kafkaProducer.PublishAsync("match-created", matchCreatedEvent);
 
-        // TODO: move title logic to title microservice
-        await streakTitleHandler.HandleAsync();
-        var rusherTitleEarned = await rusherTitleHandler.HandleAsync(match);
-        var punisherTitleEarned = await punisherTitleHandler.HandleAsync(match);
-
         var titlesEarned = new List<Title>();
-        if (rusherTitleEarned is not null)
+        if (match.GameMode != Enums.GameMode.Cooperative)
         {
-            titlesEarned.Add(rusherTitleEarned);
-        }
-
-        if (punisherTitleEarned is not null)
-        {
-            titlesEarned.Add(punisherTitleEarned);
+            // TODO: move title logic to title microservice
+            await streakTitleHandler.HandleAsync();
+            var rusherTitlesEarned = await rusherTitleHandler.HandleAsync(match);
+            var punisherTitlesEarned = await punisherTitleHandler.HandleAsync(match);
+            titlesEarned.AddRange(rusherTitlesEarned);
+            titlesEarned.AddRange(punisherTitlesEarned);
         }
 
         var heroes = await catalogHeroCache.GetAsync();
-        var winnerHero = heroes.First(h => h.Id == match.Fighters.First(f => f.IsWinner).HeroId);
-        var looserHero = heroes.First(h => h.Id == match.Fighters.First(f => !f.IsWinner).HeroId);
+        var players = await playerCache.GetAsync();
+        var fighterResults = match.Fighters.Select(f => new FighterResult
+            {
+                HeroName = heroes.First(h => h.Id == f.HeroId).Name,
+                PlayerName = players.First(p => p.Id == f.PlayerId).Name,
+                MatchPoints = f.MatchPoints ?? 0,
+                IsWinner = f.IsWinner,
+                Placement = f.Placement,
+                Team = f.Team
+            }).ToList();
+
         var result = new SaveMatchResult
             {
-                WinnerHeroName = winnerHero.Name,
-                WinnerMatchPoints = match.Fighters.First(f => f.IsWinner).MatchPoints.Value,
-                LooserHeroName = looserHero.Name,
-                LooserMatchPoints = match.Fighters.First(f => !f.IsWinner).MatchPoints.Value,
+                GameMode = match.GameMode,
+                FighterResults = fighterResults,
+                PlayersWon = match.GameMode == Enums.GameMode.Cooperative ? match.Fighters.First().IsWinner : null,
+                VillainName = matchCreatedEvent.Villain?.Name,
                 TitlesEarned = titlesEarned.Select(x => x.Name).ToList()
             };
 

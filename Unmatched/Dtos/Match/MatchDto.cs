@@ -18,6 +18,10 @@ public class MatchDto
     public bool IsPlanned { get; set; }
     
     public Stage? Stage { get; set; }
-    
+
     public int? Epic { get; set; }
+
+    public GameMode GameMode { get; set; }
+
+    public MatchVillainDto? Villain { get; set; }
 }

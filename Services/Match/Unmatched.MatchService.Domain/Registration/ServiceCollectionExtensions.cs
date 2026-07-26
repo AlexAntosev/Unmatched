@@ -9,6 +9,7 @@ using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Services;
 using Unmatched.MatchService.Domain.TitleHandlers;
+using Unmatched.MatchService.Domain.Validation;
 
 public static class ServiceCollectionExtensions
 {
@@ -19,6 +20,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
         services.AddSingleton<ICatalogMapCache, CatalogMapCache>();
         services.AddSingleton<ICatalogSidekickCache, CatalogSidekickCache>();
+        services.AddSingleton<ICatalogVillainCache, CatalogVillainCache>();
+        services.AddSingleton<ICatalogMinionCache, CatalogMinionCache>();
         services.AddSingleton<IPlayerCache, PlayerCache>();
 
         services.AddTransient<IMatchService, MatchService>();
@@ -29,6 +32,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRatingCalculator, RatingCalculator>();
         services.AddTransient<IUnrankedRatingCalculator, UnrankedRatingCalculator>();
         services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
+        services.AddTransient<ITeamVsTeamRatingCalculator, TeamVsTeamRatingCalculator>();
+        services.AddTransient<IFreeForAllRatingCalculator, FreeForAllRatingCalculator>();
+        services.AddTransient<ICooperativeRatingCalculator, CooperativeRatingCalculator>();
+        services.AddTransient<IGameModeValidatorFactory, GameModeValidatorFactory>();
 
         services.AddTransient<IStreakTitleHandler, StreakTitleHandler>();
         services.AddTransient<IRusherTitleHandler, RusherTitleHandler>();

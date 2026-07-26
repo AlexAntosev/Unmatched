@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.Dtos;
 
+using Unmatched.Enums;
+
 public class UiMatchLogDto
 {
     public string Comment { get; set; }
@@ -15,4 +17,8 @@ public class UiMatchLogDto
     public string TournamentName { get; set; }
 
     public int? Epic { get; set; }
+
+    public GameMode GameMode { get; set; }
+
+    public UiMatchVillainDto? Villain { get; set; }
 }

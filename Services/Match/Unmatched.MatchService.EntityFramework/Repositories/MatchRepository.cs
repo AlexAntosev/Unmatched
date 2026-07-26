@@ -25,7 +25,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
 
     public async Task<List<MatchEntity>> GetFinishedAsync()
     {
-        return await DbContext.Matches.Include(x => x.Tournament).Include(x => x.Fighters).Where(m => !m.IsPlanned).AsNoTracking().ToListAsync();
+        return await DbContext.Matches.Include(x => x.Tournament).Include(x => x.Fighters).Include(x => x.Villain).ThenInclude(v => v.Minions).Where(m => !m.IsPlanned).AsNoTracking().ToListAsync();
     }
 
     public async Task<List<MatchEntity>> GetFinishedByHeroIdAsync(Guid heroId)
@@ -33,6 +33,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
         return await DbContext.Matches
             .Include(x => x.Fighters)
             .Include(x => x.Tournament)
+            .Include(x => x.Villain).ThenInclude(v => v.Minions)
             .Where(m => m.Fighters.Any(f => f.HeroId == heroId) && !m.IsPlanned)
             .OrderByDescending(m => m.Date)
             .AsNoTracking()
@@ -44,6 +45,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
         return await DbContext.Matches
             .Include(x => x.Fighters)
             .Include(x => x.Tournament)
+            .Include(x => x.Villain).ThenInclude(v => v.Minions)
             .Where(m => m.MapId.Equals(mapId) && !m.IsPlanned)
             .OrderByDescending(m => m.Date)
             .AsNoTracking()
@@ -55,6 +57,7 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
         return await DbContext.Matches
             .Include(x => x.Fighters)
             .Include(x => x.Tournament)
+            .Include(x => x.Villain).ThenInclude(v => v.Minions)
             .Where(m => m.Fighters.Any(f => f.PlayerId == playerId) && !m.IsPlanned)
             .OrderByDescending(m => m.Date)
             .AsNoTracking()
@@ -78,11 +81,11 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
 
     public override async Task<IReadOnlyList<MatchEntity>> GetAsync()
     {
-        return await DbContext.Set<MatchEntity>().Include(x => x.Fighters).AsNoTracking().ToListAsync();
+        return await DbContext.Set<MatchEntity>().Include(x => x.Fighters).Include(x => x.Villain).ThenInclude(v => v.Minions).AsNoTracking().ToListAsync();
     }
     public override async Task<MatchEntity?> GetByIdAsync(Guid id)
     {
-        var entity = await DbContext.Set<MatchEntity>().Include(x => x.Fighters).Include(x => x.Fighters).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var entity = await DbContext.Set<MatchEntity>().Include(x => x.Fighters).Include(x => x.Villain).ThenInclude(v => v.Minions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         return entity;
     }
 }

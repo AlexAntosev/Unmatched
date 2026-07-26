@@ -3,13 +3,14 @@
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class GoldenHalatLeagueMatchHandler : BaseMatchHandler
 {
     private readonly IRatingCalculator _ratingCalculator;
 
-    public GoldenHalatLeagueMatchHandler(IUnitOfWork unitOfWork, IRatingCalculator ratingCalculator)
-    : base(unitOfWork)
+    public GoldenHalatLeagueMatchHandler(IUnitOfWork unitOfWork, IGameModeValidatorFactory validatorFactory, IRatingCalculator ratingCalculator)
+    : base(unitOfWork, validatorFactory)
     {
         _ratingCalculator = ratingCalculator;
     }

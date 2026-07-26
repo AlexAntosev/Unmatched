@@ -21,4 +21,8 @@ public interface ICatalogClient
     Task<IEnumerable<Guid>> GetOwnedExpansionIdsAsync();
 
     Task SetOwnedExpansionIdsAsync(IEnumerable<Guid> expansionIds);
+
+    Task<IEnumerable<CatalogVillainDto>> GetVillainsAsync();
+
+    Task<IEnumerable<CatalogMinionDto>> GetMinionsAsync();
 }

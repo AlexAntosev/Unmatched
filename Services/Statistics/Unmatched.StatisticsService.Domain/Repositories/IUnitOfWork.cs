@@ -6,5 +6,9 @@ public interface IUnitOfWork : IDisposable
 
     IMapStatsRepository MapStats { get; }
 
+    IVillainStatsRepository VillainStats { get; }
+
+    IMinionStatsRepository MinionStats { get; }
+
     Task SaveChangesAsync();
 }

@@ -1,4 +1,4 @@
-﻿namespace Unmatched.MatchService.Contracts.Kafka;
+namespace Unmatched.MatchService.Contracts.Kafka;
 
 public class MatchCreated
 {
@@ -14,6 +14,10 @@ public class MatchCreated
 
     public Guid? TournamentId { get; set; }
 
+    public GameMode GameMode { get; set; }
+
+    public MatchVillain? Villain { get; set; }
+
     public class Fighter
     {
         public Guid HeroId { get; set; }
@@ -25,5 +29,29 @@ public class MatchCreated
         public Guid PlayerId { get; set; }
 
         public int? ResultRating { get; set; }
+
+        public int? Team { get; set; }
+
+        public int? Placement { get; set; }
+    }
+
+    public class MatchVillain
+    {
+        public Guid VillainId { get; set; }
+
+        public string? Name { get; set; }
+
+        public bool IsWinner { get; set; }
+
+        public IEnumerable<MatchMinion> Minions { get; set; } = new List<MatchMinion>();
+    }
+
+    public class MatchMinion
+    {
+        public Guid MinionId { get; set; }
+
+        public string? Name { get; set; }
+
+        public bool IsWinner { get; set; }
     }
 }

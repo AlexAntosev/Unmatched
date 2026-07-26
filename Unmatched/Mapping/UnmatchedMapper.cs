@@ -13,6 +13,8 @@ public class UnmatchedMapper : Profile
     public UnmatchedMapper()
     {
         CreateMap<CatalogHeroDto, UiHeroDto>().ForMember(x => x.ImageUrl, c => c.Ignore()).ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore()).ReverseMap();
+        CreateMap<CatalogVillainDto, VillainDto>().ForMember(x => x.ImageUrl, c => c.Ignore()).ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore());
+        CreateMap<CatalogMinionDto, MinionDto>().ForMember(x => x.ImageUrl, c => c.Ignore()).ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore());
         CreateMap<CatalogSidekickDto, UiSidekickDto>().ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore());
         CreateMap<FighterDto, UiFighterDto>().ForMember(x => x.PlayerId, c => c.MapFrom(s => s.Player.Id)).ForMember(x => x.HeroId, c => c.MapFrom(s => s.Hero.Id)).ReverseMap();
         CreateMap<FighterHeroDto, UiHeroDto>().ForMember(x => x.ImageUrl, c => c.Ignore()).ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore()).ReverseMap();
@@ -20,6 +22,8 @@ public class UnmatchedMapper : Profile
         CreateMap<FighterSidekickDto, UiSidekickDto>().ForMember(x => x.MeleeRangeImageUrl, c => c.Ignore()).ReverseMap();
         CreateMap<MatchDto, UiMatchDto>().ReverseMap();
         CreateMap<MatchLogDto, UiMatchLogDto>().ReverseMap();
+        CreateMap<MatchVillainDto, UiMatchVillainDto>().ReverseMap();
+        CreateMap<MatchMinionDto, UiMatchMinionDto>().ReverseMap();
         CreateMap<PlayerDto, UiPlayerDto>().ReverseMap();
 
         CreateMap<CatalogMapDto, MapDto>().ForMember(x => x.ImageUrl, c => c.Ignore()).ReverseMap();

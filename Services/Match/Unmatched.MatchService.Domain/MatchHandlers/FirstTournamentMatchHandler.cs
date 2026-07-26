@@ -3,13 +3,14 @@
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class FirstTournamentMatchHandler : BaseMatchHandler
 {
     private readonly IFirstTournamentRatingCalculator _ratingCalculator;
 
-    public FirstTournamentMatchHandler(IUnitOfWork unitOfWork, IFirstTournamentRatingCalculator ratingCalculator)
-    : base(unitOfWork)
+    public FirstTournamentMatchHandler(IUnitOfWork unitOfWork, IGameModeValidatorFactory validatorFactory, IFirstTournamentRatingCalculator ratingCalculator)
+    : base(unitOfWork, validatorFactory)
     {
         _ratingCalculator = ratingCalculator;
     }

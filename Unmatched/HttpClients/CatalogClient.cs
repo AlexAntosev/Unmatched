@@ -73,4 +73,18 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         var response = await httpClient.PutAsync("/collection", content);
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task<IEnumerable<CatalogVillainDto>> GetVillainsAsync()
+    {
+        var response = await httpClient.GetAsync("/villain");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogVillainDto>>();
+    }
+
+    public async Task<IEnumerable<CatalogMinionDto>> GetMinionsAsync()
+    {
+        var response = await httpClient.GetAsync("/minion");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogMinionDto>>();
+    }
 }

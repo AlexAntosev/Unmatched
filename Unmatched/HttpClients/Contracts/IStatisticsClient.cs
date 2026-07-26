@@ -16,4 +16,12 @@ public interface IStatisticsClient
     Task<PlayerStatisticsDto> GetPlayerStatsAsync(Guid playerId);
 
     Task<IEnumerable<PlayerStatisticsDto>> GetPlayerStatsAsync();
+
+    Task<VillainStatisticsDto> GetVillainStatsAsync(Guid villainId);
+
+    Task<IEnumerable<VillainStatisticsDto>> GetVillainStatsAsync();
+
+    Task<MinionStatisticsDto> GetMinionStatsAsync(Guid minionId);
+
+    Task<IEnumerable<MinionStatisticsDto>> GetMinionStatsAsync();
 }

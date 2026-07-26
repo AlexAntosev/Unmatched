@@ -73,10 +73,20 @@
             <label for="timeSpent">Time spent (in seconds):</label>
             <InputNumber @bind-Value=Fighter.TimeSpentInSeconds id="timeSpent" class="form-control transparent rounded-form"/>
         </div>
-        <div>
-            <label for="isWinner">Winner:</label>
-            <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check-input transparent rounded-form"/>
-        </div>
+        @if (ShowWinnerCheckbox)
+        {
+            <div>
+                <label for="isWinner">Winner:</label>
+                <InputCheckbox @bind-Value=Fighter.IsWinner id="isWinner" class="form-check-input transparent rounded-form"/>
+            </div>
+        }
+        @if (ShowPlacementInput)
+        {
+            <div>
+                <label for="placement">Placement:</label>
+                <InputNumber @bind-Value=Fighter.Placement id="placement" class="form-control transparent rounded-form"/>
+            </div>
+        }
 
     </fieldset>
 </EditForm>
@@ -94,6 +104,12 @@
 
     [Parameter]
     public UiFighterDto Fighter { get; set; } = new();
+
+    [Parameter]
+    public bool ShowWinnerCheckbox { get; set; } = true;
+
+    [Parameter]
+    public bool ShowPlacementInput { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

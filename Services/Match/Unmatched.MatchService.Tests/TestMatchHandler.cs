@@ -3,6 +3,7 @@
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class TestMatchHandler : BaseMatchHandler
 {
@@ -15,7 +16,7 @@ public class TestMatchHandler : BaseMatchHandler
     }
 
     public TestMatchHandler(IUnitOfWork unitOfWork)
-        : base(unitOfWork)
+        : base(unitOfWork, new GameModeValidatorFactory())
     {
     }
 }

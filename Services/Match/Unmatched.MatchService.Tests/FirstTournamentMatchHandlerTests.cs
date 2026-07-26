@@ -9,6 +9,7 @@ using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class FirstTournamentMatchHandlerTests
 {
@@ -24,7 +25,7 @@ public class FirstTournamentMatchHandlerTests
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
         
-        _handler = new FirstTournamentMatchHandler(_unitOfWork.Object, _ratingCalculator.Object);
+        _handler = new FirstTournamentMatchHandler(_unitOfWork.Object, new GameModeValidatorFactory(), _ratingCalculator.Object);
     }
     
     [Fact]

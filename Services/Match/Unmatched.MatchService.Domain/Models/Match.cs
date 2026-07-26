@@ -16,10 +16,14 @@ public class Match
     public IEnumerable<Fighter> Fighters { get; set; }
 
     public Guid? TournamentId { get; set; }
-    
+
     public bool IsPlanned { get; set; }
-    
+
     public Stage? Stage { get; set; }
-    
+
     public int? Epic { get; set; }
+
+    public GameMode GameMode { get; set; }
+
+    public MatchVillain? Villain { get; set; }
 }
