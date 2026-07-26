@@ -66,7 +66,7 @@ public class RatingCalculator(IUnitOfWork unitOfWork, ICatalogHeroCache catalogH
             80 * Math.Round(matchContext.WinnerFighter.CardsLeft.Value / (0.8 * matchContext.WinnerReferenceHero.DeckSize), 1, MidpointRounding.ToPositiveInfinity));
         var forHandicap = Convert.ToInt32(
             matchContext.LooserPointsBeforeMatch > matchContext.WinnerPointsBeforeMatch
-                ? 100 * ((matchContext.LooserPointsBeforeMatch - matchContext.WinnerPointsBeforeMatch) / 500)
+                ? 100.0 * (matchContext.LooserPointsBeforeMatch - matchContext.WinnerPointsBeforeMatch) / 500.0
                 : 0);
         var forHpLeft = Convert.ToInt32(
             80

@@ -3,6 +3,7 @@ using Syncfusion.Blazor;
 using Unmatched.Initializer.Registration;
 using Unmatched.Registration;
 using Unmatched.UI.BlazorServer;
+using Unmatched.UI.BlazorServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.RegisterInitializers();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<RatingRecalculationStateNotifier>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

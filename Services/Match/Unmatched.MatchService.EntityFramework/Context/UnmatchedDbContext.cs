@@ -48,6 +48,7 @@ public class UnmatchedDbContext : DbContext
 
     public DbSet<RatingEntity> Ratings { get; set; }
 
+    public DbSet<RatingRecalculationStateEntity> RatingRecalculationStates { get; set; }
 
     public DbSet<TournamentEntity> Tournaments { get; set; }
 

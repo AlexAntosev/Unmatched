@@ -38,4 +38,10 @@ public class RatingController(IRatingService ratingService, IMapper mapper) : Co
         await ratingService.RecalculateAsync();
         return Ok();
     }
+
+    [HttpGet("recalculation-required")]
+    public async Task<ActionResult<bool>> IsRecalculationRequired()
+    {
+        return Ok(await ratingService.IsRecalculationRequiredAsync());
+    }
 }
