@@ -1,41 +1,78 @@
-﻿@page "/maps-statistics"
-@using Microsoft.AspNetCore.Components
+@page "/maps-statistics"
 @using Unmatched.Dtos
-@using Unmatched.Dtos.Statistics
-@using Unmatched.Services.Statistics
 @using Unmatched.Services.Contracts
-@inject NavigationManager NavManager
+@using Unmatched.Services.Statistics
 @inject IMapStatisticsService MapStatisticsService
 @inject IMapService MapService
 @inject ICollectionService CollectionService
+@inject NavigationManager NavManager
+@*
+    Not in the design pack: the 1c ladder with a map thumbnail instead of a hero token. Maps from
+    sets you do not own are hidden, matching the heroes ladder.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Maps Statistics</h1>
-    <SfGrid DataSource="@_maps" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="20"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="UiMapStatisticsDto"></GridEvents>
-        <GridColumns>
-            <GridColumn Field="Name" HeaderText="Map" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(UiMapStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-</div>
+<EntityLadder TItem="UiMapStatisticsDto" Items="_maps" Title="Maps"
+              Lede="@($"{_maps.Count} maps · {_totalMatches:N0} matches played")"
+              Breadcrumbs="Crumbs" Columns="@Columns" SearchText="@(m => m.Name ?? string.Empty)"
+              SearchPlaceholder="Search map…">
+    <Header>
+        <div>#</div>
+        <div>Map</div>
+        <div class="maps-right">Matches</div>
+    </Header>
+    <Row>
+        <LadderRow Columns="@Columns" Rank="@(_maps.IndexOf(context) + 1)" Name="@context.Name"
+                   ImageUrl="@context.ImageUrl" Fallback="/UnknownMap.png"
+                   OnClick="@(() => Open(context))">
+            <Metrics>
+                <div class="maps-matches">@context.TotalMatches</div>
+            </Metrics>
+        </LadderRow>
+    </Row>
+</EntityLadder>
 
 @code {
-    private List<UiMapStatisticsDto> _maps = new();
+    private const string Columns = "34px 1fr 80px";
 
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Maps")];
+
+    private List<UiMapStatisticsDto> _maps = new();
+    private int _totalMatches;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             PreloadService.Show();
-            _maps = (await MapStatisticsService.GetMapsStatisticsAsync()).OrderBy(x => x.Name).ToList();
 
-            var catalogMaps = (await MapService.GetAsync()).ToDictionary(m => m.Id);
-            ApplyDisplayNames(catalogMaps);
-            await FilterByCollectionAsync(catalogMaps);
+            var stats = MapStatisticsService.GetMapsStatisticsAsync();
+            var catalog = MapService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, catalog, owned);
+
+            var catalogMaps = catalog.Result.ToDictionary(m => m.Id);
+            var ownedExpansionIds = owned.Result.ToHashSet();
+
+            _maps = stats.Result.ToList();
+            foreach (var map in _maps.Where(m => catalogMaps.ContainsKey(m.MapId)))
+            {
+                map.Name = catalogMaps[map.MapId].DisplayName;
+            }
+
+            if (ownedExpansionIds.Count > 0)
+            {
+                _maps = _maps
+                    .Where(m => !catalogMaps.TryGetValue(m.MapId, out var catalogMap)
+                             || catalogMap.ExpansionId is null
+                             || ownedExpansionIds.Contains(catalogMap.ExpansionId.Value))
+                    .ToList();
+            }
+
+            _maps = _maps.OrderByDescending(m => m.TotalMatches).ToList();
+            _totalMatches = _maps.Sum(m => m.TotalMatches);
         }
         finally
         {
@@ -43,34 +80,6 @@
         }
     }
 
-    private void ApplyDisplayNames(Dictionary<Guid, MapDto> catalogMaps)
-    {
-        foreach (var map in _maps)
-        {
-            if (catalogMaps.TryGetValue(map.MapId, out var catalogMap))
-            {
-                map.Name = catalogMap.DisplayName;
-            }
-        }
-    }
-
-    private async Task FilterByCollectionAsync(Dictionary<Guid, MapDto> catalogMaps)
-    {
-        var ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
-        if (ownedExpansionIds.Count == 0)
-        {
-            return;
-        }
-
-        _maps = _maps
-            .Where(m => !catalogMaps.TryGetValue(m.MapId, out var catalogMap) || catalogMap.ExpansionId is null || ownedExpansionIds.Contains(catalogMap.ExpansionId.Value))
-            .ToList();
-    }
-
-    private void RecordClickHandler(RecordClickEventArgs<UiMapStatisticsDto> args)
-    {
-        var mapId = args.RowData.MapId;
-        var url = $"{Urls.MapsStatistics}/{mapId}";
-        NavManager.NavigateTo(url);
-    }
+    private void Open(UiMapStatisticsDto map)
+        => NavManager.NavigateTo($"{Urls.MapsStatistics}/{map.MapId}");
 }

@@ -1,0 +1,17 @@
+::deep .match-list-head {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--um-border);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+}
+
+::deep .match-list-right {
+    text-align: right;
+}
+
+.match-list-empty {
+    padding: 28px 16px;
+    text-align: center;
+    font: 400 12.5px var(--um-font-body);
+    color: var(--um-text-dim);
+}

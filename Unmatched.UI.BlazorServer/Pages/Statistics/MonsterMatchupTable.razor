@@ -1,39 +1,29 @@
-@using Unmatched.UI.BlazorServer.Pages.Statistics
-
-@if (Rows.Any())
-{
-    <div class="page-content">
-        <h5>@Title</h5>
-        <table class="table table-hover monster-matchup-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Matches</th>
-                    <th>Wins</th>
-                    <th>Looses</th>
-                    <th>K/D</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var row in Rows)
-                {
-                    <tr>
-                        <td>@row.Name</td>
-                        <td>@row.Total</td>
-                        <td>@row.Wins</td>
-                        <td>@row.Looses</td>
-                        <td>@row.Kd</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+@*
+    The "Against villains" / "Against minions" records: name, meetings, wins, losses, K/D.
+*@
+<Panel Title="@Title">
+    @if (Rows.Count == 0)
+    {
+        <div class="monster-empty">No co-op matches recorded yet.</div>
+    }
+    @foreach (var row in Rows)
+    {
+        <div class="monster-row">
+            <span class="monster-name">@row.Name</span>
+            <span class="monster-total">@row.Total</span>
+            <span class="monster-wins">@row.Wins</span>
+            <span class="monster-losses">@row.Looses</span>
+            <span class="monster-kd" style="color:@(row.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                @row.Kd.ToString("0.00")
+            </span>
+        </div>
+    }
+</Panel>
 
 @code {
-    [Parameter]
-    public string Title { get; set; } = "";
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
 
-    [Parameter]
-    public IEnumerable<MonsterMatchupRow> Rows { get; set; } = Enumerable.Empty<MonsterMatchupRow>();
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MonsterMatchupRow> Rows { get; set; } = [];
 }

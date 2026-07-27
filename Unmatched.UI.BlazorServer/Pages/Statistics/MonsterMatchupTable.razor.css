@@ -1,0 +1,46 @@
+.monster-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 40px 40px 52px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: var(--um-radius-md);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.monster-name {
+    font: 600 12px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.monster-total,
+.monster-wins,
+.monster-losses,
+.monster-kd {
+    text-align: right;
+    font-family: var(--um-font-mono);
+}
+
+.monster-total {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.monster-wins {
+    font: 500 11px var(--um-font-mono);
+    color: var(--um-win);
+}
+
+.monster-losses {
+    font: 500 11px var(--um-font-mono);
+    color: var(--um-loss);
+}
+
+.monster-kd {
+    font: 600 11px var(--um-font-mono);
+}
+
+.monster-empty {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}

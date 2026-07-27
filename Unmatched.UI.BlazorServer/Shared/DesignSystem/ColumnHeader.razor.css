@@ -1,0 +1,10 @@
+.um-columns {
+    display: grid;
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px 8px;
+    font: 500 9.5px var(--um-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}

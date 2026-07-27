@@ -1,0 +1,19 @@
+@*
+    A side is a box of fighter chips. Teams that won get a green wash, teams that lost a red one;
+    free-for-all and single-fighter sides stay neutral because there is no "side" to colour.
+*@
+<div class="um-side um-side-@Variant @Class">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>win | loss | neutral</summary>
+    [Parameter]
+    public string Variant { get; set; } = "neutral";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,63 +1,58 @@
 @page "/villains-statistics"
-@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
-@using Unmatched.Constants
-@inject NavigationManager NavManager
 @inject IVillainStatisticsService VillainStatisticsService
+@inject NavigationManager NavManager
+@*
+    Not in the design pack: the 1c ladder pattern, in the villain hue.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Villains Statistics</h1>
-    <SfGrid @ref="_grid" DataSource="@_villains" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="VillainStatisticsDto"></GridEvents>
-        <GridSortSettings>
-            <GridSortColumns>
-                <GridSortColumn Field="@nameof(VillainStatisticsDto.TotalMatches)" Direction="SortDirection.Descending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
-        <GridColumns>
-            <GridColumn Width="20">
-                <Template>
-                    @{
-                        var villain = context as VillainStatisticsDto;
-                        <div class="image">
-                            <img src="@villain?.ImageUrl" alt="@villain?.Name" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(VillainStatisticsDto.Name) HeaderText="Villain" Width="120"></GridColumn>
-            <GridColumn Width="20">
-                <Template>
-                    @{
-                        var villain = context as VillainStatisticsDto;
-                        <div class="image">
-                            <img src="@villain?.MeleeRangeImageUrl" alt="@villain?.Name" width="100%" height="auto"/>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(VillainStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(VillainStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(VillainStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(VillainStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-</div>
+<EntityLadder TItem="VillainStatisticsDto" Items="_villains" Title="Villains"
+              Lede="@($"{_villains.Count} villains · {_totalMatches:N0} appearances")"
+              Breadcrumbs="Crumbs" Columns="@Columns" SearchText="@(v => v.Name)"
+              SearchPlaceholder="Search villain…">
+    <Header>
+        <div>#</div>
+        <div>Villain</div>
+        <div class="villains-right">GP</div>
+        <div>W / L</div>
+        <div class="villains-right">K/D</div>
+    </Header>
+    <Row>
+        <LadderRow Columns="@Columns" Rank="@(_villains.IndexOf(context) + 1)" Name="@context.Name"
+                   ImageUrl="@context.ImageUrl" IsRanged="context.IsRanged"
+                   EdgeColor="var(--um-villain)" OnClick="@(() => Open(context))">
+            <Metrics>
+                <div class="villains-matches">@context.TotalMatches</div>
+                <WinLossBar Wins="context.TotalWins" Losses="context.TotalLooses"/>
+                <div class="villains-kd" style="color:@(context.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                    @context.Kd.ToString("0.00")
+                </div>
+            </Metrics>
+        </LadderRow>
+    </Row>
+</EntityLadder>
 
 @code {
-    private List<VillainStatisticsDto> _villains = new();
-    SfGrid<VillainStatisticsDto> _grid;
+    private const string Columns = "34px 1fr 58px 90px 62px";
 
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Villains")];
+
+    private List<VillainStatisticsDto> _villains = new();
+    private int _totalMatches;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             PreloadService.Show();
-            _villains = (await VillainStatisticsService.GetVillainsStatisticsAsync()).OrderBy(x => x.Name).ToList();
+            _villains = (await VillainStatisticsService.GetVillainsStatisticsAsync())
+                .OrderByDescending(v => v.TotalMatches)
+                .ToList();
+            _totalMatches = _villains.Sum(v => v.TotalMatches);
         }
         finally
         {
@@ -65,10 +60,6 @@
         }
     }
 
-    private void RecordClickHandler(RecordClickEventArgs<VillainStatisticsDto> args)
-    {
-        var villainId = args.RowData.VillainId;
-        var url = $"{Urls.VillainsStatistics}/{villainId}";
-        NavManager.NavigateTo(url);
-    }
+    private void Open(VillainStatisticsDto villain)
+        => NavManager.NavigateTo($"{Urls.VillainsStatistics}/{villain.VillainId}");
 }

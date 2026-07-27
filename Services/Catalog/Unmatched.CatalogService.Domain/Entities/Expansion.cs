@@ -13,6 +13,9 @@ public class Expansion
 
     public string? Publisher { get; set; }
 
+    /// <summary>Box cover art, stored in MinIO under the "expansions" category.</summary>
+    public string? ImageFileName { get; set; }
+
     public virtual ICollection<Hero> Heroes { get; set; }
 
     public virtual ICollection<Map> Maps { get; set; }

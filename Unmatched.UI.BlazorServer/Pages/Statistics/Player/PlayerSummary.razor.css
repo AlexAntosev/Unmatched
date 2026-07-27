@@ -1,12 +1,19 @@
-.player-summary-columns {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    column-gap: var(--um-space-6);
-    row-gap: var(--um-space-1);
+.player-chosen {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: var(--um-radius-sm);
+    background: var(--um-gold-bg);
+    font: 500 11.5px var(--um-font-body);
+    color: var(--um-gold);
 }
 
-@media (max-width: 767.98px) {
-    .player-summary-columns {
-        grid-template-columns: 1fr;
-    }
+.player-chosen i {
+    font-size: 12px;
+}
+
+.player-winrate {
+    display: flex;
+    justify-content: flex-start;
 }

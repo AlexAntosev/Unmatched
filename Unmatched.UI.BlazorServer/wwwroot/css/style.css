@@ -1,13 +1,26 @@
-﻿.column {
+/*
+  Pre-redesign page shell. Only pages that have not been migrated to the design system still use
+  .page-content / .page-title; both are deleted together with this file once every screen is on
+  .um-page / .um-page-title.
+*/
+.page-content {
+    padding-left: var(--um-page-padding-x);
+    padding-right: var(--um-page-padding-x);
+}
+
+.page-title {
+    padding-top: var(--um-space-5);
+    font: 700 24px/1.1 var(--um-font-display);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.column {
     flex: 50%;
 }
 
 .triple-column {
     flex: 33.3%;
-}
-
-.row:after {
-    display: flex;
 }
 
 .start {
@@ -26,13 +39,4 @@
     display: flex;
     justify-content: end;
     align-items: center;
-}
-
-.page-content {
-    padding-left: var(--um-space-4);
-    padding-right: var(--um-space-4);
-}
-
-.page-title {
-    padding-top: var(--um-space-4);
 }

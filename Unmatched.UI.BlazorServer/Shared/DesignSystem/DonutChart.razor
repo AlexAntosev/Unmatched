@@ -1,0 +1,55 @@
+@using System.Globalization
+@*
+    Win-rate donut. The track is the loss colour and the arc the accent, so the ring itself reads
+    as the win/loss split without a legend.
+
+    The value sits in an HTML overlay rather than an SVG <text> element: Razor reserves the <text>
+    tag, and real HTML lets the label use the app's own type classes.
+*@
+<div class="um-donut @Class" style="@($"width:{Size}px;height:{Size}px")">
+    <svg viewBox="0 0 120 120" role="img" aria-label="@($"{Percent}%")">
+        <circle cx="60" cy="60" r="48" fill="none" stroke="@TrackColor" stroke-width="@Thickness"></circle>
+        <circle cx="60" cy="60" r="48" fill="none" stroke="@ArcColor" stroke-width="@Thickness" stroke-linecap="round"
+                stroke-dasharray="@Circumference" stroke-dashoffset="@DashOffset" transform="rotate(-90 60 60)"></circle>
+    </svg>
+    <div class="um-donut-centre">
+        <div class="um-donut-value">@Percent%</div>
+        @if (!string.IsNullOrEmpty(Caption))
+        {
+            <div class="um-donut-caption">@Caption</div>
+        }
+    </div>
+</div>
+
+@code {
+    // 2 * pi * r, with r = 48 in the 120x120 viewBox.
+    private const double Radius = 48;
+    private static readonly double FullCircle = 2 * Math.PI * Radius;
+
+    [Parameter]
+    public int Percent { get; set; }
+
+    /// <summary>Sub-label inside the ring, e.g. "64W · 39L".</summary>
+    [Parameter]
+    public string? Caption { get; set; }
+
+    [Parameter]
+    public int Size { get; set; } = 118;
+
+    [Parameter]
+    public int Thickness { get; set; } = 12;
+
+    [Parameter]
+    public string ArcColor { get; set; } = "var(--um-accent)";
+
+    [Parameter]
+    public string TrackColor { get; set; } = "rgba(242,80,107,.55)";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string Circumference => FullCircle.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private string DashOffset
+        => (FullCircle * (1 - Math.Clamp(Percent, 0, 100) / 100d)).ToString("0.##", CultureInfo.InvariantCulture);
+}

@@ -1,0 +1,113 @@
+@implements IDisposable
+@using Unmatched.UI.BlazorServer.Services
+@inject NavState NavState
+@inject NavCountsService NavCountsService
+@*
+    The fixed left rail. Expanded it is 216px with group captions, labels and counts; collapsed it
+    is 76px of centred icons whose `title` carries the label. The two states share one width
+    transition, and the choice lives in NavState so it survives navigation.
+*@
+<nav class="rail @(NavState.IsExpanded ? "is-expanded" : "is-collapsed")">
+    <div class="rail-brand">
+        @if (NavState.IsExpanded)
+        {
+            <img src="/Unmatched-logo.png" alt="Unmatched"/>
+        }
+        else
+        {
+            <div class="rail-brand-tile">U</div>
+        }
+    </div>
+
+    @foreach (var group in Groups)
+    {
+        <div class="rail-group">
+            @if (NavState.IsExpanded)
+            {
+                <div class="rail-group-title">@group.Title</div>
+            }
+            @foreach (var item in group.Items)
+            {
+                <NavLink class="rail-item" href="@item.Href" Match="NavLinkMatch.Prefix" title="@item.Label">
+                    <i class="bi @item.Icon"></i>
+                    @if (NavState.IsExpanded)
+                    {
+                        <span class="rail-item-label">@item.Label</span>
+                        <span class="rail-item-count">@item.Count(_counts)</span>
+                    }
+                </NavLink>
+            }
+        </div>
+    }
+
+    <div class="um-spacer"></div>
+
+    <RatingRecalculationWarning IsExpanded="NavState.IsExpanded"/>
+
+    <NavLink class="rail-item" href="@Urls.Settings" title="Settings">
+        <i class="bi bi-gear"></i>
+        @if (NavState.IsExpanded)
+        {
+            <span class="rail-item-label">Settings</span>
+        }
+    </NavLink>
+
+    <button type="button" class="rail-collapse" @onclick="NavState.Toggle"
+            title="@(NavState.IsExpanded ? "Collapse" : "Expand")">
+        <i class="bi @(NavState.IsExpanded ? "bi-chevron-double-left" : "bi-chevron-double-right")"></i>
+        @if (NavState.IsExpanded)
+        {
+            <span>Collapse</span>
+        }
+    </button>
+</nav>
+
+@code {
+    private record Item(string Label, string Icon, string Href, Func<NavCounts, string> Count);
+
+    private record Group(string Title, Item[] Items);
+
+    private static readonly Group[] Groups =
+    [
+        new("Statistics",
+        [
+            new("Heroes", "bi-shield-fill", Urls.HeroesStatistics, c => c.Heroes.ToString()),
+            new("Players", "bi-people", Urls.PlayersStatistics, c => c.Players.ToString()),
+            new("Maps", "bi-map", Urls.MapsStatistics, c => c.Maps.ToString()),
+            new("Minions", "bi-bug", Urls.MinionsStatistics, c => c.Minions.ToString()),
+            new("Villains", "bi-eye", Urls.VillainsStatistics, c => c.Villains.ToString())
+        ]),
+        new("Play",
+        [
+            new("Add match", "bi-plus-circle", Urls.AddMatch, _ => string.Empty),
+            new("Match log", "bi-list-ul", Urls.MatchLog, c => c.Matches.ToString()),
+            new("Collection", "bi-box-seam", Urls.Collection, c => c.Collection),
+            new("Titles", "bi-award", Urls.Titles, c => c.Titles.ToString()),
+            new("Tournaments", "bi-flag", Urls.Tournaments, c => c.Tournaments.ToString())
+        ])
+    ];
+
+    private NavCounts _counts = NavCounts.Empty;
+
+    protected override void OnInitialized()
+    {
+        NavState.Changed += OnStateChanged;
+        NavCountsService.Changed += OnCountsChanged;
+    }
+
+    protected override async Task OnInitializedAsync() => _counts = await NavCountsService.GetAsync();
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
+
+    private async void OnCountsChanged()
+    {
+        _counts = await NavCountsService.GetAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavState.Changed -= OnStateChanged;
+        NavCountsService.Changed -= OnCountsChanged;
+    }
+}

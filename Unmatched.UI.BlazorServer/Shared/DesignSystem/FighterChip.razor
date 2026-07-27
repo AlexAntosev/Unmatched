@@ -1,0 +1,51 @@
+@*
+    One participant in a match row: hero art with a green ring at full opacity when they won, a
+    neutral ring at 50% when they lost, the player's avatar pinned bottom-right and - in
+    free-for-all - a place badge top-left. Villains and minions pass no avatar: they are the game,
+    not a person.
+*@
+<div class="um-chip" title="@Title">
+    <img class="um-chip-art"
+         src="@(string.IsNullOrEmpty(ImageUrl) ? "/Unknown.png" : ImageUrl)"
+         alt="@Title"
+         style="@ArtStyle"
+         onerror="this.onerror=null;this.src='/Unknown.png'"/>
+    @if (!string.IsNullOrEmpty(PlayerAvatarUrl))
+    {
+        <img class="um-chip-avatar" src="@PlayerAvatarUrl" alt="" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+    }
+    @if (Place is not null)
+    {
+        <span class="um-chip-place" style="color:@PlaceColor.For(Place)">@Place</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string? PlayerAvatarUrl { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public bool IsWinner { get; set; }
+
+    [Parameter]
+    public int? Place { get; set; }
+
+    [Parameter]
+    public int Size { get; set; } = 30;
+
+    private string ArtStyle
+    {
+        get
+        {
+            var border = IsWinner ? "var(--um-win-ring)" : "rgba(255,255,255,.09)";
+            var opacity = IsWinner ? "1" : ".5";
+            return $"width:{Size}px;height:{Size}px;border-color:{border};opacity:{opacity}";
+        }
+    }
+}

@@ -1,0 +1,50 @@
+@*
+    One cell of the KPI strip: icon, mono label, big Chakra number and an optional trailing note.
+    `Of` renders the "7 / 10" shape the collection uses.
+*@
+<div class="um-kpi @Class">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="bi @Icon"></i>
+    }
+    <div class="um-kpi-text">
+        <div class="um-kpi-label">@Label</div>
+        <div class="um-kpi-value-row">
+            <span class="um-kpi-value">@Value</span>
+            @if (!string.IsNullOrEmpty(Of))
+            {
+                <span class="um-kpi-of">/ @Of</span>
+            }
+        </div>
+    </div>
+    <div class="um-spacer"></div>
+    @if (!string.IsNullOrEmpty(Sub))
+    {
+        <div class="um-kpi-sub" style="@(SubColor is null ? null : $"color:{SubColor}")">@Sub</div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = string.Empty;
+
+    /// <summary>Denominator shown next to the value, e.g. "10" for "7 / 10".</summary>
+    [Parameter]
+    public string? Of { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    /// <summary>Right-aligned mono note, e.g. "+37 this week".</summary>
+    [Parameter]
+    public string? Sub { get; set; }
+
+    [Parameter]
+    public string? SubColor { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

@@ -1,94 +1,69 @@
 /*
-  Remaps Bootstrap 5.3's own CSS custom properties to the Unmatched design tokens, so every
-  existing .btn/.card/.form-control/.nav-link usage across the app re-skins for free without
-  hunting down every class usage. Loaded after Bootstrap's CSS in _Host.cshtml.
+  Bootstrap is only still here for the pieces BlazorBootstrap renders for us - modals, alerts and
+  the preload overlay. Everything else in the app is built from the design system, so this file
+  just remaps the handful of Bootstrap custom properties those components read.
 */
 :root {
-    --bs-body-bg: var(--um-bg);
+    --bs-body-bg: var(--um-bg-app);
     --bs-body-color: var(--um-text);
     --bs-body-font-family: var(--um-font-body);
+    --bs-body-font-size: 13px;
 
     --bs-border-color: var(--um-border);
     --bs-border-radius: var(--um-radius-md);
-    --bs-border-radius-sm: var(--um-radius-sm);
-    --bs-border-radius-lg: var(--um-radius-lg);
+    --bs-border-radius-sm: var(--um-radius-chip);
+    --bs-border-radius-lg: var(--um-radius-card);
 
     --bs-primary: var(--um-accent);
-    --bs-primary-rgb: 230, 57, 70;
-    --bs-link-color: var(--um-accent);
-    --bs-link-color-rgb: 230, 57, 70;
-    --bs-link-hover-color: var(--um-accent-hover);
-    --bs-link-hover-color-rgb: 255, 77, 91;
+    --bs-primary-rgb: 108, 92, 255;
+    --bs-link-color: var(--um-accent-soft);
+    --bs-link-color-rgb: 139, 125, 255;
+    --bs-link-hover-color: var(--um-accent-text);
+    --bs-link-hover-color-rgb: 196, 188, 255;
 
-    --bs-danger: var(--um-accent);
-    --bs-danger-rgb: 230, 57, 70;
-    --bs-success: var(--um-winner);
-    --bs-success-rgb: 144, 238, 144;
+    --bs-danger: var(--um-loss);
+    --bs-danger-rgb: 242, 80, 107;
+    --bs-success: var(--um-win);
+    --bs-success-rgb: 52, 217, 155;
 
-    --bs-card-bg: var(--um-surface);
-    --bs-card-border-color: var(--um-border);
-    --bs-card-cap-bg: var(--um-surface-raised);
-
-    --bs-modal-bg: var(--um-surface);
+    --bs-modal-bg: var(--um-bg-panel);
+    --bs-modal-color: var(--um-text);
+    --bs-modal-border-color: var(--um-border);
+    --bs-modal-border-radius: var(--um-radius-panel);
     --bs-modal-header-border-color: var(--um-border);
     --bs-modal-footer-border-color: var(--um-border);
-
-    --bs-btn-border-radius: var(--um-radius-sm);
-}
-
-body {
-    background-color: var(--um-bg);
-    color: var(--um-text);
-}
-
-.btn-primary {
-    color: var(--um-accent-text);
-    background-color: var(--um-accent);
-    border-color: var(--um-accent);
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: var(--um-accent-hover);
-    border-color: var(--um-accent-hover);
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.15rem var(--um-bg), 0 0 0 0.3rem var(--um-accent);
-}
-
-a, .btn-link {
-    color: var(--um-accent);
-}
-
-.card {
-    background-color: var(--um-surface);
-    border-color: var(--um-border);
-    box-shadow: var(--um-shadow-sm);
-}
-
-.form-control, .form-select {
-    background-color: var(--um-surface-raised);
-    border-color: var(--um-border);
-    color: var(--um-text);
-}
-
-.form-control:focus, .form-select:focus {
-    background-color: var(--um-surface-raised);
-    color: var(--um-text);
-}
-
-.form-control::placeholder {
-    color: var(--um-text-muted);
-}
-
-.table {
-    --bs-table-bg: var(--um-surface);
-    --bs-table-color: var(--um-text);
-    --bs-table-border-color: var(--um-border);
 }
 
 .modal-content {
-    background-color: var(--um-surface);
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
     color: var(--um-text);
+}
+
+.modal-title {
+    font: 600 12.5px var(--um-font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.alert {
+    border-radius: var(--um-radius-card);
+    border-width: 1px;
+    font: 400 12.5px/1.5 var(--um-font-body);
+}
+
+.alert-danger {
+    background: var(--um-loss-wash);
+    border-color: var(--um-loss-border);
+    color: var(--um-loss);
+}
+
+.alert-success {
+    background: var(--um-win-wash);
+    border-color: var(--um-win-border);
+    color: var(--um-win);
+}
+
+.btn-close {
+    filter: invert(1) grayscale(1) brightness(1.6);
 }

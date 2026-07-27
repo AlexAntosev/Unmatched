@@ -1,39 +1,144 @@
 @page "/match-log"
-@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
-@using Unmatched.Dtos.Match
 @using Unmatched.Enums
-@using Unmatched.Services
 @using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMatchService MatchService
+@inject IPlayerService PlayerService
+@inject IHeroService HeroService
+@inject IMapService MapService
+@inject ITournamentService TournamentService
+@inject NavigationManager NavigationManager
+@*
+    Screen 6a. The whole log is loaded once and filtered in memory - at this app's volume that is
+    cheaper and simpler than a request per keystroke, and it keeps the KPI strip in agreement with
+    the rows underneath it.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Match Log</h1>
+<PageHeader Breadcrumbs="Crumbs">
+    <Controls>
+        <UmSearchBox Value="@_filter.Search" ValueChanged="OnSearchChanged"/>
+        @* Export is in the design but has no backend yet, so it is present and disabled. *@
+        <UmButton Size="sm" Icon="bi-download" Disabled="true" Title="Export is not available yet">Export</UmButton>
+        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" OnClick="GoToAddMatch">Add match</UmButton>
+    </Controls>
+</PageHeader>
 
-    <MatchLogGrid MatchLogEntries="_filteredEntries"></MatchLogGrid>
+<div class="log-kpis">
+    <KpiCard Icon="bi-controller" Label="Matches" Value="@_metrics.TotalMatches.ToString("N0")"
+             Sub="@($"+{_metrics.AddedThisWeek} this week")" SubColor="var(--um-win)"/>
+    <KpiCard Icon="bi-calendar3" Label="This month" Value="@_metrics.MatchesThisMonth.ToString()"
+             Sub="@($"{_metrics.SessionsThisMonth} sessions")"/>
+    <KpiCard Icon="bi-star-fill" Label="Avg. epic" Value="@_metrics.AverageEpic.ToString("0.#")" Sub="of 3"/>
+    <KpiCard Icon="bi-fire" Label="Longest streak" Value="@(_metrics.LongestStreak?.Length.ToString() ?? "–")"
+             Sub="@_metrics.LongestStreak?.Caption"/>
+</div>
+
+<div class="log-filters">
+    <SegmentedControl TValue="GameMode?" Variant="bar" Options="ModeFilters"
+                      Value="_filter.Mode" ValueChanged="OnModeChanged"/>
+    <div class="log-filters-divider"></div>
+
+    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-people" Value="_filter.PlayerId" ValueChanged="OnPlayerChanged">
+        <option value="">All players</option>
+        @foreach (var player in _players)
+        {
+            <option value="@player.Id">@player.Name</option>
+        }
+    </UmSelect>
+
+    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-shield" Value="_filter.HeroId" ValueChanged="OnHeroChanged">
+        <option value="">All heroes</option>
+        @foreach (var hero in _heroes)
+        {
+            <option value="@hero.Id">@hero.Name</option>
+        }
+    </UmSelect>
+
+    <UmSelect TValue="string" Variant="chip" Icon="bi-map" Value="@_filter.MapName" ValueChanged="OnMapChanged">
+        <option value="">All maps</option>
+        @foreach (var map in _maps)
+        {
+            <option value="@map.Name">@map.DisplayName</option>
+        }
+    </UmSelect>
+
+    <UmSelect TValue="string" Variant="chip" Icon="bi-flag" Value="@_filter.TournamentName" ValueChanged="OnTournamentChanged">
+        <option value="">All tournaments</option>
+        @foreach (var tournament in _tournaments)
+        {
+            <option value="@tournament.Name">@tournament.Name</option>
+        }
+    </UmSelect>
+
+    <UmSelect TValue="string" Variant="chip" Icon="bi-calendar3" Value="@_range" ValueChanged="OnRangeChanged">
+        @foreach (var range in DateRanges)
+        {
+            <option value="@range.Value">@range.Label</option>
+        }
+    </UmSelect>
+
+    <div class="um-spacer"></div>
+    <div class="log-count">@($"{_filtered.Count} of {_all.Count} matches")</div>
+</div>
+
+<div class="log-body">
+    <MatchList Matches="_filtered"/>
 </div>
 
 @code {
-    [Parameter, SupplyParameterFromQuery]
-    public string? Mode { get; set; }
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Match log")];
 
-    private List<UiMatchLogDto> _matchLogEntries = new();
-    private List<UiMatchLogDto> _filteredEntries = new();
+    private static readonly IReadOnlyList<SelectOption<GameMode?>> ModeFilters =
+    [
+        new(null, "All", "bi-grid-fill"),
+        new(GameMode.OneVsOne, "1v1", "bi-person-fill", "var(--um-mode-1v1)"),
+        new(GameMode.TeamVsTeam, "2v2", "bi-people-fill", "var(--um-mode-2v2)"),
+        new(GameMode.FreeForAll, "FFA", "bi-diagram-3-fill", "var(--um-mode-ffa)"),
+        new(GameMode.Cooperative, "Co-op", "bi-shield-fill", "var(--um-mode-coop)")
+    ];
 
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private static readonly IReadOnlyList<(string Value, string Label)> DateRanges =
+    [
+        ("", "All time"), ("30", "Last 30 days"), ("90", "Last 3 months"), ("365", "Last year")
+    ];
+
+    private readonly MatchLogFilter _filter = new();
+
+    private List<UiMatchLogDto> _all = new();
+    private List<UiMatchLogDto> _filtered = new();
+    private List<UiPlayerDto> _players = new();
+    private List<UiHeroDto> _heroes = new();
+    private List<MapDto> _maps = new();
+    private List<Dtos.Match.TournamentDto> _tournaments = new();
+    private MatchLogMetrics _metrics = MatchLogMetrics.Empty;
+    private string? _range = string.Empty;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             PreloadService.Show();
-            _matchLogEntries = (await MatchService.GetMatchLogAsync()).OrderByDescending(x => x.Date).ToList();
-            foreach (var matchLogEntry in _matchLogEntries)
-            {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
-            }
 
+            var matches = MatchService.GetMatchLogAsync();
+            var players = PlayerService.GetAsync();
+            var heroes = HeroService.GetAsync();
+            var maps = MapService.GetAsync();
+            var tournaments = TournamentService.GetAsync();
+            await Task.WhenAll(matches, players, heroes, maps, tournaments);
+
+            _all = matches.Result.OrderByDescending(m => m.Date).ToList();
+            _players = players.Result.OrderBy(p => p.Name).ToList();
+            _heroes = heroes.Result.OrderBy(h => h.Name).ToList();
+            _maps = maps.Result.OrderBy(m => m.DisplayName).ToList();
+            _tournaments = tournaments.Result.OrderBy(t => t.Name).ToList();
+
+            // The KPI strip describes the whole log, not the current filter.
+            _metrics = MatchLogMetrics.Calculate(_all, DateTime.Today);
             ApplyFilter();
         }
         finally
@@ -42,15 +147,50 @@
         }
     }
 
-    protected override void OnParametersSet()
+    private void ApplyFilter() => _filtered = _filter.Apply(_all).ToList();
+
+    private void OnModeChanged(GameMode? mode)
     {
+        _filter.Mode = mode;
         ApplyFilter();
     }
 
-    private void ApplyFilter()
+    private void OnPlayerChanged(Guid? playerId)
     {
-        _filteredEntries = Enum.TryParse<GameMode>(Mode, out var mode)
-            ? _matchLogEntries.Where(m => m.GameMode == mode).ToList()
-            : _matchLogEntries;
+        _filter.PlayerId = playerId;
+        ApplyFilter();
     }
+
+    private void OnHeroChanged(Guid? heroId)
+    {
+        _filter.HeroId = heroId;
+        ApplyFilter();
+    }
+
+    private void OnMapChanged(string? mapName)
+    {
+        _filter.MapName = mapName;
+        ApplyFilter();
+    }
+
+    private void OnTournamentChanged(string? tournamentName)
+    {
+        _filter.TournamentName = tournamentName;
+        ApplyFilter();
+    }
+
+    private void OnSearchChanged(string? search)
+    {
+        _filter.Search = search;
+        ApplyFilter();
+    }
+
+    private void OnRangeChanged(string? range)
+    {
+        _range = range;
+        _filter.From = int.TryParse(range, out var days) ? DateTime.Today.AddDays(-days) : null;
+        ApplyFilter();
+    }
+
+    private void GoToAddMatch() => NavigationManager.NavigateTo(Urls.AddMatch);
 }

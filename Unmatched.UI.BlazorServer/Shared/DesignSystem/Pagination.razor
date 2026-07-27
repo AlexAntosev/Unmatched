@@ -1,0 +1,82 @@
+@*
+    Pages are 1-based. Long ranges collapse around the current page so the control never grows
+    past seven cells.
+*@
+<div class="um-pagination @Class">
+    @if (!string.IsNullOrEmpty(Meta))
+    {
+        <div class="um-pagination-meta">@Meta</div>
+        <div class="um-spacer"></div>
+    }
+    @if (ShowLabels)
+    {
+        <button type="button" class="um-page um-page-wide" disabled="@(Page <= 1)" @onclick="@(() => GoToAsync(Page - 1))">Prev</button>
+    }
+    else
+    {
+        <button type="button" class="um-page" disabled="@(Page <= 1)" @onclick="@(() => GoToAsync(Page - 1))">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+    }
+    @* The loop variable must not be called `page` - `@page` would parse as the routing directive. *@
+    @foreach (var number in VisiblePages())
+    {
+        <button type="button" class="um-page @(number == Page ? "is-current" : null)" @onclick="@(() => GoToAsync(number))">@number</button>
+    }
+    @if (ShowLabels)
+    {
+        <button type="button" class="um-page um-page-wide" disabled="@(Page >= PageCount)" @onclick="@(() => GoToAsync(Page + 1))">Next</button>
+    }
+    else
+    {
+        <button type="button" class="um-page" disabled="@(Page >= PageCount)" @onclick="@(() => GoToAsync(Page + 1))">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    }
+</div>
+
+@code {
+    private const int MaxNumberedPages = 4;
+
+    [Parameter]
+    public int Page { get; set; } = 1;
+
+    [Parameter]
+    public int PageCount { get; set; } = 1;
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    /// <summary>Caption on the left, e.g. "Page 1 of 161".</summary>
+    [Parameter]
+    public string? Meta { get; set; }
+
+    /// <summary>Word buttons ("Prev"/"Next") instead of chevrons - the ladder uses these.</summary>
+    [Parameter]
+    public bool ShowLabels { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private IEnumerable<int> VisiblePages()
+    {
+        var first = Math.Max(1, Math.Min(Page - MaxNumberedPages / 2, PageCount - MaxNumberedPages + 1));
+        var last = Math.Min(PageCount, first + MaxNumberedPages - 1);
+        for (var page = first; page <= last; page++)
+        {
+            yield return page;
+        }
+    }
+
+    private Task GoToAsync(int page)
+    {
+        var clamped = Math.Clamp(page, 1, Math.Max(PageCount, 1));
+        if (clamped == Page)
+        {
+            return Task.CompletedTask;
+        }
+
+        Page = clamped;
+        return PageChanged.InvokeAsync(clamped);
+    }
+}

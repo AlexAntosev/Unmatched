@@ -40,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFavoriteStatisticsService, FavoriteStatisticsService>();
         services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
         services.AddTransient<IMinionStatisticsService, MinionStatisticsService>();
+        services.AddTransient<IExpansionStatisticsService, ExpansionStatisticsService>();
 
         services.AddTransient<ITitleService, TitleService>();
 

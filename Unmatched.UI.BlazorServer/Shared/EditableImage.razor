@@ -1,8 +1,13 @@
+@*
+    An image with a "Replace image" bar pinned to its bottom edge, as the hero banner shows it.
+    The caller owns the upload itself - this only picks the file and reports failures inline.
+*@
 <div class="editable-image">
-    <img src="@ImageUrl" alt="@AltText" onerror="this.onerror=null;this.src='@FallbackImageUrl'" />
-    <label class="edit-image-icon" title="Change image" @onclick:stopPropagation="true">
-        <InputFile OnChange="HandleFileSelectedAsync" accept="image/*" />
-        <span aria-hidden="true">&#9998;</span>
+    <img src="@ImageUrl" alt="@AltText" onerror="this.onerror=null;this.src='@FallbackImageUrl'"/>
+    <label class="edit-image-button" title="@Label" @onclick:stopPropagation="true">
+        <InputFile OnChange="HandleFileSelectedAsync" accept="image/*"/>
+        <i class="bi bi-upload"></i>
+        <span>@Label</span>
     </label>
     @if (_isUploading)
     {
@@ -22,6 +27,9 @@
 
     [Parameter]
     public string? AltText { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "Replace image";
 
     [Parameter]
     public string FallbackImageUrl { get; set; } = "/Unknown.png";

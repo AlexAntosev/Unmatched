@@ -81,6 +81,13 @@ public class StatisticsClient(HttpClient httpClient) : IStatisticsClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<MinionStatisticsDto>>();
     }
 
+    public async Task<IEnumerable<ExpansionStatisticsDto>> GetExpansionStatsAsync()
+    {
+        var response = await httpClient.GetAsync("/expansion/stats");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<ExpansionStatisticsDto>>();
+    }
+
     public async Task<HeroStatisticsDto> UpdateHeroImageAsync(Guid heroId, string imageFileName)
     {
         var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");

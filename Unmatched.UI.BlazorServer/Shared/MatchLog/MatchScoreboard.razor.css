@@ -1,0 +1,115 @@
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 16px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--um-bg-sunken);
+}
+
+.scoreboard-head {
+    display: grid;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px 4px;
+    font: 500 9px var(--um-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}
+
+.scoreboard-row {
+    display: grid;
+    gap: 10px;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* The losing side dims rather than recolouring, so the winner reads first. */
+.scoreboard-row.is-loser {
+    opacity: 0.72;
+}
+
+.scoreboard-participant {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+.scoreboard-art {
+    position: relative;
+    flex: none;
+    line-height: 0;
+}
+
+.scoreboard-place {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border: 1px solid var(--um-border-strong);
+    border-radius: 5px;
+    background: #0c0c11;
+    font: 700 8.5px/1 var(--um-font-display);
+}
+
+.scoreboard-names {
+    min-width: 0;
+}
+
+.scoreboard-name {
+    font: 600 12px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scoreboard-sub {
+    font: 400 9.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.scoreboard-right {
+    text-align: right;
+}
+
+.scoreboard-side {
+    font: 600 10px var(--um-font-mono);
+    letter-spacing: 0.06em;
+}
+
+.scoreboard-hp {
+    font: 600 12px var(--um-font-mono);
+}
+
+.scoreboard-cards {
+    font: 400 12px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.scoreboard-sidekick {
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.scoreboard-epic {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px 0;
+}
+
+.scoreboard-epic-label {
+    font: 500 9px var(--um-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}

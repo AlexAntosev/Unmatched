@@ -1,0 +1,57 @@
+.um-kpi {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 13px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    background: var(--um-bg-panel);
+}
+
+.um-kpi > i {
+    flex: none;
+    font-size: 16px;
+    color: var(--um-accent-soft);
+}
+
+.um-kpi-text {
+    min-width: 0;
+}
+
+.um-kpi-label {
+    font: 500 9.5px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
+}
+
+.um-kpi-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.um-kpi-value {
+    font: 700 19px var(--um-font-display);
+    color: var(--um-text);
+    white-space: nowrap;
+}
+
+.um-kpi-of {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+.um-kpi-sub {
+    flex: none;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-faint);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.um-spacer {
+    flex: 1;
+}

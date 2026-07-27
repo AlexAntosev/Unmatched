@@ -1,6 +1,6 @@
 .editable-image {
     position: relative;
-    display: inline-block;
+    display: block;
     width: 100%;
     height: 100%;
 }
@@ -12,55 +12,62 @@
     display: block;
 }
 
-.edit-image-icon {
+.edit-image-button {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.65);
-    color: white;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    line-height: 1;
+    gap: 7px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--um-radius-md);
+    background: rgba(8, 8, 12, 0.72);
+    backdrop-filter: blur(6px);
+    color: var(--um-text-bright);
+    font: 500 11.5px var(--um-font-body);
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s ease-in-out;
+    transition: border-color 0.12s ease, color 0.12s ease;
 }
 
-.editable-image:hover .edit-image-icon {
-    opacity: 1;
+.edit-image-button:hover {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
 }
 
-.edit-image-icon input[type="file"] {
+.edit-image-button i {
+    font-size: 12px;
+}
+
+.edit-image-button ::deep input[type="file"] {
     position: absolute;
     inset: 0;
-    opacity: 0;
-    cursor: pointer;
     width: 100%;
     height: 100%;
+    opacity: 0;
+    cursor: pointer;
 }
 
 .editable-image-spinner {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(8, 8, 12, 0.6);
 }
 
 .editable-image-spinner::after {
     content: "";
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--um-text-muted);
-    border-top-color: transparent;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--um-accent-soft);
     border-radius: 50%;
-    animation: editable-image-spin 0.6s linear infinite;
+    animation: editable-image-spin 0.7s linear infinite;
 }
 
 @keyframes editable-image-spin {
@@ -70,6 +77,7 @@
 }
 
 .editable-image-error {
-    font-size: 11px;
-    color: var(--um-accent);
+    margin-top: 8px;
+    font: 400 11.5px var(--um-font-body);
+    color: var(--um-loss);
 }

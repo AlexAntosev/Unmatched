@@ -1,0 +1,62 @@
+@*
+    The button in every shape the design uses. `primary` is the gradient action and the design
+    allows exactly one per screen - everything else is outline, ghost, danger or a square icon.
+*@
+<button type="@(Submit ? "submit" : "button")"
+        class="um-btn um-btn-@Variant um-btn-@Size @Class"
+        disabled="@Disabled"
+        title="@Title"
+        @onclick="OnClick"
+        @onclick:stopPropagation="StopPropagation">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="bi @Icon"></i>
+    }
+    @if (ChildContent is not null)
+    {
+        <span>@ChildContent</span>
+    }
+    @if (!string.IsNullOrEmpty(TrailingIcon))
+    {
+        <i class="bi @TrailingIcon"></i>
+    }
+</button>
+
+@code {
+    /// <summary>primary | outline | ghost | danger | icon | dice</summary>
+    [Parameter]
+    public string Variant { get; set; } = "outline";
+
+    /// <summary>md (36px) | sm (32px) | xs (26px)</summary>
+    [Parameter]
+    public string Size { get; set; } = "md";
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? TrailingIcon { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>Renders as type="submit" so it can drive an EditForm.</summary>
+    [Parameter]
+    public bool Submit { get; set; }
+
+    /// <summary>Set on buttons nested inside a clickable row so the row does not also react.</summary>
+    [Parameter]
+    public bool StopPropagation { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

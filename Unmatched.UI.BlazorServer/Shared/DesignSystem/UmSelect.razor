@@ -1,0 +1,89 @@
+@typeparam TValue
+@using System.Globalization
+@*
+    Every dropdown in the app: a form field (36px), a header control (32px) and a filter chip
+    (28px) are the same component at three sizes. A native <select> keeps keyboard and screen
+    reader behaviour; the shell around it supplies the avatar/art, the chevron and the optional
+    violet dice that the design puts wherever a value can be randomized.
+*@
+<div class="um-select um-select-@Variant @(Highlighted ? "is-highlighted" : null) @Class">
+    @if (!string.IsNullOrEmpty(ArtUrl))
+    {
+        <img class="um-select-art" src="@ArtUrl" alt=""/>
+    }
+    else if (!string.IsNullOrEmpty(AvatarUrl))
+    {
+        <img class="um-select-avatar" src="@AvatarUrl" alt=""/>
+    }
+    else if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="bi @Icon um-select-icon"></i>
+    }
+    <select class="um-select-input" value="@FormattedValue" disabled="@Disabled" @onchange="HandleChangeAsync">
+        @ChildContent
+    </select>
+    <i class="bi bi-chevron-down um-select-chevron"></i>
+    @if (OnRandomize.HasDelegate)
+    {
+        <UmButton Variant="dice" Size="xs" Icon="bi-dice-5-fill" Title="Randomize"
+                  StopPropagation="true" OnClick="@(_ => OnRandomize.InvokeAsync())"/>
+    }
+</div>
+
+@code {
+    /// <summary>field (36px) | control (32px) | chip (28px)</summary>
+    [Parameter]
+    public string Variant { get; set; } = "field";
+
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; set; }
+
+    /// <summary>The &lt;option&gt; elements.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Rounded thumbnail, e.g. a hero token. Wins over <see cref="AvatarUrl"/> and <see cref="Icon"/>.</summary>
+    [Parameter]
+    public string? ArtUrl { get; set; }
+
+    /// <summary>Circular thumbnail, e.g. a player avatar.</summary>
+    [Parameter]
+    public string? AvatarUrl { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    /// <summary>Draws the violet border the design uses on the hero field.</summary>
+    [Parameter]
+    public bool Highlighted { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>When set, a dice button appears inside the field.</summary>
+    [Parameter]
+    public EventCallback OnRandomize { get; set; }
+
+    private string? FormattedValue => BindConverter.FormatValue(Value)?.ToString();
+
+    private async Task HandleChangeAsync(ChangeEventArgs args)
+    {
+        var raw = args.Value?.ToString();
+        TValue? converted = default;
+
+        if (!string.IsNullOrEmpty(raw)
+         && BindConverter.TryConvertTo<TValue>(raw, CultureInfo.InvariantCulture, out var parsed))
+        {
+            converted = parsed;
+        }
+
+        Value = converted;
+        await ValueChanged.InvokeAsync(converted);
+    }
+}

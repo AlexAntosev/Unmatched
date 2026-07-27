@@ -1,0 +1,9 @@
+.maps-right {
+    text-align: right;
+}
+
+.maps-matches {
+    text-align: right;
+    font: 400 12px var(--um-font-mono);
+    color: var(--um-text-muted);
+}

@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 
 using Syncfusion.Blazor;
 
-using Unmatched.Initializer.Registration;
 using Unmatched.Registration;
 using Unmatched.UI.BlazorServer;
 using Unmatched.UI.BlazorServer.Services;
@@ -25,12 +24,13 @@ builder.Services.AddServerSideBlazor().AddHubOptions(options =>
 });
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.RegisterMapping();
-builder.Services.RegisterInitializers();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<RatingRecalculationStateNotifier>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+builder.Services.AddScoped<NavState>();
+builder.Services.AddScoped<NavCountsService>();
 
 builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
 builder.Services.AddSingleton<IAmazonS3>(sp =>

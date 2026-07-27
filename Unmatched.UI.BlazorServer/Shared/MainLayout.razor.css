@@ -1,71 +1,13 @@
-.page {
-    position: relative;
+.shell {
+    display: flex;
+    min-height: 100vh;
+    background: var(--um-bg-app);
+}
+
+/* min-width:0 lets grids and tables inside a page shrink instead of pushing the rail off screen. */
+.shell-main {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-}
-
-main {
-    flex: 1;
-}
-
-.sidebar {
-    background-image: linear-gradient(180deg, #1a1a1e 0%, #0c0c0e 100%);
-    border-right: 1px solid var(--um-border);
-}
-
-.top-row {
-    background-color: var(--um-surface);
-    border-bottom: 1px solid var(--um-border);
-    justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-}
-
-.top-row ::deep a, .top-row .btn-link {
-    white-space: nowrap;
-    margin-left: 1.5rem;
-}
-
-.top-row a:first-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-@media (max-width: 640.98px) {
-    .top-row:not(.auth) {
-        display: none;
-    }
-
-    .top-row.auth {
-        justify-content: space-between;
-    }
-
-    .top-row a, .top-row .btn-link {
-        margin-left: 0;
-    }
-}
-
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
 }

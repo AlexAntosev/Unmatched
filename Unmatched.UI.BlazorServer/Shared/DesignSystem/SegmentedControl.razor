@@ -1,0 +1,45 @@
+@typeparam TValue
+@*
+    The mode switch used by Add match and the Match log filter bar. Two looks share one component:
+    `pill` is the boxed switch in the Add match header, `bar` is the flatter filter row on 6a.
+*@
+<div class="um-segmented um-segmented-@Variant @Class">
+    @foreach (var option in Options)
+    {
+        var isSelected = EqualityComparer<TValue>.Default.Equals(option.Value, Value);
+        <button type="button"
+                class="um-segment @(isSelected ? "is-selected" : null)"
+                style="@(isSelected && option.Color is not null ? $"--um-segment-accent:{option.Color}" : null)"
+                @onclick="@(() => SelectAsync(option.Value))">
+            @if (option.Icon is not null)
+            {
+                <i class="bi @option.Icon" style="@(option.Color is not null ? $"color:{option.Color}" : null)"></i>
+            }
+            @option.Label
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SelectOption<TValue>> Options { get; set; } = Array.Empty<SelectOption<TValue>>();
+
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    /// <summary>pill | bar</summary>
+    [Parameter]
+    public string Variant { get; set; } = "pill";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private Task SelectAsync(TValue value)
+    {
+        Value = value;
+        return ValueChanged.InvokeAsync(value);
+    }
+}

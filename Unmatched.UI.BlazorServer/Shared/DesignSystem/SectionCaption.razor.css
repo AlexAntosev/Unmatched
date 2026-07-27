@@ -1,0 +1,31 @@
+.um-section {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.um-section i {
+    flex: none;
+    font-size: 12px;
+    color: var(--um-accent-soft);
+}
+
+.um-section-text {
+    font: 600 10.5px var(--um-font-mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--um-text-muted);
+    white-space: nowrap;
+}
+
+.um-section-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--um-border);
+}
+
+.um-section-meta {
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}

@@ -5,18 +5,26 @@
 @inject IRatingService RatingService
 @inject NavigationManager NavigationManager
 @inject RatingRecalculationStateNotifier RecalculationStateNotifier
-
+@*
+    Sits at the bottom of the nav rail whenever the match service reports that ratings drifted,
+    and links to the Settings screen where they can be recalculated.
+*@
 @if (_isRecalculationRequired)
 {
-    <div class="nav-item px-3 recalculation-warning">
-        <NavLink class="nav-link" href="@Urls.Admin" title="Rating recalculation required">
-            <span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span> Recalculation required
-        </NavLink>
-    </div>
+    <NavLink class="rail-item rail-warning" href="@Urls.Settings" title="Rating recalculation required">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        @if (IsExpanded)
+        {
+            <span class="rail-item-label">Recalculation required</span>
+        }
+    </NavLink>
 }
 
 @code {
     private bool _isRecalculationRequired;
+
+    [Parameter]
+    public bool IsExpanded { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {

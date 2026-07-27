@@ -60,6 +60,14 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogExpansionDto>>();
     }
 
+    public async Task<CatalogExpansionDto> UpdateExpansionImageAsync(Guid expansionId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/expansion/{expansionId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogExpansionDto>();
+    }
+
     public async Task<IEnumerable<Guid>> GetOwnedExpansionIdsAsync()
     {
         var response = await httpClient.GetAsync("/collection");

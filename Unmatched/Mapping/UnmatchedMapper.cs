@@ -32,7 +32,25 @@ public class UnmatchedMapper : Profile
 
         CreateMap<HeroStatisticsDto, UiHeroStatisticsDto>();
         CreateMap<MapStatisticsDto, UiMapStatisticsDto>();
+        CreateMap<ExpansionStatisticsDto, UiExpansionStatisticsDto>();
         CreateMap<CatalogPlayStyleDto, UiPlayStyleDto>().ReverseMap();
-        CreateMap<CatalogExpansionDto, ExpansionDto>();
+        CreateMap<CatalogExpansionContentDto, ExpansionContentDto>();
+        // Heroes, villains and minions share one DTO shape but their art lives in three different
+        // MinIO categories, so the category is stamped on after the collections are mapped.
+        CreateMap<CatalogExpansionDto, ExpansionDto>()
+            .AfterMap((_, destination) =>
+            {
+                SetImageCategory(destination.Heroes, "heroes");
+                SetImageCategory(destination.Villains, "villains");
+                SetImageCategory(destination.Minions, "minions");
+            });
+    }
+
+    private static void SetImageCategory(IEnumerable<ExpansionContentDto> content, string category)
+    {
+        foreach (var item in content)
+        {
+            item.ImageCategory = category;
+        }
     }
 }

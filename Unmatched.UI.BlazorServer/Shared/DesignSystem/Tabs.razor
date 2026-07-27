@@ -1,0 +1,35 @@
+@typeparam TValue
+@*
+    The sorting tabs above the heroes ladder: a 2px bottom edge marks the active tab and the rule
+    continues across the remaining width.
+*@
+<div class="um-tabs @Class">
+    @foreach (var option in Options)
+    {
+        var isSelected = EqualityComparer<TValue>.Default.Equals(option.Value, Value);
+        <button type="button" class="um-tab @(isSelected ? "is-selected" : null)" @onclick="@(() => SelectAsync(option.Value))">
+            @option.Label
+        </button>
+    }
+    <div class="um-tabs-rule"></div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SelectOption<TValue>> Options { get; set; } = Array.Empty<SelectOption<TValue>>();
+
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private Task SelectAsync(TValue value)
+    {
+        Value = value;
+        return ValueChanged.InvokeAsync(value);
+    }
+}

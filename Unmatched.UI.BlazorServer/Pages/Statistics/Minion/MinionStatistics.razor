@@ -1,46 +1,57 @@
 @page "/minions-statistics/{id}"
 @using Unmatched.Dtos
-@using Unmatched.Dtos.Match
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMinionStatisticsService MinionStatisticsService
-@using Microsoft.AspNetCore.Components
+@*
+    Not in the design pack: the 2a dossier pattern applied to a minion.
+*@
 
-<div style="margin-bottom: 16px">
-    <MinionSummary Statistics="Minion"></MinionSummary>
-</div>
-<div class="page-content" style="margin-bottom: 16px">
-    <TotalMatchesRecord Total="Minion.TotalMatches" Wins="Minion.TotalWins" Looses="Minion.TotalLooses" Kd="Minion.Kd"></TotalMatchesRecord>
-    <MonsterMatchupTable Title="Against Heroes" Rows="_heroMatchups"></MonsterMatchupTable>
-    <MatchLogGrid MatchLogEntries="_matchLogEntries"></MatchLogGrid>
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<MinionSummary Statistics="_minion"/>
+
+<div class="um-page">
+    <MonsterMatchupTable Title="Against heroes" Rows="_heroMatchups"/>
+    <MatchList Matches="_matchLog" Title="Match log" PageSize="8" Meta="@($"{_matchLog.Count} matches")"/>
 </div>
 
 @code {
     [Parameter]
-    public string Id { get; set; } = "";
+    public string Id { get; set; } = string.Empty;
 
-    private MinionStatisticsDto Minion { get; set; } = new();
-    private List<UiMatchLogDto> _matchLogEntries = new();
+    private MinionStatisticsDto _minion = new() { Name = string.Empty };
+    private List<UiMatchLogDto> _matchLog = new();
     private List<MonsterMatchupRow> _heroMatchups = new();
 
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    private IReadOnlyList<Breadcrumb.Crumb> Crumbs =>
+    [
+        new("Minions", Urls.MinionsStatistics), new(_minion.Name)
+    ];
+
+    protected override async Task OnParametersSetAsync()
     {
+        if (!Guid.TryParse(Id, out var minionId) || minionId == Guid.Empty)
+        {
+            return;
+        }
+
         try
         {
             PreloadService.Show();
-            Guid.TryParse(Id, out var minionId);
-            if (minionId == Guid.Empty)
-            {
-                return;
-            }
 
-            Minion = await MinionStatisticsService.GetMinionStatisticsAsync(minionId);
-            _matchLogEntries = (await MinionStatisticsService.GetMinionMatchesAsync(minionId)).OrderByDescending(x => x.Date).ToList();
+            var stats = MinionStatisticsService.GetMinionStatisticsAsync(minionId);
+            var matches = MinionStatisticsService.GetMinionMatchesAsync(minionId);
+            await Task.WhenAll(stats, matches);
 
-            _heroMatchups = _matchLogEntries
+            _minion = stats.Result;
+            _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
+
+            _heroMatchups = _matchLog
                 .SelectMany(m => m.Fighters)
                 .GroupBy(f => f.Hero?.Name ?? "Unknown")
                 .Select(g => new MonsterMatchupRow
@@ -50,6 +61,7 @@
                         Wins = g.Count(f => f.IsWinner),
                         Looses = g.Count(f => !f.IsWinner)
                     })
+                .OrderByDescending(r => r.Total)
                 .ToList();
         }
         finally

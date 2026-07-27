@@ -8,6 +8,8 @@ public interface ITitleService
 
     Task<IEnumerable<Title>> GetAsync();
 
+    Task<IEnumerable<Title>> GetByHeroAsync(Guid heroId);
+
     Task DeleteAsync(Guid id);
 
     Task AssignAsync(Guid titleId, Guid heroId);

@@ -1,0 +1,24 @@
+.um-medal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border: 1px solid var(--um-border-strong);
+    border-radius: 7px;
+    background: #0c0c11;
+    font-family: var(--um-font-display);
+    font-weight: 700;
+}
+
+.um-medal-md {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+}
+
+.um-medal-xs {
+    width: 15px;
+    height: 15px;
+    border-radius: 5px;
+    font-size: 8.5px;
+}

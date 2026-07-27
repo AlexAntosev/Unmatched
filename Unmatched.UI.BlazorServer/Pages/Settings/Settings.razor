@@ -1,0 +1,132 @@
+@page "/settings"
+@using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
+@inject IRatingService RatingService
+@inject IPlayerService PlayerService
+@inject RatingRecalculationStateNotifier RecalculationStateNotifier
+@inject NavCountsService NavCountsService
+@*
+    The maintenance screen the design does not cover: rating recalculation (was /admin) and player
+    management (was /initialize), reached from the gear at the bottom of the rail.
+
+    Catalog seeding used to live here too, but the catalog is populated by the Catalog service's
+    EF migrations now - the old JSON initializer has not compiled since the microservice split.
+*@
+
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<div class="um-page settings">
+    @if (_error is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+    @if (_success is not null)
+    {
+        <div class="alert alert-success" role="alert">@_success</div>
+    }
+
+    <Panel Title="Rating recalculation">
+        <p class="um-body um-muted">Recalculates ratings for every hero from the full match history.
+            This can take a while and cannot be undone.</p>
+        <div>
+            <UmButton Variant="primary" Icon="bi-arrow-repeat" Disabled="_isBusy" OnClick="RecalculateAsync">
+                @(_isRecalculating ? "Recalculating…" : "Recalculate ratings")
+            </UmButton>
+        </div>
+    </Panel>
+
+    <Panel Title="Players">
+        <div class="settings-add-player">
+            <UmField Label="Name" Class="settings-player-name">
+                <UmTextField Value="@_newPlayerName" ValueChanged="v => _newPlayerName = v" Placeholder="New player"/>
+            </UmField>
+            <UmButton Icon="bi-plus-lg" Disabled="@(_isBusy || !IsPlayerNameValid)" OnClick="AddPlayerAsync">Add player</UmButton>
+        </div>
+        <div class="settings-players">
+            @foreach (var player in _players)
+            {
+                <div class="settings-player">
+                    <HeroToken ImageUrl="@player.ImageUrl" Alt="@player.Name" Size="26" Round="true"/>
+                    <span>@player.Name</span>
+                </div>
+            }
+        </div>
+    </Panel>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs =
+    [
+        new("System"), new("Settings")
+    ];
+
+    private List<UiPlayerDto> _players = new();
+    private string? _newPlayerName;
+    private bool _isRecalculating;
+    private string? _error;
+    private string? _success;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private bool _isBusy => _isRecalculating;
+
+    private bool IsPlayerNameValid
+        => !string.IsNullOrWhiteSpace(_newPlayerName)
+        && _players.All(p => !string.Equals(p.Name, _newPlayerName, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync() => await ReloadPlayersAsync();
+
+    private async Task ReloadPlayersAsync() => _players = (await PlayerService.GetAsync()).OrderBy(p => p.Name).ToList();
+
+    private async Task RecalculateAsync()
+    {
+        _isRecalculating = true;
+        _error = null;
+        _success = null;
+        try
+        {
+            PreloadService.Show();
+            await RatingService.RecalculateAsync();
+            RecalculationStateNotifier.NotifyChanged();
+            _success = "Ratings recalculated.";
+        }
+        catch (Exception exception)
+        {
+            _error = $"Failed to recalculate ratings: {exception.Message}";
+        }
+        finally
+        {
+            _isRecalculating = false;
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task AddPlayerAsync()
+    {
+        if (!IsPlayerNameValid)
+        {
+            return;
+        }
+
+        _error = null;
+        _success = null;
+        try
+        {
+            PreloadService.Show();
+            await PlayerService.AddAsync(new UiPlayerDto { Name = _newPlayerName });
+            _newPlayerName = null;
+            await ReloadPlayersAsync();
+            NavCountsService.Invalidate();
+        }
+        catch (Exception exception)
+        {
+            _error = $"Failed to add player: {exception.Message}";
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+}

@@ -14,6 +14,7 @@
             CreateMap<MapStats, MapStatsDto>();
             CreateMap<VillainStats, VillainStatsDto>();
             CreateMap<MinionStats, MinionStatsDto>();
+            CreateMap<ExpansionStats, ExpansionStatsDto>();
         }
     }
 }

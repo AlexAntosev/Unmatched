@@ -142,6 +142,13 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<TitleDto>>();
     }
 
+    public async Task<IEnumerable<TitleDto>> GetTitlesByHeroAsync(Guid heroId)
+    {
+        var response = await httpClient.GetAsync($"/title/hero/{heroId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<TitleDto>>();
+    }
+
     public async Task DeleteTitleAsync(Guid id)
     {
         var response = await httpClient.DeleteAsync($"/title/{id}");

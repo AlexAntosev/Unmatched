@@ -1,0 +1,32 @@
+.um-wl {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.um-wl-counts {
+    display: flex;
+    justify-content: space-between;
+    font: 500 10px var(--um-font-mono);
+}
+
+.um-wl-wins {
+    color: var(--um-win);
+}
+
+.um-wl-losses {
+    color: var(--um-loss);
+}
+
+.um-wl-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(242, 80, 107, 0.55);
+    overflow: hidden;
+}
+
+.um-wl-fill {
+    height: 100%;
+    background: var(--um-win);
+}

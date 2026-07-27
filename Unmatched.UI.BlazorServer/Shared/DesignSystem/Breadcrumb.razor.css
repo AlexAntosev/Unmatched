@@ -1,0 +1,25 @@
+.um-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+    white-space: nowrap;
+}
+
+.um-breadcrumb i {
+    font-size: 9px;
+}
+
+.um-crumb {
+    color: var(--um-text-muted);
+}
+
+.um-crumb:hover {
+    color: var(--um-text);
+}
+
+.um-crumb-current {
+    color: var(--um-text);
+    font-weight: 600;
+}

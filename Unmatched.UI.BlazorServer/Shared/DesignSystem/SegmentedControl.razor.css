@@ -1,0 +1,67 @@
+.um-segmented {
+    display: flex;
+    align-self: flex-start;
+}
+
+.um-segment {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    background: none;
+    color: var(--um-text-muted);
+    font: 600 11px var(--um-font-body);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.um-segment:hover {
+    color: var(--um-text);
+}
+
+.um-segment i {
+    font-size: 11px;
+}
+
+/* ---- pill: the boxed switch in the Add match header ---- */
+
+.um-segmented-pill {
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-control);
+}
+
+.um-segmented-pill .um-segment {
+    padding: 5px 11px;
+    border-radius: 7px;
+}
+
+.um-segmented-pill .um-segment.is-selected {
+    background: var(--um-bg-hover);
+    color: var(--um-text);
+}
+
+/* ---- bar: the mode filter on the Match log ---- */
+
+.um-segmented-bar {
+    gap: 6px;
+    padding: 3px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.um-segmented-bar .um-segment {
+    height: var(--um-height-chip);
+    padding: 0 11px;
+    border-radius: var(--um-radius-sm);
+    font-size: 11.5px;
+}
+
+.um-segmented-bar .um-segment.is-selected {
+    background: rgba(139, 125, 255, 0.16);
+    border-color: rgba(139, 125, 255, 0.4);
+    color: var(--um-text);
+}

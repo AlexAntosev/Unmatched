@@ -1,0 +1,29 @@
+.settings {
+    max-width: 720px;
+}
+
+.settings-add-player {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.settings-player-name {
+    width: 240px;
+}
+
+.settings-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.settings-player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 11px 6px 6px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-inset);
+    font: 500 12.5px var(--um-font-body);
+}

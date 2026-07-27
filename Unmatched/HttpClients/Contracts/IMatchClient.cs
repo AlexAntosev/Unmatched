@@ -43,6 +43,8 @@ public interface IMatchClient
 
     Task<IEnumerable<TitleDto>> GetTitlesAsync();
 
+    Task<IEnumerable<TitleDto>> GetTitlesByHeroAsync(Guid heroId);
+
     Task DeleteTitleAsync(Guid id);
 
     Task MergeTitleAsync(Guid titleId, IEnumerable<Guid> heroesIds);

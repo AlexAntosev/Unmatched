@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Unmatched.Initializer\Unmatched.Initializer.csproj" />
         <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
     </ItemGroup>
 
@@ -146,9 +145,6 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Update="wwwroot\T-Rex.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Update="wwwroot\css\fonts\Unmatched.otf">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="..\.dockerignore">

@@ -1,0 +1,151 @@
+/*
+  Nav items are <NavLink> components, so their rendered <a> never carries this file's scope
+  attribute - everything below the rail root goes through ::deep.
+*/
+.rail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: none;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 16px 12px;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    background: var(--um-bg-nav);
+    overflow: hidden;
+    transition: var(--um-nav-transition);
+}
+
+.rail.is-expanded {
+    width: var(--um-nav-width);
+}
+
+.rail.is-collapsed {
+    width: var(--um-nav-width-collapsed);
+}
+
+.rail ::deep .rail-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 4px;
+}
+
+.rail ::deep .rail-brand img {
+    width: 112px;
+    height: auto;
+    object-fit: contain;
+    filter: invert(1);
+    opacity: 0.92;
+}
+
+.rail ::deep .rail-brand-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-gradient-primary);
+    font: 700 15px var(--um-font-display);
+    color: var(--um-text-on-accent);
+}
+
+.rail ::deep .rail-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.rail ::deep .rail-group-title {
+    padding: 8px 10px 4px;
+    font: 500 10px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}
+
+.rail ::deep .rail-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    height: 38px;
+    padding: 0 10px;
+    border-radius: var(--um-radius-md);
+    font: 500 13px var(--um-font-body);
+    color: var(--um-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.rail ::deep .rail-item:hover {
+    background: var(--um-bg-hover);
+    color: var(--um-text);
+}
+
+.rail ::deep .rail-item i {
+    flex: none;
+    width: 15px;
+    font-size: 15px;
+    text-align: center;
+}
+
+.rail ::deep .rail-item-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rail ::deep .rail-item-count {
+    flex: none;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+.rail ::deep .rail-item.active {
+    background: var(--um-gradient-nav-active);
+    color: var(--um-text-on-accent);
+}
+
+.rail ::deep .rail-item.active .rail-item-count {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.rail.is-collapsed ::deep .rail-item,
+.rail.is-collapsed ::deep .rail-collapse {
+    justify-content: center;
+    padding: 0;
+}
+
+.rail ::deep .rail-collapse {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 34px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    background: none;
+    color: var(--um-text-muted);
+    font: 500 11.5px var(--um-font-body);
+    cursor: pointer;
+    transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.rail ::deep .rail-collapse:hover {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
+}
+
+.rail ::deep .rail-collapse i {
+    font-size: 12px;
+}
+
+.rail ::deep .um-spacer {
+    flex: 1;
+}

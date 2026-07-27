@@ -1,0 +1,272 @@
+@page "/design-system"
+@using Unmatched.Enums
+@*
+    A live rendering of every design-system part, in the same order as
+    design_handoff_unmatched_redesign/screens/00-design-system.png. It is the reference used to
+    check the components against the handoff, and the quickest way to see what already exists
+    before building something new.
+*@
+
+<div class="um-page ds-page">
+    <header class="ds-masthead">
+        <img src="/Unmatched-logo.png" alt="Unmatched" class="ds-logo"/>
+        <div>
+            <div class="um-display">Design system</div>
+            <div class="ds-lede">Tokens and component library for the Unmatched tracker. Everything on the
+                redesign screens is built from the parts below.
+            </div>
+        </div>
+        <div class="um-spacer"></div>
+        <div class="ds-version">v1.0 · Jul 2026<br/>dark only</div>
+    </header>
+
+    <SectionCaption Text="01 · Colour"/>
+    @foreach (var group in ColourGroups)
+    {
+        <div class="ds-swatches">
+            @foreach (var swatch in group.Value)
+            {
+                <div class="ds-swatch">
+                    <div class="ds-swatch-fill" style="background:var(@swatch.Token)"></div>
+                    <div class="ds-swatch-text">
+                        <div class="ds-swatch-name">@swatch.Name</div>
+                        <div class="ds-swatch-token">@swatch.Token</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <SectionCaption Text="02 · Typography"/>
+    <Panel>
+        <div class="um-display">Geralt of Rivia</div>
+        <div class="um-page-title">Match log</div>
+        <div class="um-card-title">Against villains</div>
+        <div class="um-body">Heroes are filtered by your collection.</div>
+        <div class="um-ui-label">Save match</div>
+        <div class="um-metric">1 284</div>
+        <div class="um-mono-meta">12 Jul 2026 · 20:14</div>
+        <div class="um-mono-caption">Participants</div>
+    </Panel>
+
+    <SectionCaption Text="03 · Controls"/>
+    <div class="ds-grid-2">
+        <Panel Title="Buttons">
+            <div class="ds-row">
+                <UmButton Variant="primary" Icon="bi-check-lg">Save match</UmButton>
+                <UmButton Variant="outline" Icon="bi-shuffle">Randomize</UmButton>
+                <UmButton Variant="ghost">Cancel</UmButton>
+                <UmButton Variant="danger" Icon="bi-trash">Delete</UmButton>
+                <UmButton Variant="dice" Icon="bi-dice-5-fill" Title="Randomize"/>
+                <UmButton Variant="icon" Icon="bi-download" Title="Export"/>
+                <UmButton Variant="primary" Disabled="true">Disabled</UmButton>
+            </div>
+        </Panel>
+        <Panel Title="Segments, chips, toggles">
+            <SegmentedControl TValue="GameMode" Options="ModeSegments" Value="_mode" ValueChanged="v => _mode = v"/>
+            <SegmentedControl TValue="string" Variant="bar" Options="LogSegments" Value="_logMode" ValueChanged="v => _logMode = v"/>
+            <div class="ds-row">
+                <UmSelect TValue="string" Variant="chip" Icon="bi-people" Value="@_chip" ValueChanged="v => _chip = v">
+                    <option value="">All players</option>
+                    <option value="andrii">Andrii</option>
+                </UmSelect>
+                <UmToggle Label="Owned only" Value="_ownedOnly" ValueChanged="v => _ownedOnly = v"/>
+                <UmCheckbox Checked="_checked" CheckedChanged="v => _checked = v"/>
+                <UmCheckbox Checked="true" Accent="var(--um-gold)"/>
+            </div>
+        </Panel>
+        <Panel Title="Fields">
+            <div class="ds-grid-2">
+                <UmField Label="Player">
+                    <UmSelect TValue="string" AvatarUrl="/Unknown.png" Value="@_player" ValueChanged="v => _player = v">
+                        <option value="ksuha">Ksuha</option>
+                        <option value="andrii">Andrii</option>
+                    </UmSelect>
+                </UmField>
+                <UmField Label="Hero">
+                    <UmSelect TValue="string" ArtUrl="/Unknown.png" Highlighted="true" Value="@_hero"
+                              ValueChanged="v => _hero = v" OnRandomize="() => { }">
+                        <option value="medusa">Medusa</option>
+                        <option value="alice">Alice</option>
+                    </UmSelect>
+                </UmField>
+                <UmField Label="HP left">
+                    <UmTextField Type="number" Value="6"/>
+                </UmField>
+                <UmField Label="Epic">
+                    <EpicStars Value="_epic" ValueChanged="v => _epic = v"/>
+                </UmField>
+            </div>
+            <UmSearchBox Value="@_search" ValueChanged="v => _search = v"/>
+        </Panel>
+        <Panel Title="Tabs and pagination">
+            <Tabs TValue="string" Options="LadderTabs" Value="_tab" ValueChanged="v => _tab = v"/>
+            <Pagination Page="_page" PageCount="4" PageChanged="p => _page = p"/>
+            <Pagination Page="_page" PageCount="4" PageChanged="p => _page = p" ShowLabels="true"/>
+        </Panel>
+    </div>
+
+    <SectionCaption Text="04 · Domain components"/>
+    <div class="ds-grid-2">
+        <Panel Title="Badges and medals">
+            <div class="ds-row">
+                <ModeBadge Mode="GameMode.OneVsOne"/>
+                <ModeBadge Mode="GameMode.TeamVsTeam"/>
+                <ModeBadge Mode="GameMode.FreeForAll"/>
+                <ModeBadge Mode="GameMode.Cooperative"/>
+            </div>
+            <div class="ds-row">
+                <ResultBadge IsWin="true"/>
+                <ResultBadge IsWin="false"/>
+                <MedalBadge Place="1"/>
+                <MedalBadge Place="2"/>
+                <MedalBadge Place="3"/>
+                <MedalBadge Place="4"/>
+                <EpicStars Value="3" ReadOnly="true"/>
+            </div>
+        </Panel>
+        <Panel Title="Fighter chips and sides">
+            <div class="ds-row">
+                <SideBox Variant="win">
+                    <FighterChip ImageUrl="/Unknown.png" PlayerAvatarUrl="/Unknown.png" IsWinner="true" Title="Medusa"/>
+                    <FighterChip ImageUrl="/Unknown.png" PlayerAvatarUrl="/Unknown.png" IsWinner="true" Title="Dracula"/>
+                </SideBox>
+                <span class="ds-vs">VS</span>
+                <SideBox Variant="loss">
+                    <FighterChip ImageUrl="/Unknown.png" PlayerAvatarUrl="/Unknown.png" Title="Alice"/>
+                    <FighterChip ImageUrl="/Unknown.png" Title="Mothman"/>
+                </SideBox>
+            </div>
+            <div class="ds-row">
+                <FighterChip ImageUrl="/Unknown.png" PlayerAvatarUrl="/Unknown.png" IsWinner="true" Place="1" Title="First"/>
+                <FighterChip ImageUrl="/Unknown.png" PlayerAvatarUrl="/Unknown.png" Place="2" Title="Second"/>
+                <FighterChip ImageUrl="/Unknown.png" PlayerAvatarUrl="/Unknown.png" Place="3" Title="Third"/>
+            </div>
+        </Panel>
+    </div>
+
+    <Panel Title="Rows">
+        <ColumnHeader Columns="@LadderColumns">
+            <div>#</div>
+            <div>Hero</div>
+            <div class="ds-right">Pts</div>
+            <div class="ds-right">GP</div>
+            <div>W / L</div>
+            <div class="ds-right">K/D</div>
+        </ColumnHeader>
+        <LadderRow Columns="@LadderColumns" Rank="1" Name="Geralt of Rivia" Sub="Witcher" ImageUrl="/Unknown.png"
+                   IsRanged="false" EdgeColor="var(--um-win)" WashColor="var(--um-win-wash)">
+            <Metrics>
+                <div class="ds-pts">214</div>
+                <div class="ds-num">103</div>
+                <WinLossBar Wins="64" Losses="39"/>
+                <div class="ds-kd um-win-text">1.64</div>
+            </Metrics>
+        </LadderRow>
+        <LadderRow Columns="@LadderColumns" Rank="10" Name="Bigfoot" Sub="Robin Hood vs Bigfoot" ImageUrl="/Unknown.png"
+                   IsRanged="false" EdgeColor="var(--um-loss)" WashColor="var(--um-loss-wash)">
+            <Metrics>
+                <div class="ds-pts um-loss-text">-18</div>
+                <div class="ds-num">47</div>
+                <WinLossBar Wins="18" Losses="29"/>
+                <div class="ds-kd um-loss-text">0.66</div>
+            </Metrics>
+        </LadderRow>
+    </Panel>
+
+    <div class="ds-kpis">
+        <KpiCard Icon="bi-controller" Label="Matches" Value="1 284" Sub="+37 this week" SubColor="var(--um-win)"/>
+        <KpiCard Icon="bi-shield-fill" Label="Heroes" Value="42" Of="48" Sub="6 unowned"/>
+        <KpiCard Icon="bi-star-fill" Label="Avg. epic" Value="2.4" Sub="of 3"/>
+        <KpiCard Icon="bi-fire" Label="Streak" Value="9" Sub="Medusa · June"/>
+    </div>
+
+    <SectionCaption Text="05 · Data visualisation"/>
+    <div class="ds-grid-4">
+        <Panel><DonutChart Percent="62" Caption="64W · 39L"/></Panel>
+        <Panel><RadarChart Attack="3" Defence="2" Trickery="2" Difficulty="3"/></Panel>
+        <Panel><Sparkline Values="SparkValues"/></Panel>
+        <Panel><Heatmap Cells="HeatCells"/></Panel>
+    </div>
+    <Panel Title="Rating changes">
+        <LineChartSvg Points="RatingPoints"/>
+    </Panel>
+</div>
+
+@code {
+    private record Swatch(string Name, string Token);
+
+    private const string LadderColumns = "34px 1fr 58px 58px 90px 62px";
+
+    private static readonly Dictionary<string, Swatch[]> ColourGroups = new()
+    {
+        ["Surfaces"] =
+        [
+            new("bg-app", "--um-bg-app"), new("bg-panel", "--um-bg-panel"),
+            new("bg-nav", "--um-bg-nav"), new("bg-inset", "--um-bg-inset")
+        ],
+        ["Text"] =
+        [
+            new("text", "--um-text"), new("text-muted", "--um-text-muted"),
+            new("text-dim", "--um-text-dim"), new("text-faint", "--um-text-faint")
+        ],
+        ["Accent & semantic"] =
+        [
+            new("accent", "--um-accent"), new("accent-2", "--um-accent-2"),
+            new("accent-soft", "--um-accent-soft"), new("accent-text", "--um-accent-text"),
+            new("win", "--um-win"), new("loss", "--um-loss"),
+            new("info", "--um-info"), new("gold", "--um-gold")
+        ],
+        ["Ranking & modes"] =
+        [
+            new("silver", "--um-silver"), new("bronze", "--um-bronze"),
+            new("mode-2v2", "--um-mode-2v2"), new("mode-coop", "--um-mode-coop")
+        ]
+    };
+
+    private static readonly IReadOnlyList<SelectOption<GameMode>> ModeSegments =
+    [
+        new(GameMode.OneVsOne, "1v1", "bi-person-fill"),
+        new(GameMode.TeamVsTeam, "2v2", "bi-people-fill"),
+        new(GameMode.FreeForAll, "FFA", "bi-diagram-3-fill"),
+        new(GameMode.Cooperative, "Co-op", "bi-shield-fill")
+    ];
+
+    private static readonly IReadOnlyList<SelectOption<string>> LogSegments =
+    [
+        new("all", "All", "bi-grid-fill"),
+        new("1v1", "1v1", "bi-person-fill", "var(--um-mode-1v1)"),
+        new("2v2", "2v2", "bi-people-fill", "var(--um-mode-2v2)"),
+        new("ffa", "FFA", "bi-diagram-3-fill", "var(--um-mode-ffa)"),
+        new("coop", "Co-op", "bi-shield-fill", "var(--um-mode-coop)")
+    ];
+
+    private static readonly IReadOnlyList<SelectOption<string>> LadderTabs =
+    [
+        new("points", "Points"), new("winrate", "Win rate"),
+        new("kd", "K/D"), new("recent", "Recently played")
+    ];
+
+    private static readonly IReadOnlyList<double> SparkValues = [3, 5, 4, 7, 6, 9, 8, 12, 11, 14];
+
+    private static readonly IReadOnlyList<ChartPoint> RatingPoints =
+    [
+        new("Feb", 120), new("Mar", 134), new("Apr", 152), new("May", 148),
+        new("Jun", 178), new("Jul", 208)
+    ];
+
+    private static readonly IReadOnlyList<Heatmap.Cell> HeatCells =
+        Enumerable.Range(0, 24).Select(i => new Heatmap.Cell(Math.Sin(i) , $"cell {i}")).ToList();
+
+    private GameMode _mode = GameMode.OneVsOne;
+    private string _logMode = "all";
+    private string? _chip = "";
+    private string? _player = "ksuha";
+    private string? _hero = "medusa";
+    private string? _search;
+    private string _tab = "points";
+    private int _epic = 2;
+    private int _page = 1;
+    private bool _ownedOnly = true;
+    private bool _checked = true;
+}

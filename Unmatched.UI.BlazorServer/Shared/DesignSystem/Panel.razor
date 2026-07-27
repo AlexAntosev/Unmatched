@@ -1,0 +1,55 @@
+@*
+    The flat hairline-bordered surface everything sits on. A titled panel gets a header row with an
+    optional trailing meta string or action slot; `Flush` drops the body padding so a list can run
+    edge to edge.
+*@
+<div class="um-panel-root @(Raised ? "is-raised" : null) @Class">
+    @if (!string.IsNullOrEmpty(Title) || HeaderActions is not null)
+    {
+        <div class="um-panel-header @(Flush ? "is-divided" : null)">
+            <div class="um-panel-heading">@Title</div>
+            <div class="um-spacer"></div>
+            @if (!string.IsNullOrEmpty(Meta))
+            {
+                <div class="um-panel-meta">@Meta</div>
+            }
+            @HeaderActions
+        </div>
+    }
+    <div class="um-panel-body @(Flush ? "is-flush" : null)">
+        @ChildContent
+    </div>
+    @if (Footer is not null)
+    {
+        <div class="um-panel-footer">@Footer</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Mono caption on the right of the header, e.g. "103 matches · 6 shown".</summary>
+    [Parameter]
+    public string? Meta { get; set; }
+
+    /// <summary>Uses the lifted panel tone - for cards nested inside another panel.</summary>
+    [Parameter]
+    public bool Raised { get; set; }
+
+    /// <summary>Removes body padding and puts a hairline under the header, for full-bleed lists.</summary>
+    [Parameter]
+    public bool Flush { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -18,6 +18,8 @@ public interface ICatalogClient
 
     Task<IEnumerable<CatalogExpansionDto>> GetExpansionsAsync();
 
+    Task<CatalogExpansionDto> UpdateExpansionImageAsync(Guid expansionId, string imageFileName);
+
     Task<IEnumerable<Guid>> GetOwnedExpansionIdsAsync();
 
     Task SetOwnedExpansionIdsAsync(IEnumerable<Guid> expansionIds);

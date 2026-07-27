@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
         services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
         services.AddTransient<IMinionStatisticsService, MinionStatisticsService>();
+        services.AddTransient<IExpansionStatisticsService, ExpansionStatisticsService>();
 
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
         services.AddSingleton<ICatalogMapCache, CatalogMapCache>();

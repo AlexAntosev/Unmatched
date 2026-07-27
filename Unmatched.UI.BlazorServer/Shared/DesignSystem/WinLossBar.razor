@@ -1,0 +1,32 @@
+@*
+    Wins and losses over a two-tone bar - the ladder's W/L column.
+*@
+<div class="um-wl @Class">
+    <div class="um-wl-counts">
+        <span class="um-wl-wins">@Wins</span>
+        <span class="um-wl-losses">@Losses</span>
+    </div>
+    <div class="um-wl-track">
+        <div class="um-wl-fill" style="width:@(WinPercent.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Wins { get; set; }
+
+    [Parameter]
+    public int Losses { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private double WinPercent
+    {
+        get
+        {
+            var total = Wins + Losses;
+            return total == 0 ? 0 : (double)Wins / total * 100;
+        }
+    }
+}

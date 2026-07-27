@@ -19,6 +19,13 @@ public class TitleController(ITitleService titleService, IMapper mapper) : Contr
         return Ok(titles.Select(mapper.Map<TitleDto>));
     }
 
+    [HttpGet("hero/{heroId}")]
+    public async Task<ActionResult<IEnumerable<TitleDto>>> GetByHero(Guid heroId)
+    {
+        var titles = await titleService.GetByHeroAsync(heroId);
+        return Ok(titles.Select(mapper.Map<TitleDto>));
+    }
+
     [HttpPost]
     public async Task<ActionResult> Add([FromBody] TitleDto title)
     {

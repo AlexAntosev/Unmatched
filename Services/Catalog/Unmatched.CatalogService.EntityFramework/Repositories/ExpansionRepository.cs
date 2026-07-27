@@ -15,10 +15,14 @@ public class ExpansionRepository(UnmatchedDbContext dbContext) : BaseRepository<
 
     public override async Task<IReadOnlyList<Expansion>> GetAsync()
     {
+        // The collection screen shows everything that ships in a box, so all four content
+        // collections are loaded rather than just heroes and maps.
         return await DbContext.Set<Expansion>()
             .AsNoTracking()
             .Include(e => e.Heroes)
             .Include(e => e.Maps)
+            .Include(e => e.Villains)
+            .Include(e => e.Minions)
             .ToListAsync();
     }
 }

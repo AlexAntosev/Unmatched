@@ -1,0 +1,32 @@
+@*
+    Section › page. The trailing crumb is the current page and is never a link.
+*@
+<nav class="um-breadcrumb @Class">
+    @for (var i = 0; i < Items.Count; i++)
+    {
+        var item = Items[i];
+        var isLast = i == Items.Count - 1;
+        if (i > 0)
+        {
+            <i class="bi bi-chevron-right"></i>
+        }
+        if (isLast || item.Href is null)
+        {
+            <span class="um-crumb-current">@item.Label</span>
+        }
+        else
+        {
+            <a class="um-crumb" href="@item.Href">@item.Label</a>
+        }
+    }
+</nav>
+
+@code {
+    public record Crumb(string Label, string? Href = null);
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Crumb> Items { get; set; } = Array.Empty<Crumb>();
+
+    [Parameter]
+    public string? Class { get; set; }
+}

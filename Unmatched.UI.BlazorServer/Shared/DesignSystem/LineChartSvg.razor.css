@@ -1,0 +1,28 @@
+.um-line {
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+}
+
+.um-line svg {
+    flex: 1;
+    min-width: 0;
+}
+
+.um-line-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px 0;
+    font: 400 9.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.um-line-labels {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 30px;
+    margin-top: 8px;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-dim);
+}

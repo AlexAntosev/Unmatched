@@ -1,0 +1,19 @@
+.um-page-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+    background: var(--um-bg-app);
+}
+
+.um-page-header-title {
+    font: 600 14px var(--um-font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.um-spacer {
+    flex: 1;
+}

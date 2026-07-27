@@ -1,8 +1,11 @@
-@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
-@using Unmatched.UI.BlazorServer.Shared.Statistics
 
-<EntityDetailHeader Name="@Statistics.Name" ImageUrl="@Statistics.ImageUrl"/>
+<EntityBanner Name="@Statistics.Name" Eyebrow="Map profile" ImageUrl="@Statistics.ImageUrl"
+              Fallback="/UnknownMap.png">
+    <Stats>
+        <StatTile Label="Matches" Value="@Statistics.TotalMatches.ToString()"/>
+    </Stats>
+</EntityBanner>
 
 @code {
     [Parameter]

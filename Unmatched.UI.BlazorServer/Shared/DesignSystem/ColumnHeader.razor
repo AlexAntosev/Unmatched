@@ -1,0 +1,18 @@
+@*
+    The mono caption row that labels a list's columns. Shares its grid template with the rows
+    below it so the two line up.
+*@
+<div class="um-columns @Class" style="@($"grid-template-columns:{Columns}")">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Columns { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

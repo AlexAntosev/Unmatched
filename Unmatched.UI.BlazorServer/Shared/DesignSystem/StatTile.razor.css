@@ -1,0 +1,38 @@
+.um-stat {
+    min-width: 0;
+}
+
+.um-stat-label {
+    font: 400 9.5px var(--um-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
+}
+
+.um-stat-value {
+    color: var(--um-text);
+    white-space: nowrap;
+}
+
+.um-stat-card {
+    padding: 13px 15px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-card);
+    background: var(--um-bg-panel);
+}
+
+.um-stat-card .um-stat-value {
+    margin-top: 5px;
+    font: 700 26px/1.1 var(--um-font-display);
+}
+
+.um-stat-inset {
+    padding: 8px 10px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-inset);
+}
+
+.um-stat-inset .um-stat-value {
+    margin-top: 2px;
+    font: 700 15px var(--um-font-display);
+}

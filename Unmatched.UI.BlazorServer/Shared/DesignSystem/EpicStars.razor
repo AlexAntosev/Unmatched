@@ -1,0 +1,49 @@
+@*
+    Epic rating, 0-3 stars. In the match log the collapsed row shows it read-only as gold glyphs;
+    the expanded scoreboard and Add match render the interactive version.
+*@
+@if (ReadOnly)
+{
+    <span class="um-epic-text" title="@($"epic {Value}/{Max}")">@ReadOnlyGlyphs()</span>
+}
+else
+{
+    <span class="um-epic @Class">
+        @for (var star = 1; star <= Max; star++)
+        {
+            var current = star;
+            <i class="bi bi-star-fill @(current <= Value ? "is-filled" : null)"
+               title="@($"epic {current}/{Max}")"
+               @onclick="@(() => SetAsync(current))"
+               @onclick:stopPropagation="true"></i>
+        }
+    </span>
+}
+
+@code {
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+    [Parameter]
+    public int Max { get; set; } = 3;
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string ReadOnlyGlyphs()
+        => string.Concat(Enumerable.Repeat('★', Math.Clamp(Value, 0, Max)))
+         + string.Concat(Enumerable.Repeat('☆', Math.Max(Max - Value, 0)));
+
+    private Task SetAsync(int value)
+    {
+        // Clicking the current rating clears it, so a mis-click is recoverable without a reset control.
+        Value = Value == value ? 0 : value;
+        return ValueChanged.InvokeAsync(Value);
+    }
+}

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=Barlow:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+body{margin:0;background:#0a0a10;font-family:Barlow,system-ui,sans-serif;color:#ecedf2}
+a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
+</style></helmet>
+
+<div style="max-width:1240px;margin:0 auto;padding:48px 44px 90px;display:flex;flex-direction:column;gap:44px">
+
+  <div style="display:flex;align-items:flex-end;gap:20px;padding-bottom:26px;border-bottom:1px solid rgba(255,255,255,.09)">
+    <img src="assets/Unmatched-logo.png" alt="Unmatched" style="width:150px;filter:invert(1);opacity:.92">
+    <div style="flex:1">
+      <div style="font:700 34px/1 Chakra Petch,sans-serif;text-transform:uppercase;letter-spacing:.03em">Design system</div>
+      <div style="font:400 13px Barlow,sans-serif;color:#8b8c9e;margin-top:8px">Tokens and component library for the Unmatched tracker. Everything on the redesign screens is built from the parts below — nothing new should be invented at implementation time.</div>
+    </div>
+    <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70;text-align:right;white-space:nowrap">v1.0 · Jul 2026<br>dark only</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">01 · Colour</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <sc-for list="{{ colorGroups }}" as="g" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">{{ g.title }}</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+          <sc-for list="{{ g.items }}" as="c" hint-placeholder-count="6">
+            <div style="border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.08);overflow:hidden">
+              <div style="height:62px;background:{{ c.value }};border-bottom:1px solid rgba(255,255,255,.07)"></div>
+              <div style="padding:10px 11px">
+                <div style="font:600 11.5px Barlow,sans-serif;color:#ecedf2">{{ c.name }}</div>
+                <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;margin-top:3px;overflow-wrap:anywhere">{{ c.value }}</div>
+                <div style="font:400 10px/1.4 Barlow,sans-serif;color:#5c5d70;margin-top:5px">{{ c.use }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">02 · Typography</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      <sc-for list="{{ fonts }}" as="f" hint-placeholder-count="3">
+        <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+          <div style="font:600 15px Chakra Petch,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#c4bcff">{{ f.name }}</div>
+          <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e;margin-top:5px">{{ f.weights }}</div>
+          <div style="font:400 11.5px/1.5 Barlow,sans-serif;color:#8b8c9e;margin-top:10px">{{ f.use }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px;padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+      <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="7">
+        <div style="display:flex;align-items:baseline;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="width:150px;flex:none;font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ t.token }}</div>
+          <div style="flex:1;min-width:0;font:{{ t.font }};color:{{ t.color }};letter-spacing:{{ t.ls }};text-transform:{{ t.tt }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.sample }}</div>
+          <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;white-space:nowrap">{{ t.spec }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">03 · Radius, spacing, elevation</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e;margin-bottom:14px">Radius</div>
+        <div style="display:flex;gap:12px;align-items:flex-end">
+          <sc-for list="{{ radii }}" as="r" hint-placeholder-count="4">
+            <div style="text-align:center">
+              <div style="width:56px;height:56px;border-radius:{{ r.value }};background:rgba(139,125,255,.14);border:1px solid rgba(139,125,255,.35)"></div>
+              <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;margin-top:7px">{{ r.value }}</div>
+              <div style="font:400 9.5px Barlow,sans-serif;color:#5c5d70">{{ r.use }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e;margin-bottom:14px">Spacing · step 8</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ spacing }}" as="s" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:11px">
+              <div style="width:{{ s.value }}px;height:10px;border-radius:3px;background:linear-gradient(90deg,#6c5cff,#a855f7)"></div>
+              <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">{{ s.value }}px</div>
+              <div style="font:400 10px Barlow,sans-serif;color:#5c5d70">{{ s.use }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e;margin-bottom:14px">Surfaces</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ surfaces }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:11px;background:{{ s.bg }};border:1px solid {{ s.border }};box-shadow:{{ s.shadow }}">
+              <div style="font:600 11.5px Barlow,sans-serif;color:#ecedf2;flex:1">{{ s.name }}</div>
+              <div style="font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ s.spec }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">04 · Controls</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Buttons · height 32 / 36</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 18px;border-radius:10px;background:linear-gradient(150deg,#6c5cff,#a855f7);font:600 12.5px Barlow,sans-serif;color:#fff;cursor:pointer">Save match<i class="bi bi-check-lg" style="font-size:12px"></i></div>
+          <div style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);font:500 12.5px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi bi-shuffle" style="font-size:11px"></i>Randomize</div>
+          <div style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:10px;font:500 12.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2">Cancel</div>
+          <div style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:10px;border:1px solid rgba(242,80,107,.35);font:500 12.5px Barlow,sans-serif;color:#f2506b;cursor:pointer"><i class="bi bi-trash" style="font-size:11px"></i>Delete</div>
+          <div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:rgba(139,125,255,.14);border:1px solid rgba(139,125,255,.35);color:#c4bcff;cursor:pointer"><i class="bi bi-dice-5-fill" style="font-size:14px"></i></div>
+          <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 16px;border-radius:10px;background:rgba(255,255,255,.05);font:600 12.5px Barlow,sans-serif;color:#5c5d70">Disabled</div>
+        </div>
+        <div style="font:400 11px/1.5 Barlow,sans-serif;color:#5c5d70">Primary gradient only once per screen. The violet dice button appears everywhere a hero or map can be randomized.</div>
+      </div>
+
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Segmented control · filter chips · toggle</div>
+        <div style="display:flex;gap:2px;padding:3px;background:#14141c;border:1px solid rgba(255,255,255,.07);border-radius:9px;align-self:flex-start">
+          <sc-for list="{{ segments }}" as="s" hint-placeholder-count="4">
+            <div onClick="{{ s.onClick }}" style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:7px;background:{{ s.bg }};font:600 11px Barlow,sans-serif;color:{{ s.fg }};cursor:pointer"><i class="bi {{ s.icon }}" style="font-size:11px"></i>{{ s.label }}</div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:7px;height:28px;padding:0 11px;border-radius:8px;border:1px solid rgba(255,255,255,.07);font:500 11.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.4)"><i class="bi {{ c.icon }}" style="font-size:11px"></i>{{ c.label }}<i class="bi bi-chevron-down" style="font-size:8px;opacity:.6"></i></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div onClick="{{ toggleOwned }}" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;border:1px solid {{ ownedBorder }};background:{{ ownedBg }};font:500 12px Barlow,sans-serif;color:{{ ownedFg }};cursor:pointer"><i class="bi {{ ownedIcon }}" style="font-size:12px"></i>Owned only</div>
+          <div onClick="{{ toggleCheck }}" style="display:flex;align-items:center;gap:9px;cursor:pointer">
+            <div style="width:20px;height:20px;border-radius:6px;border:1.5px solid {{ checkBorder }};background:{{ checkBg }};display:flex;align-items:center;justify-content:center"><i class="bi bi-check-lg" style="display:{{ checkDisplay }};font-size:12px;color:#0a0a10"></i></div>
+            <span style="font:500 12px Barlow,sans-serif;color:#c9cad6">In collection</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Fields</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e;margin-bottom:6px">Player</div>
+            <div style="display:flex;align-items:center;gap:9px;height:36px;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)">
+              <img src="assets/players/ksuha.png" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover">
+              <span style="flex:1;font:500 12.5px Barlow,sans-serif;color:#ecedf2">Ksuha</span>
+              <i class="bi bi-chevron-down" style="font-size:10px;color:#5c5d70"></i>
+            </div>
+          </div>
+          <div>
+            <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e;margin-bottom:6px">Hero</div>
+            <div style="display:flex;align-items:center;gap:9px;height:36px;padding:0 6px 0 11px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(139,125,255,.45)">
+              <img src="assets/heroes/medusa.png" alt="" style="width:22px;height:22px;border-radius:7px;object-fit:cover">
+              <span style="flex:1;font:500 12.5px Barlow,sans-serif;color:#ecedf2">Medusa</span>
+              <div style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:rgba(139,125,255,.16);color:#c4bcff;cursor:pointer"><i class="bi bi-dice-5-fill" style="font-size:12px"></i></div>
+            </div>
+          </div>
+          <div>
+            <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e;margin-bottom:6px">HP left</div>
+            <div style="display:flex;align-items:center;height:36px;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);font:500 12.5px IBM Plex Mono,monospace;color:#ecedf2">6</div>
+          </div>
+          <div>
+            <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e;margin-bottom:6px">Epic</div>
+            <div style="display:flex;align-items:center;gap:6px;height:36px">
+              <sc-for list="{{ stars }}" as="st" hint-placeholder-count="3">
+                <i class="bi bi-star-fill" style="font-size:17px;color:{{ st.color }};cursor:pointer"></i>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)">
+          <i class="bi bi-search" style="font-size:11px;color:#5c5d70"></i>
+          <span style="font:400 12px Barlow,sans-serif;color:#5c5d70">Search hero, player, map…</span>
+        </div>
+      </div>
+
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Navigation item · tabs · pagination</div>
+        <div style="display:flex;flex-direction:column;gap:3px;width:220px;padding:8px;border-radius:11px;background:#0c0c14;border:1px solid rgba(255,255,255,.07)">
+          <sc-for list="{{ navDemo }}" as="n" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
+              <i class="bi {{ n.icon }}" style="font-size:15px"></i><span>{{ n.label }}</span><div style="flex:1"></div><span style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ n.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:4px;border-bottom:1px solid rgba(255,255,255,.07)">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+            <div style="padding:9px 14px;border-bottom:2px solid {{ t.edge }};font:500 12.5px Barlow,sans-serif;color:{{ t.fg }};cursor:pointer">{{ t.label }}</div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <sc-for list="{{ pages }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:{{ p.bg }};border:1px solid {{ p.border }};font:500 11.5px IBM Plex Mono,monospace;color:{{ p.fg }};cursor:pointer">{{ p.n }}</div>
+          </sc-for>
+          <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;cursor:pointer"><i class="bi bi-chevron-right" style="font-size:10px"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">05 · Domain components</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Mode badges</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <sc-for list="{{ modes }}" as="m" hint-placeholder-count="4">
+            <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.bg }};font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.color }}"><i class="bi {{ m.icon }}" style="font-size:10px"></i>{{ m.label }}</div>
+          </sc-for>
+        </div>
+        <div style="font:400 11px/1.5 Barlow,sans-serif;color:#5c5d70">The badge only confirms the shape the row already shows. Mode colour also drives the row's 3px left edge in the Match log.</div>
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e;margin-top:4px">Result &amp; medals</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;background:rgba(52,217,155,.14);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:#34d99b">WIN</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;background:rgba(242,80,107,.14);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:#f2506b">LOSS</div>
+          <sc-for list="{{ medals }}" as="md" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;background:#0c0c11;border:1px solid rgba(255,255,255,.14);font:700 11px Chakra Petch,sans-serif;color:{{ md.color }}">{{ md.n }}</div>
+          </sc-for>
+          <div style="display:flex;align-items:center;gap:6px;font:600 11px Chakra Petch,sans-serif;color:#f0b429">★★★<span style="color:#5c5d70;font:400 10px IBM Plex Mono,monospace">epic 3/3</span></div>
+        </div>
+      </div>
+
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Fighter chips &amp; sides</div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <sc-for list="{{ chipDemo }}" as="c" hint-placeholder-count="0">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
+              <div style="position:relative">
+                <img src="{{ c.art }}" alt="" style="width:34px;height:34px;border-radius:10px;object-fit:cover;border:1.5px solid {{ c.border }};opacity:{{ c.opacity }}">
+                <img src="{{ c.avatar }}" alt="" style="display:{{ c.avatarDisplay }};position:absolute;bottom:-4px;right:-5px;width:16px;height:16px;border-radius:50%;object-fit:cover;border:1.5px solid #101018">
+                <div style="position:absolute;top:-6px;left:-6px;display:{{ c.placeDisplay }};align-items:center;justify-content:center;width:16px;height:16px;border-radius:5px;background:#0c0c11;border:1px solid rgba(255,255,255,.14);font:700 9px Chakra Petch,sans-serif;color:{{ c.placeColor }}">{{ c.place }}</div>
+              </div>
+              <div style="font:400 9px IBM Plex Mono,monospace;color:#5c5d70;text-align:center">{{ c.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:11px;background:rgba(52,217,155,.07);border:1px solid rgba(52,217,155,.28)">
+            <img src="assets/heroes/medusa.png" alt="" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid rgba(52,217,155,.45)">
+            <img src="assets/heroes/dracula.png" alt="" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid rgba(52,217,155,.45)">
+          </div>
+          <div style="font:600 9.5px IBM Plex Mono,monospace;color:#5c5d70">VS</div>
+          <div style="display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:11px;background:rgba(242,80,107,.06);border:1px solid rgba(242,80,107,.22)">
+            <img src="assets/heroes/alice.png" alt="" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid rgba(255,255,255,.09);opacity:.5">
+            <img src="assets/heroes/bigfoot.png" alt="" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid rgba(255,255,255,.09);opacity:.5">
+          </div>
+        </div>
+        <div style="font:400 11px/1.5 Barlow,sans-serif;color:#5c5d70">A side is a box of fighter chips. Winners keep full opacity and a green ring; losers drop to 50%. Villain and minion chips carry no player avatar — they are the game, not a person.</div>
+      </div>
+    </div>
+
+    <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
+      <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Rows</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ rowDemo }}" as="r" hint-placeholder-count="0">
+          <div>
+            <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;margin-bottom:5px">{{ r.caption }}</div>
+            <div style="display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:11px;border-left:3px solid {{ r.edge }};background:{{ r.bg }}">
+              <div style="width:26px;font:700 13px Chakra Petch,sans-serif;color:{{ r.rankColor }}">{{ r.rank }}</div>
+              <img src="{{ r.art }}" alt="" style="width:32px;height:32px;border-radius:10px;object-fit:cover">
+              <div style="flex:1;min-width:0">
+                <div style="font:600 13px Barlow,sans-serif;color:#ecedf2">{{ r.name }}</div>
+                <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;margin-top:2px">{{ r.sub }}</div>
+              </div>
+              <img src="{{ r.typeIcon }}" alt="" style="width:14px;height:14px;filter:invert(1);opacity:.5"> 
+              <div style="width:60px;text-align:right;font:600 12.5px IBM Plex Mono,monospace;color:{{ r.valueColor }}">{{ r.value }}</div>
+              <div style="width:52px;text-align:right;font:400 11.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ r.extra }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font:400 11px/1.5 Barlow,sans-serif;color:#5c5d70">Win/loss edges belong to per-hero and per-player lists only. In the Match log — a hub for everyone's games — the edge shows the game mode instead, and the result lives inside the expanded scoreboard.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
+          <i class="bi {{ k.icon }}" style="font-size:16px;color:#8b7dff"></i>
+          <div style="min-width:0">
+            <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">{{ k.label }}</div>
+            <div style="font:700 19px Chakra Petch,sans-serif;color:#ecedf2;margin-top:2px;white-space:nowrap">{{ k.value }}</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="font:400 10px IBM Plex Mono,monospace;color:{{ k.subColor }};text-align:right;white-space:nowrap;flex:none">{{ k.sub }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">06 · Data visualisation</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;gap:12px">
+        <svg viewBox="0 0 120 120" style="width:108px;height:108px">
+          <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="11"></circle>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#6c5cff" stroke-width="11" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="{{ donutDash }}" transform="rotate(-90 60 60)"></circle>
+          <text x="60" y="58" text-anchor="middle" fill="#ecedf2" style="font:700 26px Chakra Petch,sans-serif">62%</text>
+          <text x="60" y="76" text-anchor="middle" fill="#6b6c7e" style="font:400 10px IBM Plex Mono,monospace">WIN RATE</text>
+        </svg>
+        <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70">donut · win rate</div>
+      </div>
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;gap:12px">
+        <svg viewBox="0 0 120 120" style="width:108px;height:108px">
+          <polygon points="60,14 106,60 60,106 14,60" fill="none" stroke="rgba(255,255,255,.08)"></polygon>
+          <polygon points="60,37 83,60 60,83 37,60" fill="none" stroke="rgba(255,255,255,.06)"></polygon>
+          <polygon points="{{ radarPoints }}" fill="rgba(108,92,255,.28)" stroke="#8b7dff" stroke-width="1.5"></polygon>
+        </svg>
+        <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70">radar · play style</div>
+      </div>
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:space-between;gap:12px">
+        <svg viewBox="0 0 240 70" preserveAspectRatio="none" style="width:100%;height:76px">
+          <polyline points="{{ sparkPoints }}" fill="none" stroke="#34d99b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        </svg>
+        <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;text-align:center">sparkline · rating form</div>
+      </div>
+      <div style="padding:18px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:space-between;gap:12px">
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px">
+          <sc-for list="{{ heat }}" as="h" hint-placeholder-count="24">
+            <div title="{{ h.title }}" style="aspect-ratio:1;border-radius:4px;background:{{ h.bg }}"></div>
+          </sc-for>
+        </div>
+        <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;text-align:center">heatmap · matchups</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">07 · Rules</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="padding:20px;border-radius:13px;background:rgba(52,217,155,.05);border:1px solid rgba(52,217,155,.22);display:flex;flex-direction:column;gap:10px">
+        <div style="font:600 12px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#34d99b">Do</div>
+        <sc-for list="{{ dos }}" as="d" hint-placeholder-count="5">
+          <div style="display:flex;gap:9px;font:400 12px/1.5 Barlow,sans-serif;color:#c9cad6"><i class="bi bi-check-lg" style="font-size:12px;color:#34d99b;margin-top:3px"></i><span>{{ d }}</span></div>
+        </sc-for>
+      </div>
+      <div style="padding:20px;border-radius:13px;background:rgba(242,80,107,.05);border:1px solid rgba(242,80,107,.22);display:flex;flex-direction:column;gap:10px">
+        <div style="font:600 12px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#f2506b">Don't</div>
+        <sc-for list="{{ donts }}" as="d" hint-placeholder-count="5">
+          <div style="display:flex;gap:9px;font:400 12px/1.5 Barlow,sans-serif;color:#c9cad6"><i class="bi bi-x-lg" style="font-size:12px;color:#f2506b;margin-top:3px"></i><span>{{ d }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
+const GOLD = '#f0b429', SILVER = '#c9cad6', BRONZE = '#cd7f32';
+
+class Component extends DCLogic {
+  state = { seg: 'team', ownedOnly: true, checked: true };
+
+  renderVals() {
+    const A = f => `assets/heroes/${f}.png`, P = p => `assets/players/${p}.png`;
+    const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    const heatVals = [78, 64, 55, 41, 33, 60, 72, 50, 45, 58, 66, 30, 48, 70, 52, 61, 39, 57, 63, 44, 36, 68, 54, 47];
+    const spark = [3, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15];
+    const r = v => 14 + (46 * v) / 3;
+
+    return {
+      colorGroups: [
+        { title: 'Surfaces', items: [
+          { name: 'bg-app', value: '#0a0a10', use: 'page background' },
+          { name: 'bg-panel', value: '#101018', use: 'cards, panels, table' },
+          { name: 'bg-nav', value: '#0c0c14', use: 'nav rail, sticky bars' },
+          { name: 'bg-inset', value: 'rgba(255,255,255,.045)', use: 'fields, chips' },
+          { name: 'border', value: 'rgba(255,255,255,.08)', use: 'all hairlines' },
+          { name: 'border-strong', value: 'rgba(255,255,255,.14)', use: 'badges, medals' }
+        ] },
+        { title: 'Text', items: [
+          { name: 'text', value: '#ecedf2', use: 'primary' },
+          { name: 'text-muted', value: '#8b8c9e', use: 'secondary' },
+          { name: 'text-dim', value: '#6b6c7e', use: 'labels' },
+          { name: 'text-faint', value: '#5c5d70', use: 'captions, mono meta' },
+          { name: 'accent-text', value: '#c4bcff', use: 'links, active values' },
+          { name: 'on-accent', value: '#ffffff', use: 'text on gradient' }
+        ] },
+        { title: 'Accent & semantic', items: [
+          { name: 'accent', value: '#6c5cff', use: 'primary action' },
+          { name: 'accent-2', value: '#a855f7', use: 'gradient end' },
+          { name: 'accent-soft', value: '#8b7dff', use: 'icons, 1v1 mode' },
+          { name: 'win', value: '#34d99b', use: 'win, positive' },
+          { name: 'loss', value: '#f2506b', use: 'loss, destructive' },
+          { name: 'info', value: '#38bdf8', use: 'co-op, minions, maps' }
+        ] },
+        { title: 'Ranking & modes', items: [
+          { name: 'gold', value: '#f0b429', use: '1st place, FFA, epic' },
+          { name: 'silver', value: '#c9cad6', use: '2nd place' },
+          { name: 'bronze', value: '#cd7f32', use: '3rd place' },
+          { name: 'mode-2v2', value: '#c084fc', use: 'team matches' },
+          { name: 'mode-coop', value: '#38bdf8', use: 'co-op matches' },
+          { name: 'villain', value: '#f0b429', use: 'villain rows' }
+        ] }
+      ],
+      fonts: [
+        { name: 'Chakra Petch', weights: '600 · 700', use: 'Headings, numbers, uppercase labels. Letter-spacing .02–.1em.' },
+        { name: 'Barlow', weights: '400 – 600', use: 'Body copy, UI labels, buttons, names.' },
+        { name: 'IBM Plex Mono', weights: '400 · 500', use: 'Metrics, dates, table meta, small uppercase captions.' }
+      ],
+      typeScale: [
+        { token: 'display', font: '700 34px Chakra Petch,sans-serif', ls: '.03em', tt: 'uppercase', color: '#ecedf2', sample: 'Geralt of Rivia', spec: '34/1.0' },
+        { token: 'page-title', font: '700 24px Chakra Petch,sans-serif', ls: '.02em', tt: 'uppercase', color: '#ecedf2', sample: 'Match log', spec: '24/1.1' },
+        { token: 'card-title', font: '600 15px Chakra Petch,sans-serif', ls: '.06em', tt: 'uppercase', color: '#ecedf2', sample: 'Against villains', spec: '15/1.2' },
+        { token: 'body', font: '400 13px Barlow,sans-serif', ls: 'normal', tt: 'none', color: '#c9cad6', sample: 'Heroes are filtered by your collection.', spec: '13/1.6' },
+        { token: 'ui-label', font: '600 12.5px Barlow,sans-serif', ls: 'normal', tt: 'none', color: '#ecedf2', sample: 'Save match', spec: '12.5' },
+        { token: 'metric', font: '700 19px Chakra Petch,sans-serif', ls: 'normal', tt: 'none', color: '#ecedf2', sample: '1 284', spec: '19' },
+        { token: 'mono-meta', font: '400 11px IBM Plex Mono,monospace', ls: 'normal', tt: 'none', color: '#8b8c9e', sample: '12 Jul 2026 · 20:14', spec: '11' },
+        { token: 'mono-caption', font: '500 9.5px IBM Plex Mono,monospace', ls: '.14em', tt: 'uppercase', color: '#6b6c7e', sample: 'Participants', spec: '9.5' }
+      ],
+      radii: [
+        { value: '8px', use: 'chips' }, { value: '11px', use: 'rows' },
+        { value: '13px', use: 'cards' }, { value: '16px', use: 'panels' }
+      ],
+      spacing: [
+        { value: 8, use: 'inside chips' }, { value: 12, use: 'card gap' },
+        { value: 14, use: 'grid gap' }, { value: 22, use: 'column gap' }, { value: 26, use: 'page padding' }
+      ],
+      surfaces: [
+        { name: 'App', bg: '#0a0a10', border: 'rgba(255,255,255,.06)', shadow: 'none', spec: '#0a0a10' },
+        { name: 'Panel', bg: '#101018', border: 'rgba(255,255,255,.08)', shadow: 'none', spec: '#101018' },
+        { name: 'Selected', bg: 'rgba(139,125,255,.1)', border: 'rgba(139,125,255,.55)', shadow: '0 10px 30px rgba(108,92,255,.22)', spec: 'accent 10%' },
+        { name: 'Inset', bg: 'rgba(255,255,255,.045)', border: 'rgba(255,255,255,.07)', shadow: 'none', spec: 'white 4.5%' }
+      ],
+      segments: [
+        { key: '1v1', label: '1v1', icon: 'bi-person-fill' },
+        { key: 'team', label: '2v2', icon: 'bi-people-fill' },
+        { key: 'ffa', label: 'FFA', icon: 'bi-diagram-3-fill' },
+        { key: 'coop', label: 'Co-op', icon: 'bi-shield-fill-check' }
+      ].map(s => ({
+        ...s,
+        bg: s.key === this.state.seg ? 'rgba(139,125,255,.2)' : 'transparent',
+        fg: s.key === this.state.seg ? '#c4bcff' : '#8b8c9e',
+        onClick: () => this.setState({ seg: s.key })
+      })),
+      chips: [
+        { icon: 'bi-people', label: 'All players' }, { icon: 'bi-shield', label: 'All heroes' },
+        { icon: 'bi-map', label: 'All maps' }, { icon: 'bi-calendar-range', label: 'Jun – Jul 2026' }
+      ],
+      toggleOwned: () => this.setState(s => ({ ownedOnly: !s.ownedOnly })),
+      ownedIcon: this.state.ownedOnly ? 'bi-toggle-on' : 'bi-toggle-off',
+      ownedFg: this.state.ownedOnly ? '#c4bcff' : '#8b8c9e',
+      ownedBg: this.state.ownedOnly ? 'rgba(139,125,255,.12)' : 'transparent',
+      ownedBorder: this.state.ownedOnly ? 'rgba(139,125,255,.45)' : 'rgba(255,255,255,.08)',
+      toggleCheck: () => this.setState(s => ({ checked: !s.checked })),
+      checkBorder: this.state.checked ? '#34d99b' : 'rgba(255,255,255,.35)',
+      checkBg: this.state.checked ? '#34d99b' : 'transparent',
+      checkDisplay: this.state.checked ? 'block' : 'none',
+      stars: [GOLD, GOLD, 'rgba(255,255,255,.14)'].map(color => ({ color })),
+      navDemo: [
+        { icon: 'bi-shield-fill', label: 'Heroes', count: 48, active: false },
+        { icon: 'bi-list-ul', label: 'Match log', count: 1284, active: true },
+        { icon: 'bi-box-seam', label: 'Collection', count: '7/10', active: false }
+      ].map(n => ({
+        ...n,
+        fg: n.active ? '#ffffff' : '#8b8c9e',
+        bg: n.active ? 'linear-gradient(150deg,rgba(108,92,255,.9),rgba(168,85,247,.7))' : 'transparent'
+      })),
+      tabs: [{ label: 'Points', active: true }, { label: 'Win rate' }, { label: 'K/D' }].map(t => ({
+        ...t, fg: t.active ? '#ecedf2' : '#8b8c9e', edge: t.active ? '#8b7dff' : 'transparent'
+      })),
+      pages: [1, 2, 3, 4].map(n => ({
+        n, bg: n === 1 ? 'rgba(139,125,255,.18)' : '#14141c',
+        border: n === 1 ? 'rgba(139,125,255,.4)' : 'rgba(255,255,255,.08)',
+        fg: n === 1 ? '#c4bcff' : '#8b8c9e'
+      })),
+      modes: [
+        { label: '1V1', icon: 'bi-person-fill', color: '#8b7dff', bg: 'rgba(139,125,255,.14)' },
+        { label: '2V2', icon: 'bi-people-fill', color: '#c084fc', bg: 'rgba(168,85,247,.14)' },
+        { label: 'FFA', icon: 'bi-diagram-3-fill', color: GOLD, bg: 'rgba(240,180,41,.14)' },
+        { label: 'CO-OP', icon: 'bi-shield-fill-check', color: '#38bdf8', bg: 'rgba(56,189,248,.14)' }
+      ],
+      medals: [
+        { n: 1, color: GOLD }, { n: 2, color: SILVER }, { n: 3, color: BRONZE }, { n: 4, color: '#8b8c9e' }
+      ],
+      chipDemo: [
+        { art: A('geralt-of-rivia'), avatar: P('vados'), avatarDisplay: 'block', border: 'rgba(52,217,155,.45)', opacity: 1, label: 'winner', placeDisplay: 'none', place: '', placeColor: GOLD },
+        { art: A('medusa'), avatar: P('ksuha'), avatarDisplay: 'block', border: 'rgba(255,255,255,.09)', opacity: 0.5, label: 'defeated', placeDisplay: 'none', place: '', placeColor: GOLD },
+        { art: A('sherlock-holmes'), avatar: P('andrii'), avatarDisplay: 'block', border: 'rgba(52,217,155,.45)', opacity: 1, label: 'placed (FFA)', placeDisplay: 'flex', place: '1', placeColor: GOLD },
+        { art: 'assets/Unknown.png', avatar: BLANK, avatarDisplay: 'none', border: 'rgba(240,180,41,.5)', opacity: 1, label: 'villain', placeDisplay: 'none', place: '', placeColor: GOLD }
+      ],
+      rowDemo: [
+        { caption: 'Ladder row — win/loss edge, per-hero context', rank: '01', art: A('geralt-of-rivia'), name: 'Geralt of Rivia', sub: 'Witcher · 103 matches',
+          typeIcon: 'assets/Melee.png', value: '214 pts', valueColor: '#c4bcff', extra: '62%', edge: GOLD, bg: 'rgba(139,125,255,.07)', rankColor: GOLD },
+        { caption: 'Negative rating — loss edge and red value', rank: '10', art: A('bigfoot'), name: 'Bigfoot', sub: 'Robin Hood vs Bigfoot · 47 matches',
+          typeIcon: 'assets/Melee.png', value: '−18 pts', valueColor: '#f2506b', extra: '38%', edge: 'rgba(242,80,107,.7)', bg: 'rgba(242,80,107,.05)', rankColor: '#8b8c9e' },
+        { caption: 'Match log row — neutral, edge shows the mode', rank: '2v2', art: A('medusa'), name: 'Team 2 · Medusa, Dracula', sub: '11 Jul 2026 · Castle',
+          typeIcon: 'assets/Ranged.png', value: '★★☆', valueColor: GOLD, extra: '4 pl.', edge: '#c084fc', bg: 'rgba(255,255,255,.025)', rankColor: '#c084fc' }
+      ],
+      kpis: [
+        { icon: 'bi-controller', label: 'Matches', value: '1 284', sub: '+37 week', subColor: '#34d99b' },
+        { icon: 'bi-shield', label: 'Heroes', value: '42 / 48', sub: '6 unowned', subColor: '#5c5d70' },
+        { icon: 'bi-star-fill', label: 'Avg. epic', value: '2.4', sub: 'of 3', subColor: '#5c5d70' },
+        { icon: 'bi-fire', label: 'Streak', value: '9', sub: 'Ksuha', subColor: '#34d99b' }
+      ],
+      donutDash: (301.6 * (1 - 62 / 100)).toFixed(1),
+      radarPoints: `60,${60 - r(3)} ${60 + r(1)},60 60,${60 + r(2)} ${60 - r(2)},60`,
+      sparkPoints: spark.map((v, i) => `${(i * 240) / (spark.length - 1)},${64 - (v / 16) * 56}`).join(' '),
+      heat: heatVals.map(v => ({
+        title: `${v}% win`,
+        bg: v >= 50
+          ? `rgba(52,217,155,${(0.14 + ((v - 50) / 50) * 0.6).toFixed(2)})`
+          : `rgba(242,80,107,${(0.14 + ((50 - v) / 50) * 0.6).toFixed(2)})`
+      })),
+      dos: [
+        'Show hero and map art as tiles or tokens; never tint a table cell with a background colour instead of art.',
+        'Keep one accent gradient action per screen; everything else is outlined or ghost.',
+        'Use mono for anything numeric or temporal — dates always carry the year (12 Jul 2026).',
+        'Let the game mode reshape a row or form: sides are boxes, VS joins them, FFA ranks with medals.',
+        'Villains and minions never get a player avatar; minions indent under their villain.'
+      ],
+      donts: [
+        'No red #e63946 from the old theme, no new hues outside this palette.',
+        'Do not record items used, actions made or time spent — the app does not track them.',
+        'No win/loss colouring of Match log rows; that context belongs to hero and player pages.',
+        'No decorative Unmatched.otf headings — Chakra Petch is the display face.',
+        'No side column for 1v1 or FFA scoreboards; only 2v2 and co-op have sides.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

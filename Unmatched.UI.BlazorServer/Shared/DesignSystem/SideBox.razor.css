@@ -1,0 +1,22 @@
+.um-side {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border: 1px solid transparent;
+    border-radius: var(--um-radius-row);
+}
+
+.um-side-win {
+    background: var(--um-win-wash);
+    border-color: var(--um-win-border);
+}
+
+.um-side-loss {
+    background: var(--um-loss-wash);
+    border-color: var(--um-loss-border);
+}
+
+.um-side-neutral {
+    padding: 6px 0;
+}

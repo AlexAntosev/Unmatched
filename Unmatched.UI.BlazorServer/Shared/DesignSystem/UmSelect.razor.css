@@ -1,0 +1,115 @@
+.um-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-inset);
+    transition: border-color 0.12s ease;
+}
+
+.um-select:hover {
+    border-color: var(--um-focus-border);
+}
+
+.um-select.is-highlighted {
+    border-color: rgba(139, 125, 255, 0.45);
+}
+
+.um-select-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--um-text);
+    font: 500 12.5px var(--um-font-body);
+    appearance: none;
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.um-select-input:focus {
+    outline: none;
+}
+
+.um-select-input:disabled {
+    color: var(--um-text-faint);
+    cursor: default;
+}
+
+.um-select-chevron {
+    flex: none;
+    font-size: 9px;
+    color: var(--um-text-faint);
+    pointer-events: none;
+}
+
+.um-select-icon {
+    flex: none;
+    font-size: 12px;
+    color: var(--um-text-dim);
+}
+
+.um-select-avatar {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.um-select-art {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+/* ---- Sizes ---- */
+
+.um-select-field {
+    height: var(--um-height-field);
+    padding: 0 10px;
+}
+
+.um-select-control {
+    height: var(--um-height-control);
+    padding: 0 10px;
+    background: var(--um-bg-inset);
+}
+
+/* Filter chips carry a border only - no fill - and muted text until something is picked. */
+.um-select-chip {
+    height: var(--um-height-chip);
+    padding: 0 11px;
+    gap: 7px;
+    border-radius: var(--um-radius-sm);
+    background: none;
+}
+
+.um-select-chip .um-select-input {
+    font: 500 11.5px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.um-select-chip:hover .um-select-input {
+    color: var(--um-text);
+}
+
+.um-select-chip .um-select-icon {
+    font-size: 11px;
+}
+
+.um-select-chip .um-select-chevron {
+    font-size: 8px;
+    opacity: 0.6;
+}
+
+/* A dice button sits flush with the right edge of a field. ::deep because UmButton renders it. */
+.um-select-field ::deep .um-btn-dice {
+    margin-right: -5px;
+}

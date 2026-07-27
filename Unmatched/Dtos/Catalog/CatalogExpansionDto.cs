@@ -10,7 +10,13 @@ public class CatalogExpansionDto
 
     public string? Publisher { get; set; }
 
-    public IEnumerable<string> HeroNames { get; set; }
+    public string? ImageFileName { get; set; }
 
-    public IEnumerable<CatalogMapDto> Maps { get; set; }
+    public IEnumerable<CatalogExpansionContentDto> Heroes { get; set; } = [];
+
+    public IEnumerable<CatalogMapDto> Maps { get; set; } = [];
+
+    public IEnumerable<CatalogExpansionContentDto> Villains { get; set; } = [];
+
+    public IEnumerable<CatalogExpansionContentDto> Minions { get; set; } = [];
 }

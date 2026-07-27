@@ -16,12 +16,12 @@
                        @onchange="@(e => OwnedChanged(expansion.Id, (bool)e.Value!))"
                        id="@expansion.Id" class="form-check-input"/>
                 <label for="@expansion.Id">@expansion.Name @(expansion.ReleaseYear is not null ? $"({expansion.ReleaseYear})" : "")</label>
-                @if (expansion.HeroNames.Any() || expansion.Maps.Any())
+                @if (expansion.Heroes.Any() || expansion.Maps.Any())
                 {
                     <div class="collection-item-details">
-                        @if (expansion.HeroNames.Any())
+                        @if (expansion.Heroes.Any())
                         {
-                            <div>Heroes: @string.Join(", ", expansion.HeroNames)</div>
+                            <div>Heroes: @string.Join(", ", expansion.Heroes.Select(h => h.Name))</div>
                         }
                         @if (expansion.Maps.Any())
                         {

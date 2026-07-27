@@ -1,0 +1,113 @@
+@using System.Globalization
+@*
+    The rating line on the hero page. Plain SVG rather than a charting library: the design shows no
+    tooltips or zoom, just the shape of the curve between three gridlines.
+
+    The plot area uses a fixed 720x190 viewBox stretched to the container, so x is the sample index
+    and y is the value mapped onto the min/max of the series.
+*@
+<div class="um-line @Class">
+    <div class="um-line-axis">
+        @foreach (var tick in AxisTicks())
+        {
+            <div>@tick</div>
+        }
+    </div>
+    <svg viewBox="0 0 720 190" preserveAspectRatio="none" style="@($"height:{Height}px")" role="img" aria-label="Rating changes">
+        <line x1="0" y1="1" x2="720" y2="1" stroke="rgba(255,255,255,.06)"></line>
+        <line x1="0" y1="95" x2="720" y2="95" stroke="rgba(255,255,255,.06)"></line>
+        <line x1="0" y1="189" x2="720" y2="189" stroke="rgba(255,255,255,.06)"></line>
+        @if (_plotted.Count > 1)
+        {
+            <path d="@AreaPath" fill="rgba(108,92,255,.16)"></path>
+            <polyline points="@LinePoints" fill="none" stroke="@StrokeColor" stroke-width="2.5" stroke-linejoin="round"
+                      vector-effect="non-scaling-stroke"></polyline>
+        }
+    </svg>
+</div>
+@if (_plotted.Count > 1)
+{
+    <div class="um-line-labels">
+        @foreach (var label in BottomLabels())
+        {
+            <div>@label</div>
+        }
+    </div>
+}
+
+@code {
+    private const double PlotWidth = 720;
+    private const double PlotHeight = 190;
+    private const int BottomLabelCount = 6;
+
+    private List<ChartPoint> _plotted = new();
+    private double _min;
+    private double _max;
+
+    [Parameter]
+    public IReadOnlyList<ChartPoint> Points { get; set; } = Array.Empty<ChartPoint>();
+
+    [Parameter]
+    public int Height { get; set; } = 190;
+
+    [Parameter]
+    public string StrokeColor { get; set; } = "var(--um-accent-soft)";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _plotted = Points.ToList();
+        if (_plotted.Count == 0)
+        {
+            _min = 0;
+            _max = 0;
+            return;
+        }
+
+        _min = _plotted.Min(p => p.Value);
+        _max = _plotted.Max(p => p.Value);
+        if (Math.Abs(_max - _min) < 0.0001)
+        {
+            // A flat series would divide by zero - pad it so the line lands mid-plot.
+            _max = _min + 1;
+        }
+    }
+
+    private double X(int index) => index / (double)Math.Max(_plotted.Count - 1, 1) * PlotWidth;
+
+    private double Y(double value) => PlotHeight - (value - _min) / (_max - _min) * (PlotHeight - 4) - 2;
+
+    private string LinePoints
+        => string.Join(' ', _plotted.Select((p, i) => $"{F(X(i))},{F(Y(p.Value))}"));
+
+    private string AreaPath
+        => $"M {F(X(0))},{F(PlotHeight)} "
+         + string.Join(' ', _plotted.Select((p, i) => $"L {F(X(i))},{F(Y(p.Value))}"))
+         + $" L {F(X(_plotted.Count - 1))},{F(PlotHeight)} Z";
+
+    private IEnumerable<string> AxisTicks()
+    {
+        if (_plotted.Count == 0)
+        {
+            yield break;
+        }
+
+        yield return Math.Round(_max).ToString(CultureInfo.InvariantCulture);
+        yield return Math.Round((_max + _min) / 2).ToString(CultureInfo.InvariantCulture);
+        yield return Math.Round(_min).ToString(CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>Evenly spaced sample labels so a long series does not crowd the axis.</summary>
+    private IEnumerable<string> BottomLabels()
+    {
+        var step = Math.Max(1, _plotted.Count / BottomLabelCount);
+        for (var i = 0; i < _plotted.Count; i += step)
+        {
+            yield return _plotted[i].Label;
+        }
+    }
+
+    private static string F(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

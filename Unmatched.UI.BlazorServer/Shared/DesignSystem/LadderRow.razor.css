@@ -1,0 +1,61 @@
+.um-ladder-row {
+    display: grid;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 14px;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.um-ladder-row.is-clickable {
+    cursor: pointer;
+}
+
+.um-ladder-row.is-clickable:hover {
+    background: var(--um-bg-hover) !important;
+}
+
+.um-ladder-row.is-selected {
+    border-color: var(--um-selected-border);
+    box-shadow: var(--um-selected-shadow);
+}
+
+.um-ladder-rank {
+    font: 700 14px var(--um-font-display);
+}
+
+.um-ladder-identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.um-ladder-names {
+    min-width: 0;
+}
+
+.um-ladder-name {
+    font: 600 13px/1.2 var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.um-ladder-sub {
+    margin-top: 2px;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* The glyph is pushed to the far edge of the identity cell. */
+.um-ladder-identity ::deep .um-ladder-type {
+    margin-left: auto;
+}

@@ -1,0 +1,10 @@
+.um-token {
+    flex: none;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #16161f;
+}
+
+.um-token.is-round {
+    border-radius: 50%;
+}

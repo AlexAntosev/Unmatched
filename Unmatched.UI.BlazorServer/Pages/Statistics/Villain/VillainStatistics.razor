@@ -1,46 +1,57 @@
 @page "/villains-statistics/{id}"
 @using Unmatched.Dtos
-@using Unmatched.Dtos.Match
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IVillainStatisticsService VillainStatisticsService
-@using Microsoft.AspNetCore.Components
+@*
+    Not in the design pack: the 2a dossier pattern applied to a villain.
+*@
 
-<div style="margin-bottom: 16px">
-    <VillainSummary Statistics="Villain"></VillainSummary>
-</div>
-<div class="page-content" style="margin-bottom: 16px">
-    <TotalMatchesRecord Total="Villain.TotalMatches" Wins="Villain.TotalWins" Looses="Villain.TotalLooses" Kd="Villain.Kd"></TotalMatchesRecord>
-    <MonsterMatchupTable Title="Against Heroes" Rows="_heroMatchups"></MonsterMatchupTable>
-    <MatchLogGrid MatchLogEntries="_matchLogEntries"></MatchLogGrid>
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<VillainSummary Statistics="_villain"/>
+
+<div class="um-page">
+    <MonsterMatchupTable Title="Against heroes" Rows="_heroMatchups"/>
+    <MatchList Matches="_matchLog" Title="Match log" PageSize="8" Meta="@($"{_matchLog.Count} matches")"/>
 </div>
 
 @code {
     [Parameter]
-    public string Id { get; set; } = "";
+    public string Id { get; set; } = string.Empty;
 
-    private VillainStatisticsDto Villain { get; set; } = new();
-    private List<UiMatchLogDto> _matchLogEntries = new();
+    private VillainStatisticsDto _villain = new() { Name = string.Empty };
+    private List<UiMatchLogDto> _matchLog = new();
     private List<MonsterMatchupRow> _heroMatchups = new();
 
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    private IReadOnlyList<Breadcrumb.Crumb> Crumbs =>
+    [
+        new("Villains", Urls.VillainsStatistics), new(_villain.Name)
+    ];
+
+    protected override async Task OnParametersSetAsync()
     {
+        if (!Guid.TryParse(Id, out var villainId) || villainId == Guid.Empty)
+        {
+            return;
+        }
+
         try
         {
             PreloadService.Show();
-            Guid.TryParse(Id, out var villainId);
-            if (villainId == Guid.Empty)
-            {
-                return;
-            }
 
-            Villain = await VillainStatisticsService.GetVillainStatisticsAsync(villainId);
-            _matchLogEntries = (await VillainStatisticsService.GetVillainMatchesAsync(villainId)).OrderByDescending(x => x.Date).ToList();
+            var stats = VillainStatisticsService.GetVillainStatisticsAsync(villainId);
+            var matches = VillainStatisticsService.GetVillainMatchesAsync(villainId);
+            await Task.WhenAll(stats, matches);
 
-            _heroMatchups = _matchLogEntries
+            _villain = stats.Result;
+            _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
+
+            _heroMatchups = _matchLog
                 .SelectMany(m => m.Fighters)
                 .GroupBy(f => f.Hero?.Name ?? "Unknown")
                 .Select(g => new MonsterMatchupRow
@@ -50,6 +61,7 @@
                         Wins = g.Count(f => f.IsWinner),
                         Looses = g.Count(f => !f.IsWinner)
                     })
+                .OrderByDescending(r => r.Total)
                 .ToList();
         }
         finally

@@ -18,4 +18,11 @@ public class ExpansionController(IMapper mapper, IExpansionService expansionServ
         var result = expansions.Select(mapper.Map<ExpansionDto>);
         return result;
     }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<ExpansionDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var expansion = await expansionService.UpdateImageAsync(id, imageFileName);
+        return expansion is null ? NotFound() : Ok(mapper.Map<ExpansionDto>(expansion));
+    }
 }
