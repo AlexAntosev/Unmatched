@@ -99,10 +99,10 @@
         yield return Math.Round(_min).ToString(CultureInfo.InvariantCulture);
     }
 
-    /// <summary>Evenly spaced sample labels so a long series does not crowd the axis.</summary>
+    /// <summary>At most six evenly spaced labels, so a long series never crowds the axis.</summary>
     private IEnumerable<string> BottomLabels()
     {
-        var step = Math.Max(1, _plotted.Count / BottomLabelCount);
+        var step = Math.Max(1, (int)Math.Ceiling(_plotted.Count / (double)BottomLabelCount));
         for (var i = 0; i < _plotted.Count; i += step)
         {
             yield return _plotted[i].Label;

@@ -1,46 +1,188 @@
 @page "/collection"
 @using Unmatched.Dtos
 @using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Services
 @inject IExpansionService ExpansionService
 @inject ICollectionService CollectionService
+@inject IExpansionStatisticsService ExpansionStatisticsService
+@inject IImageUploadService ImageUploadService
+@inject NavCountsService NavCountsService
+@*
+    Screen 5a. A collection is a shelf of expansion boxes, so the cover carries the row. Ticking a
+    box only stages the change (gold "UNSAVED"); "Save collection" commits every pending change at
+    once, which is the colDraft/colSaved split from the handoff.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Collection</h1>
-    <p class="collection-hint">Select the expansions you own. Heroes and Maps from unselected expansions will be hidden when creating a match and in statistics.</p>
+<PageHeader Breadcrumbs="Crumbs">
+    <Controls>
+        <UmSearchBox Value="@_search" ValueChanged="OnSearchChanged" Placeholder="Search sets, heroes, maps…"/>
+        <UmToggle Label="Owned only" Value="_ownedOnly" ValueChanged="OnOwnedOnlyChanged"
+                  OnIcon="bi-toggle-on" OffIcon="bi-toggle-off"/>
+        <span class="collection-dirty" style="color:@(_draft.Count > 0 ? "var(--um-gold)" : "var(--um-text-faint)")">
+            @DirtyLabel
+        </span>
+        <UmButton Size="sm" Variant="@(_draft.Count > 0 ? "primary" : "outline")" Icon="bi-cloud-arrow-up"
+                  Disabled="@(_draft.Count == 0)" OnClick="SaveAsync">Save collection</UmButton>
+    </Controls>
+</PageHeader>
 
-    <div class="collection-list">
-        @foreach (var expansion in _expansions)
-        {
-            <div class="collection-item">
-                <input type="checkbox" checked="@_ownedIds.Contains(expansion.Id)"
-                       @onchange="@(e => OwnedChanged(expansion.Id, (bool)e.Value!))"
-                       id="@expansion.Id" class="form-check-input"/>
-                <label for="@expansion.Id">@expansion.Name @(expansion.ReleaseYear is not null ? $"({expansion.ReleaseYear})" : "")</label>
-                @if (expansion.Heroes.Any() || expansion.Maps.Any())
-                {
-                    <div class="collection-item-details">
-                        @if (expansion.Heroes.Any())
+<div class="collection-kpis">
+    <KpiCard Icon="bi-box-seam" Label="Sets" Value="@_ownedIds.Count.ToString()" Of="@_expansions.Count.ToString()"/>
+    <KpiCard Icon="bi-shield-fill" Label="Heroes" Value="@OwnedCount(e => e.HeroCount).ToString()"
+             Of="@TotalCount(e => e.HeroCount).ToString()"/>
+    <KpiCard Icon="bi-map" Label="Maps" Value="@OwnedCount(e => e.MapCount).ToString()"
+             Of="@TotalCount(e => e.MapCount).ToString()"/>
+    <KpiCard Icon="bi-eye" Label="Villains · minions"
+             Value="@($"{OwnedCount(e => e.VillainCount)} · {OwnedCount(e => e.MinionCount)}")"
+             Sub="@($"of {TotalCount(e => e.VillainCount)} · {TotalCount(e => e.MinionCount)}")"/>
+</div>
+
+<div class="collection-body">
+    <div class="collection-shelf">
+        <SectionCaption Text="Expansions" Meta="@($"{_visible.Count} shown · {_ownedIds.Count} owned")"/>
+        <div class="collection-grid">
+            @foreach (var expansion in _visible)
+            {
+                var state = StateOf(expansion);
+                <div class="collection-card @(IsSelected(expansion) ? "is-selected" : null) @(state.IsOwned ? null : "is-unowned")"
+                     @onclick="@(() => Select(expansion))">
+                    <div class="collection-cover @(state.IsOwned ? null : "is-dashed")">
+                        @if (expansion.ImageUrl is not null)
                         {
-                            <div>Heroes: @string.Join(", ", expansion.Heroes.Select(h => h.Name))</div>
+                            <img class="collection-cover-art" src="@expansion.ImageUrl" alt="@expansion.Name"/>
                         }
-                        @if (expansion.Maps.Any())
+                        else
                         {
-                            <div>Maps: @string.Join(", ", expansion.Maps.Select(m => m.DisplayName))</div>
+                            <img class="collection-cover-logo" src="/Unmatched-logo.png" alt=""/>
+                            <span class="collection-cover-caption">box art</span>
                         }
+                        <div class="collection-check">
+                            @* Ticking must not change which set the side panel shows. *@
+                            <UmCheckbox Checked="state.IsOwned" StopPropagation="true"
+                                        Accent="@(state.IsPending ? "var(--um-gold)" : null)"
+                                        Title="@state.Badge"
+                                        CheckedChanged="@(_ => ToggleOwned(expansion))"/>
+                        </div>
                     </div>
-                }
-            </div>
-        }
+                    <div class="collection-meta">
+                        <div class="collection-name">@expansion.Name</div>
+                        <div class="collection-subline">
+                            <span class="collection-year">@(expansion.ReleaseYear?.ToString() ?? "—")</span>
+                            <span class="collection-badge" style="color:@state.BadgeColor">@state.Badge</span>
+                        </div>
+                        <div class="collection-chips">
+                            @foreach (var chip in ContentChips(expansion))
+                            {
+                                <span class="collection-chip" style="color:@chip.Color">
+                                    <i class="bi @chip.Icon"></i>@chip.Label
+                                </span>
+                            }
+                        </div>
+                        <div class="collection-tokens">
+                            @foreach (var hero in expansion.Heroes.Take(5))
+                            {
+                                <img class="collection-token" src="@hero.ImageUrl" alt="@hero.Name" title="@hero.Name"
+                                     onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 
-    <button class="btn btn-primary" @onclick="OnSaveClick">Save</button>
+    @if (_selected is not null)
+    {
+        <aside class="collection-panel">
+            <div class="collection-panel-head">
+                <div class="collection-panel-cover">
+                    <EditableImage ImageUrl="@BustCache(_selected.ImageUrl)" AltText="@_selected.Name"
+                                   Label="Cover" FallbackImageUrl="/Unmatched-logo.png"
+                                   OnFileSelected="OnCoverSelectedAsync"/>
+                </div>
+                <div class="collection-panel-identity">
+                    <div class="collection-panel-name">@_selected.Name</div>
+                    <div class="collection-panel-meta">
+                        @(_selected.ReleaseYear?.ToString() ?? "—") · @(_selected.Publisher ?? "Unknown publisher")
+                    </div>
+                    <div class="um-spacer"></div>
+                    <UmButton Size="sm" Variant="@(StateOf(_selected).IsOwned ? "outline" : "primary")"
+                              Icon="@(StateOf(_selected).IsOwned ? "bi-check-circle-fill" : "bi-plus-lg")"
+                              OnClick="@(() => ToggleOwned(_selected))">
+                        @(StateOf(_selected).IsOwned ? "In your shelf" : "Add to shelf")
+                    </UmButton>
+                </div>
+            </div>
+
+            <div class="collection-panel-stats">
+                <StatTile Variant="inset" Label="Played" Value="@(SelectedStats?.TotalMatches.ToString() ?? "0")"/>
+                <StatTile Variant="inset" Label="Best hero" Value="@(SelectedStats?.BestHeroName ?? "—")"
+                          ValueColor="var(--um-accent-text)"/>
+                <StatTile Variant="inset" Label="Win rate" Value="@($"{SelectedStats?.WinRate ?? 0}%")"
+                          ValueColor="var(--um-win)"/>
+            </div>
+
+            <CollectionContentSection Title="Heroes" Icon="bi-shield-fill" IconColor="var(--um-accent-soft)"
+                                      Items="_selected.Heroes.ToList()" Edge="var(--um-accent-soft)"/>
+
+            @if (_selected.Maps.Any())
+            {
+                <div class="collection-section">
+                    <SectionCaption Text="Maps" Icon="bi-map" IconColor="var(--um-info)"
+                                    Meta="@_selected.MapCount.ToString()"/>
+                    @foreach (var map in _selected.Maps)
+                    {
+                        <div class="collection-content-row" style="border-left-color:var(--um-info)">
+                            <img class="collection-map-thumb" src="@map.ImageUrl" alt="@map.Name"
+                                 onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                            <div class="collection-content-names">
+                                <div class="collection-content-name">@map.DisplayName</div>
+                                <div class="collection-content-sub">double-sided board</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <CollectionContentSection Title="Villain &amp; minions" Icon="bi-eye" IconColor="var(--um-villain)"
+                                      Items="_selected.Villains.ToList()" Edge="var(--um-villain)"
+                                      IndentedItems="_selected.Minions.ToList()"/>
+        </aside>
+    }
 </div>
 
 @code {
-    private List<ExpansionDto> _expansions = new();
-    private HashSet<Guid> _ownedIds = new();
+    private record ContentChip(string Label, string Icon, string Color);
 
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private record CardState(bool IsOwned, bool IsPending, string Badge, string BadgeColor);
+
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Collection")];
+
+    /// <summary>Pending owned-flag changes, keyed by set - the handoff's colDraft.</summary>
+    private readonly Dictionary<Guid, bool> _draft = new();
+
+    private List<ExpansionDto> _expansions = new();
+    private List<ExpansionDto> _visible = new();
+    private HashSet<Guid> _ownedIds = new();
+    private IReadOnlyDictionary<Guid, UiExpansionStatisticsDto> _stats =
+        new Dictionary<Guid, UiExpansionStatisticsDto>();
+
+    private ExpansionDto? _selected;
+    private string? _search;
+    private bool _ownedOnly;
+    private int _cacheBust;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private UiExpansionStatisticsDto? SelectedStats
+        => _selected is null ? null : _stats.GetValueOrDefault(_selected.Id);
+
+    private string DirtyLabel
+        => _draft.Count == 0
+            ? "All changes saved"
+            : $"{_draft.Count} unsaved change{(_draft.Count == 1 ? string.Empty : "s")}";
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,8 +190,17 @@
         {
             PreloadService.Show();
 
-            _expansions = (await ExpansionService.GetAsync()).OrderBy(x => x.Name).ToList();
-            _ownedIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
+            var expansions = ExpansionService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            var stats = ExpansionStatisticsService.GetByExpansionAsync();
+            await Task.WhenAll(expansions, owned, stats);
+
+            _expansions = expansions.Result.OrderBy(e => e.Name).ToList();
+            _ownedIds = owned.Result.ToHashSet();
+            _stats = stats.Result;
+
+            Rebuild();
+            _selected = _visible.FirstOrDefault();
         }
         finally
         {
@@ -57,28 +208,155 @@
         }
     }
 
-    private void OwnedChanged(Guid expansionId, bool isOwned)
+    private void Rebuild()
     {
-        if (isOwned)
+        IEnumerable<ExpansionDto> expansions = _expansions;
+
+        if (_ownedOnly)
         {
-            _ownedIds.Add(expansionId);
+            expansions = expansions.Where(e => StateOf(e).IsOwned);
+        }
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var term = _search.Trim();
+            expansions = expansions.Where(e => Matches(e, term));
+        }
+
+        _visible = expansions.ToList();
+    }
+
+    /// <summary>Search reaches into the box: its name, its heroes, its maps.</summary>
+    private static bool Matches(ExpansionDto expansion, string term)
+        => expansion.Name.Contains(term, StringComparison.OrdinalIgnoreCase)
+        || expansion.Heroes.Any(h => h.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+        || expansion.Maps.Any(m => m.DisplayName.Contains(term, StringComparison.OrdinalIgnoreCase));
+
+    private CardState StateOf(ExpansionDto expansion)
+    {
+        var saved = _ownedIds.Contains(expansion.Id);
+        var isPending = _draft.TryGetValue(expansion.Id, out var pending);
+        var isOwned = isPending ? pending : saved;
+
+        if (isPending)
+        {
+            return new CardState(isOwned, true, "UNSAVED", "var(--um-gold)");
+        }
+
+        return isOwned
+            ? new CardState(true, false, "OWNED", "var(--um-win)")
+            : new CardState(false, false, "ADD", "var(--um-text-faint)");
+    }
+
+    private bool IsSelected(ExpansionDto expansion) => _selected?.Id == expansion.Id;
+
+    private void Select(ExpansionDto expansion) => _selected = expansion;
+
+    private void ToggleOwned(ExpansionDto expansion)
+    {
+        var saved = _ownedIds.Contains(expansion.Id);
+        var target = !StateOf(expansion).IsOwned;
+
+        // Toggling back to the saved value is not a change at all, so it leaves the draft.
+        if (target == saved)
+        {
+            _draft.Remove(expansion.Id);
         }
         else
         {
-            _ownedIds.Remove(expansionId);
+            _draft[expansion.Id] = target;
         }
+
+        Rebuild();
     }
 
-    private async Task OnSaveClick()
+    private async Task SaveAsync()
     {
         try
         {
             PreloadService.Show();
+
+            foreach (var (expansionId, isOwned) in _draft)
+            {
+                if (isOwned)
+                {
+                    _ownedIds.Add(expansionId);
+                }
+                else
+                {
+                    _ownedIds.Remove(expansionId);
+                }
+            }
+
             await CollectionService.SetOwnedExpansionIdsAsync(_ownedIds);
+            _draft.Clear();
+            NavCountsService.Invalidate();
+            Rebuild();
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    private void OnSearchChanged(string? search)
+    {
+        _search = search;
+        Rebuild();
+    }
+
+    private void OnOwnedOnlyChanged(bool ownedOnly)
+    {
+        _ownedOnly = ownedOnly;
+        Rebuild();
+    }
+
+    private int OwnedCount(Func<ExpansionDto, int> selector)
+        => _expansions.Where(e => StateOf(e).IsOwned).Sum(selector);
+
+    private int TotalCount(Func<ExpansionDto, int> selector) => _expansions.Sum(selector);
+
+    private static IEnumerable<ContentChip> ContentChips(ExpansionDto expansion)
+    {
+        if (expansion.HeroCount > 0)
+        {
+            yield return new ContentChip(Pluralise(expansion.HeroCount, "hero", "heroes"), "bi-shield-fill", "var(--um-accent-soft)");
+        }
+
+        if (expansion.MapCount > 0)
+        {
+            yield return new ContentChip(Pluralise(expansion.MapCount, "map"), "bi-map", "var(--um-info)");
+        }
+
+        if (expansion.VillainCount > 0)
+        {
+            yield return new ContentChip(Pluralise(expansion.VillainCount, "villain"), "bi-eye", "var(--um-villain)");
+        }
+
+        if (expansion.MinionCount > 0)
+        {
+            yield return new ContentChip(Pluralise(expansion.MinionCount, "minion"), "bi-bug", "var(--um-info)");
+        }
+    }
+
+    private static string Pluralise(int count, string singular, string? plural = null)
+        => $"{count} {(count == 1 ? singular : plural ?? singular + "s")}";
+
+    private string BustCache(string? imageUrl)
+        => imageUrl is null ? "/Unmatched-logo.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnCoverSelectedAsync(IBrowserFile file)
+    {
+        if (_selected is null)
+        {
+            return;
+        }
+
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync(
+            "expansions", _selected.Name, _selected.ImageFileName, stream, file.Name);
+        await ExpansionService.UpdateImageAsync(_selected.Id, fileName);
+        _selected.ImageFileName = fileName;
+        _cacheBust++;
     }
 }

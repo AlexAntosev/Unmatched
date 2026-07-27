@@ -1,0 +1,56 @@
+@using Unmatched.Dtos
+@*
+    One section of the collection side panel. Minions are passed as <see cref="IndentedItems"/> so
+    they read as belonging to the villain above them rather than as a section of their own.
+*@
+@if (Items.Count > 0 || IndentedItems.Count > 0)
+{
+    <div class="content-section">
+        <SectionCaption Text="@Title" Icon="@Icon" IconColor="@IconColor"
+                        Meta="@((Items.Count + IndentedItems.Count).ToString())"/>
+        @foreach (var item in Items)
+        {
+            <div class="content-row" style="border-left-color:@Edge">
+                <HeroToken ImageUrl="@item.ImageUrl" Alt="@item.Name" Size="30" Radius="8"/>
+                <div class="content-names">
+                    <div class="content-name">@item.Name</div>
+                    <div class="content-sub">@item.DeckSize cards · @(item.IsRanged ? "Ranged" : "Melee")</div>
+                </div>
+                <MeleeRangedIcon IsRanged="item.IsRanged" Height="13"/>
+                <div class="content-hp">@item.Hp HP</div>
+            </div>
+        }
+        @foreach (var item in IndentedItems)
+        {
+            <div class="content-row is-indented" style="border-left-color:@Edge">
+                <HeroToken ImageUrl="@item.ImageUrl" Alt="@item.Name" Size="26" Radius="8"/>
+                <div class="content-names">
+                    <div class="content-name">@item.Name</div>
+                    <div class="content-sub">minion</div>
+                </div>
+                <MeleeRangedIcon IsRanged="item.IsRanged" Height="13"/>
+                <div class="content-hp">@item.Hp HP</div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public string? Edge { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ExpansionContentDto> Items { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyList<ExpansionContentDto> IndentedItems { get; set; } = [];
+}

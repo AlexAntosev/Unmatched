@@ -1,84 +1,129 @@
-﻿@page "/tournaments/{id}"
-@using BlazorBootstrap
-@using Microsoft.AspNetCore.Components
+@page "/tournaments/{id}"
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
 @using Unmatched.Enums
-@using Unmatched.Services
+@using Unmatched.Extensions
 @using Unmatched.Services.Contracts
-@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
+@inject NavigationManager NavManager
+@*
+    Not in the design pack. A championship shows one panel per stage; a league is just its matches,
+    so it reuses the shared 3b list. Planned matches link through to the Add match form.
+*@
 
-<div class="page-content tournament-background">
-    <h1 class="page-title" style="text-align: center">@TournamentModel.Name</h1>
-    @if (TournamentModel.Type == TournamentType.Championship)
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<div class="um-page">
+    @if (_tournament.Type == TournamentType.Championship)
     {
-        <div class="net">
-            @for (var stage = TournamentModel.InitialStage; stage <= Stage.GrandFinals; stage++)
+        <div class="bracket">
+            @foreach (var stage in Stages())
             {
-                <div>
-                    <TournamentStage TournamentModel="TournamentModel" Stage="stage" TournamentMatches="@TournamentMatches"></TournamentStage>
-                </div>
+                var stageMatches = _matches.Where(m => m.Stage == stage).ToList();
+                <Panel Title="@stage.GetStageName()" Meta="@($"{stageMatches.Count}")" Class="bracket-stage">
+                    @if (stageMatches.Count == 0)
+                    {
+                        @if (_tournament.CurrentStage + 1 == stage)
+                        {
+                            <UmButton Size="sm" Icon="bi-magic" OnClick="GenerateMatchesAsync">Generate matches</UmButton>
+                        }
+                        else
+                        {
+                            <div class="bracket-empty">Not played yet.</div>
+                        }
+                    }
+                    @foreach (var match in stageMatches)
+                    {
+                        <div class="bracket-match @(match.IsPlanned ? "is-planned" : null)"
+                             @onclick="@(() => OpenMatch(match))">
+                            @foreach (var fighter in match.Fighters)
+                            {
+                                <div class="bracket-fighter">
+                                    <FighterChip ImageUrl="@fighter.HeroImageUrl" PlayerAvatarUrl="@fighter.PlayerImageUrl"
+                                                 IsWinner="@(match.IsPlanned || fighter.IsWinner)" Size="26"
+                                                 Title="@fighter.Hero?.Name"/>
+                                    <span class="bracket-name">@fighter.Hero?.Name</span>
+                                    <span class="bracket-hp">@(match.IsPlanned ? "–" : fighter.HpLeft?.ToString() ?? "–")</span>
+                                </div>
+                            }
+                            <div class="bracket-meta">
+                                @(match.Map?.DisplayName ?? "No map") · @match.Date.ToString("dd MMM yyyy")
+                            </div>
+                        </div>
+                    }
+                </Panel>
             }
         </div>
     }
     else
     {
-        <MatchLogGrid MatchLogEntries="LeagueMatches"></MatchLogGrid>
+        <MatchList Matches="_leagueMatches" Title="Matches" PageSize="10"
+                   Meta="@($"{_leagueMatches.Count} matches")"/>
     }
 </div>
 
 @code {
     [Parameter]
-    public string Id { get; set; } = "";
+    public string Id { get; set; } = string.Empty;
 
-    private TournamentDto TournamentModel { get; set; } = new ();
-    private List<UiMatchDto> TournamentMatches { get; set; } = new();
-    private List<UiMatchLogDto> LeagueMatches { get; set; } = new();
-    
-    [Inject] protected PreloadService PreloadService { get; set; }
-    
-    protected override async Task OnInitializedAsync()
+    private TournamentDto _tournament = new();
+    private List<UiMatchDto> _matches = new();
+    private List<UiMatchLogDto> _leagueMatches = new();
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private IReadOnlyList<Breadcrumb.Crumb> Crumbs =>
+    [
+        new("Tournaments", Urls.Tournaments), new(_tournament.Name ?? string.Empty)
+    ];
+
+    private IEnumerable<Stage> Stages()
     {
+        for (var stage = _tournament.InitialStage; stage <= Stage.GrandFinals; stage++)
+        {
+            yield return stage;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!Guid.TryParse(Id, out var tournamentId) || tournamentId == Guid.Empty)
+        {
+            return;
+        }
+
         try
         {
             PreloadService.Show();
-            Guid.TryParse(Id, out var tournamentId);
-            if (tournamentId == Guid.Empty)
-            {
-                return;
-            }
-            
-            TournamentModel = await TournamentService.GetAsync(tournamentId);
-            TournamentMatches = (await MatchService.GetByTournamentIdAsync(tournamentId)).ToList();
-            LeagueMatches = (await MatchService.GetMatchLogAsync())
-                .Where(m => m.TournamentName == TournamentModel.Name)
-                .OrderByDescending(x => x.Date)
+
+            _tournament = await TournamentService.GetAsync(tournamentId);
+            _matches = (await MatchService.GetByTournamentIdAsync(tournamentId)).ToList();
+
+            _leagueMatches = (await MatchService.GetMatchLogAsync())
+                .Where(m => m.TournamentName == _tournament.Name)
+                .OrderByDescending(m => m.Date)
                 .ToList();
-            
-            foreach (var matchLogEntry in LeagueMatches)
-            {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderBy(x => x.Turn);
-            }
         }
         finally
         {
             PreloadService.Hide();
         }
     }
-}
 
-<style>
-    .net {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
+    private async Task GenerateMatchesAsync()
+    {
+        await TournamentService.GenerateMatchesAsync(_tournament.Id);
+        await OnParametersSetAsync();
     }
-    
-    .tournament-background {
-        background-image: url('@($"./{TournamentModel.Name}.jpg")');
-        background-repeat: no-repeat;
-        background-size: cover;
-        height: 100vh;
+
+    /// <summary>Only a planned match is worth opening - it is the one still waiting for a result.</summary>
+    private void OpenMatch(UiMatchDto match)
+    {
+        if (match.IsPlanned)
+        {
+            NavManager.NavigateTo($"{Urls.Match}/{match.Id}");
+        }
     }
-</style>
+}

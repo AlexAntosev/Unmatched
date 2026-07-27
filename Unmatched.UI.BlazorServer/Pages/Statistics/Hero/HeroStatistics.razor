@@ -271,12 +271,19 @@
     /// </summary>
     private void BuildRatingPoints()
     {
-        var points = _ratingChanges.Select(c => new ChartPoint(c.Date, c.RatingDelta)).ToList();
+        var points = _ratingChanges.Select(c => new ChartPoint(AxisLabel(c.Date), c.RatingDelta)).ToList();
 
         // The range switch trims from the end because the series is ordered oldest to newest.
         var take = _ratingMonths == 0 ? points.Count : Math.Max(2, _ratingMonths * 4);
         _ratingPoints = points.TakeLast(take).ToList();
     }
+
+    /// <summary>
+    /// The match service formats these as short dates and caps the series with a literal "Current",
+    /// so anything that parses becomes a month and everything else is passed through.
+    /// </summary>
+    private static string AxisLabel(string date)
+        => DateTime.TryParse(date, out var parsed) ? parsed.ToString("MMM yy") : date;
 
     private void BuildMonsterMatchups()
     {

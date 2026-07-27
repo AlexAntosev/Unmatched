@@ -1,0 +1,61 @@
+.titles-new {
+    width: 200px;
+}
+
+.titles-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 12px;
+    border-radius: var(--um-radius-row);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.titles-row > i {
+    font-size: 14px;
+    color: var(--um-gold);
+}
+
+.titles-names {
+    flex: 1;
+    min-width: 0;
+}
+
+.titles-name {
+    font: 600 13px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.titles-comment {
+    margin-top: 2px;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.titles-empty {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.titles-assign {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.titles-assign-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: var(--um-radius-md);
+    font: 500 12.5px var(--um-font-body);
+    color: var(--um-text);
+    cursor: pointer;
+}
+
+.titles-assign-row:hover {
+    background: var(--um-bg-hover);
+}

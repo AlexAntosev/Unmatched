@@ -7,8 +7,6 @@ using Amazon.S3.Util;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Options;
 
-using Syncfusion.Blazor;
-
 using Unmatched.Registration;
 using Unmatched.UI.BlazorServer;
 using Unmatched.UI.BlazorServer.Services;
@@ -24,7 +22,6 @@ builder.Services.AddServerSideBlazor().AddHubOptions(options =>
 });
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.RegisterMapping();
-builder.Services.AddSyncfusionBlazor();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<RatingRecalculationStateNotifier>();

@@ -1,0 +1,49 @@
+.fighter {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+}
+
+.fighter-selects {
+    width: 170px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.fighter-stats {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.fighter-narrow {
+    width: 58px;
+    flex: none;
+}
+
+.fighter-place {
+    width: 74px;
+    flex: none;
+}
+
+.fighter-remove {
+    padding: 0 2px 7px;
+    border: 0;
+    background: none;
+    color: var(--um-text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.12s ease;
+}
+
+.fighter-remove:hover {
+    color: var(--um-loss);
+}
