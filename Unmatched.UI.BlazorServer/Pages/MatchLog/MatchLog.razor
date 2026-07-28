@@ -4,12 +4,14 @@
 @using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
+@using Unmatched.UI.BlazorServer.Services
 @inject IMatchService MatchService
 @inject IPlayerService PlayerService
 @inject IHeroService HeroService
 @inject IMapService MapService
 @inject ITournamentService TournamentService
 @inject NavigationManager NavigationManager
+@inject AppSettingsService AppSettingsService
 @*
     Screen 6a. The whole log is loaded once and filtered in memory - at this app's volume that is
     cheaper and simpler than a request per keystroke, and it keeps the KPI strip in agreement with
@@ -40,51 +42,27 @@
                       Value="_filter.Mode" ValueChanged="OnModeChanged"/>
     <div class="log-filters-divider"></div>
 
-    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-people" Value="_filter.PlayerId" ValueChanged="OnPlayerChanged">
-        <option value="">All players</option>
-        @foreach (var player in _players)
-        {
-            <option value="@player.Id">@player.Name</option>
-        }
-    </UmSelect>
+    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-people" Value="_filter.PlayerId" ValueChanged="OnPlayerChanged"
+              Options="PlayerOptions()"/>
 
-    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-shield" Value="_filter.HeroId" ValueChanged="OnHeroChanged">
-        <option value="">All heroes</option>
-        @foreach (var hero in _heroes)
-        {
-            <option value="@hero.Id">@hero.Name</option>
-        }
-    </UmSelect>
+    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-shield" Value="_filter.HeroId" ValueChanged="OnHeroChanged"
+              Options="HeroOptions()"/>
 
-    <UmSelect TValue="string" Variant="chip" Icon="bi-map" Value="@_filter.MapName" ValueChanged="OnMapChanged">
-        <option value="">All maps</option>
-        @foreach (var map in _maps)
-        {
-            <option value="@map.Name">@map.DisplayName</option>
-        }
-    </UmSelect>
+    <UmSelect TValue="string" Variant="chip" Icon="bi-map" Value="@_filter.MapName" ValueChanged="OnMapChanged"
+              Options="MapOptions()"/>
 
-    <UmSelect TValue="string" Variant="chip" Icon="bi-flag" Value="@_filter.TournamentName" ValueChanged="OnTournamentChanged">
-        <option value="">All tournaments</option>
-        @foreach (var tournament in _tournaments)
-        {
-            <option value="@tournament.Name">@tournament.Name</option>
-        }
-    </UmSelect>
+    <UmSelect TValue="string" Variant="chip" Icon="bi-flag" Value="@_filter.TournamentName" ValueChanged="OnTournamentChanged"
+              Options="TournamentOptions()"/>
 
-    <UmSelect TValue="string" Variant="chip" Icon="bi-calendar3" Value="@_range" ValueChanged="OnRangeChanged">
-        @foreach (var range in DateRanges)
-        {
-            <option value="@range.Value">@range.Label</option>
-        }
-    </UmSelect>
+    <UmSelect TValue="string" Variant="chip" Icon="bi-calendar3" Value="@_range" ValueChanged="OnRangeChanged"
+              Options="RangeOptions"/>
 
     <div class="um-spacer"></div>
     <div class="log-count">@($"{_filtered.Count} of {_all.Count} matches")</div>
 </div>
 
 <div class="log-body">
-    <MatchList Matches="_filtered"/>
+    <MatchList Matches="_filtered" PageSize="_pageSize" AllowPageSizeControl="true" PageSizeChanged="OnPageSizeChanged"/>
 </div>
 
 @code {
@@ -99,9 +77,9 @@
         new(GameMode.Cooperative, "Co-op", "bi-shield-fill", "var(--um-mode-coop)")
     ];
 
-    private static readonly IReadOnlyList<(string Value, string Label)> DateRanges =
+    private static readonly IReadOnlyList<SelectOption<string>> RangeOptions =
     [
-        ("", "All time"), ("30", "Last 30 days"), ("90", "Last 3 months"), ("365", "Last year")
+        new(null!, "All time"), new("30", "Last 30 days"), new("90", "Last 3 months"), new("365", "Last year")
     ];
 
     private readonly MatchLogFilter _filter = new();
@@ -114,9 +92,21 @@
     private List<Dtos.Match.TournamentDto> _tournaments = new();
     private MatchLogMetrics _metrics = MatchLogMetrics.Empty;
     private string? _range = string.Empty;
+    private int _pageSize = 10;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // The default seeds from Settings; the footer's segmented control only overrides it
+            // for this session, so it is never written back here.
+            _pageSize = await AppSettingsService.GetMatchesPerPageAsync();
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -148,6 +138,26 @@
     }
 
     private void ApplyFilter() => _filtered = _filter.Apply(_all).ToList();
+
+    private IReadOnlyList<SelectOption<Guid?>> PlayerOptions()
+        => new SelectOption<Guid?>[] { new(null, "All players") }
+            .Concat(_players.Select(p => new SelectOption<Guid?>(p.Id, p.Name ?? "Unknown", AvatarUrl: p.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<Guid?>> HeroOptions()
+        => new SelectOption<Guid?>[] { new(null, "All heroes") }
+            .Concat(_heroes.Select(h => new SelectOption<Guid?>(h.Id, h.Name, ArtUrl: h.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<string>> MapOptions()
+        => new SelectOption<string>[] { new(null!, "All maps") }
+            .Concat(_maps.Select(m => new SelectOption<string>(m.Name, m.DisplayName)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<string>> TournamentOptions()
+        => new SelectOption<string>[] { new(null!, "All tournaments") }
+            .Concat(_tournaments.Select(t => new SelectOption<string>(t.Name, t.Name)))
+            .ToList();
 
     private void OnModeChanged(GameMode? mode)
     {
@@ -193,4 +203,6 @@
     }
 
     private void GoToAddMatch() => NavigationManager.NavigateTo(Urls.AddMatch);
+
+    private void OnPageSizeChanged(int size) => _pageSize = size;
 }

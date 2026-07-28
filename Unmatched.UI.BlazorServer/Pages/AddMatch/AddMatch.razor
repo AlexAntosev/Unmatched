@@ -98,35 +98,17 @@
 
             <UmField Label="Map">
                 <UmSelect TValue="Guid" Icon="bi-map" Value="@(_match.Map?.Id ?? Guid.Empty)"
-                          ValueChanged="SetMap" OnRandomize="RandomizeMap">
-                    <option value="@Guid.Empty">Map…</option>
-                    @foreach (var map in _maps)
-                    {
-                        <option value="@map.Id">@map.DisplayName</option>
-                    }
-                </UmSelect>
+                          ValueChanged="SetMap" OnRandomize="RandomizeMap" Options="MapOptions()"/>
             </UmField>
 
             <UmField Label="Tournament">
                 <UmSelect TValue="Guid?" Icon="bi-flag" Value="_match.TournamentId"
-                          ValueChanged="@(id => _match.TournamentId = id)">
-                    <option value="">No tournament</option>
-                    @foreach (var tournament in _tournaments)
-                    {
-                        <option value="@tournament.Id">@tournament.Name</option>
-                    }
-                </UmSelect>
+                          ValueChanged="@(id => _match.TournamentId = id)" Options="TournamentOptions()"/>
             </UmField>
 
             <UmField Label="Stage">
                 <UmSelect TValue="Stage?" Icon="bi-diagram-2" Value="_match.Stage"
-                          ValueChanged="@(stage => _match.Stage = stage)">
-                    <option value="">No stage</option>
-                    @foreach (var stage in Stages)
-                    {
-                        <option value="@stage">@stage.GetStageName()</option>
-                    }
-                </UmSelect>
+                          ValueChanged="@(stage => _match.Stage = stage)" Options="StageOptions"/>
             </UmField>
 
             <div class="add-when">
@@ -191,6 +173,11 @@
     [
         Stage.EighthFinals, Stage.QuarterFinals, Stage.SemiFinals, Stage.ThirdPlaceDecider, Stage.GrandFinals
     ];
+
+    private static readonly IReadOnlyList<SelectOption<Stage?>> StageOptions =
+        new SelectOption<Stage?>[] { new(null, "No stage") }
+            .Concat(Stages.Select(stage => new SelectOption<Stage?>(stage, stage.GetStageName())))
+            .ToList();
 
     private UiMatchDto _match = new()
         {
@@ -506,6 +493,16 @@
         => _match.Fighters = _match.Fighters.Where(f => f != fighter).ToList();
 
     // ---- Details ----
+
+    private IReadOnlyList<SelectOption<Guid>> MapOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Map…") }
+            .Concat(_maps.Select(m => new SelectOption<Guid>(m.Id, m.DisplayName, ArtUrl: m.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<Guid?>> TournamentOptions()
+        => new SelectOption<Guid?>[] { new(null, "No tournament") }
+            .Concat(_tournaments.Select(t => new SelectOption<Guid?>(t.Id, t.Name)))
+            .ToList();
 
     private void SetMap(Guid mapId) => _match.Map = _maps.FirstOrDefault(m => m.Id == mapId);
 

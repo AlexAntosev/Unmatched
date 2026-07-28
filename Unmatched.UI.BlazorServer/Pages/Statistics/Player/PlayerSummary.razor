@@ -13,14 +13,14 @@
         @if (ChosenOne?.Hero is not null)
         {
             <span class="player-chosen">
-                <i class="bi bi-star-fill"></i>Chosen one · @ChosenOne.Hero.Name
+                <i class="bi bi-bookmark-star-fill"></i>@ChosenOne.Hero.Name main
             </span>
         }
     </Chips>
     <Stats>
-        <StatTile Label="Matches" Value="@Statistics.TotalMatches.ToString()"/>
-        <StatTile Label="Wins" Value="@Statistics.TotalWins.ToString()" ValueColor="var(--um-win)"/>
-        <StatTile Label="Losses" Value="@Statistics.TotalLooses.ToString()" ValueColor="var(--um-loss)"/>
+        <StatTile Label="Matches" Value="@Statistics.TotalMatches.ToString()" Sub="@HeroesPlayedSub"/>
+        <StatTile Label="Win rate" Value="@($"{WinRate}%")" ValueColor="@(WinRate >= 50 ? "var(--um-win)" : "var(--um-loss)")"
+                  Sub="@($"{Statistics.TotalWins} W · {Statistics.TotalLooses} L")"/>
         <StatTile Label="K/D" Value="@Statistics.Kd.ToString("0.00")"
                   ValueColor="@(Statistics.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")"/>
     </Stats>
@@ -38,12 +38,17 @@
     [Parameter]
     public FavoriteStatisticsDto? ChosenOne { get; set; }
 
+    [Parameter]
+    public int HeroesPlayedCount { get; set; }
+
     private int _cacheBust;
 
     private int WinRate
         => Statistics.TotalMatches == 0
             ? 0
             : (int)Math.Round((double)Statistics.TotalWins / Statistics.TotalMatches * 100);
+
+    private string HeroesPlayedSub => $"{HeroesPlayedCount} heroes played";
 
     private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
 

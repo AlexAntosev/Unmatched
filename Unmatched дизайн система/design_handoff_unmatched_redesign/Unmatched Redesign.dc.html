@@ -32,6 +32,257 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 @keyframes umpulse{0%,100%{opacity:.55}50%{opacity:1}}
 </style></helmet>
 
+<section class="dv-turn" id="t7">
+<div class="dv-thd"><a class="dv-tid" href="#t7">7</a><span class="dv-tname">Player profile — and three fixes to shipped screens</span></div>
+<p class="dv-note">A player is not a hero, so the page is built around <b>who they beat and what they play</b>, not one character sheet: identity band, five metrics, rating line, mode split, favourite heroes capped at six with a link out, rivals as head-to-head bars, best maps, titles, recent matches. Fixes folded into the existing screens: <b>epic stars</b> now render empty stars as hollow outlines instead of dim glyphs, the <b>match comment</b> has a home in the expanded scoreboard (plus a small icon in the row when one exists), <b>Matchups</b> on the hero page pages through every opponent with ‹ › sorted by win rate, and the match-log footer carries a <b>per-page</b> control (10 / 20 / 50 / 100) whose default lives in Settings.</p>
+<div class="dv-opts">
+  <div class="dv-opt" id="7a">
+    <div class="dv-olabel"><a class="dv-oid" href="#7a">7a</a>Player profile</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="display:flex;min-height:1180px;background:#0a0a10">
+
+        <div style="width:{{ navW }}px;flex:none;background:#0c0c14;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column;gap:16px;transition:width .18s ease">
+          <div style="display:flex;align-items:center;justify-content:center;height:{{ navHeaderH }}px;padding:0 4px">
+            <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
+            <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
+          </div>
+          <sc-for list="{{ navGroupsPlayer }}" as="g" hint-placeholder-count="0">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
+                <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
+                  <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
+                  <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
+                  <div style="flex:1"></div>
+                  <span style="display:{{ navLabelDisplay }};font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ n.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div onClick="{{ navToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;font:500 11.5px Barlow,sans-serif;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)">
+            <i class="bi {{ navToggleIcon }}" style="font-size:12px"></i><span style="display:{{ navLabelDisplay }}">Collapse</span>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:8px;font:400 12px Barlow,sans-serif;color:#6b6c7e">
+              <span style="color:#8b8c9e">Statistics</span><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#8b8c9e">Players</span><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#ecedf2;font-weight:600">{{ pl.name }}</span>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi bi-chevron-left" style="font-size:10px"></i>Ksuha</div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">Oleksandr<i class="bi bi-chevron-right" style="font-size:10px"></i></div>
+            
+          </div>
+
+          <div style="display:flex;align-items:center;gap:22px;padding:22px 26px;border-bottom:1px solid rgba(255,255,255,.07);background:linear-gradient(105deg,rgba(108,92,255,.14),rgba(168,85,247,.05) 45%,transparent 78%)">
+            <img src="assets/players/andrii.png" alt="{{ pl.name }}" style="width:92px;height:92px;flex:none;border-radius:50%;object-fit:cover;border:2px solid rgba(139,125,255,.5);box-shadow:0 8px 26px rgba(0,0,0,.5)">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:baseline;gap:12px">
+                <div style="font:700 30px/1 Chakra Petch,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:#ecedf2">{{ pl.name }}</div>
+                <div style="display:flex;align-items:baseline;gap:5px;padding:3px 9px;border-radius:7px;background:rgba(240,180,41,.14)">
+                  <span style="font:700 13px Chakra Petch,sans-serif;color:#f0b429">{{ pl.rank }}</span>
+                  <span style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ pl.rankOf }}</span>
+                </div>
+              </div>
+              <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">{{ pl.meta }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px">
+                <sc-for list="{{ pl.titles }}" as="t" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);font:500 11px Barlow,sans-serif;color:#c9cad6">
+                    <i class="bi {{ t.icon }}" style="font-size:11px;color:{{ t.color }}"></i>{{ t.label }}
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 26px">
+            <sc-for list="{{ plKpis }}" as="k" hint-placeholder-count="0">
+              <div style="padding:14px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
+                <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">{{ k.label }}</div>
+                <div style="font:700 24px Chakra Petch,sans-serif;color:{{ k.color }};margin-top:4px;white-space:nowrap">{{ k.value }}</div>
+                <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;margin-top:3px;white-space:nowrap">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;padding:0 26px 18px">
+            
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:13px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">By game mode</div>
+              <sc-for list="{{ plModes }}" as="m" hint-placeholder-count="0">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font:600 11.5px Barlow,sans-serif;color:#ecedf2;width:38px">{{ m.label }}</span>
+                    <span style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;flex:1">{{ m.matches }} matches</span>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:{{ m.pctColor }}">{{ m.pct }}%</span>
+                  </div>
+                  <div style="height:6px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden"><div style="height:100%;width:{{ m.bar }};background:{{ m.color }};border-radius:3px"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding:0 26px 18px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Heroes played</div>
+                <div style="display:flex;align-items:center;gap:6px;padding:3px 9px;border-radius:7px;background:rgba(240,180,41,.13);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;color:#f0b429"><i class="bi bi-bookmark-star-fill" style="font-size:10px"></i>MAIN · {{ plMainName }}</div>
+                <div style="flex:1"></div>
+                <div style="display:flex;align-items:center;gap:8px;height:30px;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)">
+                  <i class="bi bi-search" style="font-size:10px;color:#5c5d70"></i><span style="font:400 11.5px Barlow,sans-serif;color:#5c5d70">Filter heroes…</span>
+                </div>
+                <div style="display:flex;gap:2px;padding:3px;border-radius:9px;background:rgba(255,255,255,.04)">
+                  <sc-for list="{{ plHeroSorts }}" as="z" hint-placeholder-count="0">
+                    <div onClick="{{ z.onClick }}" style="padding:4px 10px;border-radius:7px;background:{{ z.bg }};font:500 10.5px IBM Plex Mono,monospace;color:{{ z.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ z.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70;white-space:nowrap">{{ plHeroCount }}</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 92px 118px 52px 52px 76px 116px;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
+                <div>Hero</div><div style="text-align:right">Matches</div><div style="text-align:center">W / L</div><div style="text-align:right">Win %</div><div style="text-align:right">K/D</div><div style="text-align:center">Main</div><div style="text-align:right">My rating</div>
+              </div>
+              <div style="max-height:430px;overflow-y:auto">
+                <sc-for list="{{ plHeroes }}" as="h" hint-placeholder-count="0">
+                  <div style="display:grid;grid-template-columns:1fr 92px 118px 52px 52px 76px 116px;gap:12px;align-items:center;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);background:{{ h.rowBg }}" style-hover="background:rgba(255,255,255,.045)">
+                    <div style="display:flex;align-items:center;gap:11px;min-width:0;cursor:pointer">
+                      <img src="{{ h.art }}" alt="" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;border:1.5px solid {{ h.ring }}">
+                      <span style="font:600 12.5px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.name }}</span>
+                      <img src="{{ h.typeIcon }}" alt="" style="width:12px;height:12px;filter:invert(1);opacity:.45;flex:none">
+                    </div>
+                    <div style="text-align:right;font:400 11px IBM Plex Mono,monospace;color:#8b8c9e">{{ h.matches }}</div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span style="font:500 10px IBM Plex Mono,monospace;color:#34d99b;width:14px;text-align:right">{{ h.wins }}</span>
+                      <div style="flex:1;height:5px;border-radius:3px;background:rgba(242,80,107,.55);overflow:hidden"><div style="height:100%;width:{{ h.barWin }};background:#34d99b;border-radius:3px"></div></div>
+                      <span style="font:500 10px IBM Plex Mono,monospace;color:#f2506b;width:14px">{{ h.losses }}</span>
+                    </div>
+                    <div style="text-align:right;font:600 11.5px IBM Plex Mono,monospace;color:{{ h.pctColor }}">{{ h.pct }}%</div>
+                    <div style="text-align:right;font:600 11.5px IBM Plex Mono,monospace;color:{{ h.kdColor }}">{{ h.kd }}</div>
+                    <div style="display:flex;justify-content:center">
+                      <div onClick="{{ h.setMain }}" title="{{ h.mainTitle }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid {{ h.mainBorder }};background:{{ h.mainBg }};color:{{ h.mainFg }};cursor:pointer" style-hover="border-color:rgba(240,180,41,.6)">
+                        <i class="bi {{ h.mainIcon }}" style="font-size:12px"></i>
+                      </div>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:3px">
+                      <sc-for list="{{ h.rating }}" as="st" hint-placeholder-count="0">
+                        <i onClick="{{ st.onClick }}" class="bi {{ st.icon }}" title="{{ st.title }}" style="font-size:13px;color:{{ st.color }};cursor:pointer"></i>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid rgba(255,255,255,.05);font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70">
+                <i class="bi bi-bookmark-star" style="font-size:11px"></i>One main per player · personal rating is subjective, 1–5, and never feeds the ladder
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 26px 18px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Rivals</div>
+              <sc-for list="{{ plRivals }}" as="r" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <img src="{{ r.avatar }}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none">
+                  <div style="flex:1;min-width:0">
+                    <div style="font:600 12px Barlow,sans-serif;color:#ecedf2">{{ r.name }}</div>
+                    <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ r.total }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:7px;flex:none;width:150px">
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:#34d99b;width:16px;text-align:right">{{ r.wins }}</span>
+                    <div style="flex:1;height:6px;border-radius:3px;background:rgba(242,80,107,.55);overflow:hidden"><div style="height:100%;width:{{ r.barWin }};background:#34d99b;border-radius:3px"></div></div>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:#f2506b;width:16px">{{ r.losses }}</span>
+                  </div>
+                  <span style="font:600 11.5px IBM Plex Mono,monospace;color:{{ r.pctColor }};width:34px;text-align:right;flex:none">{{ r.pct }}%</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Best maps</div>
+              <sc-for list="{{ plMaps }}" as="m" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <img src="{{ m.art }}" alt="" style="width:44px;height:30px;border-radius:7px;object-fit:cover;flex:none;background:#16161f">
+                  <span style="flex:1;min-width:0;font:500 12px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                  <span style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;flex:none">{{ m.matches }} pl.</span>
+                  <div style="width:56px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;flex:none"><div style="height:100%;width:{{ m.bar }};background:{{ m.pctColor }};border-radius:3px"></div></div>
+                  <span style="font:600 11px IBM Plex Mono,monospace;color:{{ m.pctColor }};width:34px;text-align:right;flex:none">{{ m.pct }}%</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding:0 26px 22px;display:grid;grid-template-columns:1fr;gap:16px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Titles earned</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <sc-for list="{{ plTitles }}" as="t" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)">
+                    <i class="bi {{ t.icon }}" style="font-size:17px;color:{{ t.color }};flex:none"></i>
+                    <div style="min-width:0">
+                      <div style="font:600 12px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.name }}</div>
+                      <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;margin-top:2px">{{ t.sub }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:0 26px 22px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Andrii's matches</div>
+                <div style="flex:1"></div>
+                <div style="display:flex;gap:8px">
+                  <sc-for list="{{ plMatchTallies }}" as="t" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:baseline;gap:5px;padding:3px 9px;border-radius:7px;background:{{ t.bg }};font:600 10px IBM Plex Mono,monospace;letter-spacing:.08em;color:{{ t.fg }}">{{ t.label }}<span style="font:700 12px Chakra Petch,sans-serif">{{ t.value }}</span></div>
+                  </sc-for>
+                </div>
+                <a href="#6a" style="font:500 10.5px IBM Plex Mono,monospace;color:#8b7dff">FULL LOG →</a>
+              </div>
+              <div style="display:grid;grid-template-columns:82px 46px 78px 1fr 108px 62px 58px;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
+                <div>Date</div><div>Mode</div><div>Result</div><div>Played · against</div><div>Map</div><div style="text-align:right">HP left</div><div style="text-align:right">Epic</div>
+              </div>
+              <sc-for list="{{ plMatches }}" as="m" hint-placeholder-count="0">
+                <div style="display:grid;grid-template-columns:82px 46px 78px 1fr 108px 62px 58px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.edge }};background:{{ m.bg }};cursor:pointer" style-hover="background:{{ m.bgHover }}">
+                  <div><div style="font:400 11px IBM Plex Mono,monospace;color:#c9cad6">{{ m.date }}</div><div style="font:400 9px IBM Plex Mono,monospace;color:#5c5d70;margin-top:1px">{{ m.time }}</div></div>
+                  <div style="font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;color:{{ m.modeColor }}">{{ m.mode }}</div>
+                  <div><div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.resultBg }};font:700 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.resultFg }}"><i class="bi {{ m.resultIcon }}" style="font-size:9px"></i>{{ m.result }}</div></div>
+                  <div style="display:flex;align-items:center;gap:9px;min-width:0">
+                    <img src="{{ m.art }}" alt="" style="width:26px;height:26px;border-radius:8px;object-fit:cover;flex:none;border:1.5px solid {{ m.ring }}">
+                    <span style="font:600 12px Barlow,sans-serif;white-space:nowrap;flex:none">{{ m.hero }}</span>
+                    <span style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;flex:none">vs</span>
+                    <div style="display:flex;align-items:center;gap:6px;min-width:0">
+                      <sc-for list="{{ m.opponents }}" as="o" hint-placeholder-count="0">
+                        <div style="display:flex;align-items:center;gap:5px;padding:2px 7px 2px 2px;border-radius:20px;background:rgba(255,255,255,.045)">
+                          <img src="{{ o.art }}" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover">
+                          <span style="font:500 10.5px Barlow,sans-serif;color:#c9cad6;white-space:nowrap">{{ o.name }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
+                  <div style="text-align:right;font:600 11.5px IBM Plex Mono,monospace"><span style="color:{{ m.hpColor }}">{{ m.hp }}</span><span style="color:#5c5d70"> / {{ m.oppHp }}</span></div>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                    <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70">
+                <span>Showing 6 of 168</span><div style="flex:1"></div>
+                <span style="color:#8b7dff;cursor:pointer">Load more</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-next">Try next: "settings page" · "Maps / Villains / Minions lists" · "hover preview in the ladder"</p>
+</section>
+
 <section class="dv-turn" id="t6">
 <div class="dv-thd"><a class="dv-tid" href="#t6">6</a><span class="dv-tname">Match log — the full page</span></div>
 <p class="dv-note">The row from <a class="dv-oid" href="#3b">3b</a> promoted to a page: mode filter that actually filters, a filter strip for player / hero / map / tournament / date, a four-metric header, and grouped by date so a session reads as one block. Click any row to open the full scoreboard — every participant, villain and minions included.</p>
@@ -46,10 +297,10 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
             <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
             <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
           </div>
-          <sc-for list="{{ navGroupsLog }}" as="g" hint-placeholder-count="2">
+          <sc-for list="{{ navGroupsLog }}" as="g" hint-placeholder-count="0">
             <div style="display:flex;flex-direction:column;gap:3px">
               <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
-              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="5">
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
                 <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
                   <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
                   <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
@@ -81,7 +332,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
           </div>
 
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
-            <sc-for list="{{ logKpis }}" as="k" hint-placeholder-count="4">
+            <sc-for list="{{ logKpis }}" as="k" hint-placeholder-count="0">
               <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
                 <i class="bi {{ k.icon }}" style="font-size:16px;color:#8b7dff"></i>
                 <div style="min-width:0">
@@ -96,14 +347,14 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 
           <div style="display:flex;align-items:center;gap:10px;padding:14px 26px;border-bottom:1px solid rgba(255,255,255,.07);flex-wrap:wrap">
             <div style="display:flex;gap:6px;padding:3px;border-radius:10px;background:rgba(255,255,255,.04)">
-              <sc-for list="{{ logModeFilters }}" as="f" hint-placeholder-count="5">
+              <sc-for list="{{ logModeFilters }}" as="f" hint-placeholder-count="0">
                 <div onClick="{{ f.onClick }}" style="display:flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:8px;background:{{ f.bg }};border:1px solid {{ f.border }};font:600 11.5px Barlow,sans-serif;color:{{ f.fg }};cursor:pointer" style-hover="color:#ecedf2">
                   <i class="bi {{ f.icon }}" style="font-size:11px;color:{{ f.color }}"></i>{{ f.label }}
                 </div>
               </sc-for>
             </div>
             <div style="width:1px;height:22px;background:rgba(255,255,255,.08)"></div>
-            <sc-for list="{{ logChips }}" as="c" hint-placeholder-count="5">
+            <sc-for list="{{ logChips }}" as="c" hint-placeholder-count="0">
               <div style="display:flex;align-items:center;gap:7px;height:28px;padding:0 11px;border-radius:8px;border:1px solid rgba(255,255,255,.07);font:500 11.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.4)">
                 <i class="bi {{ c.icon }}" style="font-size:11px"></i>{{ c.label }}<i class="bi bi-chevron-down" style="font-size:8px;opacity:.6"></i>
               </div>
@@ -114,20 +365,20 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 
           <div style="flex:1;padding:18px 26px 22px">
             <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
-              <div style="display:grid;grid-template-columns:82px 84px 1fr 116px 60px 24px;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
-                <div>Date</div><div>Mode</div><div>Participants</div><div>Map</div><div style="text-align:right">Epic</div><div></div>
+              <div style="display:grid;grid-template-columns:82px 84px 1fr 116px 22px 58px 24px;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
+                <div>Date</div><div>Mode</div><div>Participants</div><div>Map</div><div></div><div style="text-align:right">Epic</div><div></div>
               </div>
               <sc-for list="{{ logPage }}" as="m" hint-placeholder-count="0">
                 <div style="border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.neutralEdge }}">
-                  <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:82px 84px 1fr 116px 60px 24px;gap:12px;align-items:center;padding:12px 16px;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
+                  <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:82px 84px 1fr 116px 22px 58px 24px;gap:12px;align-items:center;padding:12px 16px;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
                     <div><div style="font:400 11px IBM Plex Mono,monospace;color:#c9cad6">{{ m.date }}</div><div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;margin-top:2px">{{ m.time }}</div></div>
                     <div><div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.mode.bg }};font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.mode.color }}"><i class="bi {{ m.mode.icon }}" style="font-size:10px"></i>{{ m.mode.label }}</div></div>
                     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0">
-                      <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="2">
+                      <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="0">
                         <div style="display:flex;align-items:center;gap:8px">
                           <div style="display:{{ g.sepDisplay }};align-items:center;justify-content:center;font:600 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ g.sepLabel }}</div>
                           <div style="display:flex;align-items:center;gap:6px">
-                            <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="1">
+                            <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="0">
                               <div title="{{ c.name }}" style="position:relative;opacity:{{ c.opacity }}">
                                 <img src="{{ c.art }}" alt="{{ c.name }}" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid {{ c.border }}">
                                 <img src="{{ c.playerAvatar }}" alt="{{ c.player }}" style="display:{{ c.playerDisplay }};position:absolute;bottom:-3px;right:-4px;width:15px;height:15px;border-radius:50%;object-fit:cover;border:1.5px solid #101018">
@@ -139,7 +390,10 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                       </sc-for>
                     </div>
                     <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
-                    <div style="text-align:right;font:600 11px Chakra Petch,sans-serif;color:#f0b429">{{ m.epic }}</div>
+                    <div title="{{ m.commentText }}" style="display:flex;align-items:center;justify-content:center"><i class="bi bi-chat-left-text-fill" style="display:{{ m.commentDisplay }};font-size:10.5px;color:#6b6c7e"></i></div>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                      <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                    </div>
                     <div style="text-align:right;color:#8b8c9e"><i class="bi {{ m.chevron }}" style="font-size:11px"></i></div>
                   </div>
                   <sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}">
@@ -151,7 +405,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                         <div style="width:52px;text-align:right">Cards</div>
                         <div style="width:118px;text-align:right">Sidekick</div>
                       </div>
-                      <sc-for list="{{ m.board.rows }}" as="r" hint-placeholder-count="4">
+                      <sc-for list="{{ m.board.rows }}" as="r" hint-placeholder-count="0">
                         <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.03);opacity:{{ r.opacity }}">
                           <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding-left:{{ r.indent }}px">
                             <div style="position:relative;flex:none">
@@ -170,14 +424,37 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                           <div style="width:118px;text-align:right;font:400 10.5px IBM Plex Mono,monospace;color:{{ r.sidekickColor }}">{{ r.sidekick }}</div>
                         </div>
                       </sc-for>
+                      <div style="display:flex;align-items:flex-start;gap:18px;margin-top:6px;padding:12px 12px;border-radius:11px;background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.05)">
+                        <div style="flex:none">
+                          <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">Epic</div>
+                          <div style="display:flex;gap:3px;margin-top:5px">
+                            <sc-for list="{{ m.epicStarsBig }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:15px;color:{{ st.color }}"></i></sc-for>
+                          </div>
+                        </div>
+                        <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.07)"></div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">Comment</div>
+                          <div style="font:400 12px/1.55 Barlow,sans-serif;color:{{ m.commentColor }};margin-top:5px;text-wrap:pretty">{{ m.commentText }}</div>
+                        </div>
+                        <div style="flex:none;display:flex;gap:7px">
+                          <div style="display:flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:8px;border:1px solid rgba(255,255,255,.08);font:500 11px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.4)"><i class="bi bi-pencil" style="font-size:10px"></i>Edit match</div>
+                        </div>
+                      </div>
                     </div>
                   </sc-if>
                 </div>
               </sc-for>
-              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px">
-                <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70">Page 1 of 161</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-top:1px solid rgba(255,255,255,.05)">
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70">{{ logPageLabel }}</div>
+                <div style="width:1px;height:18px;background:rgba(255,255,255,.08)"></div>
+                <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70">Per page</div>
+                <div style="display:flex;gap:2px;padding:3px;border-radius:9px;background:rgba(255,255,255,.04)">
+                  <sc-for list="{{ logSizes }}" as="z" hint-placeholder-count="0">
+                    <div onClick="{{ z.onClick }}" style="min-width:30px;text-align:center;padding:4px 8px;border-radius:7px;background:{{ z.bg }};font:500 11px IBM Plex Mono,monospace;color:{{ z.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ z.n }}</div>
+                  </sc-for>
+                </div>
                 <div style="flex:1"></div>
-                <sc-for list="{{ pages }}" as="p" hint-placeholder-count="4">
+                <sc-for list="{{ pages }}" as="p" hint-placeholder-count="0">
                   <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:{{ p.bg }};border:1px solid {{ p.border }};font:500 11.5px IBM Plex Mono,monospace;color:{{ p.fg }};cursor:pointer">{{ p.n }}</div>
                 </sc-for>
                 <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;cursor:pointer"><i class="bi bi-chevron-right" style="font-size:10px"></i></div>
@@ -206,10 +483,10 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
             <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
             <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
           </div>
-          <sc-for list="{{ navGroupsCol }}" as="g" hint-placeholder-count="2">
+          <sc-for list="{{ navGroupsCol }}" as="g" hint-placeholder-count="0">
             <div style="display:flex;flex-direction:column;gap:3px">
               <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
-              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="5">
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
                 <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
                   <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
                   <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
@@ -245,7 +522,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
           </div>
 
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
-            <sc-for list="{{ colKpis }}" as="k" hint-placeholder-count="4">
+            <sc-for list="{{ colKpis }}" as="k" hint-placeholder-count="0">
               <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
                 <i class="bi {{ k.icon }}" style="font-size:16px;color:#8b7dff"></i>
                 <div style="min-width:0">
@@ -287,7 +564,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                         </div>
                       </div>
                       <div style="display:flex;flex-wrap:wrap;gap:5px">
-                        <sc-for list="{{ s.chips }}" as="c" hint-placeholder-count="3">
+                        <sc-for list="{{ s.chips }}" as="c" hint-placeholder-count="0">
                           <div style="display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.05);font:500 10px IBM Plex Mono,monospace;color:{{ c.fg }}">
                             <i class="bi {{ c.icon }}" style="font-size:9px"></i>{{ c.value }}
                           </div>
@@ -296,7 +573,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                       <div style="flex:1"></div>
                       <div style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden">
                         <div style="display:flex">
-                          <sc-for list="{{ s.tokens }}" as="t" hint-placeholder-count="4">
+                          <sc-for list="{{ s.tokens }}" as="t" hint-placeholder-count="0">
                             <img src="{{ t.art }}" alt="{{ t.name }}" title="{{ t.name }}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid {{ s.tokenRing }};margin-left:-7px;opacity:{{ s.opacity }}">
                           </sc-for>
                         </div>
@@ -325,7 +602,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               </div>
 
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-                <sc-for list="{{ colOne.stats }}" as="st" hint-placeholder-count="3">
+                <sc-for list="{{ colOne.stats }}" as="st" hint-placeholder-count="0">
                   <div style="padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.045)">
                     <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">{{ st.label }}</div>
                     <div style="font:700 15px Chakra Petch,sans-serif;color:{{ st.color }};margin-top:2px">{{ st.value }}</div>
@@ -333,7 +610,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                 </sc-for>
               </div>
 
-              <sc-for list="{{ colOne.sections }}" as="sec" hint-placeholder-count="3">
+              <sc-for list="{{ colOne.sections }}" as="sec" hint-placeholder-count="0">
                 <div style="display:flex;flex-direction:column;gap:8px">
                   <div style="display:flex;align-items:center;gap:9px">
                     <i class="bi {{ sec.icon }}" style="font-size:12px;color:{{ sec.color }}"></i>
@@ -341,7 +618,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                     <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
                     <div style="font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70">{{ sec.count }}</div>
                   </div>
-                  <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="4">
+                  <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="0">
                     <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border-left:3px solid {{ r.edge }};margin-left:{{ r.indent }}px" style-hover="background:rgba(255,255,255,.06)">
                       <img src="{{ r.art }}" alt="" style="width:{{ r.artW }}px;height:30px;border-radius:{{ r.artRadius }};object-fit:cover;flex:none;background:#16161f">
                       <div style="flex:1;min-width:0">
@@ -378,7 +655,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
           <div style="font:600 14px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">Add match</div>
           <div style="flex:1"></div>
           <div style="display:flex;gap:2px;padding:3px;background:#14141c;border:1px solid rgba(255,255,255,.07);border-radius:9px">
-            <sc-for list="{{ addModes }}" as="m" hint-placeholder-count="4">
+            <sc-for list="{{ addModes }}" as="m" hint-placeholder-count="0">
               <div onClick="{{ m.onClick }}" style="display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;background:{{ m.segBg }};font:600 11px Barlow,sans-serif;color:{{ m.segFg }};cursor:pointer">
                 <i class="bi {{ m.icon }}" style="font-size:11px"></i>{{ m.short }}
               </div>
@@ -392,23 +669,23 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Participants</div>
               <div style="flex:1"></div>
               <div style="display:{{ winnerPickerDisplay }};gap:6px">
-                <sc-for list="{{ addWinnerOptions }}" as="w" hint-placeholder-count="2">
+                <sc-for list="{{ addWinnerOptions }}" as="w" hint-placeholder-count="0">
                   <div onClick="{{ w.onClick }}" style="display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:8px;background:{{ w.bg }};border:1px solid {{ w.border }};font:600 10.5px Barlow,sans-serif;color:{{ w.fg }};cursor:pointer"><i class="bi {{ w.icon }}" style="font-size:10px"></i>{{ w.label }} won</div>
                 </sc-for>
               </div>
             </div>
-            <sc-for list="{{ addSides }}" as="s" hint-placeholder-count="2">
+            <sc-for list="{{ addSides }}" as="s" hint-placeholder-count="0">
               <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border-radius:13px;background:{{ s.bg }};border:1px solid {{ s.border }}">
                 <div style="display:flex;align-items:center;gap:8px">
                   <div style="font:600 10.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ s.titleColor }}">{{ s.title }}</div>
                   <div style="flex:1"></div>
                   <div onClick="{{ s.addClick }}" style="display:{{ s.addDisplay }};align-items:center;gap:5px;padding:3px 8px;border-radius:7px;border:1px dashed rgba(255,255,255,.16);font:500 10.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)"><i class="bi bi-plus-lg" style="font-size:9px"></i>{{ s.addLabel }}</div>
                 </div>
-                <sc-for list="{{ s.fighters }}" as="f" hint-placeholder-count="1">
+                <sc-for list="{{ s.fighters }}" as="f" hint-placeholder-count="0">
                   <div style="display:flex;align-items:center;gap:11px;padding:10px;border-radius:11px;background:#101018;border:1px solid rgba(255,255,255,.08)">
                     <img src="{{ f.art }}" alt="{{ f.name }}" style="width:44px;height:44px;flex:none;border-radius:11px;object-fit:cover;border:1px solid rgba(255,255,255,.12)">
                     <div style="width:150px;flex:none;display:flex;flex-direction:column;gap:5px">
-                      <sc-for list="{{ f.fields }}" as="fd" hint-placeholder-count="2">
+                      <sc-for list="{{ f.fields }}" as="fd" hint-placeholder-count="0">
                         <div style="display:flex;align-items:center;gap:6px;height:26px;padding:0 8px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
                           <img src="{{ fd.avatar }}" alt="" style="display:{{ fd.avatarDisplay }};width:15px;height:15px;border-radius:50%;object-fit:cover">
                           <span style="flex:1;min-width:0;font:500 11.5px Barlow,sans-serif;color:{{ fd.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fd.value }}</span>
@@ -426,7 +703,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                           <i class="bi bi-chevron-down" style="font-size:9px;color:#6b6c7e"></i>
                         </div>
                       </div>
-                      <sc-for list="{{ f.stats }}" as="st" hint-placeholder-count="3">
+                      <sc-for list="{{ f.stats }}" as="st" hint-placeholder-count="0">
                         <div style="display:{{ st.display }};flex-direction:column;gap:3px;width:{{ st.w }}px">
                           <div style="font:400 8.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70">{{ st.label }}</div>
                           <div style="display:flex;align-items:center;justify-content:center;height:26px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);font:500 12px IBM Plex Mono,monospace;color:#ecedf2">{{ st.value }}</div>
@@ -460,7 +737,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <img src="assets/maps/kaer-morhen.png" alt="Kaer Morhen" style="width:100%;height:100%;object-fit:cover">
               <div style="position:absolute;left:0;right:0;bottom:0;padding:8px 11px;background:linear-gradient(180deg,rgba(8,8,12,0),rgba(8,8,12,.9));font:600 11.5px Chakra Petch,sans-serif;letter-spacing:.06em;text-transform:uppercase">Kaer Morhen</div>
             </div>
-            <sc-for list="{{ addDetailFields }}" as="d" hint-placeholder-count="5">
+            <sc-for list="{{ addDetailFields }}" as="d" hint-placeholder-count="0">
               <div>
                 <div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:4px">{{ d.label }}</div>
                 <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
@@ -473,7 +750,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
             <div>
               <div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:4px">Epic</div>
               <div style="display:flex;align-items:center;gap:7px;height:26px">
-                <sc-for list="{{ addEpic }}" as="e" hint-placeholder-count="3">
+                <sc-for list="{{ addEpic }}" as="e" hint-placeholder-count="0">
                   <i class="bi bi-star-fill" style="font-size:17px;color:{{ e.color }};cursor:pointer"></i>
                 </sc-for>
               </div>
@@ -482,7 +759,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
         </div>
 
         <div style="display:flex;align-items:center;gap:10px;padding:13px 20px;border-top:1px solid rgba(255,255,255,.07);background:#0c0c14">
-          <sc-for list="{{ addSummary }}" as="c" hint-placeholder-count="4">
+          <sc-for list="{{ addSummary }}" as="c" hint-placeholder-count="0">
             <div style="display:flex;align-items:center;gap:6px;font:400 11px IBM Plex Mono,monospace;color:#6b6c7e"><i class="bi {{ c.icon }}" style="font-size:11px"></i>{{ c.value }}</div>
           </sc-for>
           <div style="flex:1"></div>
@@ -512,17 +789,17 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
             <div style="flex:1"></div>
             <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">click any row — every mode expands</div>
           </div>
-          <sc-for list="{{ logMatches }}" as="m" hint-placeholder-count="4">
+          <sc-for list="{{ logMatches }}" as="m" hint-placeholder-count="0">
             <div style="border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.edge }};background:{{ m.rowBg }}">
-              <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:82px 84px 1fr 104px 60px 24px;gap:12px;align-items:center;padding:12px 16px;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
+              <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:82px 84px 1fr 104px 58px 24px;gap:12px;align-items:center;padding:12px 16px;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
                 <div><div style="font:400 11px IBM Plex Mono,monospace;color:#c9cad6">{{ m.date }}</div><div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;margin-top:2px">{{ m.time }}</div></div>
                 <div><div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.mode.bg }};font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.mode.color }}"><i class="bi {{ m.mode.icon }}" style="font-size:10px"></i>{{ m.mode.label }}</div></div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0">
-                  <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="2">
+                  <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="0">
                     <div style="display:flex;align-items:center;gap:8px">
                       <div style="display:{{ g.sepDisplay }};align-items:center;justify-content:center;font:600 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ g.sepLabel }}</div>
                       <div style="display:flex;align-items:center;gap:6px">
-                        <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="1">
+                        <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="0">
                           <div title="{{ c.name }}" style="position:relative;opacity:{{ c.opacity }}">
                             <img src="{{ c.art }}" alt="{{ c.name }}" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid {{ c.border }}">
                             <img src="{{ c.playerAvatar }}" alt="{{ c.player }}" style="display:{{ c.playerDisplay }};position:absolute;bottom:-3px;right:-4px;width:15px;height:15px;border-radius:50%;object-fit:cover;border:1.5px solid #101018">
@@ -535,7 +812,9 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                   
                 </div>
                 <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
-                <div style="text-align:right;font:600 11px Chakra Petch,sans-serif;color:#f0b429">{{ m.epic }}</div>
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                  <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                </div>
                 <div style="text-align:right;color:#8b8c9e"><i class="bi {{ m.chevron }}" style="font-size:11px"></i></div>
               </div>
               <sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}">
@@ -547,7 +826,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                     <div style="width:52px;text-align:right">Cards</div>
                     <div style="width:104px;text-align:right">Sidekick</div>
                   </div>
-                  <sc-for list="{{ m.board.rows }}" as="r" hint-placeholder-count="4">
+                  <sc-for list="{{ m.board.rows }}" as="r" hint-placeholder-count="0">
                     <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.03);opacity:{{ r.opacity }}">
                       <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding-left:{{ r.indent }}px">
                         <div style="position:relative;flex:none">
@@ -598,10 +877,10 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
             <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
             <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
           </div>
-          <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="2">
+          <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="0">
             <div style="display:flex;flex-direction:column;gap:3px">
               <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
-              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="5">
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
                 <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
                   <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
                   <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
@@ -658,14 +937,14 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                     <img src="assets/Melee.png" alt="Melee" style="height:22px;width:auto;filter:invert(1);opacity:.85;margin-bottom:4px">
                   </div>
                   <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-                    <sc-for list="{{ detailChips }}" as="c" hint-placeholder-count="4">
+                    <sc-for list="{{ detailChips }}" as="c" hint-placeholder-count="0">
                       <div style="display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:8px;background:rgba(255,255,255,.055);font:500 11.5px Barlow,sans-serif;color:#c9cad6"><i class="bi {{ c.icon }}" style="font-size:12px;color:{{ c.color }}"></i>{{ c.label }}</div>
                     </sc-for>
                   </div>
                 </div>
 
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-                  <sc-for list="{{ detailStats }}" as="s" hint-placeholder-count="4">
+                  <sc-for list="{{ detailStats }}" as="s" hint-placeholder-count="0">
                     <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:13px 15px">
                       <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">{{ s.label }}</div>
                       <div style="font:700 26px/1.1 Chakra Petch,sans-serif;color:{{ s.color }};margin-top:5px">{{ s.value }}</div>
@@ -676,11 +955,11 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                 <div style="display:grid;grid-template-columns:1fr 1fr 200px;gap:12px">
                   <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:9px">
                     <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">Play style</div>
-                    <sc-for list="{{ playStyle }}" as="p" hint-placeholder-count="4">
+                    <sc-for list="{{ playStyle }}" as="p" hint-placeholder-count="0">
                       <div style="display:flex;align-items:center;gap:10px">
                         <span style="flex:1;font:500 12px Barlow,sans-serif;color:#c9cad6">{{ p.label }}</span>
                         <div style="display:flex;gap:4px">
-                          <sc-for list="{{ p.dots }}" as="d" hint-placeholder-count="3">
+                          <sc-for list="{{ p.dots }}" as="d" hint-placeholder-count="0">
                             <div style="width:16px;height:6px;border-radius:3px;background:{{ d.bg }}"></div>
                           </sc-for>
                         </div>
@@ -689,7 +968,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                   </div>
                   <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:10px">
                     <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">Titles</div>
-                    <sc-for list="{{ titlesList }}" as="t" hint-placeholder-count="2">
+                    <sc-for list="{{ titlesList }}" as="t" hint-placeholder-count="0">
                       <div style="display:flex;align-items:center;gap:9px"><i class="bi bi-award-fill" style="font-size:13px;color:#f0b429"></i><span style="font:600 12px Barlow,sans-serif">{{ t.name }}</span><span style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ t.comment }}</span></div>
                     </sc-for>
                     <div style="height:1px;background:rgba(255,255,255,.07);margin:2px 0"></div>
@@ -726,7 +1005,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                 </div>
                 <div style="display:flex;gap:10px">
                   <div style="display:flex;flex-direction:column;justify-content:space-between;padding:2px 0;font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e;height:190px">
-                    <sc-for list="{{ ratingLine.axis }}" as="a" hint-placeholder-count="3"><div>{{ a }}</div></sc-for>
+                    <sc-for list="{{ ratingLine.axis }}" as="a" hint-placeholder-count="0"><div>{{ a }}</div></sc-for>
                   </div>
                   <svg viewBox="0 0 720 190" preserveAspectRatio="none" style="flex:1;height:190px">
                     <line x1="0" y1="1" x2="720" y2="1" stroke="rgba(255,255,255,.06)"></line>
@@ -737,14 +1016,14 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                   </svg>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding-left:30px;font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">
-                  <sc-for list="{{ ratingLine.labels }}" as="l" hint-placeholder-count="6"><div>{{ l }}</div></sc-for>
+                  <sc-for list="{{ ratingLine.labels }}" as="l" hint-placeholder-count="0"><div>{{ l }}</div></sc-for>
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                 <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
                   <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#f2506b">Antagonist</div>
                   <div style="display:flex;align-items:center;gap:11px">
-                    <img src="{{ nemesis.art }}" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:cover;border:1px solid rgba(242,80,107,.35)">
+                    <img src="assets/heroes/dracula.png" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:cover;border:1px solid rgba(242,80,107,.35)">
                     <div><div style="font:700 15px Chakra Petch,sans-serif;letter-spacing:.02em;text-transform:uppercase">{{ nemesis.name }}</div><div style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ nemesis.total }} meetings</div></div>
                   </div>
                   <div style="display:flex;gap:8px">
@@ -754,13 +1033,21 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                   </div>
                 </div>
                 <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:11px">
-                  <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Matchups</div>
-                  <sc-for list="{{ matchups }}" as="m" hint-placeholder-count="5">
-                    <div style="display:flex;align-items:center;gap:10px">
-                      <img src="{{ m.art }}" alt="" style="width:24px;height:24px;border-radius:7px;object-fit:cover">
-                      <span style="font:500 11.5px Barlow,sans-serif;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
-                      <div style="width:60px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden"><div style="height:100%;width:{{ m.pct }}%;background:{{ m.color }};border-radius:3px"></div></div>
-                      <span style="font:600 10.5px IBM Plex Mono,monospace;color:{{ m.color }};width:32px;text-align:right">{{ m.pct }}%</span>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Matchups</div>
+                    <div style="flex:1"></div>
+                    <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;white-space:nowrap">{{ muRange }}</div>
+                    <div onClick="{{ muPrev }}" title="Previous" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid rgba(255,255,255,.08);color:{{ muPrevFg }};cursor:pointer" style-hover="border-color:rgba(139,125,255,.45)"><i class="bi bi-chevron-left" style="font-size:10px"></i></div>
+                    <div onClick="{{ muNext }}" title="Next" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid rgba(255,255,255,.08);color:{{ muNextFg }};cursor:pointer" style-hover="border-color:rgba(139,125,255,.45)"><i class="bi bi-chevron-right" style="font-size:10px"></i></div>
+                  </div>
+                  <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70">Sorted by win rate against</div>
+                  <sc-for list="{{ muRows }}" as="m" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:10px" style-hover="background:rgba(255,255,255,.03)">
+                      <img src="{{ m.art }}" alt="" style="width:24px;height:24px;border-radius:7px;object-fit:cover;flex:none">
+                      <span style="font:500 11.5px Barlow,sans-serif;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                      <span style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;flex:none">{{ m.meetings }}</span>
+                      <div style="width:56px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;flex:none"><div style="height:100%;width:{{ m.bar }};background:{{ m.color }};border-radius:3px"></div></div>
+                      <span style="font:600 10.5px IBM Plex Mono,monospace;color:{{ m.color }};width:32px;text-align:right;flex:none">{{ m.pct }}%</span>
                     </div>
                   </sc-for>
                 </div>
@@ -776,7 +1063,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <div style="display:grid;grid-template-columns:86px 46px 1fr 108px 74px 60px;gap:12px;padding:9px 16px;font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;border-bottom:1px solid rgba(255,255,255,.05)">
                 <div>Date</div><div>Mode</div><div>Opponent</div><div>Map</div><div>HP left</div><div style="text-align:right">Epic</div>
               </div>
-              <sc-for list="{{ matchRowsDetail }}" as="m" hint-placeholder-count="6">
+              <sc-for list="{{ matchRowsDetail }}" as="m" hint-placeholder-count="0">
                 <div style="display:grid;grid-template-columns:86px 46px 1fr 108px 74px 60px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.edge }};background:{{ m.bg }};cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
                   <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e">{{ m.date }}</div>
                   <div style="font:600 10px IBM Plex Mono,monospace;color:#6b6c7e">{{ m.mode }}</div>
@@ -788,7 +1075,9 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                   </div>
                   <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
                   <div style="font:600 11.5px IBM Plex Mono,monospace"><span style="color:{{ m.color }}">{{ m.hp }}</span><span style="color:#5c5d70"> / {{ m.oppHp }}</span></div>
-                  <div style="text-align:right;font:600 11px Chakra Petch,sans-serif;color:#f0b429">{{ m.epic }}</div>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                  <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                </div>
                 </div>
               </sc-for>
             </div>
@@ -796,7 +1085,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:11px">
                 <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Against villains</div>
-                <sc-for list="{{ villainRows }}" as="r" hint-placeholder-count="2">
+                <sc-for list="{{ villainRows }}" as="r" hint-placeholder-count="0">
                   <div style="display:grid;grid-template-columns:1fr 40px 40px 40px 52px;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.03)">
                     <span style="font:600 12px Barlow,sans-serif">{{ r.name }}</span>
                     <span style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;text-align:right">{{ r.total }}</span>
@@ -808,7 +1097,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               </div>
               <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:11px">
                 <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Against minions</div>
-                <sc-for list="{{ minionRows }}" as="r" hint-placeholder-count="3">
+                <sc-for list="{{ minionRows }}" as="r" hint-placeholder-count="0">
                   <div style="display:grid;grid-template-columns:1fr 40px 40px 40px 52px;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.03)">
                     <span style="font:600 12px Barlow,sans-serif">{{ r.name }}</span>
                     <span style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;text-align:right">{{ r.total }}</span>
@@ -840,7 +1129,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
       <div style="display:flex;min-height:900px;background:#0b0b10">
         <div style="width:64px;flex:none;background:#08080d;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px">
           <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid #8b7dff;display:flex;align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#8b7dff;margin-bottom:12px">U</div>
-          <sc-for list="{{ rail }}" as="r" hint-placeholder-count="9">
+          <sc-for list="{{ rail }}" as="r" hint-placeholder-count="0">
             <div title="{{ r.label }}" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:{{ r.fg }};background:{{ r.bgFlat }};cursor:pointer" style-hover="color:#ecedf2"><i class="bi {{ r.icon }}"></i></div>
           </sc-for>
         </div>
@@ -852,12 +1141,12 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <div style="font:400 12px/1.5 Barlow,sans-serif;color:#8b8c9e;margin-top:6px">42 heroes · 1 284 matches · updated 4 min ago</div>
             </div>
             <div style="flex:1"></div>
-            <sc-for list="{{ miniStats }}" as="s" hint-placeholder-count="3">
+            <sc-for list="{{ miniStats }}" as="s" hint-placeholder-count="0">
               <div style="padding-bottom:4px"><div style="font:400 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">{{ s.label }}</div><div style="font:700 19px Chakra Petch,sans-serif;color:{{ s.color }}">{{ s.value }}</div></div>
             </sc-for>
           </div>
           <div style="display:flex;gap:8px;padding:18px 26px 0">
-            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="0">
               <div style="padding:8px 14px;border-radius:9px 9px 0 0;border-bottom:2px solid {{ t.edge }};font:600 12.5px Barlow,sans-serif;color:{{ t.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ t.label }}</div>
             </sc-for>
             <div style="flex:1;border-bottom:2px solid rgba(255,255,255,.07)"></div>
@@ -868,7 +1157,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <div style="display:grid;grid-template-columns:34px 1fr 58px 58px 90px 62px;gap:12px;padding:0 14px 8px;font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70">
                 <div>#</div><div>Hero</div><div style="text-align:right">Pts</div><div style="text-align:right">GP</div><div>W / L</div><div style="text-align:right">K/D</div>
               </div>
-              <sc-for list="{{ ladder }}" as="h" hint-placeholder-count="10">
+              <sc-for list="{{ ladder }}" as="h" hint-placeholder-count="0">
                 <div style="display:grid;grid-template-columns:34px 1fr 58px 58px 90px 62px;gap:12px;align-items:center;padding:9px 14px;border-radius:11px;background:{{ h.rowBg }};border:1px solid {{ h.rowBorder }};border-left:3px solid {{ h.edge }};cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
                   <div style="font:700 14px Chakra Petch,sans-serif;color:{{ h.rankColor }}">{{ h.place }}</div>
                   <div style="display:flex;align-items:center;gap:10px;min-width:0">
@@ -890,7 +1179,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               </sc-for>
               <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px">
                 <div style="height:30px;padding:0 12px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;font:500 11.5px Barlow,sans-serif;color:#8b8c9e">Prev</div>
-                <sc-for list="{{ pages }}" as="p" hint-placeholder-count="4">
+                <sc-for list="{{ pages }}" as="p" hint-placeholder-count="0">
                   <div style="width:30px;height:30px;border-radius:8px;background:{{ p.bg }};border:1px solid {{ p.border }};display:flex;align-items:center;justify-content:center;font:600 11.5px Barlow,sans-serif;color:{{ p.fg }}">{{ p.n }}</div>
                 </sc-for>
                 <div style="height:30px;padding:0 12px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;font:500 11.5px Barlow,sans-serif;color:#ecedf2">Next</div>
@@ -904,7 +1193,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                   <div><div style="font:700 14px Chakra Petch,sans-serif;letter-spacing:.02em;text-transform:uppercase">Medusa</div><div style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">selected · rank 04</div></div>
                 </div>
                 <div style="display:flex;gap:8px">
-                  <sc-for list="{{ sideStats }}" as="s" hint-placeholder-count="4">
+                  <sc-for list="{{ sideStats }}" as="s" hint-placeholder-count="0">
                     <div style="flex:1;background:rgba(255,255,255,.045);border-radius:9px;padding:8px 9px"><div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.08em;color:#6b6c7e">{{ s.label }}</div><div style="font:700 15px Chakra Petch,sans-serif;color:{{ s.color }}">{{ s.value }}</div></div>
                   </sc-for>
                 </div>
@@ -920,7 +1209,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               </div>
               <div style="background:#12121a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:11px">
                 <div style="font:600 11.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Best / worst matchups</div>
-                <sc-for list="{{ matchups }}" as="m" hint-placeholder-count="5">
+                <sc-for list="{{ matchups }}" as="m" hint-placeholder-count="0">
                   <div style="display:flex;align-items:center;gap:10px">
                     <img src="{{ m.art }}" alt="" style="width:26px;height:26px;border-radius:8px;object-fit:cover">
                     <span style="font:500 12px Barlow,sans-serif;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
@@ -932,7 +1221,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <div style="background:#12121a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:10px">
                 <div style="display:flex;align-items:center;justify-content:space-between"><div style="font:600 11.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Collection</div><span style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">6 / 11 sets</span></div>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-                  <sc-for list="{{ sets }}" as="s" hint-placeholder-count="6">
+                  <sc-for list="{{ sets }}" as="s" hint-placeholder-count="0">
                     <div style="border-radius:10px;border:1px solid {{ s.border }};background:{{ s.bg }};padding:9px;display:flex;flex-direction:column;gap:6px;opacity:{{ s.opacity }}">
                       <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 2px,transparent 2px 8px);display:flex;align-items:center;justify-content:center;font:400 8px IBM Plex Mono,monospace;color:rgba(255,255,255,.3)">box art</div>
                       <div style="font:600 10.5px/1.25 Barlow,sans-serif;color:#c9cad6">{{ s.name }}</div>
@@ -1270,6 +1559,7 @@ class Component extends DCLogic {
       ['24 Jun 2026', 'Tomoe Gozen', 'ksuha', 'Kaer Morhen', 6, 0, true, '★★★', '1v1']
     ].map(([date, opp, player, map, hp, oppHp, won, epic, mode]) => ({
       date, opp, map, hp, oppHp, epic, mode, art: A(opp.toLowerCase().replace(/ /g, '-')), avatar: P(player),
+      epicStars: this.epicStars((epic.match(/★/g) || []).length, 11),
       result: won ? 'WIN' : 'LOSS',
       color: won ? '#34d99b' : '#f2506b',
       edge: won ? 'rgba(52,217,155,.65)' : 'rgba(242,80,107,.65)',
@@ -1317,6 +1607,221 @@ class Component extends DCLogic {
     };
   }
 
+  epicStars(n, size) {
+    return [1, 2, 3].map(i => ({
+      icon: i <= n ? 'bi-star-fill' : 'bi-star',
+      color: i <= n ? GOLD : 'rgba(255,255,255,.16)',
+      size: size || 11
+    }));
+  }
+
+  playerVals() {
+    const A = f => `assets/heroes/${f}.png`, P = p => `assets/players/${p}.png`, UNK = 'assets/Unknown.png';
+    const spark = [-120, -40, 90, 210, 180, 340, 420, 560, 690, 640, 880, 1010, 1180, 1478];
+    const w = 1080, h = 150, min = -200, max = 1550;
+    const pts = spark.map((v, i) => `${((i * w) / (spark.length - 1)).toFixed(1)},${(h - ((v - min) / (max - min)) * h).toFixed(1)}`);
+
+    const HEROES = [
+      ['Dracula', 'dracula', 22, 15, 'Melee', 5],
+      ['Sherlock Holmes', 'sherlock-holmes', 18, 11, 'Ranged', 4],
+      ['Achilles', 'achilles', 16, 9, 'Melee', 4],
+      ['King Arthur', 'king-arthur', 14, 6, 'Melee', 2],
+      ['Medusa', 'medusa', 12, 7, 'Ranged', 4],
+      ['Robin Hood', 'robin-hood', 11, 4, 'Ranged', 3],
+      ['Geralt of Rivia', 'geralt-of-rivia', 10, 6, 'Melee', 5],
+      ['Tomoe Gozen', 'tomoe-gozen', 9, 5, 'Melee', 3],
+      ['Alice', 'alice', 9, 3, 'Melee', 2],
+      ['Bigfoot', 'bigfoot', 8, 3, 'Melee', 3],
+      ['Invisible Man', null, 7, 4, 'Melee', 3],
+      ['Sinbad', null, 6, 2, 'Melee', 2],
+      ['Loki', null, 5, 1, 'Ranged', 1],
+      ['Jekyll & Hyde', null, 5, 3, 'Melee', 4],
+      ['Yennefer', null, 4, 2, 'Ranged', 3],
+      ['Sun Wukong', null, 4, 3, 'Melee', 4],
+      ['Ciri', null, 3, 1, 'Melee', 2],
+      ['Blackbeard', null, 2, 0, 'Ranged', 1]
+    ];
+
+    const sort = this.state.plSort || 'played';
+    const main = this.state.plMain || 'Dracula';
+    const ratings = this.state.plRatings || {};
+
+    let heroes = HEROES.map(([name, file, matches, wins, type, defRating]) => {
+      const losses = matches - wins, kd = losses ? wins / losses : wins;
+      const pct = Math.round((wins / matches) * 100);
+      const mine = ratings[name] ?? defRating;
+      const isMain = name === main;
+      return {
+        name, art: file ? A(file) : UNK, matches, wins, losses, pct, kd: kd.toFixed(2), kdNum: kd, mine,
+        typeIcon: type === 'Melee' ? 'assets/Melee.png' : 'assets/Ranged.png',
+        pctColor: pct >= 55 ? '#34d99b' : pct >= 45 ? '#c9cad6' : '#f2506b',
+        kdColor: kd >= 1 ? '#34d99b' : '#f2506b',
+        barWin: `${(wins / matches) * 100}%`,
+        ring: isMain ? 'rgba(240,180,41,.75)' : 'rgba(255,255,255,.08)',
+        rowBg: isMain ? 'rgba(240,180,41,.05)' : 'transparent',
+        mainIcon: isMain ? 'bi-bookmark-star-fill' : 'bi-bookmark',
+        mainFg: isMain ? '#f0b429' : '#5c5d70',
+        mainBg: isMain ? 'rgba(240,180,41,.14)' : 'transparent',
+        mainBorder: isMain ? 'rgba(240,180,41,.45)' : 'rgba(255,255,255,.08)',
+        mainTitle: isMain ? 'Main hero' : 'Set as main hero',
+        setMain: () => this.setState({ plMain: name }),
+        rating: [1, 2, 3, 4, 5].map(i => ({
+          icon: i <= mine ? 'bi-star-fill' : 'bi-star',
+          color: i <= mine ? '#c4bcff' : 'rgba(255,255,255,.16)',
+          title: `Rate ${i} / 5`,
+          onClick: () => this.setState(st => ({ plRatings: { ...(st.plRatings || {}), [name]: i } }))
+        }))
+      };
+    });
+    if (sort === 'winrate') heroes = heroes.slice().sort((x, y) => y.pct - x.pct);
+    else if (sort === 'rating') heroes = heroes.slice().sort((x, y) => y.mine - x.mine || y.matches - x.matches);
+    else if (sort === 'kd') heroes = heroes.slice().sort((x, y) => y.kdNum - x.kdNum);
+
+    const match = (date, time, mode, modeColor, hero, heroFile, opponents, map, hp, oppHp, won, epic) => ({
+      date, time, mode, modeColor, hero, art: heroFile ? A(heroFile) : UNK, map, hp, oppHp,
+      opponents: opponents.map(([n, f]) => ({ name: n, art: f ? A(f) : UNK })),
+      result: won ? 'WIN' : 'LOSS',
+      resultIcon: won ? 'bi-arrow-up-short' : 'bi-arrow-down-short',
+      resultFg: won ? '#34d99b' : '#f2506b',
+      resultBg: won ? 'rgba(52,217,155,.14)' : 'rgba(242,80,107,.14)',
+      edge: won ? 'rgba(52,217,155,.7)' : 'rgba(242,80,107,.7)',
+      bg: won ? 'rgba(52,217,155,.05)' : 'rgba(242,80,107,.05)',
+      bgHover: won ? 'rgba(52,217,155,.1)' : 'rgba(242,80,107,.1)',
+      ring: won ? 'rgba(52,217,155,.45)' : 'rgba(242,80,107,.35)',
+      hpColor: won ? '#34d99b' : '#f2506b',
+      epicStars: this.epicStars(epic, 11)
+    });
+
+    const rival = (name, key, wins, losses) => {
+      const total = wins + losses, pct = Math.round((wins / total) * 100);
+      return { name, avatar: P(key), total: `${total} matches`, wins, losses, pct, barWin: `${pct}%`,
+        pctColor: pct >= 50 ? '#34d99b' : '#f2506b' };
+    };
+
+    return {
+      pl: {
+        name: 'Andrii', avatar: P('andrii'),
+        meta: 'Logged since Mar 2022 · 18 heroes played · favourite set: Cobble & Fog',
+        rank: '#2', rankOf: 'of 6 players',
+        titles: [
+          { label: 'Dracula main', icon: 'bi-bookmark-star-fill', color: '#f0b429' },
+          { label: '9-win streak', icon: 'bi-fire', color: '#f2506b' },
+          { label: 'Tournament finalist', icon: 'bi-flag-fill', color: '#8b7dff' }
+        ]
+      },
+      plKpis: [
+        { label: 'Matches', value: '168', sub: '18 heroes played', color: '#ecedf2' },
+        { label: 'Win rate', value: '54%', sub: '91 W · 77 L', color: '#34d99b' },
+        { label: 'K/D', value: '1.18', sub: 'league avg 1.00', color: '#ecedf2' }
+      ],
+      plRating: {
+        area: `0,${h} ${pts.join(' ')} ${w},${h}`,
+        line: pts.join(' '),
+        labels: ['Mar 22', 'Sep 22', 'Mar 23', 'Sep 23', 'Mar 24', 'Jul 26'],
+        axis: ['1 478', '640', '−200']
+      },
+      plModes: [
+        { label: '1v1', matches: 96, pct: 58, color: '#8b7dff' },
+        { label: '2v2', matches: 38, pct: 51, color: '#c084fc' },
+        { label: 'FFA', matches: 22, pct: 41, color: '#f0b429' },
+        { label: 'Co-op', matches: 12, pct: 67, color: '#38bdf8' }
+      ].map(m => ({ ...m, bar: `${m.pct}%`, pctColor: m.pct >= 55 ? '#34d99b' : m.pct >= 45 ? '#c9cad6' : '#f2506b' })),
+      plHeroes: heroes,
+      plHeroCount: `${HEROES.length} of 48 heroes`,
+      plMainName: main.toUpperCase(),
+      plHeroSorts: [
+        { key: 'played', label: 'played' },
+        { key: 'winrate', label: 'win %' },
+        { key: 'kd', label: 'k/d' },
+        { key: 'rating', label: 'my rating' }
+      ].map(z => ({
+        ...z,
+        bg: z.key === sort ? 'rgba(139,125,255,.18)' : 'transparent',
+        fg: z.key === sort ? '#c4bcff' : '#8b8c9e',
+        onClick: () => this.setState({ plSort: z.key })
+      })),
+      plMatchTallies: [
+        { label: 'W', value: 91, fg: '#34d99b', bg: 'rgba(52,217,155,.13)' },
+        { label: 'L', value: 77, fg: '#f2506b', bg: 'rgba(242,80,107,.13)' }
+      ],
+      plMatches: [
+        match('12 Jul 2026', '20:14', '1V1', '#8b7dff', 'Dracula', 'dracula', [['Medusa', 'medusa']], 'Baskerville Manor', 9, 0, true, 3),
+        match('11 Jul 2026', '19:02', '2V2', '#c084fc', 'Sherlock Holmes', 'sherlock-holmes', [['Alice', 'alice'], ['Bigfoot', 'bigfoot']], 'Castle', 0, 6, false, 2),
+        match('09 Jul 2026', '21:40', 'FFA', '#f0b429', 'Achilles', 'achilles', [['Tomoe Gozen', 'tomoe-gozen'], ['King Arthur', 'king-arthur']], 'Soho', 0, 5, false, 1),
+        match('05 Jul 2026', '18:25', 'CO-OP', '#38bdf8', 'King Arthur', 'king-arthur', [['Mothman', null]], 'Sleepy Hollow', 4, 2, false, 3),
+        match('04 Jul 2026', '20:50', '1V1', '#8b7dff', 'Sherlock Holmes', 'sherlock-holmes', [['Dracula', 'dracula']], 'Soho', 6, 0, true, 2),
+        match('28 Jun 2026', '21:10', '1V1', '#8b7dff', 'Geralt of Rivia', 'geralt-of-rivia', [['Bigfoot', 'bigfoot']], 'Kaer Morhen', 11, 0, true, 3)
+      ],
+      plRivals: [
+        rival('Ksuha', 'ksuha', 21, 14),
+        rival('Oleksandr', 'oleksandr', 17, 18),
+        rival('Zheka', 'zheka', 12, 16),
+        rival('Tetyana', 'tetyana', 9, 7),
+        rival('Vados', 'vados', 6, 9)
+      ],
+      plMaps: [
+        { name: 'Baskerville Manor', file: 'london', pct: 71, matches: 21 },
+        { name: 'Sherwood Forest', file: 'tavern', pct: 56, matches: 18 },
+        { name: 'Marmoreal', file: 'castle', pct: 44, matches: 16 },
+        { name: 'Kaer Morhen', file: 'kaer-morhen', pct: 33, matches: 9 }
+      ].map(m => ({
+        ...m, art: `assets/maps/${m.file}.png`, bar: `${m.pct}%`,
+        pctColor: m.pct >= 55 ? '#34d99b' : m.pct >= 45 ? '#c9cad6' : '#f2506b'
+      })),
+      navGroupsPlayer: [
+        { title: 'Statistics', items: [
+          { icon: 'bi-shield-fill', label: 'Heroes', count: 48 },
+          { icon: 'bi-people', label: 'Players', count: 6, active: true },
+          { icon: 'bi-map', label: 'Maps', count: 20 },
+          { icon: 'bi-bug', label: 'Minions', count: 6 },
+          { icon: 'bi-eye', label: 'Villains', count: 2 }
+        ] },
+        { title: 'Play', items: [
+          { icon: 'bi-plus-circle', label: 'Add match', count: '' },
+          { icon: 'bi-list-ul', label: 'Match log', count: 1284 },
+          { icon: 'bi-box-seam', label: 'Collection', count: '7/10' },
+          { icon: 'bi-award', label: 'Titles', count: 9 },
+          { icon: 'bi-flag', label: 'Tournaments', count: 3 }
+        ] }
+      ].map(g => ({ ...g, items: g.items.map(n => ({
+        ...n,
+        fg: n.active ? '#ffffff' : '#8b8c9e',
+        bg: n.active ? 'linear-gradient(150deg,rgba(108,92,255,.9),rgba(168,85,247,.7))' : 'transparent',
+        justify: this.state.navOpen ? 'flex-start' : 'center'
+      })) })),
+      plTitles: [
+        { name: 'Bloodline', sub: '15 wins as Dracula', icon: 'bi-award-fill', color: '#f0b429' },
+        { name: 'Deduction', sub: '10 wins as Sherlock', icon: 'bi-search', color: '#8b7dff' },
+        { name: 'Comeback', sub: 'won on 1 HP left', icon: 'bi-heart-pulse', color: '#f2506b' },
+        { name: 'Co-op captain', sub: '8 villains downed', icon: 'bi-shield-fill-check', color: '#38bdf8' }
+      ]
+    };
+  }
+
+  matchupsVals() {
+    const A = f => `assets/heroes/${f}.png`;
+    const all = [
+      ['Alice', 'alice', 78, 9], ['Dracula', 'dracula', 71, 7], ['Medusa', 'medusa', 66, 6],
+      ['Robin Hood', 'robin-hood', 60, 5], ['Tomoe Gozen', 'tomoe-gozen', 55, 11],
+      ['King Arthur', 'king-arthur', 52, 21], ['Achilles', 'achilles', 48, 8],
+      ['Sherlock Holmes', 'sherlock-holmes', 38, 13], ['Bigfoot', 'bigfoot', 33, 6],
+      ['Sinbad', null, 25, 4], ['Invisible Man', null, 20, 5], ['Loki', null, 0, 3]
+    ].map(([name, file, pct, meetings]) => ({
+      name, art: file ? A(file) : 'assets/Unknown.png', pct, meetings: `${meetings} met`,
+      bar: `${pct}%`, color: pct >= 55 ? '#34d99b' : pct >= 45 ? '#c9cad6' : '#f2506b'
+    }));
+    const size = 5, page = this.state.muPage || 0, last = Math.ceil(all.length / size) - 1;
+    const from = page * size;
+    return {
+      muRows: all.slice(from, from + size),
+      muRange: `${from + 1}–${Math.min(from + size, all.length)} of ${all.length}`,
+      muPrev: () => this.setState({ muPage: Math.max(0, page - 1) }),
+      muNext: () => this.setState({ muPage: Math.min(last, page + 1) }),
+      muPrevFg: page === 0 ? '#3c3d4c' : '#8b8c9e',
+      muNextFg: page === last ? '#3c3d4c' : '#8b8c9e'
+    };
+  }
+
   matchLogVals() {
     const MODES = {
       '1v1':  { label: '1v1',  icon: 'bi-person-fill',   color: '#8b7dff', bg: 'rgba(139,125,255,.14)' },
@@ -1355,12 +1860,14 @@ class Component extends DCLogic {
         ] },
       { id: 'm2', date: '11 Jul 2026', time: '19:02', mode: 'team', map: 'Castle', epic: '★★☆', focalWon: false,
         summary: 'Team 2 took it · Dracula closed the game with 9 HP',
+        comment: "Zheka drew the whole Dracula deck by turn six. We houseruled that a discarded scheme card stays face up — worked well, keep it.",
         groups: [
           group('Team 1', false, [chip('Geralt of Rivia', 'vados', 0, false), chip('Alice', 'tetyana', 3, false)], null),
           group('Team 2', true, [chip('Medusa', 'ksuha', 6, true), chip('Dracula', 'zheka', 9, true)], 'VS')
         ] },
       { id: 'm3', date: '09 Jul 2026', time: '21:40', mode: 'ffa', map: 'London', epic: '★☆☆', focalWon: false,
         summary: '4 fighters · Sherlock Holmes survived with 5 HP',
+        comment: "Bigfoot went out on turn three, so the rest was a three-way. Next time we start FFA on the larger map.",
         groups: [
           group(null, true, [chip('Sherlock Holmes', 'andrii', 5, true, { place: '1', placeColor: GOLD })], null),
           group(null, false, [chip('Tomoe Gozen', 'tetyana', 0, false, { place: '2', placeColor: SILVER })], '›'),
@@ -1369,12 +1876,14 @@ class Component extends DCLogic {
         ] },
       { id: 'm4', date: '05 Jul 2026', time: '18:25', mode: 'coop', map: 'Sleepy Hollow', epic: '★★★', focalWon: false,
         summary: 'Mothman survived 3 heroes with 2 HP · Tarantula ×2 alive',
+        comment: "Closest co-op yet — Mothman on 2 HP with both Tarantulas alive. King Arthur held the far zone the entire game.",
         groups: [
           group('Heroes', false, [chip('Geralt of Rivia', 'vados', 0, false), chip('Robin Hood', 'ksuha', 0, false), chip('King Arthur', 'andrii', 4, false)], null),
           group('Villains', true, [chip('Mothman', null, 2, true, { art: 'assets/Unknown.png', minions: [{ name: 'Tarantula', hp: 3 }, { name: 'Tarantula', hp: 1 }] })], 'VS')
         ] },
       { id: 'm5', date: '04 Jul 2026', time: '20:50', mode: '1v1', map: 'London', epic: '★★☆', focalWon: true,
         summary: 'Sherlock Holmes beat Dracula · 6 HP left',
+        comment: "Watson never left the fight. Dracula never got a single bite in.",
         groups: [
           group(null, true, [chip('Sherlock Holmes', 'andrii', 6, true)], null),
           group(null, false, [chip('Dracula', 'zheka', 0, false)], 'VS')
@@ -1388,6 +1897,7 @@ class Component extends DCLogic {
         ] },
       { id: 'm7', date: '28 Jun 2026', time: '21:10', mode: 'team', map: 'Kaer Morhen', epic: '★☆☆', focalWon: true,
         summary: 'Team 1 swept it · Tomoe Gozen untouched on 12 HP',
+        comment: "Tomoe Gozen finished untouched. Bad matchup for Bigfoot on this map.",
         groups: [
           group('Team 1', true, [chip('Tomoe Gozen', 'tetyana', 12, true), chip('Achilles', 'oleksandr', 5, true)], null),
           group('Team 2', false, [chip('Bigfoot', 'zheka', 0, false), chip('Alice', 'ksuha', 0, false)], 'VS')
@@ -1472,6 +1982,11 @@ class Component extends DCLogic {
       const open = this.state.openMatch === m.id;
       return {
         ...m, modeKey: m.mode, mode, open, board: BOARDS[m.id],
+        epicStars: this.epicStars((m.epic.match(/★/g) || []).length, 11),
+        epicStarsBig: this.epicStars((m.epic.match(/★/g) || []).length, 15),
+        commentDisplay: m.comment ? 'block' : 'none',
+        commentText: m.comment || 'No comment on this match.',
+        commentColor: m.comment ? '#c9cad6' : '#5c5d70',
         toggle: () => this.setState(s => ({ openMatch: s.openMatch === m.id ? null : m.id })),
         chevron: open ? 'bi-chevron-up' : 'bi-chevron-down',
         shape: m.mode === 'ffa' ? '4 fighters' : m.mode === 'coop' ? '3 heroes · 1 villain' : '',
@@ -1486,6 +2001,7 @@ class Component extends DCLogic {
 
     const fMode = this.state.logMode || 'all';
     const filtered = logMatches.filter(m => fMode === 'all' || m.modeKey === fMode);
+    const size = this.state.logSize || 10;
 
     return {
       logMatches: logMatches.slice(0, 4),
@@ -1504,6 +2020,13 @@ class Component extends DCLogic {
         onClick: () => this.setState({ logMode: f.key })
       })),
       logCount: `${filtered.length} of 1 284 matches`,
+      logPageLabel: `Page 1 of ${Math.ceil(1284 / size)}`,
+      logSizes: [10, 20, 50, 100].map(n => ({
+        n,
+        bg: n === size ? 'rgba(139,125,255,.18)' : 'transparent',
+        fg: n === size ? '#c4bcff' : '#8b8c9e',
+        onClick: () => this.setState({ logSize: n })
+      })),
       navGroupsLog: [
         { title: 'Statistics', items: [
           { icon: 'bi-shield-fill', label: 'Heroes', count: 48 },
@@ -1819,6 +2342,8 @@ class Component extends DCLogic {
     return {
       ...this.detailVals(),
       ...this.collectionVals(),
+      ...this.playerVals(),
+      ...this.matchupsVals(),
       ...this.addMatchVals(),
       ...this.matchLogVals(),
       rail, kpis, podium,

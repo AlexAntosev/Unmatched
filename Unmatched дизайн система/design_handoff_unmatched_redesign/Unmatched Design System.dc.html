@@ -359,7 +359,88 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 
   <div style="display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">07 · Rules</div>
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">07 · Menus, epic stars, settings</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Dropdown menu — open state</div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:210px;flex:none">
+            <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 11px;border-radius:9px;background:rgba(139,125,255,.1);border:1px solid rgba(139,125,255,.5);font:500 12px Barlow,sans-serif;color:#ecedf2;cursor:pointer">
+              <i class="bi bi-shield" style="font-size:11px;color:#8b7dff"></i><span style="flex:1">All heroes</span><i class="bi bi-chevron-up" style="font-size:9px;color:#8b8c9e"></i>
+            </div>
+            <div style="margin-top:6px;padding:6px;border-radius:11px;background:#14141c;border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 44px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:8px;height:30px;padding:0 9px;border-radius:8px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)">
+                <i class="bi bi-search" style="font-size:10px;color:#5c5d70"></i><span style="font:400 11.5px Barlow,sans-serif;color:#5c5d70">Filter…</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:1px;max-height:212px;overflow:hidden">
+                <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border-radius:8px;background:{{ m.bg }};font:500 12px Barlow,sans-serif;color:{{ m.fg }};cursor:pointer" style-hover="background:rgba(255,255,255,.06);color:#ecedf2">
+                    <img src="{{ m.art }}" alt="" style="display:{{ m.artDisplay }};width:20px;height:20px;border-radius:50%;object-fit:cover;flex:none">
+                    <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.label }}</span>
+                    <span style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ m.count }}</span>
+                    <i class="bi bi-check-lg" style="display:{{ m.checkDisplay }};font-size:11px;color:#c4bcff"></i>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,.07)"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 9px 4px">
+                <span style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70">74 heroes</span>
+                <span style="font:500 10.5px Barlow,sans-serif;color:#8b7dff;cursor:pointer">Clear</span>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:0;font:400 11px/1.6 Barlow,sans-serif;color:#5c5d70">
+            The menu is a panel, not a native <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">&lt;select&gt;</span> popup: surface <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">#14141c</span>, 1px border <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">rgba(255,255,255,.1)</span>, radius 11px, shadow <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">0 18px 44px rgba(0,0,0,.6)</span>, 6px padding, 6px offset below the trigger.<br><br>
+            Items are 32px rows, radius 8px, 500 12px Barlow. Selected = <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">rgba(139,125,255,.16)</span> + <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">#c4bcff</span> text and a check; hover = <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">rgba(255,255,255,.06)</span>. Lists over ~8 entries get the filter field and scroll at 212px. Never inherit the browser's white popup.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+          <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Epic rating — filled vs empty</div>
+          <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:center">
+            <sc-for list="{{ epicSamples }}" as="e" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+                <div style="display:flex;gap:3px">
+                  <sc-for list="{{ e.stars }}" as="st" hint-placeholder-count="0">
+                    <i class="bi {{ st.icon }}" style="font-size:{{ e.size }}px;color:{{ st.color }}"></i>
+                  </sc-for>
+                </div>
+                <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ e.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font:400 11px/1.55 Barlow,sans-serif;color:#5c5d70">Empty stars are the <b style="color:#c9cad6;font-weight:600">outline</b> glyph <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">bi-star</span> at <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">rgba(255,255,255,.16)</span> — never a dimmed gold fill, which reads as "half lit" at row size. Filled = <span style="font-family:IBM Plex Mono,monospace;color:#8b8c9e">bi-star-fill</span> gold. 11px in rows, 15px in detail panels, 17px when editable.</div>
+        </div>
+
+        <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+          <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Settings row</div>
+          <sc-for list="{{ settingRows }}" as="s" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+              <div style="flex:1;min-width:0">
+                <div style="font:600 12.5px Barlow,sans-serif;color:#ecedf2">{{ s.label }}</div>
+                <div style="font:400 10.5px/1.45 Barlow,sans-serif;color:#5c5d70;margin-top:2px">{{ s.hint }}</div>
+              </div>
+              <div style="display:flex;gap:2px;padding:3px;border-radius:9px;background:rgba(255,255,255,.04);flex:none">
+                <sc-for list="{{ s.options }}" as="o" hint-placeholder-count="0">
+                  <div onClick="{{ o.onClick }}" style="min-width:34px;text-align:center;padding:5px 9px;border-radius:7px;background:{{ o.bg }};font:500 11px IBM Plex Mono,monospace;color:{{ o.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ o.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <div style="font:400 11px/1.55 Barlow,sans-serif;color:#5c5d70">Matches per page is a real preference: it seeds the match-log footer control, and the footer only overrides it for the current session.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">08 · Rules</div>
       <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -384,7 +465,14 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 const GOLD = '#f0b429', SILVER = '#c9cad6', BRONZE = '#cd7f32';
 
 class Component extends DCLogic {
-  state = { seg: 'team', ownedOnly: true, checked: true };
+  state = { seg: 'team', ownedOnly: true, checked: true, pageSize: 20, density: 'cosy', dateFmt: 'D MMM YYYY' };
+
+  epicStars(n) {
+    return [1, 2, 3].map(i => ({
+      icon: i <= n ? 'bi-star-fill' : 'bi-star',
+      color: i <= n ? '#f0b429' : 'rgba(255,255,255,.16)'
+    }));
+  }
 
   renderVals() {
     const A = f => `assets/heroes/${f}.png`, P = p => `assets/players/${p}.png`;
@@ -536,6 +624,45 @@ class Component extends DCLogic {
         bg: v >= 50
           ? `rgba(52,217,155,${(0.14 + ((v - 50) / 50) * 0.6).toFixed(2)})`
           : `rgba(242,80,107,${(0.14 + ((50 - v) / 50) * 0.6).toFixed(2)})`
+      })),
+      menuItems: [
+        { label: 'All heroes', count: 74, art: '', selected: true },
+        { label: 'Achilles', count: 31, art: A('achilles') },
+        { label: 'Alice', count: 44, art: A('alice') },
+        { label: 'Bigfoot', count: 27, art: A('bigfoot') },
+        { label: 'Dracula', count: 52, art: A('dracula') },
+        { label: 'King Arthur', count: 61, art: A('king-arthur') },
+        { label: 'Medusa', count: 38, art: A('medusa') }
+      ].map(m => ({
+        ...m,
+        art: m.art || BLANK,
+        artDisplay: m.art ? 'block' : 'none',
+        bg: m.selected ? 'rgba(139,125,255,.16)' : 'transparent',
+        fg: m.selected ? '#c4bcff' : '#c9cad6',
+        checkDisplay: m.selected ? 'block' : 'none'
+      })),
+      epicSamples: [
+        { label: 'epic 3 / 3', size: 15, stars: this.epicStars(3) },
+        { label: 'epic 2 / 3', size: 15, stars: this.epicStars(2) },
+        { label: 'epic 1 / 3', size: 15, stars: this.epicStars(1) },
+        { label: 'row size 11px', size: 11, stars: this.epicStars(2) },
+        { label: 'editable 17px', size: 17, stars: this.epicStars(2) }
+      ],
+      settingRows: [
+        { label: 'Matches per page', hint: 'Rows in one page of the match-log grid.', key: 'pageSize',
+          options: [10, 20, 50, 100].map(n => ({ label: n, value: n })) },
+        { label: 'Row density', hint: 'Vertical padding of list and table rows.', key: 'density',
+          options: [{ label: 'tight', value: 'tight' }, { label: 'cosy', value: 'cosy' }, { label: 'loose', value: 'loose' }] },
+        { label: 'Date format', hint: 'Dates always include the year.', key: 'dateFmt',
+          options: [{ label: 'D MMM YYYY', value: 'D MMM YYYY' }, { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' }] }
+      ].map(s => ({
+        ...s,
+        options: s.options.map(o => ({
+          label: o.label,
+          bg: this.state[s.key] === o.value ? 'rgba(139,125,255,.18)' : 'transparent',
+          fg: this.state[s.key] === o.value ? '#c4bcff' : '#8b8c9e',
+          onClick: () => this.setState({ [s.key]: o.value })
+        }))
       })),
       dos: [
         'Show hero and map art as tiles or tokens; never tint a table cell with a background colour instead of art.',

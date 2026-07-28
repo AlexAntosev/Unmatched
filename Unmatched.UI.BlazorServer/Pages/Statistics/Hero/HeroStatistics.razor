@@ -165,16 +165,32 @@
                 }
             </Panel>
 
-            <Panel Title="Matchups">
-                @if (_matchups.Count == 0)
-                {
-                    <div class="hero-muted">No recorded matchups yet.</div>
-                }
-                @foreach (var matchup in _matchups)
-                {
-                    <MatchupBar Name="@matchup.OpponentName" ImageUrl="@matchup.OpponentImageUrl"
-                                Percent="matchup.WinPercent" TokenSize="24" BarWidth="60"/>
-                }
+            <Panel Title="Matchups" Meta="@MatchupRangeLabel">
+                <HeaderActions>
+                    <div class="hero-matchup-pager">
+                        <button type="button" class="hero-matchup-page" disabled="@(_matchupPage <= 1)" @onclick="@(() => GoToMatchupPage(_matchupPage - 1))">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button" class="hero-matchup-page" disabled="@(_matchupPage >= MatchupPageCount)" @onclick="@(() => GoToMatchupPage(_matchupPage + 1))">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </HeaderActions>
+                <ChildContent>
+                    @if (_matchups.Count == 0)
+                    {
+                        <div class="hero-muted">No recorded matchups yet.</div>
+                    }
+                    else
+                    {
+                        <div class="hero-matchups-caption">Sorted by win rate against</div>
+                        @foreach (var matchup in MatchupPage())
+                        {
+                            <MatchupBar Name="@matchup.OpponentName" ImageUrl="@matchup.OpponentImageUrl"
+                                        Percent="matchup.WinPercent" Meta="@($"{matchup.Total} met")" TokenSize="24" BarWidth="56"/>
+                        }
+                    }
+                </ChildContent>
             </Panel>
         </div>
 
@@ -212,6 +228,26 @@
     private int _ratingMonths = 6;
     private int _winRate;
     private int _cacheBust;
+    private int _matchupPage = 1;
+
+    private const int MatchupsPerPage = 5;
+
+    private int MatchupPageCount => Math.Max(1, (int)Math.Ceiling(_matchups.Count / (double)MatchupsPerPage));
+
+    private string MatchupRangeLabel
+    {
+        get
+        {
+            if (_matchups.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var first = (_matchupPage - 1) * MatchupsPerPage + 1;
+            var last = Math.Min(_matchupPage * MatchupsPerPage, _matchups.Count);
+            return $"{first}–{last} of {_matchups.Count}";
+        }
+    }
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
@@ -251,8 +287,10 @@
                 : (int)Math.Round((double)_hero.TotalWins / _hero.TotalMatches * 100);
 
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
-            _matchups = HeroMatchupCalculator.BestAndWorst(HeroMatchupCalculator.Calculate(heroId, _matchLog));
-            _antagonist = HeroMatchupCalculator.Antagonist(HeroMatchupCalculator.Calculate(heroId, _matchLog));
+            var matchups = HeroMatchupCalculator.Calculate(heroId, _matchLog);
+            _matchups = matchups;
+            _matchupPage = 1;
+            _antagonist = HeroMatchupCalculator.Antagonist(matchups);
 
             _ratingChanges = ratings.Result;
             BuildRatingPoints();
@@ -339,6 +377,11 @@
         _ratingMonths = months;
         BuildRatingPoints();
     }
+
+    private IReadOnlyList<HeroMatchup> MatchupPage()
+        => _matchups.Skip((_matchupPage - 1) * MatchupsPerPage).Take(MatchupsPerPage).ToList();
+
+    private void GoToMatchupPage(int page) => _matchupPage = Math.Clamp(page, 1, MatchupPageCount);
 
     private void GoToHero(Guid? heroId)
     {

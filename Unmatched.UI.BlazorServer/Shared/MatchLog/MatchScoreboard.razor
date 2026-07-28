@@ -1,5 +1,6 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
+@inject NavigationManager NavManager
 @*
     The expanded half of a 3b row: every participant, villain and minions included. The Side column
     only appears where the sides have names (2v2 and co-op) - never for 1v1 or free-for-all.
@@ -51,9 +52,20 @@
             <div class="scoreboard-right scoreboard-sidekick">@Sidekick(participant)</div>
         </div>
     }
-    <div class="scoreboard-epic">
-        <span class="scoreboard-epic-label">Epic</span>
-        <EpicStars Value="Epic" ValueChanged="EpicChanged"/>
+    <div class="scoreboard-footer">
+        <div class="scoreboard-footer-epic">
+            <span class="scoreboard-footer-label">Epic</span>
+            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="15"/>
+        </div>
+        <div class="scoreboard-footer-divider"></div>
+        <div class="scoreboard-footer-comment">
+            <span class="scoreboard-footer-label">Comment</span>
+            <span class="scoreboard-footer-comment-text @(HasComment ? null : "is-empty")">
+                @(HasComment ? Match.Comment : "No comment on this match.")
+            </span>
+        </div>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Icon="bi-pencil" OnClick="GoToEditMatch">Edit match</UmButton>
     </div>
 </div>
 
@@ -66,11 +78,9 @@
     [Parameter, EditorRequired]
     public UiMatchLogDto Match { get; set; } = default!;
 
-    [Parameter]
-    public int Epic { get; set; }
+    private bool HasComment => !string.IsNullOrWhiteSpace(Match.Comment);
 
-    [Parameter]
-    public EventCallback<int> EpicChanged { get; set; }
+    private void GoToEditMatch() => NavManager.NavigateTo($"{Urls.Match}/{Match.MatchId}");
 
     private string GridStyle
         => _hasSides

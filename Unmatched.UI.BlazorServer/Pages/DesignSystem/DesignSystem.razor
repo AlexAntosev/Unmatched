@@ -66,10 +66,8 @@
             <SegmentedControl TValue="GameMode" Options="ModeSegments" Value="_mode" ValueChanged="v => _mode = v"/>
             <SegmentedControl TValue="string" Variant="bar" Options="LogSegments" Value="_logMode" ValueChanged="v => _logMode = v"/>
             <div class="ds-row">
-                <UmSelect TValue="string" Variant="chip" Icon="bi-people" Value="@_chip" ValueChanged="v => _chip = v">
-                    <option value="">All players</option>
-                    <option value="andrii">Andrii</option>
-                </UmSelect>
+                <UmSelect TValue="string" Variant="chip" Icon="bi-people" Value="@_chip" ValueChanged="v => _chip = v"
+                          Options="@(new SelectOption<string>[] { new(null!, "All players"), new("andrii", "Andrii") })"/>
                 <UmToggle Label="Owned only" Value="_ownedOnly" ValueChanged="v => _ownedOnly = v"/>
                 <UmCheckbox Checked="_checked" CheckedChanged="v => _checked = v"/>
                 <UmCheckbox Checked="true" Accent="var(--um-gold)"/>
@@ -78,17 +76,13 @@
         <Panel Title="Fields">
             <div class="ds-grid-2">
                 <UmField Label="Player">
-                    <UmSelect TValue="string" AvatarUrl="/Unknown.png" Value="@_player" ValueChanged="v => _player = v">
-                        <option value="ksuha">Ksuha</option>
-                        <option value="andrii">Andrii</option>
-                    </UmSelect>
+                    <UmSelect TValue="string" AvatarUrl="/Unknown.png" Value="@_player" ValueChanged="v => _player = v"
+                              Options="@(new SelectOption<string>[] { new("ksuha", "Ksuha"), new("andrii", "Andrii") })"/>
                 </UmField>
                 <UmField Label="Hero">
                     <UmSelect TValue="string" ArtUrl="/Unknown.png" Highlighted="true" Value="@_hero"
-                              ValueChanged="v => _hero = v" OnRandomize="() => { }">
-                        <option value="medusa">Medusa</option>
-                        <option value="alice">Alice</option>
-                    </UmSelect>
+                              ValueChanged="v => _hero = v" OnRandomize="() => { }"
+                              Options="@(new SelectOption<string>[] { new("medusa", "Medusa"), new("alice", "Alice") })"/>
                 </UmField>
                 <UmField Label="HP left">
                     <UmTextField Type="number" Value="6"/>

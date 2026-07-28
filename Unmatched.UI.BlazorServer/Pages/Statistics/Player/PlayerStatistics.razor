@@ -1,23 +1,27 @@
 @page "/players-statistics/{id}"
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IPlayerStatisticsService PlayerStatisticsService
 @inject IFavoriteStatisticsService FavoriteStatisticsService
+@inject IFavoriteService FavoriteService
+@inject IHeroService HeroService
 @*
-    Not in the design pack: the 2a dossier pattern applied to a player - banner, favourite heroes
-    as ladder rows, the shared 3b match log, and the villain/minion records.
+    Not in the design pack: the 2a dossier pattern applied to a player - banner, heroes played, this
+    player's own coloured matches, and the villain/minion records.
 *@
 
 <PageHeader Breadcrumbs="Crumbs"/>
 
-<PlayerSummary Statistics="_player" ChosenOne="_chosenOne"/>
+<PlayerSummary Statistics="_player" ChosenOne="_chosenOne" HeroesPlayedCount="_favorites.Count"/>
 
 <div class="um-page">
-    <Favorites Records="_favorites"/>
+    <HeroesPlayed Records="_favorites" TotalHeroCount="_totalHeroCount"
+                  MainToggled="ToggleMainAsync" RatingChanged="RateHeroAsync"/>
 
-    <MatchList Matches="_matchLog" Title="Match log" PageSize="6" Meta="@($"{_matchLog.Count} matches")"/>
+    <PlayerMatches PlayerName="@_player.Name" Entries="_playerMatches"/>
 
     <div class="player-duo">
         <MonsterMatchupTable Title="Against villains" Rows="_villainMatchups"/>
@@ -32,9 +36,12 @@
     private PlayerStatisticsDto _player = new() { Name = string.Empty };
     private List<UiMatchLogDto> _matchLog = new();
     private List<FavoriteStatisticsDto> _favorites = new();
+    private List<PlayerMatchEntry> _playerMatches = new();
     private List<MonsterMatchupRow> _villainMatchups = new();
     private List<MonsterMatchupRow> _minionMatchups = new();
     private FavoriteStatisticsDto? _chosenOne;
+    private Guid _playerId;
+    private int _totalHeroCount;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
@@ -51,6 +58,8 @@
             return;
         }
 
+        _playerId = playerId;
+
         try
         {
             PreloadService.Show();
@@ -58,10 +67,12 @@
             var stats = PlayerStatisticsService.GetPlayerStatisticsAsync(playerId);
             var matches = PlayerStatisticsService.GetPlayerMatchesAsync(playerId);
             var favorites = FavoriteStatisticsService.GetFavoritesStatisticsAsync(playerId);
-            await Task.WhenAll(stats, matches, favorites);
+            var heroes = HeroService.GetAsync();
+            await Task.WhenAll(stats, matches, favorites, heroes);
 
             _player = stats.Result;
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
+            _totalHeroCount = heroes.Result.Count();
 
             _favorites = favorites.Result.OrderByDescending(f => f.TotalMatches).ToList();
             for (var i = 0; i < _favorites.Count; i++)
@@ -70,12 +81,34 @@
             }
 
             _chosenOne = _favorites.FirstOrDefault(f => f.IsChosenOne);
+            _playerMatches = PlayerMatchPresentation.Build(playerId, _matchLog).ToList();
             BuildMonsterMatchups();
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    /// <summary>Exactly one main hero per player - the backend already clears whoever had it before.</summary>
+    private async Task ToggleMainAsync(FavoriteStatisticsDto record)
+    {
+        var isMain = !record.IsChosenOne;
+        await FavoriteService.UpdateChosenOneAsync(_playerId, record.HeroId, isMain);
+
+        foreach (var favorite in _favorites)
+        {
+            favorite.IsChosenOne = favorite == record && isMain;
+        }
+
+        _chosenOne = _favorites.FirstOrDefault(f => f.IsChosenOne);
+    }
+
+    /// <summary>Subjective 1-5 note - never feeds the ladder or any computed stat.</summary>
+    private async Task RateHeroAsync((FavoriteStatisticsDto Record, int Rating) args)
+    {
+        args.Record.Favour = args.Rating;
+        await FavoriteService.UpdateFavourAsync(_playerId, args.Record.HeroId, args.Rating);
     }
 
     private void BuildMonsterMatchups()

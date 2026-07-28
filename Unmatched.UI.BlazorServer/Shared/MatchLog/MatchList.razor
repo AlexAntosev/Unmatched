@@ -1,6 +1,5 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Contracts
-@inject IMatchService MatchService
 @inject IMapService MapService
 @*
     A panel of 3b rows with a column header and paging. Only one row is expanded at a time, which
@@ -13,6 +12,7 @@
             <div>Mode</div>
             <div>Participants</div>
             <div>Map</div>
+            <div></div>
             <div class="match-list-right">Epic</div>
             <div></div>
         </ColumnHeader>
@@ -25,18 +25,29 @@
             <MatchRow Match="match"
                       MapName="@MapDisplayName(match.MapName)"
                       IsOpen="@(_openMatchId == match.MatchId)"
-                      OnToggle="@(() => Toggle(match.MatchId))"
-                      EpicChanged="@(epic => UpdateEpicAsync(match, epic))"/>
+                      OnToggle="@(() => Toggle(match.MatchId))"/>
         }
     </ChildContent>
     <Footer>
-        <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage"
-                    Meta="@($"Page {_currentPage} of {PageCount}")"/>
+        @if (AllowPageSizeControl)
+        {
+            <span class="match-list-footer-page">Page @_currentPage of @PageCount</span>
+            <div class="match-list-footer-divider"></div>
+            <span class="match-list-footer-pagesize-label">Per page</span>
+            <SegmentedControl TValue="int" Variant="bar" Options="PageSizeOptions" Value="PageSize" ValueChanged="OnPageSizeChanged"/>
+            <div class="um-spacer"></div>
+            <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage"/>
+        }
+        else
+        {
+            <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage"
+                        Meta="@($"Page {_currentPage} of {PageCount}")"/>
+        }
     </Footer>
 </Panel>
 
 @code {
-    private const string Columns = "82px 84px 1fr 116px 60px 24px";
+    private const string Columns = "82px 84px 1fr 116px 22px 60px 24px";
 
     private Dictionary<string, string> _mapDisplayNames = new();
     private List<UiMatchLogDto> _all = new();
@@ -55,6 +66,16 @@
 
     [Parameter]
     public int PageSize { get; set; } = 8;
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    /// <summary>Shows the "Per page" segmented override in the footer - the match log page opts in.</summary>
+    [Parameter]
+    public bool AllowPageSizeControl { get; set; }
+
+    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
 
     private int PageCount => Math.Max(1, (int)Math.Ceiling(_all.Count / (double)PageSize));
 
@@ -87,12 +108,12 @@
     private void Toggle(Guid matchId)
         => _openMatchId = _openMatchId == matchId ? null : matchId;
 
+    private Task OnPageSizeChanged(int size)
+    {
+        _currentPage = 1;
+        return PageSizeChanged.InvokeAsync(size);
+    }
+
     private string MapDisplayName(string mapName)
         => _mapDisplayNames.GetValueOrDefault(mapName, mapName);
-
-    private async Task UpdateEpicAsync(UiMatchLogDto match, int epic)
-    {
-        match.Epic = epic;
-        await MatchService.UpdateEpicAsync(match.MatchId, epic);
-    }
 }

@@ -31,7 +31,7 @@ before implementing. Mobile is explicitly **out of scope** for now.
 
 ### Screens that exist vs. screens that don't
 
-The screens documented here (`1c`, `2a`, `3b`, `4b`, `5a`, `6a`) are **designed and approved — build
+The screens documented here (`1c`, `2a`, `3b`, `4b`, `5a`, `6a`, `7a`) are **designed and approved — build
 them exactly as they are**, down to the values in this README; do not improvise alternatives.
 
 The app also has screens that were **not** designed yet: Players list, Player detail, Maps, Minions,
@@ -139,6 +139,11 @@ Order, top to bottom:
 6. Match log excerpt (row style 3b).
 7. Against villains / Against minions.
 
+**Matchups is paged, not truncated.** The card header carries a range label (`1–5 of 12`) and ‹ ›
+buttons (24×24px, radius 7, border hairline, arrow colour `#8b8c9e`, `#3c3d4c` when the end is
+reached). Five rows per page, **sorted by win rate against that opponent, descending**, each row:
+hero token, name, `N met`, 56px bar, win %. Caption under the header: "Sorted by win rate against".
+
 ### 3b — Match row (shared component)
 
 The single row shape used by the match log and any "recent matches" block.
@@ -153,7 +158,17 @@ Grid `82px 84px 1fr 116px 60px 24px`, gap 12px, padding 12px 16px, hairline bott
   ring + 50% opacity when it lost) with the player's 15px round avatar pinned bottom-right.
   In FFA the separator is `›` and each chip carries a place badge top-left (gold/silver/bronze/grey).
   Villain and minion chips carry **no** player avatar.
-- **Map**, **Epic** (`★★☆`, gold), chevron.
+- **Map**, **comment indicator**, **Epic**, chevron.
+
+**Epic stars.** Filled = `bi-star-fill` gold `#f0b429`; empty = the **outline** glyph `bi-star` at
+`rgba(255,255,255,.16)`. Never a dimmed gold fill — at row size it reads as half-lit. 11px in rows,
+15px in detail panels, 17px when editable.
+
+**Comment.** When a match has a comment, the row shows a 10.5px `bi-chat-left-text-fill` in
+`#6b6c7e` (own 22px column between Map and Epic) with the text as its `title`. The full text lives in
+the expanded panel footer: a 11px-radius inset strip holding `EPIC` + 15px stars on the left, a
+hairline divider, then `COMMENT` + the text at 400 12px/1.55 Barlow (`#c9cad6`; when empty, "No
+comment on this match." in `#5c5d70`), and an outlined **Edit match** button on the right.
 
 Click toggles a **scoreboard** listing *every* participant:
 columns `Participant · Side · HP left · Cards · Sidekick`.
@@ -168,6 +183,11 @@ four KPI cards (Matches 1 284 / This month / Avg. epic / Longest streak) ·
 filter bar: a segmented mode filter (All · 1v1 · 2v2 · FFA · Co-op — **actually filters the list**)
 plus dropdown chips for players, heroes, maps, tournaments, date range, with the result count on the right ·
 the list of 3b rows in a rounded panel · pagination.
+
+**Rows per page.** The footer carries the page label, a divider, the caption `PER PAGE` and a
+segmented 10 / 20 / 50 / 100 control (same styling as any segmented control: 3px padding track,
+7px radius items, active `rgba(139,125,255,.18)` + `#c4bcff`). The default comes from
+Settings → *Matches per page*; the footer control overrides it for the current session only.
 
 **Rows are not coloured win/loss here.** The app is a hub for everybody's matches, so the left edge
 carries the *mode* colour and the result is only visible inside the expanded scoreboard.
@@ -200,6 +220,35 @@ three mini stats, then sections **Heroes** (token, deck size, type, HP), **Maps*
 **Villain & minions** (villain row plus indented minion rows with counts).
 **Save collection** commits all pending checkbox changes at once.
 
+### 7a — Player profile
+
+A player is not a hero — the page is about **who they beat and what they play**.
+
+1. Header: breadcrumb Statistics › Players › Name, prev/next player buttons, primary **Add match**.
+2. Identity band on a soft violet gradient (`linear-gradient(105deg,rgba(108,92,255,.14),rgba(168,85,247,.05) 45%,transparent 78%)`):
+   92px round avatar with a `rgba(139,125,255,.5)` ring, name in display type, a gold rank pill
+   (`#2` + `of 6 players`), mono meta line, and title chips.
+3. **Three** KPI cards only: Matches, Win rate, K/D. **No Points and no Form card.**
+4. Rating changes line chart (2fr) + By game mode bars (1fr, one bar per mode in the mode colour).
+5. **Heroes played** — full-width panel listing **every hero the player has played**, internal scroll
+   (`max-height:430px`), sort segmented control (played / win % / k/d / my rating), filter field, and a
+   count. Columns: `Hero | Matches | W/L | Win % | K/D | Main | My rating`.
+   - **No rank numbers and no gold/silver/bronze highlighting** in this list — it is not a ladder.
+   - **Main** is a bookmark toggle, 26px, **exactly one hero per player**: active =
+     `bi-bookmark-star-fill` gold on `rgba(240,180,41,.14)` with a `rgba(240,180,41,.45)` border, the
+     hero token gets a gold ring and the row a 5% gold wash; the panel header shows `MAIN · <HERO>`.
+   - **My rating** is a subjective **1–5 star** control in accent violet `#c4bcff` (empty = outline at
+     `rgba(255,255,255,.16)`), clickable per hero. It never feeds the ladder or any computed stat.
+6. Rivals (head-to-head W/L bar per player) + Best maps, two equal columns.
+7. Titles earned — four cards.
+8. **`<Name>`'s matches** — own section, and here rows **are** coloured by result: 3px left edge
+   `rgba(52,217,155,.7)` / `rgba(242,80,107,.7)` with a 5% wash of the same hue, a WIN/LOSS badge,
+   the hero the player played, `vs` opponent chips, map, `HP / opponent HP`, epic stars. Header shows
+   W and L tallies and a link to the full match log; footer has "Showing 6 of 168" + Load more.
+
+New backend needs for this screen: `IsMain` (one per player) and a per-player, per-hero subjective
+rating 1–5.
+
 ## Interactions & state
 
 | State | Scope | Notes |
@@ -211,6 +260,11 @@ three mini stats, then sections **Heroes** (token, deck size, type, HP), **Maps*
 | `colSet` | collection | index of the set shown in the right panel |
 | `colDraft` | collection | pending owned-flag changes, keyed by set; drives the gold UNSAVED state |
 | `colSaved` | collection | committed owned flags, written by Save collection |
+| `logSize` | match log | rows per page (10/20/50/100), seeded from Settings |
+| `muPage` | hero page | Matchups carousel page |
+| `plMain` | player page | the player's single main hero |
+| `plRatings` | player page | per-hero subjective 1–5 rating |
+| `plSort` | player page | hero list sort: played / win % / k/d / my rating |
 | ladder hover | heroes | hovered hero drives the right analysis column (not yet built) |
 
 Transitions are short and functional: `width .18s ease` on the rail, background/border colour on hover.
@@ -245,15 +299,28 @@ time spent; colour match-log rows win/loss; use `Unmatched.otf`; show a side col
 ## Files in this bundle
 
 - `Unmatched Design System.dc.html` — tokens and component library (start here)
-- `Unmatched Redesign.dc.html` — all screens (`1c`, `2a`, `3b`, `4b`, `5a`, `6a`)
+- `Unmatched Redesign.dc.html` — all screens (`1c`, `2a`, `3b`, `4b`, `5a`, `6a`, `7a`)
 - `screens/` — PNG reference shots of each approved screen:
   `00-design-system.png`, `1c-heroes-ladder.png`, `2a-hero-detail.png`, `3b-match-row.png`,
-  `4b-add-match.png`, `5a-collection.png`, `6a-match-log.png`
+  `4b-add-match.png`, `5a-collection.png`, `6a-match-log.png`, `7a-player-profile.png`
 - `support.js` — runtime the prototypes need to render locally; **not** for the target codebase
 - `assets/` — every image referenced above
 
+## Menus and settings
+
+**Dropdowns are custom panels, never the browser's native popup.** Surface `#14141c`, 1px
+`rgba(255,255,255,.1)`, radius 11px, shadow `0 18px 44px rgba(0,0,0,.6)`, 6px padding, 6px below the
+trigger. Items are 32px rows, radius 8px, 500 12px Barlow, optional 20px token on the left and a
+count on the right; selected = `rgba(139,125,255,.16)` + `#c4bcff` + check icon; hover =
+`rgba(255,255,255,.06)`. Lists longer than ~8 entries get a filter field at the top and scroll at
+212px. The trigger keeps its focused look while open (accent border, chevron flipped).
+
+**Settings screen** uses the settings row: label + hint on the left, control on the right, hairline
+between rows. It owns at least *Matches per page* (10 / 20 / 50 / 100 — the default for the match-log
+footer), *Row density*, *Date format*. See section 07 of the design system.
+
 ## Still missing (design side)
 
-Players list · hover preview in the 1c ladder · mobile adaptation (deliberately postponed).
+Players **list** · hover preview in the 1c ladder · mobile adaptation (deliberately postponed).
 Build these — and every other undesigned screen — from the design-system parts as described under
 **Fidelity** above.

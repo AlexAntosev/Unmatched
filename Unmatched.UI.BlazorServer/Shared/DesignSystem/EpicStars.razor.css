@@ -1,27 +1,33 @@
-.um-epic-text {
-    font: 600 11px var(--um-font-display);
-    letter-spacing: 0.02em;
-    color: var(--um-gold);
-    white-space: nowrap;
-}
-
 .um-epic {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 3px;
+    white-space: nowrap;
 }
 
 .um-epic i {
-    font-size: 17px;
-    color: rgba(255, 255, 255, 0.14);
+    /* font-size comes from the inline style (Size parameter). */
+    color: rgba(255, 255, 255, 0.16);
     cursor: pointer;
     transition: color 0.12s ease;
 }
 
+.um-epic.is-readonly i {
+    cursor: default;
+}
+
 .um-epic i:hover {
-    color: rgba(240, 180, 41, 0.6);
+    color: color-mix(in srgb, var(--um-epic-color, var(--um-gold)) 60%, transparent);
+}
+
+.um-epic.is-readonly i:hover {
+    color: rgba(255, 255, 255, 0.16);
 }
 
 .um-epic i.is-filled {
-    color: var(--um-gold);
+    color: var(--um-epic-color, var(--um-gold));
+}
+
+.um-epic.is-readonly i.is-filled:hover {
+    color: var(--um-epic-color, var(--um-gold));
 }

@@ -21,32 +21,32 @@ public class FavoriteService(IUnitOfWork unitOfWork) : IFavoriteService
 
     public async Task<Guid?> UpdateChosenOneAsync(Guid playerId, Guid heroId, bool isChosenOne)
     {
-
         var chosenOne = unitOfWork.Favorites.Query().FirstOrDefault(m => m.IsChosenOne && m.PlayerId == playerId);
-        if (chosenOne is not null)
+        if (chosenOne is not null && chosenOne.HeroId != heroId)
         {
             chosenOne.IsChosenOne = false;
             unitOfWork.Favorites.AddOrUpdate(chosenOne);
         }
 
-        var favorite = unitOfWork.Favorites.Query().FirstOrDefault(m => m.PlayerId == playerId && m.HeroId == heroId);
-        if (favorite is not null)
-        {
-            favorite.IsChosenOne = isChosenOne;
-            unitOfWork.Favorites.AddOrUpdate(favorite);
-        }
+        // A hero can be played (and therefore "made main") long before it ever picks up a Favorite
+        // row, since one is only created the first time it is favourited or rated.
+        var favorite = GetOrCreateFavorite(playerId, heroId);
+        favorite.IsChosenOne = isChosenOne;
+        unitOfWork.Favorites.AddOrUpdate(favorite);
+
         await unitOfWork.SaveChangesAsync();
-        return favorite?.HeroId;
+        return favorite.HeroId;
     }
 
     public async Task UpdateFavourAsync(Guid playerId, Guid heroId, int favour)
     {
-        var favorite = unitOfWork.Favorites.Query().FirstOrDefault(m => m.PlayerId == playerId && m.HeroId == heroId);
-        if (favorite is not null)
-        {
-            favorite.Favour = favour;
-            unitOfWork.Favorites.AddOrUpdate(favorite);
-            await unitOfWork.SaveChangesAsync();
-        }
+        var favorite = GetOrCreateFavorite(playerId, heroId);
+        favorite.Favour = favour;
+        unitOfWork.Favorites.AddOrUpdate(favorite);
+        await unitOfWork.SaveChangesAsync();
     }
+
+    private Favorite GetOrCreateFavorite(Guid playerId, Guid heroId)
+        => unitOfWork.Favorites.Query().FirstOrDefault(m => m.PlayerId == playerId && m.HeroId == heroId)
+        ?? new Favorite { Id = Guid.NewGuid(), PlayerId = playerId, HeroId = heroId };
 }

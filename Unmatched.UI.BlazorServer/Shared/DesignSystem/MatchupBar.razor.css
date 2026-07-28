@@ -15,6 +15,13 @@
     text-overflow: ellipsis;
 }
 
+.um-matchup-meta {
+    flex: none;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
 .um-matchup-track {
     flex: none;
     height: 5px;

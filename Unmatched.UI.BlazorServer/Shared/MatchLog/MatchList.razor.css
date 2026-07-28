@@ -15,3 +15,23 @@
     font: 400 12.5px var(--um-font-body);
     color: var(--um-text-dim);
 }
+
+.match-list-footer-page {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.match-list-footer-divider {
+    width: 1px;
+    height: 16px;
+    background: var(--um-border);
+}
+
+.match-list-footer-pagesize-label {
+    font: 500 9px var(--um-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}

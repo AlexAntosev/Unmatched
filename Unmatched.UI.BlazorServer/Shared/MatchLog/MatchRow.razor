@@ -39,8 +39,14 @@
             }
         </div>
         <div class="match-row-map">@MapName</div>
+        <div class="match-row-comment">
+            @if (!string.IsNullOrWhiteSpace(Match.Comment))
+            {
+                <i class="bi bi-chat-left-text-fill" title="@Match.Comment"></i>
+            }
+        </div>
         <div class="match-row-epic">
-            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true"/>
+            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="11"/>
         </div>
         <div class="match-row-chevron">
             <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"></i>
@@ -48,7 +54,7 @@
     </div>
     @if (IsOpen)
     {
-        <MatchScoreboard Match="Match" Epic="@(Match.Epic ?? 0)" EpicChanged="EpicChanged"/>
+        <MatchScoreboard Match="Match"/>
     }
 </div>
 
@@ -68,9 +74,6 @@
 
     [Parameter]
     public EventCallback OnToggle { get; set; }
-
-    [Parameter]
-    public EventCallback<int> EpicChanged { get; set; }
 
     protected override void OnParametersSet()
     {

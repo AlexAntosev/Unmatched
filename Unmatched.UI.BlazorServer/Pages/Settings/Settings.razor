@@ -6,6 +6,7 @@
 @inject IPlayerService PlayerService
 @inject RatingRecalculationStateNotifier RecalculationStateNotifier
 @inject NavCountsService NavCountsService
+@inject AppSettingsService AppSettingsService
 @*
     The maintenance screen the design does not cover: rating recalculation (was /admin) and player
     management (was /initialize), reached from the gear at the bottom of the rail.
@@ -25,6 +26,17 @@
     {
         <div class="alert alert-success" role="alert">@_success</div>
     }
+
+    <Panel Title="Preferences">
+        <div class="settings-row">
+            <div>
+                <div class="settings-row-label">Matches per page</div>
+                <div class="settings-row-hint">Default page size for the match log. Its footer control can override this for the current session only.</div>
+            </div>
+            <SegmentedControl TValue="int" Variant="bar" Options="MatchesPerPageOptions"
+                              Value="_matchesPerPage" ValueChanged="OnMatchesPerPageChangedAsync"/>
+        </div>
+    </Panel>
 
     <Panel Title="Rating recalculation">
         <p class="um-body um-muted">Recalculates ratings for every hero from the full match history.
@@ -61,11 +73,15 @@
         new("System"), new("Settings")
     ];
 
+    private static readonly IReadOnlyList<SelectOption<int>> MatchesPerPageOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
+
     private List<UiPlayerDto> _players = new();
     private string? _newPlayerName;
     private bool _isRecalculating;
     private string? _error;
     private string? _success;
+    private int _matchesPerPage = 10;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
@@ -77,6 +93,21 @@
         && _players.All(p => !string.Equals(p.Name, _newPlayerName, StringComparison.OrdinalIgnoreCase));
 
     protected override async Task OnInitializedAsync() => await ReloadPlayersAsync();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _matchesPerPage = await AppSettingsService.GetMatchesPerPageAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnMatchesPerPageChangedAsync(int value)
+    {
+        _matchesPerPage = value;
+        await AppSettingsService.SetMatchesPerPageAsync(value);
+    }
 
     private async Task ReloadPlayersAsync() => _players = (await PlayerService.GetAsync()).OrderBy(p => p.Name).ToList();
 

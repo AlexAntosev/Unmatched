@@ -1,0 +1,102 @@
+@using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
+@inject IMapService MapService
+@*
+    "<Name>'s matches" - unlike the shared 3b row, this section belongs to one person, so rows ARE
+    coloured by result: a 3px win/loss edge plus a 5% wash of the same hue.
+*@
+<Panel Title="@($"{PlayerName}'s matches")" Flush="true">
+    <HeaderActions>
+        <span class="pm-tally pm-tally-win">W @Wins</span>
+        <span class="pm-tally pm-tally-loss">L @Losses</span>
+        <a class="pm-full-log" href="@Urls.MatchLog">Full log<i class="bi bi-arrow-right"></i></a>
+    </HeaderActions>
+    <ChildContent>
+        <ColumnHeader Columns="@Columns" Class="pm-head">
+            <div>Date</div>
+            <div>Mode</div>
+            <div>Result</div>
+            <div>Played &middot; Against</div>
+            <div>Map</div>
+            <div class="pm-right">HP left</div>
+            <div class="pm-right">Epic</div>
+        </ColumnHeader>
+        @if (Entries.Count == 0)
+        {
+            <div class="pm-empty">No matches yet.</div>
+        }
+        @foreach (var entry in Entries.Take(_shown))
+        {
+            <div class="pm-row" style="@($"grid-template-columns:{Columns};border-left-color:{EdgeColor(entry)};background:{WashColor(entry)}")">
+                <div>
+                    <div class="pm-date">@entry.Match.Date.ToString("dd MMM yyyy")</div>
+                    @if (entry.Match.Date.TimeOfDay != TimeSpan.Zero)
+                    {
+                        <div class="pm-time">@entry.Match.Date.ToString("HH:mm")</div>
+                    }
+                </div>
+                <div><ModeBadge Mode="entry.Match.GameMode"/></div>
+                <div><ResultBadge IsWin="entry.Self.IsWinner"/></div>
+                <div class="pm-versus">
+                    <HeroToken ImageUrl="@entry.Self.HeroImageUrl" Alt="@entry.Self.Hero?.Name" Size="26" Radius="8"/>
+                    <span class="pm-hero-name">@(entry.Self.Hero?.Name ?? "Unknown")</span>
+                    <span class="pm-vs">vs</span>
+                    @foreach (var opponent in entry.Opponents)
+                    {
+                        <HeroToken ImageUrl="@opponent.ImageUrl" Alt="@opponent.Name" Size="26" Radius="8"/>
+                        <span class="pm-opponent-name">@opponent.Name</span>
+                    }
+                </div>
+                <div class="pm-map">@MapDisplayName(entry.Match.MapName)</div>
+                <div class="pm-right pm-hp">@Value(entry.Self.HpLeft) / @Value(entry.Opponents.FirstOrDefault()?.HpLeft)</div>
+                <div class="pm-right"><EpicStars Value="@(entry.Match.Epic ?? 0)" ReadOnly="true" Size="11"/></div>
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <span class="pm-showing">Showing @Math.Min(_shown, Entries.Count) of @Entries.Count</span>
+        @if (_shown < Entries.Count)
+        {
+            <UmButton Size="sm" OnClick="LoadMore">Load more</UmButton>
+        }
+    </Footer>
+</Panel>
+
+@code {
+    private const string Columns = "82px 84px 64px 1fr 130px 80px 60px";
+    private const int PageSize = 6;
+
+    private Dictionary<string, string> _mapDisplayNames = new();
+    private int _shown = PageSize;
+
+    [Parameter, EditorRequired]
+    public string PlayerName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlayerMatchEntry> Entries { get; set; } = [];
+
+    private int Wins => Entries.Count(e => e.Self.IsWinner);
+
+    private int Losses => Entries.Count(e => !e.Self.IsWinner);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var maps = await MapService.GetAsync();
+        _mapDisplayNames = maps
+            .GroupBy(m => m.Name)
+            .ToDictionary(group => group.Key, group => group.First().DisplayName);
+    }
+
+    private string MapDisplayName(string mapName) => _mapDisplayNames.GetValueOrDefault(mapName, mapName);
+
+    private static string Value(int? value) => value?.ToString() ?? "–";
+
+    private static string EdgeColor(PlayerMatchEntry entry)
+        => entry.Self.IsWinner ? "rgba(52,217,155,.7)" : "rgba(242,80,107,.7)";
+
+    private static string WashColor(PlayerMatchEntry entry)
+        => entry.Self.IsWinner ? "var(--um-win-wash)" : "var(--um-loss-wash)";
+
+    private void LoadMore() => _shown = Math.Min(_shown + PageSize, Entries.Count);
+}

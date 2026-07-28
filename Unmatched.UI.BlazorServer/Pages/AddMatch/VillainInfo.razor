@@ -9,13 +9,7 @@
                    Size="44" Radius="11"/>
         <div class="fighter-selects">
             <UmSelect TValue="Guid" Variant="chip" Icon="bi-eye"
-                      Value="MatchVillain.VillainId" ValueChanged="OnVillainChanged">
-                <option value="@Guid.Empty">Villain…</option>
-                @foreach (var villain in Villains)
-                {
-                    <option value="@villain.Id">@villain.Name</option>
-                }
-            </UmSelect>
+                      Value="MatchVillain.VillainId" ValueChanged="OnVillainChanged" Options="VillainOptions()"/>
         </div>
         <div class="fighter-stats">
             <UmField Label="HP" Class="fighter-narrow">
@@ -36,13 +30,7 @@
                        Size="26" Radius="8" Opacity="0.85"/>
             <div class="minion-select">
                 <UmSelect TValue="Guid" Variant="chip" Value="minion.MinionId"
-                          ValueChanged="@(id => OnMinionChanged(minion, id))">
-                    <option value="@Guid.Empty">Minion…</option>
-                    @foreach (var option in Minions)
-                    {
-                        <option value="@option.Id">@option.Name</option>
-                    }
-                </UmSelect>
+                          ValueChanged="@(id => OnMinionChanged(minion, id))" Options="MinionOptions()"/>
             </div>
             <UmField Label="HP left" Class="minion-hp">
                 <UmTextField Type="number" Variant="xs" Centered="true" Value="@minion.HpLeft?.ToString()"
@@ -69,6 +57,16 @@
     public EventCallback OnChanged { get; set; }
 
     private static int? ParseInt(string? value) => int.TryParse(value, out var parsed) ? parsed : null;
+
+    private IReadOnlyList<SelectOption<Guid>> VillainOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Villain…") }
+            .Concat(Villains.Select(v => new SelectOption<Guid>(v.Id, v.Name, ArtUrl: v.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<Guid>> MinionOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Minion…") }
+            .Concat(Minions.Select(m => new SelectOption<Guid>(m.Id, m.Name, ArtUrl: m.ImageUrl)))
+            .ToList();
 
     private Task OnVillainChanged(Guid villainId)
     {

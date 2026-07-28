@@ -5,6 +5,10 @@
 <div class="um-stat um-stat-@Variant @Class">
     <div class="um-stat-label">@Label</div>
     <div class="um-stat-value" style="@(ValueColor is null ? null : $"color:{ValueColor}")">@Value</div>
+    @if (!string.IsNullOrEmpty(Sub))
+    {
+        <div class="um-stat-sub">@Sub</div>
+    }
 </div>
 
 @code {
@@ -20,6 +24,10 @@
 
     [Parameter]
     public string? ValueColor { get; set; }
+
+    /// <summary>Optional caption under the value, e.g. "18 heroes played".</summary>
+    [Parameter]
+    public string? Sub { get; set; }
 
     [Parameter]
     public string? Class { get; set; }

@@ -13,21 +13,9 @@
 
     <div class="fighter-selects">
         <UmSelect TValue="Guid" Variant="chip" AvatarUrl="@Fighter.PlayerImageUrl"
-                  Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged">
-            <option value="@Guid.Empty">Player…</option>
-            @foreach (var player in Players)
-            {
-                <option value="@player.Id">@player.Name</option>
-            }
-        </UmSelect>
+                  Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged" Options="PlayerOptions()"/>
         <UmSelect TValue="Guid" Variant="chip" Highlighted="true"
-                  Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero">
-            <option value="@Guid.Empty">Hero…</option>
-            @foreach (var hero in Heroes)
-            {
-                <option value="@hero.Id">@hero.Name</option>
-            }
-        </UmSelect>
+                  Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero" Options="HeroOptions()"/>
     </div>
 
     <div class="fighter-stats">
@@ -35,21 +23,13 @@
         {
             <UmField Label="Place" Class="fighter-place">
                 <UmSelect TValue="int?" Variant="chip" Icon="bi-award"
-                          Value="Fighter.Placement" ValueChanged="OnPlacementChanged">
-                    @for (var place = 1; place <= MaxPlace; place++)
-                    {
-                        <option value="@place">@place</option>
-                    }
-                </UmSelect>
+                          Value="Fighter.Placement" ValueChanged="OnPlacementChanged" Options="PlaceOptions()"/>
             </UmField>
         }
         @if (ShowTurn)
         {
             <UmField Label="Turn" Class="fighter-narrow">
-                <UmSelect TValue="int?" Variant="chip" Value="Fighter.Turn" ValueChanged="OnTurnChanged">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                </UmSelect>
+                <UmSelect TValue="int?" Variant="chip" Value="Fighter.Turn" ValueChanged="OnTurnChanged" Options="TurnOptions"/>
             </UmField>
         }
         <UmField Label="HP" Class="fighter-narrow">
@@ -75,6 +55,8 @@
 </div>
 
 @code {
+    private static readonly IReadOnlyList<SelectOption<int?>> TurnOptions = [new(1, "1"), new(2, "2")];
+
     [Parameter, EditorRequired]
     public UiFighterDto Fighter { get; set; } = default!;
 
@@ -100,6 +82,19 @@
     public EventCallback OnChanged { get; set; }
 
     private static int? ParseInt(string? value) => int.TryParse(value, out var parsed) ? parsed : null;
+
+    private IReadOnlyList<SelectOption<Guid>> PlayerOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Player…") }
+            .Concat(Players.Select(p => new SelectOption<Guid>(p.Id, p.Name ?? "Unknown", AvatarUrl: p.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<Guid>> HeroOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Hero…") }
+            .Concat(Heroes.Select(h => new SelectOption<Guid>(h.Id, h.Name, ArtUrl: h.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<int?>> PlaceOptions()
+        => Enumerable.Range(1, MaxPlace).Select(place => new SelectOption<int?>(place, place.ToString())).ToList();
 
     private Task OnPlayerChanged(Guid playerId)
     {

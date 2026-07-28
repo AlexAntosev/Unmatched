@@ -28,6 +28,7 @@ builder.Services.AddScoped<RatingRecalculationStateNotifier>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<NavState>();
 builder.Services.AddScoped<NavCountsService>();
+builder.Services.AddScoped<AppSettingsService>();
 
 builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
 builder.Services.AddSingleton<IAmazonS3>(sp =>

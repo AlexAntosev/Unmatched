@@ -5,6 +5,10 @@
 <div class="um-matchup @Class">
     <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="@TokenSize" Radius="7"/>
     <span class="um-matchup-name">@Name</span>
+    @if (Meta is not null)
+    {
+        <span class="um-matchup-meta">@Meta</span>
+    }
     <div class="um-matchup-track" style="@($"width:{BarWidth}px")">
         <div class="um-matchup-fill" style="width:@Percent%;background:@Color"></div>
     </div>
@@ -20,6 +24,10 @@
 
     [Parameter]
     public int Percent { get; set; }
+
+    /// <summary>Caption between the name and the bar, e.g. "14 met".</summary>
+    [Parameter]
+    public string? Meta { get; set; }
 
     [Parameter]
     public int TokenSize { get; set; } = 26;

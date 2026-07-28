@@ -100,16 +100,51 @@
     color: var(--um-text-muted);
 }
 
-.scoreboard-epic {
+.scoreboard-footer {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 6px 10px 0;
+    gap: 14px;
+    margin-top: 2px;
+    padding: 10px 12px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-inset);
 }
 
-.scoreboard-epic-label {
+.scoreboard-footer-epic {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+}
+
+.scoreboard-footer-label {
     font: 500 9px var(--um-font-mono);
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    color: var(--um-text-faint);
+}
+
+.scoreboard-footer-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--um-border);
+}
+
+.scoreboard-footer-comment {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+}
+
+.scoreboard-footer-comment-text {
+    font: 400 12px/1.55 var(--um-font-body);
+    color: var(--um-text-bright);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.scoreboard-footer-comment-text.is-empty {
     color: var(--um-text-faint);
 }

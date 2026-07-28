@@ -42,21 +42,11 @@
             </UmField>
             <UmField Label="Initial stage">
                 <UmSelect TValue="Stage" Icon="bi-diagram-2" Value="_form.InitialStage"
-                          ValueChanged="@(stage => _form.InitialStage = stage)">
-                    @foreach (var stage in AllStages)
-                    {
-                        <option value="@stage">@stage.GetStageName()</option>
-                    }
-                </UmSelect>
+                          ValueChanged="@(stage => _form.InitialStage = stage)" Options="StageOptions"/>
             </UmField>
             <UmField Label="Type">
                 <UmSelect TValue="TournamentType" Icon="bi-trophy" Value="_form.Type"
-                          ValueChanged="@(type => _form.Type = type)">
-                    @foreach (var type in AllTypes)
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </UmSelect>
+                          ValueChanged="@(type => _form.Type = type)" Options="TypeOptions"/>
             </UmField>
             <UmButton Variant="primary" Icon="bi-plus-lg" Disabled="@(!IsFormValid)" OnClick="AddAsync">
                 Add tournament
@@ -74,6 +64,12 @@
     ];
 
     private static readonly TournamentType[] AllTypes = [TournamentType.Championship, TournamentType.League];
+
+    private static readonly IReadOnlyList<SelectOption<Stage>> StageOptions =
+        AllStages.Select(stage => new SelectOption<Stage>(stage, stage.GetStageName())).ToList();
+
+    private static readonly IReadOnlyList<SelectOption<TournamentType>> TypeOptions =
+        AllTypes.Select(type => new SelectOption<TournamentType>(type, type.ToString())).ToList();
 
     private List<TournamentDto> _tournaments = new();
     private TournamentDto _form = new();

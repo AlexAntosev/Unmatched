@@ -284,3 +284,44 @@
     font: 400 12px var(--um-font-body);
     color: var(--um-text-dim);
 }
+
+.hero-matchups-caption {
+    font: 400 9.5px var(--um-font-mono);
+    letter-spacing: 0.04em;
+    color: var(--um-text-faint);
+    margin-bottom: 2px;
+}
+
+.hero-matchup-pager {
+    display: flex;
+    gap: 6px;
+}
+
+.hero-matchup-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--um-border);
+    border-radius: 7px;
+    background: none;
+    color: #8b8c9e;
+    cursor: pointer;
+    transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.hero-matchup-page:hover:not(:disabled) {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
+}
+
+.hero-matchup-page:disabled {
+    color: #3c3d4c;
+    cursor: default;
+}
+
+.hero-matchup-page i {
+    font-size: 10px;
+}
