@@ -9,4 +9,6 @@ public interface IMapStatisticsService
     Task<IEnumerable<UiMapStatisticsDto>> GetMapsStatisticsAsync();
 
     Task<UiMapStatisticsDto> GetMapStatisticsAsync(Guid mapId);
+
+    Task<string> UpdateImageAsync(Guid mapId, string imageFileName);
 }

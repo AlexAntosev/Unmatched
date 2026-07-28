@@ -20,4 +20,18 @@ public class MapStatisticsService(IMapper mapper, IUnitOfWork unitOfWork) : IMap
         var map = await unitOfWork.MapStats.GetAsync(mapId);
         return map;
     }
+
+    public async Task<MapStats?> UpdateImageAsync(Guid mapId, string imageFileName)
+    {
+        var stats = await unitOfWork.MapStats.GetAsync(mapId);
+        if (stats is null)
+        {
+            return null;
+        }
+
+        stats.ImageFileName = imageFileName;
+        await unitOfWork.MapStats.AddOrUpdateAsync(stats);
+        await unitOfWork.SaveChangesAsync();
+        return stats;
+    }
 }

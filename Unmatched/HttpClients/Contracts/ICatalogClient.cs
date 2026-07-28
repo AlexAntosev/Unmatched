@@ -33,4 +33,6 @@ public interface ICatalogClient
     Task<CatalogVillainDto> UpdateVillainImageAsync(Guid villainId, string imageFileName);
 
     Task<CatalogMinionDto> UpdateMinionImageAsync(Guid minionId, string imageFileName);
+
+    Task<CatalogMapDto> UpdateMapImageAsync(Guid mapId, string imageFileName);
 }

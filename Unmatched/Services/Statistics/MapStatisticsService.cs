@@ -24,4 +24,10 @@ public class MapStatisticsService(IMapper mapper, IMatchClient matchClient, ISta
         var dto = await statisticsClient.GetMapsStatisticsAsync(mapId);
         return mapper.Map<UiMapStatisticsDto>(dto);
     }
+
+    public async Task<string> UpdateImageAsync(Guid mapId, string imageFileName)
+    {
+        var updated = await statisticsClient.UpdateMapImageAsync(mapId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

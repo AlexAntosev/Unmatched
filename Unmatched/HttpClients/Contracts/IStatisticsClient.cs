@@ -32,4 +32,6 @@ public interface IStatisticsClient
     Task<VillainStatisticsDto> UpdateVillainImageAsync(Guid villainId, string imageFileName);
 
     Task<MinionStatisticsDto> UpdateMinionImageAsync(Guid minionId, string imageFileName);
+
+    Task<MapStatisticsDto> UpdateMapImageAsync(Guid mapId, string imageFileName);
 }
