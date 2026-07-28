@@ -13,4 +13,6 @@ public class FighterHeroDto
     public IEnumerable<FighterSidekickDto> Sidekicks { get; set; }
 
     public string Color { get; set; }
+
+    public string? ImageFileName { get; set; }
 }
