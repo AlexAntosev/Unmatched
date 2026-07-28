@@ -194,8 +194,7 @@
             </Panel>
         </div>
 
-        <MatchList Matches="_matchLog" Title="Match log" PageSize="6"
-                   Meta="@($"{_matchLog.Count} matches")"/>
+        <HeroMatches HeroName="@_hero.Name" Entries="_heroMatches"/>
 
         <div class="hero-duo">
             <MonsterMatchupTable Title="Against villains" Rows="_villainMatchups"/>
@@ -216,6 +215,7 @@
     private string? _expansionName;
 
     private List<UiMatchLogDto> _matchLog = new();
+    private List<HeroMatchEntry> _heroMatches = new();
     private List<RatingChangeDto> _ratingChanges = new();
     private List<ChartPoint> _ratingPoints = new();
     private IReadOnlyList<HeroMatchup> _matchups = [];
@@ -287,6 +287,7 @@
                 : (int)Math.Round((double)_hero.TotalWins / _hero.TotalMatches * 100);
 
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
+            _heroMatches = HeroMatchPresentation.Build(heroId, _matchLog).ToList();
             var matchups = HeroMatchupCalculator.Calculate(heroId, _matchLog);
             _matchups = matchups;
             _matchupPage = 1;

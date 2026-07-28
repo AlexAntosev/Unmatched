@@ -1,10 +1,14 @@
 @page "/villains-statistics"
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @inject IVillainStatisticsService VillainStatisticsService
+@inject IVillainService VillainService
+@inject ICollectionService CollectionService
 @inject NavigationManager NavManager
 @*
-    Not in the design pack: the 1c ladder pattern, in the villain hue.
+    Not in the design pack: the 1c ladder pattern, in the villain hue. Villains from sets you do not
+    own are hidden, matching the heroes and maps ladders.
 *@
 
 <EntityLadder TItem="VillainStatisticsDto" Items="_villains" Title="Villains"
@@ -49,9 +53,27 @@
         try
         {
             PreloadService.Show();
-            _villains = (await VillainStatisticsService.GetVillainsStatisticsAsync())
-                .OrderByDescending(v => v.TotalMatches)
-                .ToList();
+
+            var stats = VillainStatisticsService.GetVillainsStatisticsAsync();
+            var catalog = VillainService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, catalog, owned);
+
+            var catalogVillains = catalog.Result.ToDictionary(v => v.Id);
+            var ownedExpansionIds = owned.Result.ToHashSet();
+
+            _villains = stats.Result.ToList();
+
+            if (ownedExpansionIds.Count > 0)
+            {
+                _villains = _villains
+                    .Where(v => !catalogVillains.TryGetValue(v.VillainId, out var catalogVillain)
+                             || catalogVillain.ExpansionId is null
+                             || ownedExpansionIds.Contains(catalogVillain.ExpansionId.Value))
+                    .ToList();
+            }
+
+            _villains = _villains.OrderByDescending(v => v.TotalMatches).ToList();
             _totalMatches = _villains.Sum(v => v.TotalMatches);
         }
         finally

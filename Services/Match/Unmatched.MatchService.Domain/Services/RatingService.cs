@@ -2,10 +2,11 @@
 
 using AutoMapper;
 
+using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, IMapper mapper) : IRatingService
+public class RatingService(IMatchHandlerFactory matchHandlerFactory, IUnitOfWork unitOfWork, IMapper mapper) : IRatingService
 {
     public async Task<IEnumerable<Rating>> GetAllAsync()
     {
@@ -54,32 +55,30 @@ public class RatingService(IMatchService matchService, IUnitOfWork unitOfWork, I
     public Task<bool> IsRecalculationRequiredAsync()
         => unitOfWork.RatingRecalculationState.IsRecalculationRequiredAsync();
 
+    /// <remarks>
+    /// Ratings and Fighters.MatchPoints are values derived from the match history, so a recalculation only
+    /// resets those and replays the history over them - the matches and fighters themselves are never
+    /// deleted. Replaying goes straight through the match handlers rather than through IMatchService so
+    /// that re-deriving old ratings doesn't re-publish a match-created event per match (which would
+    /// double-count every match in the statistics service) or re-award titles.
+    /// </remarks>
     public async Task RecalculateAsync()
     {
-        var matches = await GetMatchesAsync();
+        var matches = (await unitOfWork.Matches.GetFinishedForRatingReplayAsync()).OrderBy(m => m.Date).ToList();
 
-        await ClearDataAsync();
+        // if the replay dies halfway through, the ratings left behind are derived from only part of the
+        // history - keep the flag raised until it has fully succeeded so the UI keeps asking for a re-run.
+        await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(true);
+
+        unitOfWork.Ratings.DeleteAll();
+        await unitOfWork.SaveChangesAsync();
 
         foreach (var match in matches)
         {
-            await matchService.AddOrUpdateAsync(match);
+            var handler = matchHandlerFactory.Create(match);
+            await handler.HandleAsync(match);
         }
 
         await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(false);
-    }
-
-    private async Task ClearDataAsync()
-    {
-        unitOfWork.Matches.DeleteAll();
-        unitOfWork.Fighters.DeleteAll();
-        unitOfWork.Ratings.DeleteAll();
-
-        await unitOfWork.SaveChangesAsync();
-    }
-
-    private async Task<IEnumerable<Match>> GetMatchesAsync()
-    {
-        var matches = await unitOfWork.Matches.GetAsync();
-        return matches.Select(mapper.Map<Match>).OrderBy(m => m.Date);
     }
 }

@@ -289,7 +289,7 @@
         return fighter;
     }
 
-    /// <summary>Heroes and maps from sets you do not own are hidden, except ones already picked.</summary>
+    /// <summary>Heroes, maps, villains and minions from sets you do not own are hidden, except ones already picked.</summary>
     private async Task FilterByCollectionAsync()
     {
         var ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
@@ -300,12 +300,20 @@
 
         var keepHeroIds = _match.Fighters.Select(f => f.HeroId).Where(id => id != Guid.Empty).ToHashSet();
         var keepMapId = _match.Map?.Id;
+        var keepVillainId = _match.Villain?.VillainId;
+        var keepMinionIds = (_match.Villain?.Minions ?? []).Select(m => m.MinionId).Where(id => id != Guid.Empty).ToHashSet();
 
         _heroes = _heroes
             .Where(h => h.ExpansionId is null || ownedExpansionIds.Contains(h.ExpansionId.Value) || keepHeroIds.Contains(h.Id))
             .ToList();
         _maps = _maps
             .Where(m => m.ExpansionId is null || ownedExpansionIds.Contains(m.ExpansionId.Value) || m.Id == keepMapId)
+            .ToList();
+        _villains = _villains
+            .Where(v => v.ExpansionId is null || ownedExpansionIds.Contains(v.ExpansionId.Value) || v.Id == keepVillainId)
+            .ToList();
+        _minions = _minions
+            .Where(m => m.ExpansionId is null || ownedExpansionIds.Contains(m.ExpansionId.Value) || keepMinionIds.Contains(m.Id))
             .ToList();
     }
 

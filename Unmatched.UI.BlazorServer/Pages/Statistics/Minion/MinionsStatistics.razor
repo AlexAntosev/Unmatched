@@ -1,11 +1,15 @@
 @page "/minions-statistics"
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @inject IMinionStatisticsService MinionStatisticsService
+@inject IMinionService MinionService
+@inject ICollectionService CollectionService
 @inject NavigationManager NavManager
 @*
     Not in the design pack: the 1c ladder pattern. Wins here are the minion's own - a minion wins
-    when the villain side wins.
+    when the villain side wins. Minions from sets you do not own are hidden, matching the heroes
+    and maps ladders.
 *@
 
 <EntityLadder TItem="MinionStatisticsDto" Items="_minions" Title="Minions"
@@ -50,9 +54,27 @@
         try
         {
             PreloadService.Show();
-            _minions = (await MinionStatisticsService.GetMinionsStatisticsAsync())
-                .OrderByDescending(m => m.TotalMatches)
-                .ToList();
+
+            var stats = MinionStatisticsService.GetMinionsStatisticsAsync();
+            var catalog = MinionService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, catalog, owned);
+
+            var catalogMinions = catalog.Result.ToDictionary(m => m.Id);
+            var ownedExpansionIds = owned.Result.ToHashSet();
+
+            _minions = stats.Result.ToList();
+
+            if (ownedExpansionIds.Count > 0)
+            {
+                _minions = _minions
+                    .Where(m => !catalogMinions.TryGetValue(m.MinionId, out var catalogMinion)
+                             || catalogMinion.ExpansionId is null
+                             || ownedExpansionIds.Contains(catalogMinion.ExpansionId.Value))
+                    .ToList();
+            }
+
+            _minions = _minions.OrderByDescending(m => m.TotalMatches).ToList();
             _totalMatches = _minions.Sum(m => m.TotalMatches);
         }
         finally

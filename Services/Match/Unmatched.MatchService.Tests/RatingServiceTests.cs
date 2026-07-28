@@ -5,16 +5,14 @@ using AutoMapper;
 using Moq;
 
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Services;
 
-using Fighter = Unmatched.MatchService.Domain.Models.Fighter;
-using Match = Unmatched.MatchService.Domain.Models.Match;
-using SaveMatchResult = Unmatched.MatchService.Domain.Models.SaveMatchResult;
-
 public class RatingServiceTests
 {
-    private readonly Mock<IMatchService> _matchService = new();
+    private readonly Mock<IMatchHandlerFactory> _matchHandlerFactory = new();
+    private readonly Mock<IMatchHandler> _matchHandler = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
@@ -31,11 +29,10 @@ public class RatingServiceTests
         _unitOfWork.Setup(u => u.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(u => u.RatingRecalculationState).Returns(_recalculationStateRepository.Object);
 
-        _mapper
-            .Setup(m => m.Map<Match>(It.IsAny<MatchEntity>()))
-            .Returns((MatchEntity e) => new Match { Id = e.Id, Date = e.Date, Fighters = Array.Empty<Fighter>(), Comment = string.Empty });
+        _matchHandlerFactory.Setup(f => f.Create(It.IsAny<MatchEntity>())).Returns(_matchHandler.Object);
+        _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
-        _ratingService = new RatingService(_matchService.Object, _unitOfWork.Object, _mapper.Object);
+        _ratingService = new RatingService(_matchHandlerFactory.Object, _unitOfWork.Object, _mapper.Object);
     }
 
     [Fact]
@@ -50,13 +47,13 @@ public class RatingServiceTests
         var matchMar = new MatchEntity { Id = Guid.NewGuid(), Date = new DateTime(2026, 3, 1), Fighters = new List<FighterEntity>() };
 
         // storage returns them out of chronological order - as if matchJan was the backdated one, added last
-        _matchRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<MatchEntity> { matchFeb, matchMar, matchJan });
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity> { matchFeb, matchMar, matchJan });
 
         var replayOrder = new List<Guid>();
-        _matchService
-            .Setup(s => s.AddOrUpdateAsync(It.IsAny<Match>()))
-            .Callback((Match m) => replayOrder.Add(m.Id))
-            .ReturnsAsync((SaveMatchResult)null!);
+        _matchHandler
+            .Setup(h => h.HandleAsync(It.IsAny<MatchEntity>()))
+            .Callback((MatchEntity m) => replayOrder.Add(m.Id))
+            .Returns(Task.CompletedTask);
 
         await _ratingService.RecalculateAsync();
 
@@ -64,26 +61,52 @@ public class RatingServiceTests
     }
 
     [Fact]
-    public async Task RecalculateAsync_ClearsExistingMatchesFightersAndRatingsBeforeReplaying()
+    public async Task RecalculateAsync_ClearsRatings_ButNeverDeletesMatchesOrFighters()
     {
-        _matchRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<MatchEntity>());
+        // ratings are derived data and get rebuilt by the replay; the match history is the source of truth
+        // and has to survive - deleting it up front meant a failing replay wiped it permanently.
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity>());
 
         await _ratingService.RecalculateAsync();
 
-        _matchRepository.Verify(r => r.DeleteAll(), Times.Once);
-        _fighterRepository.Verify(r => r.DeleteAll(), Times.Once);
         _ratingRepository.Verify(r => r.DeleteAll(), Times.Once);
-        _unitOfWork.Verify(u => u.SaveChangesAsync(), Times.Once);
+        _matchRepository.Verify(r => r.DeleteAll(), Times.Never);
+        _fighterRepository.Verify(r => r.DeleteAll(), Times.Never);
+    }
+
+    [Fact]
+    public async Task RecalculateAsync_ReplaysOnlyFinishedMatches()
+    {
+        // a planned match has no result to score, and replaying one would silently mark it played
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity>());
+
+        await _ratingService.RecalculateAsync();
+
+        _matchRepository.Verify(r => r.GetFinishedForRatingReplayAsync(), Times.Once);
+        _matchRepository.Verify(r => r.GetAsync(), Times.Never);
     }
 
     [Fact]
     public async Task RecalculateAsync_ClearsRecalculationRequiredFlagAfterReplaying()
     {
-        _matchRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<MatchEntity>());
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity>());
 
         await _ratingService.RecalculateAsync();
 
         _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(false), Times.Once);
+    }
+
+    [Fact]
+    public async Task RecalculateAsync_ReplayFails_LeavesRecalculationRequiredFlagRaised()
+    {
+        var match = new MatchEntity { Id = Guid.NewGuid(), Date = new DateTime(2026, 1, 1), Fighters = new List<FighterEntity>() };
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity> { match });
+        _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ThrowsAsync(new InvalidOperationException("boom"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _ratingService.RecalculateAsync());
+
+        _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(true), Times.Once);
+        _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(false), Times.Never);
     }
 
     [Fact]

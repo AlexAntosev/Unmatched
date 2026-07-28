@@ -28,6 +28,11 @@ public class MatchRepository(UnmatchedDbContext dbContext) : BaseRepository<Matc
         return await DbContext.Matches.Include(x => x.Tournament).Include(x => x.Fighters).Include(x => x.Villain).ThenInclude(v => v.Minions).Where(m => !m.IsPlanned).AsNoTracking().ToListAsync();
     }
 
+    public async Task<List<MatchEntity>> GetFinishedForRatingReplayAsync()
+    {
+        return await DbContext.Matches.Include(x => x.Fighters).Include(x => x.Villain).ThenInclude(v => v.Minions).Where(m => !m.IsPlanned).AsNoTracking().ToListAsync();
+    }
+
     public async Task<List<MatchEntity>> GetFinishedByHeroIdAsync(Guid heroId)
     {
         return await DbContext.Matches
