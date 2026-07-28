@@ -1,0 +1,73 @@
+@using System.Globalization
+@*
+    The four play-style axes (Attack / Defence / Trickery / Difficulty) on a 0-3 scale, drawn as a
+    diamond so the shape reads at a glance at ladder-sidebar size. Axis labels are HTML overlays
+    because Razor reserves the SVG <text> tag.
+*@
+<div class="um-radar @Class" style="@($"height:{Height}px")">
+    <svg viewBox="0 0 120 120" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Play style">
+        <polygon points="60,14 106,60 60,106 14,60" fill="none" stroke="rgba(255,255,255,.09)"></polygon>
+        <polygon points="60,37 83,60 60,83 37,60" fill="none" stroke="rgba(255,255,255,.07)"></polygon>
+        <polygon points="@Points" fill="@FillColor" stroke="@StrokeColor" stroke-width="2"></polygon>
+    </svg>
+    @if (ShowLabels)
+    {
+        <span class="um-radar-label is-top">Attack</span>
+        <span class="um-radar-label is-right">Def</span>
+        <span class="um-radar-label is-bottom">Trickery</span>
+        <span class="um-radar-label is-left">Dif</span>
+    }
+</div>
+
+@code {
+    // Centre of the 120x120 viewBox and the radius of the outer ring.
+    private const double Centre = 60;
+    private const double MaxRadius = 46;
+
+    [Parameter]
+    public int Attack { get; set; }
+
+    [Parameter]
+    public int Defence { get; set; }
+
+    [Parameter]
+    public int Trickery { get; set; }
+
+    [Parameter]
+    public int Difficulty { get; set; }
+
+    [Parameter]
+    public int Max { get; set; } = 3;
+
+    [Parameter]
+    public bool ShowLabels { get; set; } = true;
+
+    [Parameter]
+    public int Height { get; set; } = 130;
+
+    [Parameter]
+    public string FillColor { get; set; } = "rgba(168,85,247,.28)";
+
+    [Parameter]
+    public string StrokeColor { get; set; } = "var(--um-mode-2v2)";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>Top, right, bottom, left - attack, defence, trickery, difficulty.</summary>
+    private string Points
+    {
+        get
+        {
+            var up = Centre - Scale(Attack);
+            var right = Centre + Scale(Defence);
+            var down = Centre + Scale(Trickery);
+            var left = Centre - Scale(Difficulty);
+            return $"{F(Centre)},{F(up)} {F(right)},{F(Centre)} {F(Centre)},{F(down)} {F(left)},{F(Centre)}";
+        }
+    }
+
+    private double Scale(int value) => Math.Clamp(value, 0, Max) / (double)Math.Max(Max, 1) * MaxRadius;
+
+    private static string F(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

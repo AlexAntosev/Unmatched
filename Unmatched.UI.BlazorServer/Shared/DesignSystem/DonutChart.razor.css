@@ -1,0 +1,31 @@
+.um-donut {
+    position: relative;
+    flex: none;
+}
+
+.um-donut svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.um-donut-centre {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.um-donut-value {
+    font: 700 26px/1 var(--um-font-display);
+    color: var(--um-text);
+}
+
+.um-donut-caption {
+    font: 500 9px var(--um-font-mono);
+    color: var(--um-text-muted);
+}

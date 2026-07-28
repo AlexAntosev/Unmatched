@@ -1,102 +1,94 @@
-﻿@page "/tournaments"
-@using Microsoft.AspNetCore.Components
-@using Unmatched.Dtos
+@page "/tournaments"
 @using Unmatched.Dtos.Match
 @using Unmatched.Enums
 @using Unmatched.Extensions
-@using Unmatched.Services
 @using Unmatched.Services.Contracts
-ons
 @inject ITournamentService TournamentService
 @inject NavigationManager NavManager
+@*
+    Not in the design pack: a panel of rows plus a create form, built from design-system parts.
+    A first pass - the layout is deliberately plain until this screen gets designed.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Tournaments</h1>
-    <div style="margin-bottom: 16px">
-        <SfGrid DataSource="@_tournaments" AllowPaging="true" AllowSorting="true">
-            <GridEvents CommandClicked="OnCommandClick" OnRecordClick="RecordClickHandler" TValue="TournamentDto"></GridEvents>
-            <GridPageSettings PageSize="20"></GridPageSettings>
-            <GridColumns>
-                <GridColumn Field=@nameof(TournamentDto.Name) HeaderText="Tournament" Width="120"></GridColumn>
-                <GridColumn Width="150">
-                    <GridCommandColumns>
-                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                    </GridCommandColumns>
-                </GridColumn>
-            </GridColumns>
-        </SfGrid>
-    </div>
-    <div>
-        <EditForm Model=@_addTournamentForm>
-            <div style="width: 256px; margin-bottom: 8px">
-                <label>Name:</label>
-                <InputText @bind-Value=_addTournamentForm.Name name="Name" class="form-control"/>
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<div class="um-page">
+    <Panel Title="Tournaments" Meta="@($"{_tournaments.Count} tournaments")">
+        @if (_tournaments.Count == 0)
+        {
+            <div class="tournaments-empty">No tournaments yet.</div>
+        }
+        @foreach (var tournament in _tournaments)
+        {
+            <div class="tournaments-row" @onclick="@(() => Open(tournament))">
+                <i class="bi bi-flag-fill"></i>
+                <div class="tournaments-names">
+                    <div class="tournaments-name">@tournament.Name</div>
+                    <div class="tournaments-meta">
+                        @tournament.Type · @tournament.CurrentStage.GetStageName()
+                    </div>
+                </div>
+                <UmButton Size="sm" Variant="danger" Icon="bi-trash" StopPropagation="true"
+                          OnClick="@(() => DeleteAsync(tournament.Id))">Delete</UmButton>
             </div>
-            <div style="width: 256px; margin-bottom: 8px">
-                <label>Initial stage:</label>
-                <InputSelect @bind-Value=_addTournamentForm.InitialStage name="InitialStage" id="stages" class="form-select">
-                    @foreach (var stage in _stages)
-                    {
-                        <option value="@stage.Item1"> @stage.Item2</option>
-                    }
-                </InputSelect >
-            </div>
-            <div style="width: 256px; margin-bottom: 8px">
-                <label>Tournament type:</label>
-                <InputSelect @bind-Value=_addTournamentForm.Type name="Type" id="types" class="form-select">
-                    @foreach (var type in _types)
-                    {
-                        <option value="@type.Item1"> @type.Item2</option>
-                    }
-                </InputSelect >
-            </div>
-            <button class="btn btn-primary" @onclick="OnAddTournamentClick">Add tournament</button>
-        </EditForm>
-    </div>
+        }
+    </Panel>
+
+    <Panel Title="New tournament">
+        <div class="tournaments-form">
+            <UmField Label="Name">
+                <UmTextField Placeholder="Tournament name" Value="@_form.Name"
+                             ValueChanged="@(v => _form.Name = v)"/>
+            </UmField>
+            <UmField Label="Initial stage">
+                <UmSelect TValue="Stage" Icon="bi-diagram-2" Value="_form.InitialStage"
+                          ValueChanged="@(stage => _form.InitialStage = stage)" Options="StageOptions"/>
+            </UmField>
+            <UmField Label="Type">
+                <UmSelect TValue="TournamentType" Icon="bi-trophy" Value="_form.Type"
+                          ValueChanged="@(type => _form.Type = type)" Options="TypeOptions"/>
+            </UmField>
+            <UmButton Variant="primary" Icon="bi-plus-lg" Disabled="@(!IsFormValid)" OnClick="AddAsync">
+                Add tournament
+            </UmButton>
+        </div>
+    </Panel>
 </div>
 
 @code {
-    private List<TournamentDto> _tournaments = new ();
-    private readonly TournamentDto _addTournamentForm = new();
-    private List<(Stage?, string)> _stages = new();
-    private List<(TournamentType, string)> _types = new();
-    
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Tournaments")];
 
-    protected override async Task OnInitializedAsync()
-    {
-        _types = new List<(TournamentType, string)>
-            {
-                (TournamentType.Championship, "Championship"),
-                (TournamentType.League, "League"),
-            };
-        _stages = new List<(Stage?, string)>
-            {
-                (null, ""),
-                (Stage.EighthFinals, Stage.EighthFinals.GetStageName()),
-                (Stage.QuarterFinals, Stage.QuarterFinals.GetStageName()),
-                (Stage.SemiFinals, Stage.SemiFinals.GetStageName()),
-                (Stage.ThirdPlaceDecider, Stage.ThirdPlaceDecider.GetStageName()),
-                (Stage.GrandFinals, Stage.GrandFinals.GetStageName())
-            };
-        
-        await RefreshTournamentsAsync();
-    }
-    
-    private void RecordClickHandler(RecordClickEventArgs<TournamentDto> args)
-    {
-        var tournamentId = args.RowData.Id;
-        var url = $"{Urls.Tournaments}/{tournamentId}";
-        NavManager.NavigateTo(url);
-    }
+    private static readonly Stage[] AllStages =
+    [
+        Stage.EighthFinals, Stage.QuarterFinals, Stage.SemiFinals, Stage.ThirdPlaceDecider, Stage.GrandFinals
+    ];
 
-    private async Task RefreshTournamentsAsync()
+    private static readonly TournamentType[] AllTypes = [TournamentType.Championship, TournamentType.League];
+
+    private static readonly IReadOnlyList<SelectOption<Stage>> StageOptions =
+        AllStages.Select(stage => new SelectOption<Stage>(stage, stage.GetStageName())).ToList();
+
+    private static readonly IReadOnlyList<SelectOption<TournamentType>> TypeOptions =
+        AllTypes.Select(type => new SelectOption<TournamentType>(type, type.ToString())).ToList();
+
+    private List<TournamentDto> _tournaments = new();
+    private TournamentDto _form = new();
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private bool IsFormValid
+        => !string.IsNullOrWhiteSpace(_form.Name)
+        && _tournaments.All(t => !string.Equals(t.Name, _form.Name, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync() => await RefreshAsync();
+
+    private async Task RefreshAsync()
     {
         try
         {
             PreloadService.Show();
-            
-            _tournaments = (await TournamentService.GetAsync()).ToList();
+            _tournaments = (await TournamentService.GetAsync()).OrderBy(t => t.Name).ToList();
         }
         finally
         {
@@ -104,31 +96,21 @@ ons
         }
     }
 
-    private async Task OnAddTournamentClick()
+    private async Task AddAsync()
     {
-        if (IsInvalidTournamentName(_addTournamentForm.Name))
+        if (!IsFormValid)
         {
             return;
         }
-        
-        await AddTournamentAsync(_addTournamentForm);
-    }
 
-    private bool IsInvalidTournamentName(string? tournamentName)
-    {
-        return tournamentName is null || tournamentName == string.Empty || _tournaments.Any(t => t.Name == tournamentName);
-    }
-    
-    private async Task AddTournamentAsync(TournamentDto tournament)
-    {
         try
         {
             PreloadService.Show();
-
-            tournament.CurrentStage = tournament.InitialStage;
-            var created = await TournamentService.AddAsync(tournament);
+            _form.CurrentStage = _form.InitialStage;
+            var created = await TournamentService.AddAsync(_form);
             await TournamentService.GenerateMatchesAsync(created.Id);
-            _tournaments = (await TournamentService.GetAsync()).ToList();
+            _form = new TournamentDto();
+            await RefreshAsync();
         }
         finally
         {
@@ -136,32 +118,12 @@ ons
         }
     }
 
-    private async Task OnCommandClick(CommandClickEventArgs<TournamentDto> args)
+    private async Task DeleteAsync(Guid id)
     {
-        switch (args.CommandColumn.Type)
-        {
-            case CommandButtonType.Delete:
-                await DeleteTournamentAsync(args.RowData.Id);
-                break;
-            case CommandButtonType.Edit:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        await TournamentService.DeleteAsync(id);
+        await RefreshAsync();
     }
 
-    private async Task DeleteTournamentAsync(Guid id)
-    {
-        try
-        {
-            PreloadService.Show();
-            
-            await TournamentService.DeleteAsync(id);
-            _tournaments = (await TournamentService.GetAsync()).ToList();
-        }
-        finally
-        {
-            PreloadService.Hide();
-        }
-    }
+    private void Open(TournamentDto tournament)
+        => NavManager.NavigateTo($"{Urls.Tournaments}/{tournament.Id}");
 }

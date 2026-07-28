@@ -27,6 +27,11 @@ public class FavoriteStatisticsDto : IComparable<FavoriteStatisticsDto>
             ? Math.Round((double)TotalWins / TotalLooses, 2)
             : 0;
 
+    public int WinRate
+        => TotalMatches == 0
+            ? 0
+            : (int)Math.Round((double)TotalWins / TotalMatches * 100);
+
     public int Place { get; set; }
 
     public int TotalLooses { get; set; }

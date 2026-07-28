@@ -1,0 +1,33 @@
+@*
+    A mono caption, a hairline that eats the remaining width, and an optional trailing count -
+    the header used above the expansion shelf and each section of the collection side panel.
+*@
+<div class="um-section @Class">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="bi @Icon" style="@(IconColor is null ? null : $"color:{IconColor}")"></i>
+    }
+    <div class="um-section-text">@Text</div>
+    <div class="um-section-rule"></div>
+    @if (!string.IsNullOrEmpty(Meta))
+    {
+        <div class="um-section-meta">@Meta</div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public string? Meta { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

@@ -1,69 +1,228 @@
-﻿@page "/heroes-statistics"
-@using Microsoft.AspNetCore.Components
+@page "/heroes-statistics"
 @using Unmatched.Dtos
-@using Unmatched.Services.Statistics
+@using Unmatched.Extensions
 @using Unmatched.Services.Contracts
-@using Unmatched.Constants
+@using Unmatched.Services.Statistics
 @inject NavigationManager NavManager
 @inject IHeroStatisticsService HeroStatisticsService
 @inject IHeroService HeroService
+@inject IPlayStyleService PlayStyleService
 @inject ICollectionService CollectionService
+@inject IExpansionService ExpansionService
+@inject IMatchService MatchService
+@*
+    Screen 1c, the landing screen: a dense ranked list with an analysis column that follows the
+    hovered or selected hero. Heroes from expansions you do not own are hidden, which is what the
+    Collection screen's owned flags are for.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Heroes Statistics</h1>
-    <SfGrid @ref="_grid" DataSource="@_heroes" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="40"></GridPageSettings>
-        <GridEvents QueryCellInfo="CustomizeCell" OnRecordClick="RecordClickHandler" TValue="UiHeroStatisticsDto"></GridEvents>
-        <GridSortSettings>
-            <GridSortColumns>
-                <GridSortColumn Field="@nameof(UiHeroStatisticsDto.Points)" Direction="SortDirection.Descending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
-        <GridColumns>
-            <GridColumn Field=@nameof(UiHeroStatisticsDto.Place) Width="25" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Width="20">
-                <Template>
-                    @{
-                        var hero = context as UiHeroStatisticsDto;
-                        <div class="image">
-                            <img src="@hero?.ImageUrl" alt="@hero.HeroId" width="100%" height="auto" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+<PageHeader Breadcrumbs="Crumbs">
+    <Controls>
+        <UmSearchBox Value="@_search" ValueChanged="OnSearchChanged" Placeholder="Search hero…"/>
+    </Controls>
+</PageHeader>
+
+<div class="ladder">
+    <header class="ladder-head">
+        <div>
+            <h1 class="um-page-title">Heroes ladder</h1>
+            <div class="ladder-lede">@_heroes.Count heroes · @_totalMatches.ToString("N0") matches</div>
+        </div>
+        <div class="um-spacer"></div>
+        @foreach (var stat in HeadlineStats())
+        {
+            <div class="ladder-headline">
+                <div class="ladder-headline-label">@stat.Label</div>
+                <div class="ladder-headline-value" style="color:@stat.Color">@stat.Value</div>
+            </div>
+        }
+    </header>
+
+    <Tabs TValue="LadderSort" Options="SortTabs" Value="_sort" ValueChanged="OnSortChanged" Class="ladder-tabs"/>
+
+    <div class="ladder-body">
+        <div class="ladder-list">
+            <ColumnHeader Columns="@Columns">
+                <div>#</div>
+                <div>Hero</div>
+                <div class="ladder-right">Pts</div>
+                <div class="ladder-right">GP</div>
+                <div>W / L</div>
+                <div class="ladder-right">K/D</div>
+            </ColumnHeader>
+
+            @foreach (var hero in _page)
+            {
+                <LadderRow Columns="@Columns"
+                           Rank="@DisplayRank(hero)"
+                           Name="@hero.Name"
+                           Sub="@ExpansionName(hero.HeroId)"
+                           ImageUrl="@hero.ImageUrl"
+                           IsRanged="hero.IsRanged"
+                           EdgeColor="@EdgeColor(hero)"
+                           WashColor="@WashColor(hero)"
+                           Selected="@(_spotlight?.HeroId == hero.HeroId)"
+                           OnHover="@(() => SelectAsync(hero))"
+                           OnClick="@(() => OpenHero(hero))">
+                    <Metrics>
+                        <div class="ladder-points" style="color:@(hero.Points < 0 ? "var(--um-loss)" : "var(--um-accent-text)")">
+                            @hero.Points
+                        </div>
+                        <div class="ladder-matches">@hero.TotalMatches</div>
+                        <WinLossBar Wins="hero.TotalWins" Losses="hero.TotalLooses"/>
+                        <div class="ladder-kd" style="color:@(hero.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                            @hero.Kd.ToString("0.00")
+                        </div>
+                    </Metrics>
+                </LadderRow>
+            }
+
+            <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage" ShowLabels="true"
+                        Class="ladder-pagination"/>
+        </div>
+
+        <aside class="ladder-aside">
+            @if (_spotlight is not null)
+            {
+                <Panel Raised="true">
+                    <div class="spotlight-head">
+                        <HeroToken ImageUrl="@_spotlight.ImageUrl" Alt="@_spotlight.Name" Size="40" Radius="11"/>
+                        <div>
+                            <div class="spotlight-name">@_spotlight.Name</div>
+                            <div class="spotlight-rank">selected · rank @(DisplayRank(_spotlight)?.ToString("00") ?? "-")</div>
+                        </div>
+                    </div>
+                    <div class="spotlight-stats">
+                        <StatTile Variant="inset" Label="Pts" Value="@_spotlight.Points.ToString()"
+                                  ValueColor="var(--um-accent-text)"/>
+                        <StatTile Variant="inset" Label="WR" Value="@($"{WinRate(_spotlight)}%")"
+                                  ValueColor="var(--um-win)"/>
+                        <StatTile Variant="inset" Label="HP" Value="@_spotlight.Hp.ToString()"/>
+                        <StatTile Variant="inset" Label="Deck" Value="@_spotlight.DeckSize.ToString()"/>
+                    </div>
+                    <RadarChart Attack="_spotlightStyle?.Attack ?? 0"
+                                Defence="_spotlightStyle?.Defence ?? 0"
+                                Trickery="_spotlightStyle?.Trickery ?? 0"
+                                Difficulty="_spotlightStyle?.Difficulty ?? 0"/>
+                </Panel>
+
+                <Panel Raised="true" Title="Best / worst matchups">
+                    @if (_spotlightMatchups.Count == 0)
+                    {
+                        <div class="spotlight-empty">No recorded matchups yet.</div>
+                    }
+                    @foreach (var matchup in _spotlightMatchups)
+                    {
+                        <MatchupBar Name="@matchup.OpponentName" ImageUrl="@matchup.OpponentImageUrl"
+                                    Percent="matchup.WinPercent"/>
+                    }
+                </Panel>
+            }
+
+            <Panel Raised="true" Title="Collection" Meta="@($"{_ownedExpansionIds.Count} / {_expansions.Count} sets")">
+                <div class="spotlight-sets">
+                    @foreach (var expansion in _expansions.Take(6))
+                    {
+                        var owned = _ownedExpansionIds.Contains(expansion.Id);
+                        <div class="spotlight-set @(owned ? null : "is-missing")">
+                            <div class="spotlight-set-cover">
+                                @if (expansion.ImageUrl is not null)
+                                {
+                                    <img src="@expansion.ImageUrl" alt="@expansion.Name"/>
+                                }
+                                else
+                                {
+                                    <span>box art</span>
+                                }
+                            </div>
+                            <div class="spotlight-set-name">@expansion.Name</div>
+                            <div class="spotlight-set-tag" style="color:@(owned ? "var(--um-win)" : "var(--um-text-faint)")">
+                                @(owned ? "owned" : "missing")
+                            </div>
                         </div>
                     }
-                </Template>
-            </GridColumn>
-            <GridColumn Field="Name" HeaderText="Hero" Width="120"></GridColumn>
-            <GridColumn Width="20">
-                <Template>
-                    @{
-                        var hero = context as UiHeroStatisticsDto;
-                        <div class="image">
-                            <img src="@hero.MeleeRangeImageUrl" alt="@hero.HeroId" width="100%" height="auto"/>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(UiHeroStatisticsDto.Points) HeaderText="Points" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(UiHeroStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(UiHeroStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(UiHeroStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(UiHeroStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
-        </GridColumns>
-    </SfGrid>
+                </div>
+            </Panel>
+        </aside>
+    </div>
 </div>
 
 @code {
+    private const string Columns = "34px 1fr 58px 58px 90px 62px";
+    private const int PageSize = 10;
+
+    public enum LadderSort
+    {
+        Points,
+        WinRate,
+        Kd,
+        RecentlyPlayed
+    }
+
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Heroes")];
+
+    private static readonly IReadOnlyList<SelectOption<LadderSort>> SortTabs =
+    [
+        new(LadderSort.Points, "Points"), new(LadderSort.WinRate, "Win rate"),
+        new(LadderSort.Kd, "K/D"), new(LadderSort.RecentlyPlayed, "Recently played")
+    ];
+
+    private readonly Dictionary<Guid, UiPlayStyleDto?> _playStyles = new();
+
     private List<UiHeroStatisticsDto> _heroes = new();
-    SfGrid<UiHeroStatisticsDto> _grid;
-    
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private List<UiHeroStatisticsDto> _sorted = new();
+    private List<UiHeroStatisticsDto> _page = new();
+    private Dictionary<Guid, int?> _displayRanks = new();
+    private List<UiMatchLogDto> _matches = new();
+    private List<ExpansionDto> _expansions = new();
+    private Dictionary<Guid, string?> _expansionNamesByHero = new();
+    private HashSet<Guid> _ownedExpansionIds = new();
+    private Dictionary<Guid, DateTime> _lastPlayedByHero = new();
+
+    private UiHeroStatisticsDto? _spotlight;
+    private UiPlayStyleDto? _spotlightStyle;
+    private IReadOnlyList<HeroMatchup> _spotlightMatchups = [];
+
+    private LadderSort _sort = LadderSort.Points;
+    private string? _search;
+    private int _currentPage = 1;
+    private int _totalMatches;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(_sorted.Count / (double)PageSize));
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             PreloadService.Show();
-            _heroes = (await HeroStatisticsService.GetHeroesStatisticsAsync()).OrderBy(x => x.Place).ToList();
-            await FilterByCollectionAsync();
+
+            var stats = HeroStatisticsService.GetHeroesStatisticsAsync();
+            var catalogHeroes = HeroService.GetAsync();
+            var expansions = ExpansionService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            var matches = MatchService.GetMatchLogAsync();
+            await Task.WhenAll(stats, catalogHeroes, expansions, owned, matches);
+
+            _expansions = expansions.Result.OrderBy(e => e.Name).ToList();
+            _ownedExpansionIds = owned.Result.ToHashSet();
+            _matches = matches.Result.ToList();
+            _totalMatches = _matches.Count;
+
+            var heroes = catalogHeroes.Result.ToList();
+            _expansionNamesByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionName);
+            var expansionIdByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionId);
+
+            _lastPlayedByHero = _matches
+                .SelectMany(m => m.Fighters.Select(f => (f.HeroId, m.Date)))
+                .GroupBy(x => x.HeroId)
+                .ToDictionary(g => g.Key, g => g.Max(x => x.Date));
+
+            _heroes = FilterByCollection(stats.Result.ToList(), expansionIdByHero);
+            Rebuild();
+            await SelectAsync(_page.FirstOrDefault());
         }
         finally
         {
@@ -71,66 +230,147 @@
         }
     }
 
-    private async Task FilterByCollectionAsync()
+    /// <summary>Heroes from sets you do not own are hidden - unless nothing is marked as owned yet.</summary>
+    private List<UiHeroStatisticsDto> FilterByCollection(
+        List<UiHeroStatisticsDto> heroes,
+        Dictionary<Guid, Guid?> expansionIdByHero)
     {
-        var ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
-        if (ownedExpansionIds.Count == 0)
+        if (_ownedExpansionIds.Count == 0)
+        {
+            return heroes;
+        }
+
+        return heroes
+            .Where(h => !expansionIdByHero.TryGetValue(h.HeroId, out var expansionId)
+                     || expansionId is null
+                     || _ownedExpansionIds.Contains(expansionId.Value))
+            .ToList();
+    }
+
+    private void Rebuild()
+    {
+        IEnumerable<UiHeroStatisticsDto> heroes = _heroes;
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            heroes = heroes.Where(h => h.Name.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Unranked heroes (no recorded matches) always sink to the bottom, regardless of sort tab.
+        heroes = _sort switch
+        {
+            LadderSort.WinRate => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(WinRate).ThenByDescending(h => h.TotalMatches),
+            LadderSort.Kd => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(h => h.Kd).ThenByDescending(h => h.TotalMatches),
+            LadderSort.RecentlyPlayed => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(h => _lastPlayedByHero.GetValueOrDefault(h.HeroId)),
+            _ => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(h => h.Points).ThenByDescending(h => h.Kd)
+        };
+
+        _sorted = heroes.ToList();
+        _displayRanks = BuildDisplayRanks(_sorted);
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        _page = _sorted.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    /// <summary>
+    /// Renumbers the currently filtered/sorted list from 1, so unranked heroes (hidden by
+    /// collection filters or excluded because they have no matches) don't leave gaps in the
+    /// numbers shown on screen. Heroes with no recorded matches stay unranked.
+    /// </summary>
+    private static Dictionary<Guid, int?> BuildDisplayRanks(IReadOnlyList<UiHeroStatisticsDto> heroes)
+    {
+        var ranks = new Dictionary<Guid, int?>();
+        var place = 1;
+        foreach (var hero in heroes)
+        {
+            ranks[hero.HeroId] = hero.Place is not null ? place++ : null;
+        }
+
+        return ranks;
+    }
+
+    private int? DisplayRank(UiHeroStatisticsDto hero) => _displayRanks.GetValueOrDefault(hero.HeroId);
+
+    private async Task SelectAsync(UiHeroStatisticsDto? hero)
+    {
+        if (hero is null || _spotlight?.HeroId == hero.HeroId)
         {
             return;
         }
 
-        var heroExpansionIds = (await HeroService.GetAsync()).ToDictionary(h => h.Id, h => h.ExpansionId);
+        _spotlight = hero;
+        _spotlightMatchups = HeroMatchupCalculator.BestAndWorst(
+            HeroMatchupCalculator.Calculate(hero.HeroId, _matches));
 
-        _heroes = _heroes
-            .Where(h => !heroExpansionIds.TryGetValue(h.HeroId, out var expansionId) || expansionId is null || ownedExpansionIds.Contains(expansionId.Value))
-            .ToList();
+        // Play styles are not part of the stats list, so they are fetched lazily and remembered.
+        if (!_playStyles.TryGetValue(hero.HeroId, out var style))
+        {
+            style = await PlayStyleService.GetAsync(hero.HeroId);
+            _playStyles[hero.HeroId] = style;
+        }
+
+        _spotlightStyle = style;
     }
 
-    private void RecordClickHandler(RecordClickEventArgs<UiHeroStatisticsDto> args)
+    private void OnSortChanged(LadderSort sort)
     {
-        var heroId = args.RowData.HeroId;
-        var url = $"{Urls.HeroesStatistics}/{heroId}";
-        NavManager.NavigateTo(url);
+        _sort = sort;
+        _currentPage = 1;
+        Rebuild();
     }
 
-    private void CustomizeCell(QueryCellInfoEventArgs<UiHeroStatisticsDto> args)
+    private void OnSearchChanged(string? search)
     {
-        if (args.Data.Place == 1)
+        _search = search;
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        Rebuild();
+    }
+
+    private void OpenHero(UiHeroStatisticsDto hero)
+        => NavManager.NavigateTo($"{Urls.HeroesStatistics}/{hero.HeroId}");
+
+    private string? ExpansionName(Guid heroId)
+        => _expansionNamesByHero.GetValueOrDefault(heroId).ToShortName();
+
+    private static int WinRate(UiHeroStatisticsDto hero)
+        => hero.TotalMatches == 0 ? 0 : (int)Math.Round((double)hero.TotalWins / hero.TotalMatches * 100);
+
+    /// <summary>Medals mark the podium; a negative score marks a hero that is losing ground.</summary>
+    private string? EdgeColor(UiHeroStatisticsDto hero)
+    {
+        if (hero.Points < 0)
         {
-            args.Cell.AddClass(new [] { "champion-cell" });
+            return "var(--um-loss)";
         }
-        
-        if (args.Data.Place == 2)
+
+        var rank = DisplayRank(hero);
+        return rank is >= 1 and <= 3 ? PlaceColor.For(rank) : null;
+    }
+
+    private static string? WashColor(UiHeroStatisticsDto hero)
+        => hero.Points < 0 ? "var(--um-loss-wash)" : null;
+
+    private record Headline(string Label, string Value, string Color);
+
+    private IEnumerable<Headline> HeadlineStats()
+    {
+        var played = _heroes.Where(h => h.TotalMatches > 0).ToList();
+        if (played.Count == 0)
         {
-            args.Cell.AddClass(new [] { "second-place-cell" });
+            yield break;
         }
-        
-        if (args.Data.Place > 2 && args.Data.Place <= 5)
-        {
-            args.Cell.AddClass(new [] { "leader-cell" });
-        }
-        
-        if (args.Data.Points < 0)
-        {
-            args.Cell.AddClass(new [] { "looser-cell" });
-        }
+
+        var topWinRate = played.MaxBy(WinRate)!;
+        var mostPlayed = played.MaxBy(h => h.TotalMatches)!;
+        var coldest = played.MinBy(WinRate)!;
+
+        yield return new Headline("Top win rate", $"{WinRate(topWinRate)}%", "var(--um-win)");
+        yield return new Headline("Most played", mostPlayed.Name, "var(--um-text)");
+        yield return new Headline("Coldest", coldest.Name, "var(--um-loss)");
     }
 }
-
-<style>
-    .champion-cell {
-        background-color: @Colors.Champion !important;
-    }
-    
-    .second-place-cell {
-        background-color: @Colors.SecondPlace !important;
-    }
-    
-    .leader-cell {
-        background-color: @Colors.Leader !important;
-    }
-    
-    .looser-cell {
-        background-color: @Colors.Looser !important;
-    }
-</style>

@@ -1,0 +1,87 @@
+.um-text-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-inset);
+    transition: border-color 0.12s ease;
+}
+
+.um-text-field:hover,
+.um-text-field:focus-within {
+    border-color: var(--um-focus-border);
+}
+
+.um-text-field i {
+    flex: none;
+    font-size: 12px;
+    color: var(--um-text-dim);
+}
+
+.um-text-field input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--um-text);
+    font: 500 12.5px var(--um-font-body);
+}
+
+.um-text-field input:focus {
+    outline: none;
+}
+
+.um-text-field input::placeholder {
+    color: var(--um-text-faint);
+}
+
+.um-text-field input:disabled {
+    color: var(--um-text-faint);
+}
+
+/* Numeric and temporal values use the mono face per the type scale. */
+.um-text-field input[type="number"],
+.um-text-field input[type="date"],
+.um-text-field input[type="time"] {
+    font-family: var(--um-font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Spinners would break the compact HP / Cards boxes. */
+.um-text-field input[type="number"] {
+    appearance: textfield;
+}
+
+.um-text-field input[type="number"]::-webkit-outer-spin-button,
+.um-text-field input[type="number"]::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+.um-text-field.is-centered input {
+    text-align: center;
+}
+
+.um-text-field-field {
+    height: var(--um-height-field);
+    padding: 0 10px;
+}
+
+.um-text-field-control {
+    height: var(--um-height-control);
+    padding: 0 10px;
+}
+
+.um-text-field-xs {
+    height: 26px;
+    padding: 0 8px;
+    border-radius: var(--um-radius-sm);
+}
+
+.um-text-field-xs input {
+    font-size: 12px;
+}

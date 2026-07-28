@@ -57,7 +57,7 @@ namespace Unmatched.StatisticsService.EntityFramework.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Place")
+                    b.Property<int?>("Place")
                         .HasColumnType("int");
 
                     b.Property<int>("Points")
@@ -102,6 +102,98 @@ namespace Unmatched.StatisticsService.EntityFramework.Migrations
                     b.HasKey("MapId");
 
                     b.ToTable("MapStats");
+                });
+
+            modelBuilder.Entity("Unmatched.StatisticsService.EntityFramework.Entities.MinionStatsEntity", b =>
+                {
+                    b.Property<Guid>("MinionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DeckSize")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Hp")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRanged")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastMatchIncludedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalLooses")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalMatches")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalWins")
+                        .HasColumnType("int");
+
+                    b.HasKey("MinionId");
+
+                    b.ToTable("MinionStats");
+                });
+
+            modelBuilder.Entity("Unmatched.StatisticsService.EntityFramework.Entities.VillainStatsEntity", b =>
+                {
+                    b.Property<Guid>("VillainId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DeckSize")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Hp")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRanged")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastMatchIncludedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalLooses")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalMatches")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalWins")
+                        .HasColumnType("int");
+
+                    b.HasKey("VillainId");
+
+                    b.ToTable("VillainStats");
                 });
 #pragma warning restore 612, 618
         }

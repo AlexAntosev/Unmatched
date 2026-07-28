@@ -7,8 +7,9 @@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 @using Unmatched.UI.BlazorServer
+@* Component namespaces are imported globally: a missing @using makes Razor silently treat the
+   component as an unknown HTML element, which renders nothing and never fails the build. *@
 @using Unmatched.UI.BlazorServer.Shared
-@using Syncfusion.Blazor
-@using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Popups
-@using Syncfusion.Blazor.Buttons
+@using Unmatched.UI.BlazorServer.Shared.DesignSystem
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
+@using Unmatched.UI.BlazorServer.Pages.Statistics

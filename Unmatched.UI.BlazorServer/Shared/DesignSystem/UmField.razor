@@ -1,0 +1,22 @@
+@*
+    A mono caption above a control. The control styles itself - this only owns the label and the
+    vertical rhythm between the two.
+*@
+<div class="um-field @Class">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <div class="um-field-label">@Label</div>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

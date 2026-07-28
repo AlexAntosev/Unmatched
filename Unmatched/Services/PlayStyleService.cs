@@ -13,4 +13,10 @@ public class PlayStyleService(ICatalogClient catalogClient, IMapper mapper) : IP
     {
         await catalogClient.UpdatePlayStyleAsync(mapper.Map<CatalogPlayStyleDto>(playStyleDto));
     }
+
+    public async Task<UiPlayStyleDto?> GetAsync(Guid heroId)
+    {
+        var playStyle = await catalogClient.GetPlayStyleByHero(heroId);
+        return playStyle is null ? null : mapper.Map<UiPlayStyleDto>(playStyle);
+    }
 }

@@ -21,4 +21,10 @@ public class PlayerService(IPlayerClient playerClient, IMapper mapper) : IPlayer
         var playerDto = mapper.Map<PlayerDto>(dto);
         await playerClient.AddAsync(playerDto);
     }
+
+    public async Task<string> UpdateImageAsync(Guid playerId, string imageFileName)
+    {
+        var updated = await playerClient.UpdatePlayerImageAsync(playerId, imageFileName);
+        return updated.ImageFileName!;
+    }
 }

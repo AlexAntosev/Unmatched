@@ -1,46 +1,64 @@
-﻿@page "/players-statistics"
-@using Microsoft.AspNetCore.Components
+@page "/players-statistics"
 @using Unmatched.Dtos
 @using Unmatched.Services.Statistics
-@inject NavigationManager NavManager
 @inject IPlayerStatisticsService PlayerStatisticsService
+@inject NavigationManager NavManager
+@*
+    Not in the design pack: built from the 1c ladder pattern, minus the points column players do
+    not have.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Players Statistics</h1>
-    <SfGrid DataSource="@_players" AllowPaging="true" AllowSorting="true">
-        <GridPageSettings PageSize="20"></GridPageSettings>
-        <GridEvents OnRecordClick="RecordClickHandler" TValue="PlayerStatisticsDto"></GridEvents>
-        <GridColumns>
-             <GridColumn Width="20">
-                <Template>
-                    @{
-                        var player = context as PlayerStatisticsDto;
-                        <div class="image">
-                            <img src="@player?.ImageUrl" alt="@player.PlayerId" width="100%" height="auto"/>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(PlayerStatisticsDto.Name) HeaderText="Player" Width="120"></GridColumn>
-            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalMatches) HeaderText="Matches" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalWins) HeaderText="Wins" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(PlayerStatisticsDto.TotalLooses) HeaderText="Looses" Width="80"></GridColumn>
-            <GridColumn Field=@nameof(PlayerStatisticsDto.Kd) HeaderText="K/D" Width="50"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-</div>
+<EntityLadder TItem="PlayerStatisticsDto" Items="_players" Title="Players"
+              Lede="@($"{_players.Count} players · {_totalMatches:N0} recorded appearances")"
+              Breadcrumbs="Crumbs" Columns="@Columns" SearchText="@(p => p.Name)"
+              SearchPlaceholder="Search player…">
+    <Header>
+        <div>#</div>
+        <div>Player</div>
+        <div class="players-right">GP</div>
+        <div>W / L</div>
+        <div class="players-right">K/D</div>
+    </Header>
+    <Row>
+        <LadderRow Columns="@Columns" Rank="context.Place" Name="@context.Name" ImageUrl="@context.ImageUrl"
+                   RoundArt="true" OnClick="@(() => Open(context))">
+            <Metrics>
+                <div class="players-matches">@context.TotalMatches</div>
+                <WinLossBar Wins="context.TotalWins" Losses="context.TotalLooses"/>
+                <div class="players-kd" style="color:@(context.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                    @context.Kd.ToString("0.00")
+                </div>
+            </Metrics>
+        </LadderRow>
+    </Row>
+</EntityLadder>
 
 @code {
+    private const string Columns = "34px 1fr 58px 90px 62px";
+
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Players")];
+
     private List<PlayerStatisticsDto> _players = new();
-    
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private int _totalMatches;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             PreloadService.Show();
-            _players = (await PlayerStatisticsService.GetPlayersStatisticsAsync()).OrderBy(x => x.Name).ToList();
+            _players = (await PlayerStatisticsService.GetPlayersStatisticsAsync())
+                .OrderByDescending(p => p.TotalMatches)
+                .ToList();
+            _totalMatches = _players.Sum(p => p.TotalMatches);
+
+            // Player stats carry no rank of their own, so the list numbers itself by activity.
+            for (var i = 0; i < _players.Count; i++)
+            {
+                _players[i].Place = i + 1;
+            }
         }
         finally
         {
@@ -48,10 +66,6 @@
         }
     }
 
-    private void RecordClickHandler(RecordClickEventArgs<PlayerStatisticsDto> args)
-    {
-        var playerId = args.RowData.PlayerId;
-        var url = $"{Urls.PlayersStatistics}/{playerId}";
-        NavManager.NavigateTo(url);
-    }
+    private void Open(PlayerStatisticsDto player)
+        => NavManager.NavigateTo($"{Urls.PlayersStatistics}/{player.PlayerId}");
 }

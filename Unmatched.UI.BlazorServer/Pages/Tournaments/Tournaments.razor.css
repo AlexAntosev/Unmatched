@@ -1,0 +1,55 @@
+.tournaments-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 12px;
+    border-radius: var(--um-radius-row);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.tournaments-row:hover {
+    background: var(--um-bg-hover);
+}
+
+.tournaments-row > i {
+    font-size: 14px;
+    color: var(--um-accent-soft);
+}
+
+.tournaments-names {
+    flex: 1;
+    min-width: 0;
+}
+
+.tournaments-name {
+    font: 600 13px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.tournaments-meta {
+    margin-top: 2px;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.tournaments-empty {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.tournaments-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tournaments-form > * {
+    width: 220px;
+}
+
+.tournaments-form > .um-btn {
+    width: auto;
+}

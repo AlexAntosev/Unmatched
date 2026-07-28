@@ -5,4 +5,6 @@ using Unmatched.CatalogService.Domain.Entities;
 public interface IExpansionService
 {
     Task<IEnumerable<Expansion>> GetAllAsync();
+
+    Task<Expansion?> UpdateImageAsync(Guid id, string imageFileName);
 }

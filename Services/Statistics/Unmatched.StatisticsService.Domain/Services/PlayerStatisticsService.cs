@@ -13,7 +13,7 @@ public class PlayerStatisticsService(IMatchClient matchClient, IPlayerCache play
         var players = await playerCache.GetAsync();
         var matches = (await matchClient.GetMatchLogAsync()).ToList();
 
-        return players.Select(player => BuildStats(player.Id, player.Name, matches)).ToList();
+        return players.Select(player => BuildStats(player.Id, player.Name, player.ImageFileName, matches)).ToList();
     }
 
     public async Task<PlayerStats> GetPlayerStatisticsAsync(Guid playerId)
@@ -21,10 +21,10 @@ public class PlayerStatisticsService(IMatchClient matchClient, IPlayerCache play
         var player = await playerCache.GetAsync(playerId);
         var matches = await matchClient.GetFinishedByPlayerAsync(playerId);
 
-        return BuildStats(playerId, player?.Name ?? string.Empty, matches);
+        return BuildStats(playerId, player?.Name ?? string.Empty, player?.ImageFileName, matches);
     }
 
-    private static PlayerStats BuildStats(Guid playerId, string name, IEnumerable<MatchLogDto> matches)
+    private static PlayerStats BuildStats(Guid playerId, string name, string? imageFileName, IEnumerable<MatchLogDto> matches)
     {
         var playerFights = matches
             .OrderByDescending(match => match.Date)
@@ -37,6 +37,7 @@ public class PlayerStatisticsService(IMatchClient matchClient, IPlayerCache play
             {
                 PlayerId = playerId,
                 Name = name,
+                ImageFileName = imageFileName,
                 TotalMatches = playerFights.Count,
                 TotalWins = playerFights.Count(fighter => fighter.IsWinner),
                 TotalLooses = playerFights.Count(fighter => fighter.IsWinner == false),

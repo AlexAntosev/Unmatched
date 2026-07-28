@@ -1,0 +1,34 @@
+@using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Services
+@inject IMapService MapService
+@inject IMapStatisticsService MapStatisticsService
+@inject IImageUploadService ImageUploadService
+
+<EntityBanner Name="@Statistics.Name" Eyebrow="Map profile" ImageUrl="@BustCache(Statistics.ImageUrl)"
+              Fallback="/UnknownMap.png" OnFileSelected="OnImageSelectedAsync">
+    <Stats>
+        <StatTile Label="Matches" Value="@Statistics.TotalMatches.ToString()"/>
+    </Stats>
+</EntityBanner>
+
+@code {
+    [Parameter]
+    public UiMapStatisticsDto Statistics { get; set; } = new();
+
+    private int _cacheBust;
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/UnknownMap.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("maps", Statistics.Name, Statistics.ImageFileName, stream, file.Name);
+        await MapService.UpdateImageAsync(Statistics.MapId, fileName);
+        await MapStatisticsService.UpdateImageAsync(Statistics.MapId, fileName);
+        Statistics.ImageFileName = fileName;
+        _cacheBust++;
+        StateHasChanged();
+    }
+}

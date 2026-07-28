@@ -52,10 +52,16 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<int?>("MatchPoints")
                         .HasColumnType("int");
 
+                    b.Property<int?>("Placement")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("PlayerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("SidekickHpLeft")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Team")
                         .HasColumnType("int");
 
                     b.Property<int?>("TimeSpentInSeconds")
@@ -101,6 +107,9 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<int?>("Epic")
                         .HasColumnType("int");
 
+                    b.Property<int>("GameMode")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsPlanned")
                         .HasColumnType("bit");
 
@@ -118,6 +127,60 @@ namespace Unmatched.EntityFramework.Migrations
                     b.HasIndex("TournamentId");
 
                     b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchMinionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("HpLeft")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsWinner")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MatchVillainId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MinionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchVillainId");
+
+                    b.ToTable("MatchMinions");
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchVillainEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("CardsLeft")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HpLeft")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsWinner")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VillainId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId")
+                        .IsUnique();
+
+                    b.ToTable("MatchVillains");
                 });
 
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.RatingEntity", b =>
@@ -226,9 +289,34 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Navigation("Tournament");
                 });
 
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchMinionEntity", b =>
+                {
+                    b.HasOne("Unmatched.MatchService.Domain.Entities.MatchVillainEntity", null)
+                        .WithMany("Minions")
+                        .HasForeignKey("MatchVillainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchVillainEntity", b =>
+                {
+                    b.HasOne("Unmatched.MatchService.Domain.Entities.MatchEntity", null)
+                        .WithOne("Villain")
+                        .HasForeignKey("Unmatched.MatchService.Domain.Entities.MatchVillainEntity", "MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchEntity", b =>
                 {
                     b.Navigation("Fighters");
+
+                    b.Navigation("Villain");
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchVillainEntity", b =>
+                {
+                    b.Navigation("Minions");
                 });
 
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TitleEntity", b =>

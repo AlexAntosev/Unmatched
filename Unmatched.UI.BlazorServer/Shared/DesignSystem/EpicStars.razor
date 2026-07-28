@@ -1,0 +1,57 @@
+@*
+    A 0-N star rating. Filled = bi-star-fill in Color (gold by default); empty is the OUTLINE glyph
+    bi-star, never a dimmed fill (that reads as "half lit" at row size). Sized 11px in rows, 15px in
+    detail panels, 17px when editable (Size parameter). Read-only contexts (the match row, the
+    scoreboard footer) render the same icons as the editable one, just non-interactive. The player
+    page's personal 1-5 rating reuses this with Max="5" and the accent violet Color - it is a
+    subjective note that never feeds the ladder or any computed stat.
+*@
+<span class="um-epic @(ReadOnly ? "is-readonly" : null) @Class" style="font-size:@(Size)px;--um-epic-color:@Color" title="@($"epic {Value}/{Max}")">
+    @for (var star = 1; star <= Max; star++)
+    {
+        var current = star;
+        var filled = current <= Value;
+        if (ReadOnly)
+        {
+            <i class="bi @(filled ? "bi-star-fill is-filled" : "bi-star")"></i>
+        }
+        else
+        {
+            <i class="bi @(filled ? "bi-star-fill is-filled" : "bi-star")"
+               @onclick="@(() => SetAsync(current))"
+               @onclick:stopPropagation="true"></i>
+        }
+    }
+</span>
+
+@code {
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+    [Parameter]
+    public int Max { get; set; } = 3;
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>Glyph size in px - 11 in rows, 15 in detail panels, 17 when editable.</summary>
+    [Parameter]
+    public int Size { get; set; } = 17;
+
+    /// <summary>Filled-star colour - gold for epic, accent violet for the player page's personal rating.</summary>
+    [Parameter]
+    public string Color { get; set; } = "var(--um-gold)";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private Task SetAsync(int value)
+    {
+        // Clicking the current rating clears it, so a mis-click is recoverable without a reset control.
+        Value = Value == value ? 0 : value;
+        return ValueChanged.InvokeAsync(Value);
+    }
+}

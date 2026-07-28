@@ -9,4 +9,8 @@ public interface ICatalogClient
     Task<IEnumerable<CatalogMapDto>> GetMapsAsync();
 
     Task<IEnumerable<CatalogSidekickDto>> GetSidekicksAsync();
+
+    Task<IEnumerable<CatalogVillainDto>> GetVillainsAsync();
+
+    Task<IEnumerable<CatalogMinionDto>> GetMinionsAsync();
 }

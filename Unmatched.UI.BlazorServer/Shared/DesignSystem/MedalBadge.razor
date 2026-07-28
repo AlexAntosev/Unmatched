@@ -1,0 +1,13 @@
+@*
+    The place chip: gold / silver / bronze for the top three, grey below.
+*@
+<span class="um-medal um-medal-@Size" style="color:@PlaceColor.For(Place)">@Place</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public int Place { get; set; }
+
+    /// <summary>md (22px, standalone) | xs (15px, pinned on a fighter chip)</summary>
+    [Parameter]
+    public string Size { get; set; } = "md";
+}

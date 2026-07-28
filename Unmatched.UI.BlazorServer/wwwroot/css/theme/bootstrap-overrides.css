@@ -1,0 +1,69 @@
+/*
+  Bootstrap is only still here for the pieces BlazorBootstrap renders for us - modals, alerts and
+  the preload overlay. Everything else in the app is built from the design system, so this file
+  just remaps the handful of Bootstrap custom properties those components read.
+*/
+:root {
+    --bs-body-bg: var(--um-bg-app);
+    --bs-body-color: var(--um-text);
+    --bs-body-font-family: var(--um-font-body);
+    --bs-body-font-size: 13px;
+
+    --bs-border-color: var(--um-border);
+    --bs-border-radius: var(--um-radius-md);
+    --bs-border-radius-sm: var(--um-radius-chip);
+    --bs-border-radius-lg: var(--um-radius-card);
+
+    --bs-primary: var(--um-accent);
+    --bs-primary-rgb: 108, 92, 255;
+    --bs-link-color: var(--um-accent-soft);
+    --bs-link-color-rgb: 139, 125, 255;
+    --bs-link-hover-color: var(--um-accent-text);
+    --bs-link-hover-color-rgb: 196, 188, 255;
+
+    --bs-danger: var(--um-loss);
+    --bs-danger-rgb: 242, 80, 107;
+    --bs-success: var(--um-win);
+    --bs-success-rgb: 52, 217, 155;
+
+    --bs-modal-bg: var(--um-bg-panel);
+    --bs-modal-color: var(--um-text);
+    --bs-modal-border-color: var(--um-border);
+    --bs-modal-border-radius: var(--um-radius-panel);
+    --bs-modal-header-border-color: var(--um-border);
+    --bs-modal-footer-border-color: var(--um-border);
+}
+
+.modal-content {
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    color: var(--um-text);
+}
+
+.modal-title {
+    font: 600 12.5px var(--um-font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.alert {
+    border-radius: var(--um-radius-card);
+    border-width: 1px;
+    font: 400 12.5px/1.5 var(--um-font-body);
+}
+
+.alert-danger {
+    background: var(--um-loss-wash);
+    border-color: var(--um-loss-border);
+    color: var(--um-loss);
+}
+
+.alert-success {
+    background: var(--um-win-wash);
+    border-color: var(--um-win-border);
+    color: var(--um-win);
+}
+
+.btn-close {
+    filter: invert(1) grayscale(1) brightness(1.6);
+}

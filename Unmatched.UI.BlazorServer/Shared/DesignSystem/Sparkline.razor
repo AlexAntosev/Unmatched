@@ -1,0 +1,57 @@
+@using System.Globalization
+@*
+    A bare trend line - no axes, no labels. Used for recent form where only the direction matters.
+*@
+<svg class="um-sparkline @Class" viewBox="0 0 240 70" preserveAspectRatio="none"
+     style="@($"height:{Height}px")" role="img" aria-label="Recent form">
+    @if (_values.Count > 1)
+    {
+        <polyline points="@LinePoints" fill="none" stroke="@StrokeColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+    }
+</svg>
+
+@code {
+    private const double PlotWidth = 240;
+    private const double PlotHeight = 70;
+
+    private List<double> _values = new();
+    private double _min;
+    private double _max;
+
+    [Parameter]
+    public IReadOnlyList<double> Values { get; set; } = Array.Empty<double>();
+
+    [Parameter]
+    public int Height { get; set; } = 76;
+
+    [Parameter]
+    public string StrokeColor { get; set; } = "var(--um-win)";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _values = Values.ToList();
+        if (_values.Count == 0)
+        {
+            return;
+        }
+
+        _min = _values.Min();
+        _max = _values.Max();
+        if (Math.Abs(_max - _min) < 0.0001)
+        {
+            _max = _min + 1;
+        }
+    }
+
+    private string LinePoints
+        => string.Join(' ', _values.Select((v, i) =>
+        {
+            var x = i / (double)Math.Max(_values.Count - 1, 1) * PlotWidth;
+            var y = PlotHeight - (v - _min) / (_max - _min) * (PlotHeight - 6) - 3;
+            return $"{x.ToString("0.##", CultureInfo.InvariantCulture)},{y.ToString("0.##", CultureInfo.InvariantCulture)}";
+        }));
+}

@@ -1,58 +1,62 @@
-﻿@page "/maps-statistics/{id}"
-@using Microsoft.AspNetCore.Components
+@page "/maps-statistics/{id}"
 @using Unmatched.Dtos
-@using Unmatched.Dtos.Match
-@using Unmatched.Dtos.Statistics
-@using Unmatched.Services.Statistics
 @using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMapStatisticsService MapStatisticsService
 @inject IMapService MapService
+@*
+    Not in the design pack: the 2a dossier pattern applied to a map.
+*@
 
-<div class="page-content">
-    <h3 align="center" class="page-title">@Statistics.Name</h3>
-    <img src="@Statistics.ImageUrl" onerror="this.onerror=null;this.src='/UnknownMap.png'" />
-    <TotalMatchesRecord Total="Statistics.TotalMatches" ></TotalMatchesRecord>
-    <StatisticsRecord Title="Map champ" HeroMatches="_mapChampMatches"></StatisticsRecord>
-    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<MapSummary Statistics="_map"/>
+
+<div class="um-page">
+    <MatchList Matches="_matchLog" Title="Match log" PageSize="8" Meta="@($"{_matchLog.Count} matches")"/>
 </div>
 
 @code {
     [Parameter]
-    public string Id { get; set; } = "";
-    
-    private List<UiMatchLogDto> _matchLogEntries = new();
-    private UiMapStatisticsDto Statistics { get; set; } = new ();
-    
-    private IGrouping<string, UiFighterDto>? _mapChampMatches;
-    
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
-    
-    protected override async Task OnInitializedAsync()
+    public string Id { get; set; } = string.Empty;
+
+    private UiMapStatisticsDto _map = new();
+    private List<UiMatchLogDto> _matchLog = new();
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private IReadOnlyList<Breadcrumb.Crumb> Crumbs =>
+    [
+        new("Maps", Urls.MapsStatistics), new(_map.Name ?? string.Empty)
+    ];
+
+    protected override async Task OnParametersSetAsync()
     {
+        if (!Guid.TryParse(Id, out var mapId) || mapId == Guid.Empty)
+        {
+            return;
+        }
+
         try
         {
             PreloadService.Show();
-            var mapId = Guid.Parse(Id);
-            Statistics = await MapStatisticsService.GetMapStatisticsAsync(mapId);
 
-            var catalogMap = (await MapService.GetAsync()).FirstOrDefault(m => m.Id == mapId);
+            var stats = MapStatisticsService.GetMapStatisticsAsync(mapId);
+            var matches = MapStatisticsService.GetMapMatchesAsync(mapId);
+            var catalog = MapService.GetAsync();
+            await Task.WhenAll(stats, matches, catalog);
+
+            _map = stats.Result;
+            // The stats service stores the internal map name; the catalog knows the printed one.
+            var catalogMap = catalog.Result.FirstOrDefault(m => m.Id == mapId);
             if (catalogMap is not null)
             {
-                Statistics.Name = catalogMap.DisplayName;
+                _map.Name = catalogMap.DisplayName;
             }
-            _matchLogEntries = (await MapStatisticsService.GetMapMatchesAsync(mapId)).OrderByDescending(x => x.Date).ToList();
-            foreach (var matchLogEntry in _matchLogEntries)
-            {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.Player.Id == mapId);
-            }
-        
-            _mapChampMatches = _matchLogEntries
-                .SelectMany(m => m.Fighters.Where(f => f.IsWinner))
-                .GroupBy(f => f.Hero.Name)
-                .OrderByDescending(g => g.Count())
-                .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
-                .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-                .FirstOrDefault();
+
+            _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
         }
         finally
         {

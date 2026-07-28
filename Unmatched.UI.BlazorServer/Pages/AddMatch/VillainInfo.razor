@@ -1,0 +1,90 @@
+@using Unmatched.Dtos
+@*
+    The co-op villain box: the villain itself plus its minions, indented beneath it. The villain
+    has no sidekick, and minions record only how much HP they had left.
+*@
+<div class="villain">
+    <div class="fighter">
+        <HeroToken ImageUrl="@(MatchVillain.Villain?.ImageUrl ?? "/Unknown.png")" Alt="@MatchVillain.Villain?.Name"
+                   Size="44" Radius="11"/>
+        <div class="fighter-selects">
+            <UmSelect TValue="Guid" Variant="chip" Icon="bi-eye"
+                      Value="MatchVillain.VillainId" ValueChanged="OnVillainChanged" Options="VillainOptions()"/>
+        </div>
+        <div class="fighter-stats">
+            <UmField Label="HP" Class="fighter-narrow">
+                <UmTextField Type="number" Variant="xs" Centered="true" Value="@MatchVillain.HpLeft?.ToString()"
+                             ValueChanged="@(v => MatchVillain.HpLeft = ParseInt(v))"/>
+            </UmField>
+            <UmField Label="Cards" Class="fighter-narrow">
+                <UmTextField Type="number" Variant="xs" Centered="true" Value="@MatchVillain.CardsLeft?.ToString()"
+                             ValueChanged="@(v => MatchVillain.CardsLeft = ParseInt(v))"/>
+            </UmField>
+        </div>
+    </div>
+
+    @foreach (var minion in MatchVillain.Minions.ToList())
+    {
+        <div class="minion">
+            <HeroToken ImageUrl="@(minion.Minion?.ImageUrl ?? "/Unknown.png")" Alt="@minion.Minion?.Name"
+                       Size="26" Radius="8" Opacity="0.85"/>
+            <div class="minion-select">
+                <UmSelect TValue="Guid" Variant="chip" Value="minion.MinionId"
+                          ValueChanged="@(id => OnMinionChanged(minion, id))" Options="MinionOptions()"/>
+            </div>
+            <UmField Label="HP left" Class="minion-hp">
+                <UmTextField Type="number" Variant="xs" Centered="true" Value="@minion.HpLeft?.ToString()"
+                             ValueChanged="@(v => minion.HpLeft = ParseInt(v))"/>
+            </UmField>
+            <button type="button" class="minion-remove" title="Remove minion" @onclick="() => RemoveMinion(minion)">
+                <i class="bi bi-trash3"></i>
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<VillainDto> Villains { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyList<MinionDto> Minions { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public UiMatchVillainDto MatchVillain { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private static int? ParseInt(string? value) => int.TryParse(value, out var parsed) ? parsed : null;
+
+    private IReadOnlyList<SelectOption<Guid>> VillainOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Villain…") }
+            .Concat(Villains.Select(v => new SelectOption<Guid>(v.Id, v.Name, ArtUrl: v.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<Guid>> MinionOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Minion…") }
+            .Concat(Minions.Select(m => new SelectOption<Guid>(m.Id, m.Name, ArtUrl: m.ImageUrl)))
+            .ToList();
+
+    private Task OnVillainChanged(Guid villainId)
+    {
+        MatchVillain.Villain = Villains.FirstOrDefault(v => v.Id == villainId);
+        MatchVillain.SetDefaultData();
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task OnMinionChanged(UiMatchMinionDto matchMinion, Guid minionId)
+    {
+        matchMinion.Minion = Minions.FirstOrDefault(m => m.Id == minionId);
+        matchMinion.SetDefaultData();
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task RemoveMinion(UiMatchMinionDto matchMinion)
+    {
+        MatchVillain.Minions = MatchVillain.Minions.Where(m => m != matchMinion).ToList();
+        return OnChanged.InvokeAsync();
+    }
+}

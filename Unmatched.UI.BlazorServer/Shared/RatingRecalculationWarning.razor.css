@@ -1,0 +1,9 @@
+/* Colours only - size and layout come from .rail-item in NavRail's scoped CSS. */
+::deep .rail-warning {
+    color: var(--um-gold);
+}
+
+::deep .rail-warning:hover {
+    background: var(--um-gold-bg);
+    color: var(--um-gold);
+}

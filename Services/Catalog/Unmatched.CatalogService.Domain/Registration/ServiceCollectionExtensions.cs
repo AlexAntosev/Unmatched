@@ -22,5 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPlayStyleService, PlayStyleService>();
         services.AddTransient<IExpansionService, ExpansionService>();
         services.AddTransient<IOwnedExpansionService, OwnedExpansionService>();
+        services.AddTransient<IVillainService, VillainService>();
+        services.AddTransient<IMinionService, MinionService>();
     }
 }

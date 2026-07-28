@@ -1,64 +1,302 @@
-﻿@page "/heroes-statistics/{id}"
+@page "/heroes-statistics/{id}"
 @using Unmatched.Dtos
+@using Unmatched.Enums
+@using Unmatched.Extensions
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Services
 @inject IHeroStatisticsService HeroStatisticsService
-@using BlazorBootstrap
-@using Microsoft.AspNetCore.Components
-@using Unmatched.Dtos.Match
+@inject IHeroService HeroService
+@inject IPlayStyleService PlayStyleService
+@inject IImageUploadService ImageUploadService
+@inject NavigationManager NavManager
+@*
+    Screen 2a - the hero dossier, top to bottom: banner, four stat cards, play style + titles +
+    win rate, the rating line, antagonist + matchups, the match log excerpt, and the villain and
+    minion records.
+*@
 
-<div style="margin-bottom: 16px">
-    <HeroSummary Statistics="Hero"></HeroSummary>
-</div>
-<div class="page-content" style="margin-bottom: 16px">
-    <StatisticsRecord Title="Antagonist" HeroMatches="_againstAntagonistMatches" IsAgainst="true"></StatisticsRecord>
-    <TotalMatchesRecord Total="Hero.TotalMatches" Wins="Hero.TotalWins" Looses="Hero.TotalLooses" Kd="Hero.Kd"></TotalMatchesRecord>
-    <DuelMatches MatchLogEntries="_matchLogEntries"></DuelMatches>
-</div>
-<div class="page-content">
-    <LineChart @ref="_lineChart" />
+<PageHeader Breadcrumbs="Crumbs">
+    <Controls>
+        <UmButton Size="sm" Icon="bi-chevron-left" Disabled="@(_previousHeroId is null)"
+                  OnClick="@(() => GoToHero(_previousHeroId))">Prev hero</UmButton>
+        <UmButton Size="sm" TrailingIcon="bi-chevron-right" Disabled="@(_nextHeroId is null)"
+                  OnClick="@(() => GoToHero(_nextHeroId))">Next hero</UmButton>
+    </Controls>
+</PageHeader>
+
+<div class="hero">
+    <section class="hero-banner">
+        <div class="hero-banner-glow"></div>
+        <div class="hero-banner-content">
+            <div class="hero-art-column">
+                <div class="hero-art">
+                    <EditableImage ImageUrl="@BustCache(_hero.ImageUrl)" AltText="@_hero.Name"
+                                   OnFileSelected="OnImageSelectedAsync"/>
+                </div>
+                <div class="hero-colour">
+                    <label class="hero-colour-swatch" style="background:@(_hero.Color ?? "var(--um-accent)")">
+                        <input type="color" value="@(_hero.Color ?? "#6c5cff")" @onchange="OnColorChangeAsync"/>
+                    </label>
+                    <div>
+                        <div class="hero-colour-label">Hero colour</div>
+                        <div class="hero-colour-value">@(_hero.Color?.ToUpperInvariant() ?? "—") · used in charts</div>
+                    </div>
+                    <i class="bi bi-pencil"></i>
+                </div>
+            </div>
+
+            <div class="hero-identity">
+                <div class="hero-eyebrow">
+                    <span class="um-section-caption">Hero profile</span>
+                    <span class="hero-rank">RANK @(_hero.Place?.ToString("00") ?? "-")</span>
+                </div>
+                <div class="hero-title-row">
+                    <h1 class="hero-name">@_hero.Name</h1>
+                    <MeleeRangedIcon IsRanged="_hero.IsRanged" Height="22" Opacity="0.85"/>
+                </div>
+                <div class="hero-chips">
+                    <span class="hero-chip"><i class="bi bi-heart-pulse-fill" style="color:var(--um-loss)"></i>@_hero.Hp HP</span>
+                    <span class="hero-chip"><i class="bi bi-layers-fill" style="color:var(--um-accent-soft)"></i>@_hero.DeckSize cards</span>
+                    @if (_expansionName is not null)
+                    {
+                        <span class="hero-chip"><i class="bi bi-box-seam" style="color:var(--um-text-muted)"></i>@_expansionName</span>
+                    }
+                    @if (_sidekick is not null)
+                    {
+                        <span class="hero-chip"><i class="bi bi-people-fill" style="color:var(--um-text-muted)"></i>Sidekick ×@_sidekick.Count</span>
+                    }
+                </div>
+
+                <div class="hero-stat-cards">
+                    <StatTile Label="Place" Value="@(_hero.Place?.ToString("00") ?? "-")" ValueColor="@PlaceColor.For(_hero.Place)"/>
+                    <StatTile Label="Points" Value="@_hero.Points.ToString()"/>
+                    <StatTile Label="HP" Value="@_hero.Hp.ToString()"/>
+                    <StatTile Label="Deck size" Value="@_hero.DeckSize.ToString()"/>
+                </div>
+
+                <div class="hero-analysis">
+                    <Panel Title="Play style">
+                        @foreach (var axis in PlayStyleAxes())
+                        {
+                            <div class="hero-axis">
+                                <span class="hero-axis-label">@axis.Label</span>
+                                <div class="hero-axis-dots">
+                                    @for (var level = 1; level <= 3; level++)
+                                    {
+                                        <span class="hero-axis-dot @(level <= axis.Value ? "is-on" : null)"></span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </Panel>
+
+                    <Panel Title="Titles">
+                        @if (_hero.Titles?.Any() != true)
+                        {
+                            <div class="hero-muted">No titles yet.</div>
+                        }
+                        @foreach (var title in _hero.Titles ?? [])
+                        {
+                            <div class="hero-title-item">
+                                <i class="bi bi-award-fill"></i>
+                                <span class="hero-title-name">@title.Name</span>
+                                <span class="hero-title-comment">@title.Comment</span>
+                            </div>
+                        }
+                        @if (_sidekick is not null)
+                        {
+                            <div class="hero-divider"></div>
+                            <div class="hero-sidekick">
+                                <HeroToken ImageUrl="/Unknown.png" Alt="@_sidekick.Name" Size="28" Radius="8" Opacity="0.7"/>
+                                <div>
+                                    <div class="hero-sidekick-name">@_sidekick.Name</div>
+                                    <div class="hero-sidekick-meta">sidekick · @_sidekick.Hp HP</div>
+                                </div>
+                            </div>
+                        }
+                    </Panel>
+
+                    <Panel Title="Win rate" Class="hero-winrate">
+                        <DonutChart Percent="_winRate" Caption="@($"{_hero.TotalWins}W · {_hero.TotalLooses}L")"/>
+                    </Panel>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero-body">
+        <Panel Title="Rating changes">
+            <HeaderActions>
+                <SegmentedControl TValue="int" Options="RatingRanges" Value="_ratingMonths" ValueChanged="OnRatingRangeChanged"/>
+            </HeaderActions>
+            <ChildContent>
+                @if (_ratingPoints.Count < 2)
+                {
+                    <div class="hero-muted">Not enough rated matches to draw a trend yet.</div>
+                }
+                else
+                {
+                    <LineChartSvg Points="_ratingPoints"/>
+                }
+            </ChildContent>
+        </Panel>
+
+        <div class="hero-duo">
+            <Panel Title="Antagonist" Class="hero-antagonist">
+                @if (_antagonist is null)
+                {
+                    <div class="hero-muted">No opponents recorded yet.</div>
+                }
+                else
+                {
+                    <div class="hero-antagonist-head">
+                        <HeroToken ImageUrl="@_antagonist.OpponentImageUrl" Alt="@_antagonist.OpponentName" Size="44" Radius="12"/>
+                        <div>
+                            <div class="hero-antagonist-name">@_antagonist.OpponentName</div>
+                            <div class="hero-antagonist-meta">@_antagonist.Total meetings</div>
+                        </div>
+                    </div>
+                    <div class="hero-antagonist-stats">
+                        <StatTile Variant="inset" Label="Wins" Value="@_antagonist.Wins.ToString()" ValueColor="var(--um-win)"/>
+                        <StatTile Variant="inset" Label="Losses" Value="@_antagonist.Losses.ToString()" ValueColor="var(--um-loss)"/>
+                        <StatTile Variant="inset" Label="K/D" Value="@_antagonist.Kd.ToString("0.00")"/>
+                    </div>
+                }
+            </Panel>
+
+            <Panel Title="Matchups" Meta="@MatchupRangeLabel">
+                <HeaderActions>
+                    <div class="hero-matchup-pager">
+                        <button type="button" class="hero-matchup-page" disabled="@(_matchupPage <= 1)" @onclick="@(() => GoToMatchupPage(_matchupPage - 1))">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button" class="hero-matchup-page" disabled="@(_matchupPage >= MatchupPageCount)" @onclick="@(() => GoToMatchupPage(_matchupPage + 1))">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </HeaderActions>
+                <ChildContent>
+                    @if (_matchups.Count == 0)
+                    {
+                        <div class="hero-muted">No recorded matchups yet.</div>
+                    }
+                    else
+                    {
+                        <div class="hero-matchups-caption">Sorted by win rate against</div>
+                        @foreach (var matchup in MatchupPage())
+                        {
+                            <MatchupBar Name="@matchup.OpponentName" ImageUrl="@matchup.OpponentImageUrl"
+                                        Percent="matchup.WinPercent" Meta="@($"{matchup.Total} met")" TokenSize="24" BarWidth="56"/>
+                        }
+                    }
+                </ChildContent>
+            </Panel>
+        </div>
+
+        <HeroMatches HeroName="@_hero.Name" Entries="_heroMatches"/>
+
+        <div class="hero-duo">
+            <MonsterMatchupTable Title="Against villains" Rows="_villainMatchups"/>
+            <MonsterMatchupTable Title="Against minions" Rows="_minionMatchups"/>
+        </div>
+    </section>
 </div>
 
 @code {
-    [Parameter]
-    public string Id { get; set; } = "";
-    
-    private List<UiMatchLogDto> _matchLogEntries = new();
-    private List<RatingChangeDto> _ratingChanges = new();
-    private IGrouping<string, UiFighterDto>? _againstAntagonistMatches;
-    private UiHeroStatisticsDto Hero { get; set; } = new ();
-    private LineChart _lineChart;
+    private static readonly IReadOnlyList<SelectOption<int>> RatingRanges =
+    [
+        new(6, "6M"), new(12, "1Y"), new(0, "All")
+    ];
 
-    [Inject] protected PreloadService PreloadService { get; set; }
-    
-    protected override async Task OnInitializedAsync()
+    private UiHeroStatisticsDto _hero = new() { Name = string.Empty };
+    private UiPlayStyleDto? _playStyle;
+    private UiSidekickDto? _sidekick;
+    private string? _expansionName;
+
+    private List<UiMatchLogDto> _matchLog = new();
+    private List<HeroMatchEntry> _heroMatches = new();
+    private List<RatingChangeDto> _ratingChanges = new();
+    private List<ChartPoint> _ratingPoints = new();
+    private IReadOnlyList<HeroMatchup> _matchups = [];
+    private HeroMatchup? _antagonist;
+    private List<MonsterMatchupRow> _villainMatchups = new();
+    private List<MonsterMatchupRow> _minionMatchups = new();
+
+    private Guid? _previousHeroId;
+    private Guid? _nextHeroId;
+    private int _ratingMonths = 6;
+    private int _winRate;
+    private int _cacheBust;
+    private int _matchupPage = 1;
+
+    private const int MatchupsPerPage = 5;
+
+    private int MatchupPageCount => Math.Max(1, (int)Math.Ceiling(_matchups.Count / (double)MatchupsPerPage));
+
+    private string MatchupRangeLabel
     {
+        get
+        {
+            if (_matchups.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var first = (_matchupPage - 1) * MatchupsPerPage + 1;
+            var last = Math.Min(_matchupPage * MatchupsPerPage, _matchups.Count);
+            return $"{first}–{last} of {_matchups.Count}";
+        }
+    }
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private IReadOnlyList<Breadcrumb.Crumb> Crumbs =>
+    [
+        new("Heroes ladder", Urls.HeroesStatistics), new(_hero.Name)
+    ];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!Guid.TryParse(Id, out var heroId) || heroId == Guid.Empty)
+        {
+            return;
+        }
+
         try
         {
             PreloadService.Show();
-            Guid.TryParse(Id, out var heroId);
-            if (heroId == Guid.Empty)
-            {
-                return;
-            }
-            
-            Hero = await HeroStatisticsService.GetHeroStatisticsAsync(heroId);
-            _matchLogEntries = (await HeroStatisticsService.GetHeroMatchesAsync(heroId)).OrderByDescending(x => x.Date).ToList();
-            foreach (var matchLogEntry in _matchLogEntries)
-            {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.HeroId == heroId);
-            }
 
-            _againstAntagonistMatches = _matchLogEntries
-                .SelectMany(m => m.Fighters.Where(f => f.HeroId != heroId))
-                .GroupBy(f => f.Hero.Name)
-                .OrderByDescending(g => g.Count(f => f.IsWinner))
-                .ThenBy(g => g.Count(f => !f.IsWinner))
-                .ThenByDescending(g => g.Select(f => f.HpLeft ?? 0).Sum())
-                .ThenByDescending(g => g.Select(f => f.SidekickHpLeft ?? 0).Sum())
-                .FirstOrDefault();
+            var stats = HeroStatisticsService.GetHeroStatisticsAsync(heroId);
+            var matches = HeroStatisticsService.GetHeroMatchesAsync(heroId);
+            var ratings = HeroStatisticsService.GetRatingChangesAsync(heroId);
+            var ladder = HeroStatisticsService.GetHeroesStatisticsAsync();
+            var catalogHeroes = HeroService.GetAsync();
+            await Task.WhenAll(stats, matches, ratings, ladder, catalogHeroes);
 
-            _ratingChanges = await HeroStatisticsService.GetRatingChangesAsync(heroId);
-            await UpdateChart();
+            _hero = stats.Result;
+            _playStyle = _hero.PlayStyle ?? await PlayStyleService.GetAsync(heroId);
+            _sidekick = _hero.Sidekicks?.FirstOrDefault();
+            _expansionName = catalogHeroes.Result.FirstOrDefault(h => h.Id == heroId)?.ExpansionName.ToShortName();
+            _winRate = _hero.TotalMatches == 0
+                ? 0
+                : (int)Math.Round((double)_hero.TotalWins / _hero.TotalMatches * 100);
+
+            _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
+            _heroMatches = HeroMatchPresentation.Build(heroId, _matchLog).ToList();
+            var matchups = HeroMatchupCalculator.Calculate(heroId, _matchLog);
+            _matchups = matchups;
+            _matchupPage = 1;
+            _antagonist = HeroMatchupCalculator.Antagonist(matchups);
+
+            _ratingChanges = ratings.Result;
+            BuildRatingPoints();
+            BuildMonsterMatchups();
+            BuildNeighbours(ladder.Result.ToList(), heroId);
         }
         finally
         {
@@ -66,70 +304,105 @@
         }
     }
 
-    private async Task UpdateChart()
+    /// <summary>
+    /// Despite the name, RatingChangeDto.RatingDelta already carries the running rating, so the
+    /// series is plotted as-is rather than accumulated here.
+    /// </summary>
+    private void BuildRatingPoints()
     {
-        var heroColor = new List<string>
-            {
-                Hero.Color
-            };
-        var data = new ChartData
-            {
-                Labels = _ratingChanges.Select(c => c.Date).ToList(),
-                Datasets = new List<IChartDataset>
-                    {
-                        new LineChartDataset
-                            {
-                                Label = Hero.Name,
-                                Data = _ratingChanges.Select(c => (double)c.RatingDelta).ToList(),
-                                BackgroundColor = heroColor,
-                                BorderColor = heroColor,
-                                BorderWidth = new List<double>{2},
-                                HoverBorderWidth = new List<double>{4},
-                                PointBackgroundColor = heroColor,
-                                PointBorderColor = heroColor,
-                                PointRadius = new List<int>{4},
-                                PointHoverRadius = new List<int>{4}
-                            }
-                    }
-            };
-        var options = new LineChartOptions
-            {
-                Interaction =
-                    {
-                        Mode = InteractionMode.Index
-                    }
-            };
+        var points = _ratingChanges.Select(c => new ChartPoint(AxisLabel(c.Date), c.RatingDelta)).ToList();
 
-        options.Plugins.Title!.Text = "Rating changes";
-        options.Plugins.Title.Display = true;
-        options.Plugins.Title!.Font!.Size = 20;
-
-        options.Responsive = true;
-
-        options.Scales.X!.Title!.Text = "Date";
-        options.Scales.X.Title.Display = true;
-
-        options.Scales.Y!.Title!.Text = "Rating";
-        options.Scales.Y.Title.Display = true;
-
-        await _lineChart.UpdateAsync(data, options);
+        // The range switch trims from the end because the series is ordered oldest to newest.
+        var take = _ratingMonths == 0 ? points.Count : Math.Max(2, _ratingMonths * 4);
+        _ratingPoints = points.TakeLast(take).ToList();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    /// <summary>
+    /// The match service formats these as short dates and caps the series with a literal "Current",
+    /// so anything that parses becomes a month and everything else is passed through.
+    /// </summary>
+    private static string AxisLabel(string date)
+        => DateTime.TryParse(date, out var parsed) ? parsed.ToString("MMM yy") : date;
+
+    private void BuildMonsterMatchups()
     {
-        if (firstRender)
-        {
-            var data = new ChartData
+        var coopMatches = _matchLog.Where(m => m.Villain is not null).ToList();
+
+        _villainMatchups = coopMatches
+            .GroupBy(m => m.Villain!.Name ?? "Unknown")
+            .Select(g => new MonsterMatchupRow
                 {
-                    Labels = _ratingChanges.Select(c => c.Date).ToList(),
-                    Datasets = new List<IChartDataset>()
-                };
+                    Name = g.Key,
+                    Total = g.Count(),
+                    Wins = g.Count(m => !m.Villain!.IsWinner),
+                    Looses = g.Count(m => m.Villain!.IsWinner)
+                })
+            .OrderByDescending(r => r.Total)
+            .ToList();
 
-            var options = new LineChartOptions();
-
-            await _lineChart.InitializeAsync(data, options);
-        }
-
-        await base.OnAfterRenderAsync(firstRender);
+        _minionMatchups = coopMatches
+            .SelectMany(m => m.Villain!.Minions)
+            .GroupBy(m => m.Name ?? "Unknown")
+            .Select(g => new MonsterMatchupRow
+                {
+                    Name = g.Key,
+                    Total = g.Count(),
+                    Wins = g.Count(m => !m.IsWinner),
+                    Looses = g.Count(m => m.IsWinner)
+                })
+            .OrderByDescending(r => r.Total)
+            .ToList();
     }
+
+    /// <summary>Prev/next walk the ladder in rank order, which is how the user got here.</summary>
+    private void BuildNeighbours(List<UiHeroStatisticsDto> ladder, Guid heroId)
+    {
+        var ordered = ladder.OrderBy(h => h.Place ?? int.MaxValue).ToList();
+        var index = ordered.FindIndex(h => h.HeroId == heroId);
+        _previousHeroId = index > 0 ? ordered[index - 1].HeroId : null;
+        _nextHeroId = index >= 0 && index < ordered.Count - 1 ? ordered[index + 1].HeroId : null;
+    }
+
+    private record Axis(string Label, int Value);
+
+    private IEnumerable<Axis> PlayStyleAxes()
+    {
+        yield return new Axis("Attack", _playStyle?.Attack ?? 0);
+        yield return new Axis("Defence", _playStyle?.Defence ?? 0);
+        yield return new Axis("Trickery", _playStyle?.Trickery ?? 0);
+        yield return new Axis("Difficulty", _playStyle?.Difficulty ?? 0);
+    }
+
+    private void OnRatingRangeChanged(int months)
+    {
+        _ratingMonths = months;
+        BuildRatingPoints();
+    }
+
+    private IReadOnlyList<HeroMatchup> MatchupPage()
+        => _matchups.Skip((_matchupPage - 1) * MatchupsPerPage).Take(MatchupsPerPage).ToList();
+
+    private void GoToMatchupPage(int page) => _matchupPage = Math.Clamp(page, 1, MatchupPageCount);
+
+    private void GoToHero(Guid? heroId)
+    {
+        if (heroId is not null)
+        {
+            NavManager.NavigateTo($"{Urls.HeroesStatistics}/{heroId}");
+        }
+    }
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("heroes", _hero.Name, _hero.ImageFileName, stream, file.Name);
+        await HeroService.UpdateImageAsync(_hero.HeroId, fileName);
+        await HeroStatisticsService.UpdateImageAsync(_hero.HeroId, fileName);
+        _hero.ImageFileName = fileName;
+        _cacheBust++;
+    }
+
+    private void OnColorChangeAsync(ChangeEventArgs e) => _hero.Color = e.Value?.ToString();
 }

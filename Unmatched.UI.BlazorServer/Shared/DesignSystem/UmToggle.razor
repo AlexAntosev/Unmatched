@@ -1,0 +1,33 @@
+@*
+    The "Owned only" style toggle: a 32px control that lights up violet when on.
+*@
+<button type="button" class="um-toggle @(Value ? "is-on" : null) @Class" @onclick="ToggleAsync">
+    <i class="bi @(Value ? OnIcon : OffIcon)"></i>
+    @Label
+</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter]
+    public string OnIcon { get; set; } = "bi-toggle-on";
+
+    [Parameter]
+    public string OffIcon { get; set; } = "bi-toggle-off";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private Task ToggleAsync()
+    {
+        Value = !Value;
+        return ValueChanged.InvokeAsync(Value);
+    }
+}

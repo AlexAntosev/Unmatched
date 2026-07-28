@@ -22,7 +22,7 @@ public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, ISta
         var catalogHeroSidekicks = await catalogClient.GetSidekicksByHeroAsync(heroId);
         uiModel.Sidekicks = catalogHeroSidekicks.Select(mapper.Map<UiSidekickDto>);
 
-        uiModel.Titles = new List<TitleDto>(); //TODO
+        uiModel.Titles = await matchClient.GetTitlesByHeroAsync(heroId);
 
         var catalogPlayStyle = await catalogClient.GetPlayStyleByHero(heroId);
         uiModel.PlayStyle = mapper.Map<UiPlayStyleDto>(catalogPlayStyle);
@@ -40,5 +40,11 @@ public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, ISta
     {
         var matches = await matchClient.GetHeroRatingChangesAsync(heroId);
         return matches.Select(mapper.Map<RatingChangeDto>).ToList();
+    }
+
+    public async Task<string> UpdateImageAsync(Guid heroId, string imageFileName)
+    {
+        var updated = await statisticsClient.UpdateHeroImageAsync(heroId, imageFileName);
+        return updated.ImageFileName!;
     }
 }

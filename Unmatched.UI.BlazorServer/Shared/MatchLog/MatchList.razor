@@ -1,0 +1,119 @@
+@using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@inject IMapService MapService
+@*
+    A panel of 3b rows with a column header and paging. Only one row is expanded at a time, which
+    is the `openMatch` state from the handoff.
+*@
+<Panel Title="@Title" Meta="@Meta" Flush="true">
+    <ChildContent>
+        <ColumnHeader Columns="@Columns" Class="match-list-head">
+            <div>Date</div>
+            <div>Mode</div>
+            <div>Participants</div>
+            <div>Map</div>
+            <div></div>
+            <div class="match-list-right">Epic</div>
+            <div></div>
+        </ColumnHeader>
+        @if (_page.Count == 0)
+        {
+            <div class="match-list-empty">No matches match these filters.</div>
+        }
+        @foreach (var match in _page)
+        {
+            <MatchRow Match="match"
+                      MapName="@MapDisplayName(match.MapName)"
+                      IsOpen="@(_openMatchId == match.MatchId)"
+                      OnToggle="@(() => Toggle(match.MatchId))"/>
+        }
+    </ChildContent>
+    <Footer>
+        @if (AllowPageSizeControl)
+        {
+            <span class="match-list-footer-page">Page @_currentPage of @PageCount</span>
+            <div class="match-list-footer-divider"></div>
+            <span class="match-list-footer-pagesize-label">Per page</span>
+            <SegmentedControl TValue="int" Variant="bar" Options="PageSizeOptions" Value="PageSize" ValueChanged="OnPageSizeChanged"/>
+            <div class="um-spacer"></div>
+            <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage"/>
+        }
+        else
+        {
+            <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage"
+                        Meta="@($"Page {_currentPage} of {PageCount}")"/>
+        }
+    </Footer>
+</Panel>
+
+@code {
+    private const string Columns = "82px 84px 1fr 116px 22px 60px 24px";
+
+    private Dictionary<string, string> _mapDisplayNames = new();
+    private List<UiMatchLogDto> _all = new();
+    private List<UiMatchLogDto> _page = new();
+    private Guid? _openMatchId;
+    private int _currentPage = 1;
+
+    [Parameter, EditorRequired]
+    public IEnumerable<UiMatchLogDto> Matches { get; set; } = [];
+
+    [Parameter]
+    public string Title { get; set; } = "Match log";
+
+    [Parameter]
+    public string? Meta { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; } = 8;
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    /// <summary>Shows the "Per page" segmented override in the footer - the match log page opts in.</summary>
+    [Parameter]
+    public bool AllowPageSizeControl { get; set; }
+
+    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
+
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(_all.Count / (double)PageSize));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var maps = await MapService.GetAsync();
+        _mapDisplayNames = maps
+            .GroupBy(m => m.Name)
+            .ToDictionary(group => group.Key, group => group.First().DisplayName);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _all = Matches.ToList();
+        // Filters can shrink the list under the current page - fall back to the last one that exists.
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        BuildPage();
+    }
+
+    private void BuildPage()
+        => _page = _all.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        _openMatchId = null;
+        BuildPage();
+    }
+
+    private void Toggle(Guid matchId)
+        => _openMatchId = _openMatchId == matchId ? null : matchId;
+
+    private Task OnPageSizeChanged(int size)
+    {
+        _currentPage = 1;
+        return PageSizeChanged.InvokeAsync(size);
+    }
+
+    private string MapDisplayName(string mapName)
+        => _mapDisplayNames.GetValueOrDefault(mapName, mapName);
+}

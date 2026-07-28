@@ -1,0 +1,10 @@
+@*
+    WIN / LOSS. Only appears where the row belongs to one hero or player - never in the shared
+    match log, where the result lives inside the expanded scoreboard.
+*@
+<span class="um-result @(IsWin ? "is-win" : "is-loss")">@(IsWin ? "WIN" : "LOSS")</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public bool IsWin { get; set; }
+}

@@ -2,8 +2,9 @@
 
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
-public abstract class BaseMatchHandler(IUnitOfWork unitOfWork) : IMatchHandler
+public abstract class BaseMatchHandler(IUnitOfWork unitOfWork, IGameModeValidatorFactory validatorFactory) : IMatchHandler
 {
     protected readonly IUnitOfWork UnitOfWork = unitOfWork;
 
@@ -21,7 +22,7 @@ public abstract class BaseMatchHandler(IUnitOfWork unitOfWork) : IMatchHandler
     {
         foreach (var fighter in match.Fighters)
         {
-            fighter.MatchPoints = matchPoints[fighter.HeroId];
+            fighter.MatchPoints = matchPoints.TryGetValue(fighter.HeroId, out var points) ? points : 0;
         }
 
         match.IsPlanned = false;
@@ -44,24 +45,10 @@ public abstract class BaseMatchHandler(IUnitOfWork unitOfWork) : IMatchHandler
     
     private void Validate(MatchEntity match)
     {
-        if (IsNotEnoughFighters(match.Fighters))
-        {
-            throw new ArgumentException("Not enough fighters.", nameof(match));
-        }
-        
-        if (IsNotOneWinner(match.Fighters))
-        {
-            throw new ArgumentException("Match should has one winner.", nameof(match));
-        }
+        validatorFactory.Create(match.GameMode).Validate(match);
 
         InnerValidate(match);
     }
-    
-    private static bool IsNotEnoughFighters(ICollection<FighterEntity>? fighters) 
-        => fighters is null || fighters.Count < 2;
-    
-    private static bool IsNotOneWinner(ICollection<FighterEntity> fighters) 
-        => fighters.Count(f => f.IsWinner) != 1;
 
     private async Task<RatingEntity> UpdateHeroRatingAsync(Guid heroId, int matchPoint)
     {

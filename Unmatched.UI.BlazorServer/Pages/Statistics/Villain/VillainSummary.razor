@@ -1,69 +1,40 @@
-﻿@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Services
+@inject IVillainService VillainService
+@inject IVillainStatisticsService VillainStatisticsService
+@inject IImageUploadService ImageUploadService
 
-<div style="background: linear-gradient(180deg, @Statistics.Villain.Color 0%, rgba(255,255,255,1) 100%);">
-    <div style="display: flex; align-items: center; justify-content: center;" >
-        <h3 class="page-title">@Statistics.Villain.Name</h3>
-        <button style="background-color: transparent; border: 0px" onclick="@UpdateVillainColor">✎</button>
-        <input type="color" value="@Statistics.Villain.Color" onchange="@OnColorChange"/>
-    </div>
-    <div class="wrapper page-content">
-        <div class="image-container">
-            @if (Statistics.Villain is not null)
-            {
-                <img src="@Statistics.Villain.ImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
-            }
-        </div>
-        <div>
-            <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
-            <img style="margin-bottom: 0.5rem;" src="@_statistics.Villain?.MeleeRangeImageUrl" alt="@_statistics.VillainId" width="64px" height="auto"/>
-            <h5>Hp: @_statistics.Villain.Hp</h5>
-            <h5>Deck size: @_statistics.Villain.DeckSize</h5>
-        </div>
-    </div>
-</div>
+<EntityBanner Name="@Statistics.Name" Eyebrow="Villain profile" ImageUrl="@BustCache(Statistics.ImageUrl)"
+              OnFileSelected="OnImageSelectedAsync">
+    <TitleExtra>
+        <MeleeRangedIcon IsRanged="Statistics.IsRanged" Height="20" Opacity="0.85"/>
+    </TitleExtra>
+    <Stats>
+        <StatTile Label="Matches" Value="@Statistics.TotalMatches.ToString()"/>
+        <StatTile Label="Wins" Value="@Statistics.TotalWins.ToString()" ValueColor="var(--um-win)"/>
+        <StatTile Label="Losses" Value="@Statistics.TotalLooses.ToString()" ValueColor="var(--um-loss)"/>
+        <StatTile Label="HP" Value="@Statistics.Hp.ToString()"/>
+    </Stats>
+</EntityBanner>
 
 @code {
     [Parameter]
-    public VillainStatisticsDto Statistics
-    {
-        get => _statistics;
-        set
-        {
-            _statistics = value;
-        }
-    }
-    
-    private VillainStatisticsDto _statistics = new();
+    public VillainStatisticsDto Statistics { get; set; } = new();
 
-    private void OnColorChange(ChangeEventArgs e)
+    private int _cacheBust;
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
     {
-        _statistics.Villain.Color = e.Value?.ToString();
-    }
-    
-    private void UpdateVillainColor()
-    {
-        var color = _statistics.Villain.Color;
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("villains", Statistics.Name, Statistics.ImageFileName, stream, file.Name);
+        await VillainService.UpdateImageAsync(Statistics.VillainId, fileName);
+        await VillainStatisticsService.UpdateImageAsync(Statistics.VillainId, fileName);
+        Statistics.ImageFileName = fileName;
+        _cacheBust++;
+        StateHasChanged();
     }
 }
-
-<style>
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      column-gap: 32px;
-      row-gap: 4px;
-    }
-    
-    .image-container {
-        width: 250px;
-        height: 200px;
-        text-align: center;
-        display: block;
-    }
-    
-    .container img {
-        margin: auto;
-        display: block;
-    }             
-</style>

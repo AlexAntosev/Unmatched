@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=Barlow:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+body{margin:0;background:#08080c;font-family:Barlow,system-ui,sans-serif;color:#ecedf2}
+a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(255,255,255,.07);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px IBM Plex Mono,monospace;padding:3px 7px;background:#ecedf2;color:#08080c;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 Barlow,sans-serif;color:#ecedf2}
+.dv-opts{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px IBM Plex Mono,monospace;padding:3px 7px;background:rgba(255,255,255,.1);color:#ecedf2;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Barlow,sans-serif;color:rgba(236,237,242,.55)}
+.dv-card{max-width:100%;background:#0c0c11;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden}
+.dv-opt:target .dv-oid{background:#6c5cff;color:#fff}
+.dv-next{margin:22px 0 0;font:12.5px/1.6 Barlow,sans-serif;color:rgba(236,237,242,.5)}
+.dv-note{margin:0 0 22px;max-width:900px;font:13px/1.65 Barlow,sans-serif;color:rgba(236,237,242,.62)}
+.dv-note b{color:#ecedf2;font-weight:600}
+@font-face{font-family:"UnmatchedBrand";src:url("assets/fonts/Unmatched.otf");font-display:swap}
+@keyframes umpulse{0%,100%{opacity:.55}50%{opacity:1}}
+</style></helmet>
+
+<section class="dv-turn" id="t7">
+<div class="dv-thd"><a class="dv-tid" href="#t7">7</a><span class="dv-tname">Player profile — and three fixes to shipped screens</span></div>
+<p class="dv-note">A player is not a hero, so the page is built around <b>who they beat and what they play</b>, not one character sheet: identity band, five metrics, rating line, mode split, favourite heroes capped at six with a link out, rivals as head-to-head bars, best maps, titles, recent matches. Fixes folded into the existing screens: <b>epic stars</b> now render empty stars as hollow outlines instead of dim glyphs, the <b>match comment</b> has a home in the expanded scoreboard (plus a small icon in the row when one exists), <b>Matchups</b> on the hero page pages through every opponent with ‹ › sorted by win rate, and the match-log footer carries a <b>per-page</b> control (10 / 20 / 50 / 100) whose default lives in Settings.</p>
+<div class="dv-opts">
+  <div class="dv-opt" id="7a">
+    <div class="dv-olabel"><a class="dv-oid" href="#7a">7a</a>Player profile</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="display:flex;min-height:1180px;background:#0a0a10">
+
+        <div style="width:{{ navW }}px;flex:none;background:#0c0c14;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column;gap:16px;transition:width .18s ease">
+          <div style="display:flex;align-items:center;justify-content:center;height:{{ navHeaderH }}px;padding:0 4px">
+            <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
+            <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
+          </div>
+          <sc-for list="{{ navGroupsPlayer }}" as="g" hint-placeholder-count="0">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
+                <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
+                  <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
+                  <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
+                  <div style="flex:1"></div>
+                  <span style="display:{{ navLabelDisplay }};font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ n.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div onClick="{{ navToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;font:500 11.5px Barlow,sans-serif;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)">
+            <i class="bi {{ navToggleIcon }}" style="font-size:12px"></i><span style="display:{{ navLabelDisplay }}">Collapse</span>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:8px;font:400 12px Barlow,sans-serif;color:#6b6c7e">
+              <span style="color:#8b8c9e">Statistics</span><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#8b8c9e">Players</span><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#ecedf2;font-weight:600">{{ pl.name }}</span>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi bi-chevron-left" style="font-size:10px"></i>Ksuha</div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">Oleksandr<i class="bi bi-chevron-right" style="font-size:10px"></i></div>
+            
+          </div>
+
+          <div style="display:flex;align-items:center;gap:22px;padding:22px 26px;border-bottom:1px solid rgba(255,255,255,.07);background:linear-gradient(105deg,rgba(108,92,255,.14),rgba(168,85,247,.05) 45%,transparent 78%)">
+            <img src="assets/players/andrii.png" alt="{{ pl.name }}" style="width:92px;height:92px;flex:none;border-radius:50%;object-fit:cover;border:2px solid rgba(139,125,255,.5);box-shadow:0 8px 26px rgba(0,0,0,.5)">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:baseline;gap:12px">
+                <div style="font:700 30px/1 Chakra Petch,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:#ecedf2">{{ pl.name }}</div>
+                <div style="display:flex;align-items:baseline;gap:5px;padding:3px 9px;border-radius:7px;background:rgba(240,180,41,.14)">
+                  <span style="font:700 13px Chakra Petch,sans-serif;color:#f0b429">{{ pl.rank }}</span>
+                  <span style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ pl.rankOf }}</span>
+                </div>
+              </div>
+              <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">{{ pl.meta }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px">
+                <sc-for list="{{ pl.titles }}" as="t" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);font:500 11px Barlow,sans-serif;color:#c9cad6">
+                    <i class="bi {{ t.icon }}" style="font-size:11px;color:{{ t.color }}"></i>{{ t.label }}
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 26px">
+            <sc-for list="{{ plKpis }}" as="k" hint-placeholder-count="0">
+              <div style="padding:14px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
+                <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">{{ k.label }}</div>
+                <div style="font:700 24px Chakra Petch,sans-serif;color:{{ k.color }};margin-top:4px;white-space:nowrap">{{ k.value }}</div>
+                <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;margin-top:3px;white-space:nowrap">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;padding:0 26px 18px">
+            
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:13px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">By game mode</div>
+              <sc-for list="{{ plModes }}" as="m" hint-placeholder-count="0">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font:600 11.5px Barlow,sans-serif;color:#ecedf2;width:38px">{{ m.label }}</span>
+                    <span style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;flex:1">{{ m.matches }} matches</span>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:{{ m.pctColor }}">{{ m.pct }}%</span>
+                  </div>
+                  <div style="height:6px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden"><div style="height:100%;width:{{ m.bar }};background:{{ m.color }};border-radius:3px"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding:0 26px 18px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Heroes played</div>
+                <div style="display:flex;align-items:center;gap:6px;padding:3px 9px;border-radius:7px;background:rgba(240,180,41,.13);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;color:#f0b429"><i class="bi bi-bookmark-star-fill" style="font-size:10px"></i>MAIN · {{ plMainName }}</div>
+                <div style="flex:1"></div>
+                <div style="display:flex;align-items:center;gap:8px;height:30px;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)">
+                  <i class="bi bi-search" style="font-size:10px;color:#5c5d70"></i><span style="font:400 11.5px Barlow,sans-serif;color:#5c5d70">Filter heroes…</span>
+                </div>
+                <div style="display:flex;gap:2px;padding:3px;border-radius:9px;background:rgba(255,255,255,.04)">
+                  <sc-for list="{{ plHeroSorts }}" as="z" hint-placeholder-count="0">
+                    <div onClick="{{ z.onClick }}" style="padding:4px 10px;border-radius:7px;background:{{ z.bg }};font:500 10.5px IBM Plex Mono,monospace;color:{{ z.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ z.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70;white-space:nowrap">{{ plHeroCount }}</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 92px 118px 52px 52px 76px 116px;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
+                <div>Hero</div><div style="text-align:right">Matches</div><div style="text-align:center">W / L</div><div style="text-align:right">Win %</div><div style="text-align:right">K/D</div><div style="text-align:center">Main</div><div style="text-align:right">My rating</div>
+              </div>
+              <div style="max-height:430px;overflow-y:auto">
+                <sc-for list="{{ plHeroes }}" as="h" hint-placeholder-count="0">
+                  <div style="display:grid;grid-template-columns:1fr 92px 118px 52px 52px 76px 116px;gap:12px;align-items:center;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);background:{{ h.rowBg }}" style-hover="background:rgba(255,255,255,.045)">
+                    <div style="display:flex;align-items:center;gap:11px;min-width:0;cursor:pointer">
+                      <img src="{{ h.art }}" alt="" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;border:1.5px solid {{ h.ring }}">
+                      <span style="font:600 12.5px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.name }}</span>
+                      <img src="{{ h.typeIcon }}" alt="" style="width:12px;height:12px;filter:invert(1);opacity:.45;flex:none">
+                    </div>
+                    <div style="text-align:right;font:400 11px IBM Plex Mono,monospace;color:#8b8c9e">{{ h.matches }}</div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span style="font:500 10px IBM Plex Mono,monospace;color:#34d99b;width:14px;text-align:right">{{ h.wins }}</span>
+                      <div style="flex:1;height:5px;border-radius:3px;background:rgba(242,80,107,.55);overflow:hidden"><div style="height:100%;width:{{ h.barWin }};background:#34d99b;border-radius:3px"></div></div>
+                      <span style="font:500 10px IBM Plex Mono,monospace;color:#f2506b;width:14px">{{ h.losses }}</span>
+                    </div>
+                    <div style="text-align:right;font:600 11.5px IBM Plex Mono,monospace;color:{{ h.pctColor }}">{{ h.pct }}%</div>
+                    <div style="text-align:right;font:600 11.5px IBM Plex Mono,monospace;color:{{ h.kdColor }}">{{ h.kd }}</div>
+                    <div style="display:flex;justify-content:center">
+                      <div onClick="{{ h.setMain }}" title="{{ h.mainTitle }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid {{ h.mainBorder }};background:{{ h.mainBg }};color:{{ h.mainFg }};cursor:pointer" style-hover="border-color:rgba(240,180,41,.6)">
+                        <i class="bi {{ h.mainIcon }}" style="font-size:12px"></i>
+                      </div>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:3px">
+                      <sc-for list="{{ h.rating }}" as="st" hint-placeholder-count="0">
+                        <i onClick="{{ st.onClick }}" class="bi {{ st.icon }}" title="{{ st.title }}" style="font-size:13px;color:{{ st.color }};cursor:pointer"></i>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid rgba(255,255,255,.05);font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70">
+                <i class="bi bi-bookmark-star" style="font-size:11px"></i>One main per player · personal rating is subjective, 1–5, and never feeds the ladder
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 26px 18px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Rivals</div>
+              <sc-for list="{{ plRivals }}" as="r" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <img src="{{ r.avatar }}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none">
+                  <div style="flex:1;min-width:0">
+                    <div style="font:600 12px Barlow,sans-serif;color:#ecedf2">{{ r.name }}</div>
+                    <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ r.total }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:7px;flex:none;width:150px">
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:#34d99b;width:16px;text-align:right">{{ r.wins }}</span>
+                    <div style="flex:1;height:6px;border-radius:3px;background:rgba(242,80,107,.55);overflow:hidden"><div style="height:100%;width:{{ r.barWin }};background:#34d99b;border-radius:3px"></div></div>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:#f2506b;width:16px">{{ r.losses }}</span>
+                  </div>
+                  <span style="font:600 11.5px IBM Plex Mono,monospace;color:{{ r.pctColor }};width:34px;text-align:right;flex:none">{{ r.pct }}%</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Best maps</div>
+              <sc-for list="{{ plMaps }}" as="m" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <img src="{{ m.art }}" alt="" style="width:44px;height:30px;border-radius:7px;object-fit:cover;flex:none;background:#16161f">
+                  <span style="flex:1;min-width:0;font:500 12px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                  <span style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;flex:none">{{ m.matches }} pl.</span>
+                  <div style="width:56px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;flex:none"><div style="height:100%;width:{{ m.bar }};background:{{ m.pctColor }};border-radius:3px"></div></div>
+                  <span style="font:600 11px IBM Plex Mono,monospace;color:{{ m.pctColor }};width:34px;text-align:right;flex:none">{{ m.pct }}%</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding:0 26px 22px;display:grid;grid-template-columns:1fr;gap:16px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Titles earned</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <sc-for list="{{ plTitles }}" as="t" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)">
+                    <i class="bi {{ t.icon }}" style="font-size:17px;color:{{ t.color }};flex:none"></i>
+                    <div style="min-width:0">
+                      <div style="font:600 12px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.name }}</div>
+                      <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;margin-top:2px">{{ t.sub }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:0 26px 22px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Andrii's matches</div>
+                <div style="flex:1"></div>
+                <div style="display:flex;gap:8px">
+                  <sc-for list="{{ plMatchTallies }}" as="t" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:baseline;gap:5px;padding:3px 9px;border-radius:7px;background:{{ t.bg }};font:600 10px IBM Plex Mono,monospace;letter-spacing:.08em;color:{{ t.fg }}">{{ t.label }}<span style="font:700 12px Chakra Petch,sans-serif">{{ t.value }}</span></div>
+                  </sc-for>
+                </div>
+                <a href="#6a" style="font:500 10.5px IBM Plex Mono,monospace;color:#8b7dff">FULL LOG →</a>
+              </div>
+              <div style="display:grid;grid-template-columns:82px 46px 78px 1fr 108px 62px 58px;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
+                <div>Date</div><div>Mode</div><div>Result</div><div>Played · against</div><div>Map</div><div style="text-align:right">HP left</div><div style="text-align:right">Epic</div>
+              </div>
+              <sc-for list="{{ plMatches }}" as="m" hint-placeholder-count="0">
+                <div style="display:grid;grid-template-columns:82px 46px 78px 1fr 108px 62px 58px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.edge }};background:{{ m.bg }};cursor:pointer" style-hover="background:{{ m.bgHover }}">
+                  <div><div style="font:400 11px IBM Plex Mono,monospace;color:#c9cad6">{{ m.date }}</div><div style="font:400 9px IBM Plex Mono,monospace;color:#5c5d70;margin-top:1px">{{ m.time }}</div></div>
+                  <div style="font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;color:{{ m.modeColor }}">{{ m.mode }}</div>
+                  <div><div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.resultBg }};font:700 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.resultFg }}"><i class="bi {{ m.resultIcon }}" style="font-size:9px"></i>{{ m.result }}</div></div>
+                  <div style="display:flex;align-items:center;gap:9px;min-width:0">
+                    <img src="{{ m.art }}" alt="" style="width:26px;height:26px;border-radius:8px;object-fit:cover;flex:none;border:1.5px solid {{ m.ring }}">
+                    <span style="font:600 12px Barlow,sans-serif;white-space:nowrap;flex:none">{{ m.hero }}</span>
+                    <span style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;flex:none">vs</span>
+                    <div style="display:flex;align-items:center;gap:6px;min-width:0">
+                      <sc-for list="{{ m.opponents }}" as="o" hint-placeholder-count="0">
+                        <div style="display:flex;align-items:center;gap:5px;padding:2px 7px 2px 2px;border-radius:20px;background:rgba(255,255,255,.045)">
+                          <img src="{{ o.art }}" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover">
+                          <span style="font:500 10.5px Barlow,sans-serif;color:#c9cad6;white-space:nowrap">{{ o.name }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
+                  <div style="text-align:right;font:600 11.5px IBM Plex Mono,monospace"><span style="color:{{ m.hpColor }}">{{ m.hp }}</span><span style="color:#5c5d70"> / {{ m.oppHp }}</span></div>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                    <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70">
+                <span>Showing 6 of 168</span><div style="flex:1"></div>
+                <span style="color:#8b7dff;cursor:pointer">Load more</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-next">Try next: "settings page" · "Maps / Villains / Minions lists" · "hover preview in the ladder"</p>
+</section>
+
+<section class="dv-turn" id="t6">
+<div class="dv-thd"><a class="dv-tid" href="#t6">6</a><span class="dv-tname">Match log — the full page</span></div>
+<p class="dv-note">The row from <a class="dv-oid" href="#3b">3b</a> promoted to a page: mode filter that actually filters, a filter strip for player / hero / map / tournament / date, a four-metric header, and grouped by date so a session reads as one block. Click any row to open the full scoreboard — every participant, villain and minions included.</p>
+<div class="dv-opts">
+  <div class="dv-opt" id="6a">
+    <div class="dv-olabel"><a class="dv-oid" href="#6a">6a</a>Dense log with live mode filter and expandable scoreboards</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="display:flex;min-height:940px;background:#0a0a10">
+
+        <div style="width:{{ navW }}px;flex:none;background:#0c0c14;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column;gap:16px;transition:width .18s ease">
+          <div style="display:flex;align-items:center;justify-content:center;height:{{ navHeaderH }}px;padding:0 4px">
+            <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
+            <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
+          </div>
+          <sc-for list="{{ navGroupsLog }}" as="g" hint-placeholder-count="0">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
+                <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
+                  <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
+                  <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
+                  <div style="flex:1"></div>
+                  <span style="display:{{ navLabelDisplay }};font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ n.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div onClick="{{ navToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;font:500 11.5px Barlow,sans-serif;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)">
+            <i class="bi {{ navToggleIcon }}" style="font-size:12px"></i><span style="display:{{ navLabelDisplay }}">Collapse</span>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:8px;font:400 12px Barlow,sans-serif;color:#6b6c7e">
+              <span style="color:#8b8c9e">Play</span><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#ecedf2;font-weight:600">Match log</span>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);min-width:200px">
+              <i class="bi bi-search" style="font-size:11px;color:#5c5d70"></i>
+              <span style="font:400 12px Barlow,sans-serif;color:#5c5d70">Search hero, player, map…</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi bi-download" style="font-size:11px"></i>Export</div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);font:600 12px Barlow,sans-serif;color:#fff;cursor:pointer"><i class="bi bi-plus-lg" style="font-size:11px"></i>Add match</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <sc-for list="{{ logKpis }}" as="k" hint-placeholder-count="0">
+              <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
+                <i class="bi {{ k.icon }}" style="font-size:16px;color:#8b7dff"></i>
+                <div style="min-width:0">
+                  <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">{{ k.label }}</div>
+                  <div style="font:700 19px Chakra Petch,sans-serif;color:#ecedf2;margin-top:2px">{{ k.value }}</div>
+                </div>
+                <div style="flex:1"></div>
+                <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;text-align:right;white-space:nowrap">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 26px;border-bottom:1px solid rgba(255,255,255,.07);flex-wrap:wrap">
+            <div style="display:flex;gap:6px;padding:3px;border-radius:10px;background:rgba(255,255,255,.04)">
+              <sc-for list="{{ logModeFilters }}" as="f" hint-placeholder-count="0">
+                <div onClick="{{ f.onClick }}" style="display:flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:8px;background:{{ f.bg }};border:1px solid {{ f.border }};font:600 11.5px Barlow,sans-serif;color:{{ f.fg }};cursor:pointer" style-hover="color:#ecedf2">
+                  <i class="bi {{ f.icon }}" style="font-size:11px;color:{{ f.color }}"></i>{{ f.label }}
+                </div>
+              </sc-for>
+            </div>
+            <div style="width:1px;height:22px;background:rgba(255,255,255,.08)"></div>
+            <sc-for list="{{ logChips }}" as="c" hint-placeholder-count="0">
+              <div style="display:flex;align-items:center;gap:7px;height:28px;padding:0 11px;border-radius:8px;border:1px solid rgba(255,255,255,.07);font:500 11.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.4)">
+                <i class="bi {{ c.icon }}" style="font-size:11px"></i>{{ c.label }}<i class="bi bi-chevron-down" style="font-size:8px;opacity:.6"></i>
+              </div>
+            </sc-for>
+            <div style="flex:1"></div>
+            <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70;white-space:nowrap">{{ logCount }}</div>
+          </div>
+
+          <div style="flex:1;padding:18px 26px 22px">
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:82px 84px 1fr 116px 22px 58px 24px;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">
+                <div>Date</div><div>Mode</div><div>Participants</div><div>Map</div><div></div><div style="text-align:right">Epic</div><div></div>
+              </div>
+              <sc-for list="{{ logPage }}" as="m" hint-placeholder-count="0">
+                <div style="border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.neutralEdge }}">
+                  <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:82px 84px 1fr 116px 22px 58px 24px;gap:12px;align-items:center;padding:12px 16px;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
+                    <div><div style="font:400 11px IBM Plex Mono,monospace;color:#c9cad6">{{ m.date }}</div><div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;margin-top:2px">{{ m.time }}</div></div>
+                    <div><div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.mode.bg }};font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.mode.color }}"><i class="bi {{ m.mode.icon }}" style="font-size:10px"></i>{{ m.mode.label }}</div></div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0">
+                      <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="0">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <div style="display:{{ g.sepDisplay }};align-items:center;justify-content:center;font:600 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ g.sepLabel }}</div>
+                          <div style="display:flex;align-items:center;gap:6px">
+                            <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="0">
+                              <div title="{{ c.name }}" style="position:relative;opacity:{{ c.opacity }}">
+                                <img src="{{ c.art }}" alt="{{ c.name }}" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid {{ c.border }}">
+                                <img src="{{ c.playerAvatar }}" alt="{{ c.player }}" style="display:{{ c.playerDisplay }};position:absolute;bottom:-3px;right:-4px;width:15px;height:15px;border-radius:50%;object-fit:cover;border:1.5px solid #101018">
+                                <div style="position:absolute;top:-5px;left:-5px;display:{{ c.placeDisplay }};align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;background:#0c0c11;border:1px solid rgba(255,255,255,.14);font:700 8.5px Chakra Petch,sans-serif;color:{{ c.placeColor }}">{{ c.place }}</div>
+                              </div>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
+                    <div title="{{ m.commentText }}" style="display:flex;align-items:center;justify-content:center"><i class="bi bi-chat-left-text-fill" style="display:{{ m.commentDisplay }};font-size:10.5px;color:#6b6c7e"></i></div>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                      <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                    </div>
+                    <div style="text-align:right;color:#8b8c9e"><i class="bi {{ m.chevron }}" style="font-size:11px"></i></div>
+                  </div>
+                  <sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}">
+                    <div style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:6px;background:rgba(8,8,12,.45);border-top:1px solid rgba(255,255,255,.05)">
+                      <div style="display:flex;align-items:center;gap:10px;padding:8px 10px 4px;font:500 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70">
+                        <div style="flex:1">Participant</div>
+                        <div style="display:{{ m.board.sideDisplay }};width:68px">Side</div>
+                        <div style="width:56px;text-align:right">HP left</div>
+                        <div style="width:52px;text-align:right">Cards</div>
+                        <div style="width:118px;text-align:right">Sidekick</div>
+                      </div>
+                      <sc-for list="{{ m.board.rows }}" as="r" hint-placeholder-count="0">
+                        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.03);opacity:{{ r.opacity }}">
+                          <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding-left:{{ r.indent }}px">
+                            <div style="position:relative;flex:none">
+                              <img src="{{ r.art }}" alt="{{ r.name }}" style="width:{{ r.size }}px;height:{{ r.size }}px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.09)">
+                              <div style="position:absolute;top:-5px;left:-5px;display:{{ r.placeDisplay }};align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;background:#0c0c11;border:1px solid rgba(255,255,255,.14);font:700 8.5px Chakra Petch,sans-serif;color:{{ r.placeColor }}">{{ r.place }}</div>
+                            </div>
+                            <div style="min-width:0">
+                              <div style="font:600 12px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                              <div style="font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ r.sub }}</div>
+                            </div>
+                            <img src="{{ r.avatar }}" alt="" style="display:{{ r.avatarDisplay }};width:20px;height:20px;border-radius:50%;object-fit:cover;opacity:.85">
+                          </div>
+                          <div style="display:{{ m.board.sideDisplay }};width:68px;font:600 10px IBM Plex Mono,monospace;letter-spacing:.06em;color:{{ r.sideColor }}">{{ r.side }}</div>
+                          <div style="width:56px;text-align:right;font:600 12px IBM Plex Mono,monospace;color:{{ r.hpColor }}">{{ r.hp }}</div>
+                          <div style="width:52px;text-align:right;font:400 12px IBM Plex Mono,monospace;color:#8b8c9e">{{ r.cards }}</div>
+                          <div style="width:118px;text-align:right;font:400 10.5px IBM Plex Mono,monospace;color:{{ r.sidekickColor }}">{{ r.sidekick }}</div>
+                        </div>
+                      </sc-for>
+                      <div style="display:flex;align-items:flex-start;gap:18px;margin-top:6px;padding:12px 12px;border-radius:11px;background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.05)">
+                        <div style="flex:none">
+                          <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">Epic</div>
+                          <div style="display:flex;gap:3px;margin-top:5px">
+                            <sc-for list="{{ m.epicStarsBig }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:15px;color:{{ st.color }}"></i></sc-for>
+                          </div>
+                        </div>
+                        <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.07)"></div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5c5d70">Comment</div>
+                          <div style="font:400 12px/1.55 Barlow,sans-serif;color:{{ m.commentColor }};margin-top:5px;text-wrap:pretty">{{ m.commentText }}</div>
+                        </div>
+                        <div style="flex:none;display:flex;gap:7px">
+                          <div style="display:flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:8px;border:1px solid rgba(255,255,255,.08);font:500 11px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.4)"><i class="bi bi-pencil" style="font-size:10px"></i>Edit match</div>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-top:1px solid rgba(255,255,255,.05)">
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70">{{ logPageLabel }}</div>
+                <div style="width:1px;height:18px;background:rgba(255,255,255,.08)"></div>
+                <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70">Per page</div>
+                <div style="display:flex;gap:2px;padding:3px;border-radius:9px;background:rgba(255,255,255,.04)">
+                  <sc-for list="{{ logSizes }}" as="z" hint-placeholder-count="0">
+                    <div onClick="{{ z.onClick }}" style="min-width:30px;text-align:center;padding:4px 8px;border-radius:7px;background:{{ z.bg }};font:500 11px IBM Plex Mono,monospace;color:{{ z.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ z.n }}</div>
+                  </sc-for>
+                </div>
+                <div style="flex:1"></div>
+                <sc-for list="{{ pages }}" as="p" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:{{ p.bg }};border:1px solid {{ p.border }};font:500 11.5px IBM Plex Mono,monospace;color:{{ p.fg }};cursor:pointer">{{ p.n }}</div>
+                </sc-for>
+                <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;cursor:pointer"><i class="bi bi-chevron-right" style="font-size:10px"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-next">Try next: "Players list" · "design-system page"</p>
+</section>
+
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><a class="dv-tid" href="#t5">5</a><span class="dv-tname">Collection — what is actually in the box</span></div>
+<p class="dv-note">A collection is a shelf of <b>expansion boxes</b>, so the box cover carries the row. Left: every set you can own, owned ones lit, missing ones dimmed with a dashed frame. Right: the contents of the selected set — <b>heroes, maps, villains and their minions</b> — the same four entities the sidebar counts. Click any box to switch the panel; the two real covers are the art you sent, the rest are placeholders until covers are dropped in.</p>
+<div class="dv-opts">
+  <div class="dv-opt" id="5a">
+    <div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>Shelf + contents panel — click a box to read what is inside</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="display:flex;min-height:1000px;background:#0a0a10">
+
+        <div style="width:{{ navW }}px;flex:none;background:#0c0c14;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column;gap:16px;transition:width .18s ease">
+          <div style="display:flex;align-items:center;justify-content:center;height:{{ navHeaderH }}px;padding:0 4px">
+            <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
+            <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
+          </div>
+          <sc-for list="{{ navGroupsCol }}" as="g" hint-placeholder-count="0">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
+                <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
+                  <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
+                  <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
+                  <div style="flex:1"></div>
+                  <span style="display:{{ navLabelDisplay }};font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ n.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div onClick="{{ navToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;font:500 11.5px Barlow,sans-serif;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)">
+            <i class="bi {{ navToggleIcon }}" style="font-size:12px"></i><span style="display:{{ navLabelDisplay }}">Collapse</span>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:8px;font:400 12px Barlow,sans-serif;color:#6b6c7e">
+              <span style="color:#8b8c9e">Play</span><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#ecedf2;font-weight:600">Collection</span>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);min-width:190px">
+              <i class="bi bi-search" style="font-size:11px;color:#5c5d70"></i>
+              <span style="font:400 12px Barlow,sans-serif;color:#5c5d70">Search sets, heroes, maps…</span>
+            </div>
+            <div onClick="{{ colToggleOwned }}" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;border:1px solid {{ colOwnedBorder }};background:{{ colOwnedBg }};font:500 12px Barlow,sans-serif;color:{{ colOwnedFg }};cursor:pointer">
+              <i class="bi {{ colOwnedIcon }}" style="font-size:12px"></i>Owned only
+            </div>
+            <div style="font:400 11px IBM Plex Mono,monospace;color:{{ colDirtyFg }};white-space:nowrap">{{ colDirtyLabel }}</div>
+            <div onClick="{{ colSave }}" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:9px;background:{{ colSaveBg }};border:1px solid {{ colSaveBorder }};font:600 12px Barlow,sans-serif;color:{{ colSaveFg }};cursor:pointer"><i class="bi {{ colSaveIcon }}" style="font-size:11px"></i>Save collection</div>
+            
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <sc-for list="{{ colKpis }}" as="k" hint-placeholder-count="0">
+              <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.07)">
+                <i class="bi {{ k.icon }}" style="font-size:16px;color:#8b7dff"></i>
+                <div style="min-width:0">
+                  <div style="font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">{{ k.label }}</div>
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-top:3px">
+                    <span style="font:700 19px Chakra Petch,sans-serif;color:#ecedf2">{{ k.value }}</span>
+                    <span style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70">{{ k.of }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="flex:1;display:flex;gap:22px;padding:20px 26px;align-items:flex-start">
+
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="font:600 11px IBM Plex Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:#6b6c7e">Expansions</div>
+                <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#5c5d70">{{ colSetsCount }}</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <sc-for list="{{ colSets }}" as="s" hint-placeholder-count="0">
+                  <div onClick="{{ s.onClick }}" style="display:flex;min-width:0;gap:13px;padding:11px;border-radius:13px;background:{{ s.bg }};border:1px solid {{ s.border }};box-shadow:{{ s.shadow }};cursor:pointer" style-hover="border-color:rgba(139,125,255,.55)">
+                    <div style="position:relative;width:76px;height:97px;flex:none;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#1b1830,#0d0d15);border:1px {{ s.frameStyle }} rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;text-align:center">
+                      <img src="assets/Unmatched-logo.png" alt="" style="width:52px;filter:invert(1);opacity:.4">
+                      <div style="font:500 8px IBM Plex Mono,monospace;letter-spacing:.1em;color:#5c5d70;text-transform:uppercase">box art</div>
+                      <img src="{{ s.cover }}" alt="{{ s.name }}" style="display:{{ s.artDisplay }};position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:{{ s.artOpacity }}">
+                      <div onClick="{{ s.onCheck }}" title="{{ s.badge }}" style="position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:6px;border:1.5px solid {{ s.boxBorder }};background:{{ s.boxBg }};box-shadow:0 2px 8px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;cursor:pointer">
+                        <i class="bi bi-check-lg" style="display:{{ s.checkDisplay }};font-size:12px;color:#0a0a10"></i>
+                      </div>
+                    </div>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:2px">
+                      <div>
+                        <div style="font:600 13.5px/1.2 Chakra Petch,sans-serif;color:{{ s.nameFg }};text-transform:uppercase;letter-spacing:.02em">{{ s.name }}</div>
+                        <div style="display:flex;align-items:baseline;gap:7px;margin-top:3px;min-width:0">
+                          <span style="font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.year }}</span>
+                          <span style="font:600 9px IBM Plex Mono,monospace;letter-spacing:.08em;color:{{ s.badgeFg }};white-space:nowrap;flex:none">{{ s.badge }}</span>
+                        </div>
+                      </div>
+                      <div style="display:flex;flex-wrap:wrap;gap:5px">
+                        <sc-for list="{{ s.chips }}" as="c" hint-placeholder-count="0">
+                          <div style="display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.05);font:500 10px IBM Plex Mono,monospace;color:{{ c.fg }}">
+                            <i class="bi {{ c.icon }}" style="font-size:9px"></i>{{ c.value }}
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="flex:1"></div>
+                      <div style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden">
+                        <div style="display:flex">
+                          <sc-for list="{{ s.tokens }}" as="t" hint-placeholder-count="0">
+                            <img src="{{ t.art }}" alt="{{ t.name }}" title="{{ t.name }}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid {{ s.tokenRing }};margin-left:-7px;opacity:{{ s.opacity }}">
+                          </sc-for>
+                        </div>
+                        <div style="flex:1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="width:396px;flex:none;display:flex;flex-direction:column;gap:14px;background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px">
+              <div style="display:flex;gap:14px">
+                <div style="position:relative;width:104px;height:132px;flex:none;border-radius:10px;overflow:hidden;background:linear-gradient(155deg,#1b1830,#0d0d15);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center">
+                  <img src="assets/Unmatched-logo.png" alt="" style="width:58px;filter:invert(1);opacity:.4">
+                  <img src="{{ colOne.cover }}" alt="{{ colOne.name }}" style="display:{{ colOne.artDisplay }};position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                  <div style="font:700 19px/1.1 Chakra Petch,sans-serif;text-transform:uppercase;letter-spacing:.02em;color:#ecedf2">{{ colOne.name }}</div>
+                  <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">{{ colOne.meta }}</div>
+                  <div style="flex:1"></div>
+                  <div style="display:flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:9px;border:1px solid {{ colOne.ctaBorder }};background:{{ colOne.ctaBg }};font:600 11.5px Barlow,sans-serif;color:{{ colOne.ctaFg }};cursor:pointer;align-self:flex-start">
+                    <i class="bi {{ colOne.ctaIcon }}" style="font-size:11px"></i>{{ colOne.ctaLabel }}
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+                <sc-for list="{{ colOne.stats }}" as="st" hint-placeholder-count="0">
+                  <div style="padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.045)">
+                    <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">{{ st.label }}</div>
+                    <div style="font:700 15px Chakra Petch,sans-serif;color:{{ st.color }};margin-top:2px">{{ st.value }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <sc-for list="{{ colOne.sections }}" as="sec" hint-placeholder-count="0">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:9px">
+                    <i class="bi {{ sec.icon }}" style="font-size:12px;color:{{ sec.color }}"></i>
+                    <div style="font:600 10.5px IBM Plex Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:#8b8c9e">{{ sec.title }}</div>
+                    <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+                    <div style="font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70">{{ sec.count }}</div>
+                  </div>
+                  <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border-left:3px solid {{ r.edge }};margin-left:{{ r.indent }}px" style-hover="background:rgba(255,255,255,.06)">
+                      <img src="{{ r.art }}" alt="" style="width:{{ r.artW }}px;height:30px;border-radius:{{ r.artRadius }};object-fit:cover;flex:none;background:#16161f">
+                      <div style="flex:1;min-width:0">
+                        <div style="font:600 12.5px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                        <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;margin-top:1px">{{ r.sub }}</div>
+                      </div>
+                      <img src="{{ r.typeIcon }}" alt="" style="display:{{ r.typeDisplay }};width:13px;height:13px;filter:invert(1);opacity:.5;flex:none">
+                      <div style="font:600 11.5px IBM Plex Mono,monospace;color:{{ r.valueColor }};flex:none">{{ r.value }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-next">Try next: "Match log as a full page from <a class="dv-oid" href="#3b">3b</a>" · "Players list" · "mobile Collection" · "design-system page"</p>
+</section>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Add match — entering a game</span></div>
+<p class="dv-note">Today <b>AddMatch.razor</b> asks for everything at once: mode, two to six fighters, and eleven numeric fields each (HP, sidekick HP, cards, items, turn, actions, time). This screen cuts that to what is actually recorded — <b>player, hero, HP left, cards, sidekick HP, placement</b> — and lets the <b>game mode reshape the form</b>, exactly like the match rows in <a class="dv-oid" href="#3b">3b</a>: sides are boxes, VS joins them, the villain box carries its minions. It is live: click the segmented control and the participants area rebuilds.</p>
+<div class="dv-opts">
+
+  <div class="dv-opt" id="4b">
+    <div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>One sheet — everything on a single screen, for logging a match right after it ends</div>
+    <div class="dv-card" style="width:900px">
+      <div style="background:#0a0a10;display:flex;flex-direction:column;min-height:780px">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07)">
+          <div style="font:600 14px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">Add match</div>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:2px;padding:3px;background:#14141c;border:1px solid rgba(255,255,255,.07);border-radius:9px">
+            <sc-for list="{{ addModes }}" as="m" hint-placeholder-count="0">
+              <div onClick="{{ m.onClick }}" style="display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;background:{{ m.segBg }};font:600 11px Barlow,sans-serif;color:{{ m.segFg }};cursor:pointer">
+                <i class="bi {{ m.icon }}" style="font-size:11px"></i>{{ m.short }}
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="flex:1;display:grid;grid-template-columns:1fr 280px;gap:0">
+          <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;border-right:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Participants</div>
+              <div style="flex:1"></div>
+              <div style="display:{{ winnerPickerDisplay }};gap:6px">
+                <sc-for list="{{ addWinnerOptions }}" as="w" hint-placeholder-count="0">
+                  <div onClick="{{ w.onClick }}" style="display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:8px;background:{{ w.bg }};border:1px solid {{ w.border }};font:600 10.5px Barlow,sans-serif;color:{{ w.fg }};cursor:pointer"><i class="bi {{ w.icon }}" style="font-size:10px"></i>{{ w.label }} won</div>
+                </sc-for>
+              </div>
+            </div>
+            <sc-for list="{{ addSides }}" as="s" hint-placeholder-count="0">
+              <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border-radius:13px;background:{{ s.bg }};border:1px solid {{ s.border }}">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="font:600 10.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ s.titleColor }}">{{ s.title }}</div>
+                  <div style="flex:1"></div>
+                  <div onClick="{{ s.addClick }}" style="display:{{ s.addDisplay }};align-items:center;gap:5px;padding:3px 8px;border-radius:7px;border:1px dashed rgba(255,255,255,.16);font:500 10.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)"><i class="bi bi-plus-lg" style="font-size:9px"></i>{{ s.addLabel }}</div>
+                </div>
+                <sc-for list="{{ s.fighters }}" as="f" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:11px;padding:10px;border-radius:11px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+                    <img src="{{ f.art }}" alt="{{ f.name }}" style="width:44px;height:44px;flex:none;border-radius:11px;object-fit:cover;border:1px solid rgba(255,255,255,.12)">
+                    <div style="width:150px;flex:none;display:flex;flex-direction:column;gap:5px">
+                      <sc-for list="{{ f.fields }}" as="fd" hint-placeholder-count="0">
+                        <div style="display:flex;align-items:center;gap:6px;height:26px;padding:0 8px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
+                          <img src="{{ fd.avatar }}" alt="" style="display:{{ fd.avatarDisplay }};width:15px;height:15px;border-radius:50%;object-fit:cover">
+                          <span style="flex:1;min-width:0;font:500 11.5px Barlow,sans-serif;color:{{ fd.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fd.value }}</span>
+                          <i class="bi bi-chevron-down" style="font-size:9px;color:#6b6c7e"></i>
+                          <i class="bi bi-dice-5-fill" title="Randomize hero" style="display:{{ fd.diceDisplay }};font-size:11px;color:#8b7dff;cursor:pointer"></i>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="flex:1;display:flex;align-items:flex-end;gap:7px;justify-content:flex-end">
+                      <div style="display:{{ f.placeDisplay }};flex-direction:column;gap:3px;width:74px">
+                        <div style="font:400 8.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70">Place</div>
+                        <div style="display:flex;align-items:center;gap:5px;height:26px;padding:0 7px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
+                          <i class="bi {{ f.placeIcon }}" style="font-size:11px;color:{{ f.placeColor }}"></i>
+                          <span style="flex:1;font:600 11px Chakra Petch,sans-serif;letter-spacing:.04em;color:{{ f.placeColor }}">{{ f.placeLabel }}</span>
+                          <i class="bi bi-chevron-down" style="font-size:9px;color:#6b6c7e"></i>
+                        </div>
+                      </div>
+                      <sc-for list="{{ f.stats }}" as="st" hint-placeholder-count="0">
+                        <div style="display:{{ st.display }};flex-direction:column;gap:3px;width:{{ st.w }}px">
+                          <div style="font:400 8.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70">{{ st.label }}</div>
+                          <div style="display:flex;align-items:center;justify-content:center;height:26px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);font:500 12px IBM Plex Mono,monospace;color:#ecedf2">{{ st.value }}</div>
+                        </div>
+                      </sc-for>
+                      <i class="bi bi-trash3" title="Remove player" onClick="{{ f.onRemove }}" style="display:{{ s.removeDisplay }};font-size:12px;color:#6b6c7e;padding:0 2px 7px;cursor:pointer" style-hover="color:#f2506b"></i>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-for list="{{ s.minionRows }}" as="mi" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:9px;margin-left:14px;padding:7px 9px;border-radius:10px;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.18)">
+                    <img src="{{ mi.art }}" alt="{{ mi.name }}" style="width:26px;height:26px;flex:none;border-radius:8px;object-fit:cover;border:1px solid rgba(56,189,248,.25);opacity:.85">
+                    <div style="flex:1;min-width:0">
+                      <div style="font:500 11.5px Barlow,sans-serif;color:#c9e9ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mi.name }}</div>
+                      <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c9fc0">×{{ mi.count }} on the board</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:2px;width:52px;flex:none">
+                      <div style="font:400 8.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c9fc0">HP left</div>
+                      <div style="display:flex;align-items:center;justify-content:center;height:24px;border-radius:7px;background:#14141c;border:1px solid rgba(255,255,255,.08);font:500 11.5px IBM Plex Mono,monospace;color:#ecedf2">{{ mi.hp }}</div>
+                    </div>
+                    <i class="bi bi-trash3" title="Remove minion" style="font-size:12px;color:#5c9fc0;cursor:pointer" style-hover="color:#f2506b"></i>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+            <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Details</div>
+            <div style="position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);height:120px">
+              <img src="assets/maps/kaer-morhen.png" alt="Kaer Morhen" style="width:100%;height:100%;object-fit:cover">
+              <div style="position:absolute;left:0;right:0;bottom:0;padding:8px 11px;background:linear-gradient(180deg,rgba(8,8,12,0),rgba(8,8,12,.9));font:600 11.5px Chakra Petch,sans-serif;letter-spacing:.06em;text-transform:uppercase">Kaer Morhen</div>
+            </div>
+            <sc-for list="{{ addDetailFields }}" as="d" hint-placeholder-count="0">
+              <div>
+                <div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:4px">{{ d.label }}</div>
+                <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
+                  <i class="bi {{ d.icon }}" style="font-size:12px;color:#6b6c7e"></i>
+                  <span style="flex:1;min-width:0;font:500 12px Barlow,sans-serif;color:{{ d.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ d.value }}</span>
+                  <i class="bi bi-dice-5" style="display:{{ d.diceDisplay }};font-size:12px;color:#6b6c7e"></i>
+                </div>
+              </div>
+            </sc-for>
+            <div>
+              <div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:4px">Epic</div>
+              <div style="display:flex;align-items:center;gap:7px;height:26px">
+                <sc-for list="{{ addEpic }}" as="e" hint-placeholder-count="0">
+                  <i class="bi bi-star-fill" style="font-size:17px;color:{{ e.color }};cursor:pointer"></i>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;padding:13px 20px;border-top:1px solid rgba(255,255,255,.07);background:#0c0c14">
+          <sc-for list="{{ addSummary }}" as="c" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:6px;font:400 11px IBM Plex Mono,monospace;color:#6b6c7e"><i class="bi {{ c.icon }}" style="font-size:11px"></i>{{ c.value }}</div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#8b8c9e;cursor:pointer">Save &amp; add another</div>
+          <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 16px;border-radius:9px;background:#6c5cff;font:600 12.5px Barlow,sans-serif;color:#fff;cursor:pointer"><i class="bi bi-check-lg" style="font-size:13px"></i>Save match</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="dv-next">Both share one mode state — switch modes in either and the other follows. Next: Players list, then the full Match log page on <a class="dv-oid" href="#3b">3b</a>.</p>
+</section>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Match rows that survive every game mode</span></div>
+<p class="dv-note">The domain has four modes — <b>OneVsOne, TeamVsTeam, FreeForAll, Cooperative</b> — and a fighter carries <b>Team</b>, <b>Placement</b>, <b>HpLeft</b>, <b>CardsLeft</b>, <b>ActionsMade</b>, <b>Turn</b>, plus an optional <b>Villain</b> with its <b>Minions</b>. So a "Game mode" column can't carry it. The fix in all three options is the same idea: <b>one participants column that renders sides, not columns</b> — a side is a box of fighter chips, sides are joined by VS (or ranked by placement in FFA), and the villain's minions hang off the villain chip. The row shape then tells you the mode at a glance and the badge only confirms it. Every option below shows the same four real cases: 1v1, 2v2, free-for-all, co-op vs villain.</p>
+<div class="dv-opts">
+
+  <div class="dv-opt" id="3b">
+    <div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Sides row + expand — same line, opens a full scoreboard</div>
+    <div class="dv-card" style="width:900px">
+      <div style="background:#0a0a10;padding:22px">
+        <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">Match log</div>
+            <div style="flex:1"></div>
+            <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">click any row — every mode expands</div>
+          </div>
+          <sc-for list="{{ logMatches }}" as="m" hint-placeholder-count="0">
+            <div style="border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.edge }};background:{{ m.rowBg }}">
+              <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:82px 84px 1fr 104px 58px 24px;gap:12px;align-items:center;padding:12px 16px;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
+                <div><div style="font:400 11px IBM Plex Mono,monospace;color:#c9cad6">{{ m.date }}</div><div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;margin-top:2px">{{ m.time }}</div></div>
+                <div><div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ m.mode.bg }};font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:{{ m.mode.color }}"><i class="bi {{ m.mode.icon }}" style="font-size:10px"></i>{{ m.mode.label }}</div></div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0">
+                  <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <div style="display:{{ g.sepDisplay }};align-items:center;justify-content:center;font:600 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ g.sepLabel }}</div>
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="0">
+                          <div title="{{ c.name }}" style="position:relative;opacity:{{ c.opacity }}">
+                            <img src="{{ c.art }}" alt="{{ c.name }}" style="width:30px;height:30px;border-radius:9px;object-fit:cover;border:1.5px solid {{ c.border }}">
+                            <img src="{{ c.playerAvatar }}" alt="{{ c.player }}" style="display:{{ c.playerDisplay }};position:absolute;bottom:-3px;right:-4px;width:15px;height:15px;border-radius:50%;object-fit:cover;border:1.5px solid #101018">
+                            <div style="position:absolute;top:-5px;left:-5px;display:{{ c.placeDisplay }};align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;background:#0c0c11;border:1px solid rgba(255,255,255,.14);font:700 8.5px Chakra Petch,sans-serif;color:{{ c.placeColor }}">{{ c.place }}</div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                  
+                </div>
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                  <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                </div>
+                <div style="text-align:right;color:#8b8c9e"><i class="bi {{ m.chevron }}" style="font-size:11px"></i></div>
+              </div>
+              <sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}">
+                <div style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:6px;background:rgba(8,8,12,.45);border-top:1px solid rgba(255,255,255,.05)">
+                  <div style="display:flex;align-items:center;gap:10px;padding:8px 10px 4px;font:500 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70">
+                    <div style="flex:1">Participant</div>
+                    <div style="display:{{ m.board.sideDisplay }};width:68px">Side</div>
+                    <div style="width:56px;text-align:right">HP left</div>
+                    <div style="width:52px;text-align:right">Cards</div>
+                    <div style="width:104px;text-align:right">Sidekick</div>
+                  </div>
+                  <sc-for list="{{ m.board.rows }}" as="r" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.03);opacity:{{ r.opacity }}">
+                      <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding-left:{{ r.indent }}px">
+                        <div style="position:relative;flex:none">
+                          <img src="{{ r.art }}" alt="{{ r.name }}" style="width:{{ r.size }}px;height:{{ r.size }}px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.09)">
+                          <div style="position:absolute;top:-5px;left:-5px;display:{{ r.placeDisplay }};align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;background:#0c0c11;border:1px solid rgba(255,255,255,.14);font:700 8.5px Chakra Petch,sans-serif;color:{{ r.placeColor }}">{{ r.place }}</div>
+                        </div>
+                        <div style="min-width:0">
+                          <div style="font:600 12px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                          <div style="font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ r.sub }}</div>
+                        </div>
+                        <img src="{{ r.avatar }}" alt="" style="display:{{ r.avatarDisplay }};width:20px;height:20px;border-radius:50%;object-fit:cover;opacity:.85">
+                      </div>
+                      <div style="display:{{ m.board.sideDisplay }};width:68px;font:600 10px IBM Plex Mono,monospace;letter-spacing:.06em;color:{{ r.sideColor }}">{{ r.side }}</div>
+                      <div style="width:56px;text-align:right;font:600 12px IBM Plex Mono,monospace;color:{{ r.hpColor }}">{{ r.hp }}</div>
+                      <div style="width:52px;text-align:right;font:400 12px IBM Plex Mono,monospace;color:#8b8c9e">{{ r.cards }}</div>
+                      <div style="width:104px;text-align:right;font:400 10.5px IBM Plex Mono,monospace;color:{{ r.sidekickColor }}">{{ r.sidekick }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:22px;margin-top:16px;font:400 11px/1.55 Barlow,sans-serif;color:#8b8c9e">
+          <div style="flex:1"><b style="color:#ecedf2;font-weight:600">Why it works</b><br>Collapsed it stays one scannable line; expanded it lists every participant — heroes with their player, villain and minions without one — plus HP left, cards and sidekick HP.</div>
+          <div style="flex:1"><b style="color:#ecedf2;font-weight:600">Trade-off</b><br>Needs state and a taller row when open. Side column only appears for 2v2 (Team 1 / Team 2) and co-op (Heroes / Villains).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+<p class="dv-next">Chosen: <a class="dv-oid" href="#3b">3b</a> — the row shape used by the Match log page <a class="dv-oid" href="#6a">6a</a>.</p>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Hero detail — on the collapsible nav rail + <a class="dv-oid" href="#1c">1c</a>'s data language</span></div>
+<p class="dv-note">The nav rail is live — click the <b>⟪</b> button at its bottom to collapse it to icons and back; both options share that state. Content follows <b>HeroStatistics.razor</b> exactly: Place / Points / HP / Deck size cards, melee-or-ranged badge, titles, sidekick, the four play-style ratings (0–3), the antagonist record, the hero match log, Against Villains / Against Minions tables and the rating-change line chart. Collection is no longer a side widget — it is a nav destination only.</p>
+<div class="dv-opts">
+
+  <div class="dv-opt" id="2a">
+    <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Dossier — full-width hero banner, then analysis and log stacked</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="display:flex;min-height:1180px;background:#0a0a10">
+
+        <div style="width:{{ navW }}px;flex:none;background:#0c0c14;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column;gap:16px;transition:width .18s ease">
+          <div style="display:flex;align-items:center;justify-content:center;height:{{ navHeaderH }}px;padding:0 4px">
+            <div style="display:{{ navTileDisplay }};width:32px;height:32px;flex:none;border-radius:9px;background:linear-gradient(150deg,#6c5cff,#a855f7);align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#fff">U</div>
+            <img src="assets/Unmatched-logo.png" alt="Unmatched" style="display:{{ navLabelDisplay }};width:112px;height:auto;object-fit:contain;filter:invert(1);opacity:.92">
+          </div>
+          <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="0">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:{{ navLabelDisplay }};font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;color:#5c5d70;text-transform:uppercase;padding:8px 10px 4px">{{ g.title }}</div>
+              <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="0">
+                <div title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ n.justify }};gap:11px;height:38px;padding:0 10px;border-radius:9px;font:500 13px Barlow,sans-serif;color:{{ n.fg }};background:{{ n.bg }};cursor:pointer;overflow:hidden" style-hover="background:rgba(255,255,255,.05);color:#ecedf2">
+                  <i class="bi {{ n.icon }}" style="font-size:15px;flex:none"></i>
+                  <span style="display:{{ navLabelDisplay }};white-space:nowrap">{{ n.label }}</span>
+                  <div style="flex:1"></div>
+                  <span style="display:{{ navLabelDisplay }};font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ n.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div onClick="{{ navToggle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.08);color:#8b8c9e;font:500 11.5px Barlow,sans-serif;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)">
+            <i class="bi {{ navToggleIcon }}" style="font-size:12px"></i><span style="display:{{ navLabelDisplay }}">Collapse</span>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:8px;font:400 12px Barlow,sans-serif;color:#6b6c7e">
+              <a href="#1c" style="color:#8b8c9e">Heroes ladder</a><i class="bi bi-chevron-right" style="font-size:9px"></i><span style="color:#ecedf2;font-weight:600">Geralt of Rivia</span>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi bi-chevron-left" style="font-size:11px"></i>Prev hero</div>
+            <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);font:500 12px Barlow,sans-serif;color:#c9cad6" style-hover="border-color:rgba(139,125,255,.5)">Next hero<i class="bi bi-chevron-right" style="font-size:11px"></i></div>
+            <img src="assets/players/vados.png" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.14)">
+          </div>
+
+          <div style="position:relative;padding:26px;border-bottom:1px solid rgba(255,255,255,.07);overflow:hidden">
+            <div style="position:absolute;inset:0;background:radial-gradient(110% 130% at 8% 0%,rgba(108,92,255,.28),rgba(168,85,247,.1) 40%,rgba(10,10,16,0) 74%)"></div>
+            <div style="position:relative;display:flex;gap:24px">
+              <div style="width:262px;flex:none;display:flex;flex-direction:column;gap:10px">
+                <div style="position:relative;border-radius:16px;overflow:hidden;background:#101018;border:1px solid rgba(255,255,255,.09);height:330px;display:flex;align-items:center;justify-content:center">
+                  <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 2px,transparent 2px 10px)"></div>
+                  <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:12px">
+                    <img src="assets/heroes/geralt-of-rivia.png" alt="Geralt of Rivia" style="width:128px;height:128px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.16)">
+                    <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;color:rgba(255,255,255,.3);text-transform:uppercase">hero key art · 3:4</div>
+                  </div>
+                  <div style="position:absolute;bottom:12px;left:12px;right:12px;display:flex;align-items:center;justify-content:center;gap:7px;height:32px;border-radius:9px;background:rgba(8,8,12,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.1);font:500 11.5px Barlow,sans-serif;color:#c9cad6;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)"><i class="bi bi-upload" style="font-size:12px"></i>Replace image</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;background:#101018;border:1px solid rgba(255,255,255,.08)">
+                  <div style="width:22px;height:22px;border-radius:6px;background:#6c5cff;border:1px solid rgba(255,255,255,.2)"></div>
+                  <div style="flex:1"><div style="font:500 11.5px Barlow,sans-serif;color:#c9cad6">Hero colour</div><div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">#6C5CFF · used in charts</div></div>
+                  <i class="bi bi-pencil" style="font-size:12px;color:#6b6c7e"></i>
+                </div>
+              </div>
+
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px">
+                <div>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.16em;color:#8b8c9e;text-transform:uppercase">Hero profile</div>
+                    <div style="padding:3px 8px;border-radius:6px;background:rgba(240,180,41,.14);font:600 10px IBM Plex Mono,monospace;letter-spacing:.1em;color:#f0b429">RANK 01</div>
+                  </div>
+                  <div style="display:flex;align-items:flex-end;gap:14px;margin-top:8px;flex-wrap:wrap">
+                    <div style="font:700 48px/1 Chakra Petch,sans-serif;letter-spacing:.01em;text-transform:uppercase">Geralt of Rivia</div>
+                    <img src="assets/Melee.png" alt="Melee" style="height:22px;width:auto;filter:invert(1);opacity:.85;margin-bottom:4px">
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+                    <sc-for list="{{ detailChips }}" as="c" hint-placeholder-count="0">
+                      <div style="display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:8px;background:rgba(255,255,255,.055);font:500 11.5px Barlow,sans-serif;color:#c9cad6"><i class="bi {{ c.icon }}" style="font-size:12px;color:{{ c.color }}"></i>{{ c.label }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                  <sc-for list="{{ detailStats }}" as="s" hint-placeholder-count="0">
+                    <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:13px 15px">
+                      <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">{{ s.label }}</div>
+                      <div style="font:700 26px/1.1 Chakra Petch,sans-serif;color:{{ s.color }};margin-top:5px">{{ s.value }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr 200px;gap:12px">
+                  <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:9px">
+                    <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">Play style</div>
+                    <sc-for list="{{ playStyle }}" as="p" hint-placeholder-count="0">
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <span style="flex:1;font:500 12px Barlow,sans-serif;color:#c9cad6">{{ p.label }}</span>
+                        <div style="display:flex;gap:4px">
+                          <sc-for list="{{ p.dots }}" as="d" hint-placeholder-count="0">
+                            <div style="width:16px;height:6px;border-radius:3px;background:{{ d.bg }}"></div>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                    <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">Titles</div>
+                    <sc-for list="{{ titlesList }}" as="t" hint-placeholder-count="0">
+                      <div style="display:flex;align-items:center;gap:9px"><i class="bi bi-award-fill" style="font-size:13px;color:#f0b429"></i><span style="font:600 12px Barlow,sans-serif">{{ t.name }}</span><span style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ t.comment }}</span></div>
+                    </sc-for>
+                    <div style="height:1px;background:rgba(255,255,255,.07);margin:2px 0"></div>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <img src="assets/Unknown.png" alt="" style="width:28px;height:28px;border-radius:8px;object-fit:cover;opacity:.7">
+                      <div><div style="font:600 12px Barlow,sans-serif">Roach</div><div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">sidekick · 7 HP</div></div>
+                    </div>
+                  </div>
+                  <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="align-self:flex-start;font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">Win rate</div>
+                    <svg viewBox="0 0 120 120" style="width:118px;height:118px">
+                      <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(242,80,107,.55)" stroke-width="12"></circle>
+                      <circle cx="60" cy="60" r="48" fill="none" stroke="#6c5cff" stroke-width="12" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="{{ spotlightDash }}" transform="rotate(-90 60 60)"></circle>
+                      <text x="60" y="57" text-anchor="middle" style="font:700 26px Chakra Petch,sans-serif;fill:#ecedf2">62%</text>
+                      <text x="60" y="74" text-anchor="middle" style="font:500 9px IBM Plex Mono,monospace;fill:#8b8c9e">64W · 39L</text>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:22px 26px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">Rating changes</div>
+                  <div style="flex:1"></div>
+                  <div style="display:flex;gap:2px;padding:3px;background:#14141c;border:1px solid rgba(255,255,255,.07);border-radius:8px">
+                    <div style="padding:4px 10px;border-radius:6px;background:rgba(139,125,255,.2);color:#c4bcff;font:600 11px Barlow,sans-serif">6M</div>
+                    <div style="padding:4px 10px;border-radius:6px;color:#8b8c9e;font:500 11px Barlow,sans-serif">1Y</div>
+                    <div style="padding:4px 10px;border-radius:6px;color:#8b8c9e;font:500 11px Barlow,sans-serif">All</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px">
+                  <div style="display:flex;flex-direction:column;justify-content:space-between;padding:2px 0;font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e;height:190px">
+                    <sc-for list="{{ ratingLine.axis }}" as="a" hint-placeholder-count="0"><div>{{ a }}</div></sc-for>
+                  </div>
+                  <svg viewBox="0 0 720 190" preserveAspectRatio="none" style="flex:1;height:190px">
+                    <line x1="0" y1="1" x2="720" y2="1" stroke="rgba(255,255,255,.06)"></line>
+                    <line x1="0" y1="95" x2="720" y2="95" stroke="rgba(255,255,255,.06)"></line>
+                    <line x1="0" y1="189" x2="720" y2="189" stroke="rgba(255,255,255,.06)"></line>
+                    <path d="{{ ratingLine.area }}" fill="rgba(108,92,255,.16)"></path>
+                    <polyline points="{{ ratingLine.points }}" fill="none" stroke="#8b7dff" stroke-width="2.5" stroke-linejoin="round"></polyline>
+                  </svg>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-left:30px;font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">
+                  <sc-for list="{{ ratingLine.labels }}" as="l" hint-placeholder-count="0"><div>{{ l }}</div></sc-for>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                  <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#f2506b">Antagonist</div>
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <img src="assets/heroes/dracula.png" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:cover;border:1px solid rgba(242,80,107,.35)">
+                    <div><div style="font:700 15px Chakra Petch,sans-serif;letter-spacing:.02em;text-transform:uppercase">{{ nemesis.name }}</div><div style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ nemesis.total }} meetings</div></div>
+                  </div>
+                  <div style="display:flex;gap:8px">
+                    <div style="flex:1;background:rgba(52,217,155,.1);border-radius:9px;padding:8px 10px"><div style="font:400 9px IBM Plex Mono,monospace;color:#6b6c7e;letter-spacing:.08em">WINS</div><div style="font:700 16px Chakra Petch,sans-serif;color:#34d99b">{{ nemesis.wins }}</div></div>
+                    <div style="flex:1;background:rgba(242,80,107,.1);border-radius:9px;padding:8px 10px"><div style="font:400 9px IBM Plex Mono,monospace;color:#6b6c7e;letter-spacing:.08em">LOSSES</div><div style="font:700 16px Chakra Petch,sans-serif;color:#f2506b">{{ nemesis.losses }}</div></div>
+                    <div style="flex:1;background:rgba(255,255,255,.045);border-radius:9px;padding:8px 10px"><div style="font:400 9px IBM Plex Mono,monospace;color:#6b6c7e;letter-spacing:.08em">K/D</div><div style="font:700 16px Chakra Petch,sans-serif">{{ nemesis.kd }}</div></div>
+                  </div>
+                </div>
+                <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:11px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Matchups</div>
+                    <div style="flex:1"></div>
+                    <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70;white-space:nowrap">{{ muRange }}</div>
+                    <div onClick="{{ muPrev }}" title="Previous" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid rgba(255,255,255,.08);color:{{ muPrevFg }};cursor:pointer" style-hover="border-color:rgba(139,125,255,.45)"><i class="bi bi-chevron-left" style="font-size:10px"></i></div>
+                    <div onClick="{{ muNext }}" title="Next" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid rgba(255,255,255,.08);color:{{ muNextFg }};cursor:pointer" style-hover="border-color:rgba(139,125,255,.45)"><i class="bi bi-chevron-right" style="font-size:10px"></i></div>
+                  </div>
+                  <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70">Sorted by win rate against</div>
+                  <sc-for list="{{ muRows }}" as="m" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:10px" style-hover="background:rgba(255,255,255,.03)">
+                      <img src="{{ m.art }}" alt="" style="width:24px;height:24px;border-radius:7px;object-fit:cover;flex:none">
+                      <span style="font:500 11.5px Barlow,sans-serif;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                      <span style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70;flex:none">{{ m.meetings }}</span>
+                      <div style="width:56px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;flex:none"><div style="height:100%;width:{{ m.bar }};background:{{ m.color }};border-radius:3px"></div></div>
+                      <span style="font:600 10.5px IBM Plex Mono,monospace;color:{{ m.color }};width:32px;text-align:right;flex:none">{{ m.pct }}%</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">Match log</div>
+                <div style="flex:1"></div>
+                <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">103 matches · 6 shown</div>
+              </div>
+              <div style="display:grid;grid-template-columns:86px 46px 1fr 108px 74px 60px;gap:12px;padding:9px 16px;font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;border-bottom:1px solid rgba(255,255,255,.05)">
+                <div>Date</div><div>Mode</div><div>Opponent</div><div>Map</div><div>HP left</div><div style="text-align:right">Epic</div>
+              </div>
+              <sc-for list="{{ matchRowsDetail }}" as="m" hint-placeholder-count="0">
+                <div style="display:grid;grid-template-columns:86px 46px 1fr 108px 74px 60px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid {{ m.edge }};background:{{ m.bg }};cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
+                  <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e">{{ m.date }}</div>
+                  <div style="font:600 10px IBM Plex Mono,monospace;color:#6b6c7e">{{ m.mode }}</div>
+                  <div style="display:flex;align-items:center;gap:9px;min-width:0">
+                    <span style="font:700 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;color:{{ m.color }};width:34px">{{ m.result }}</span>
+                    <img src="{{ m.art }}" alt="" style="width:24px;height:24px;border-radius:7px;object-fit:cover">
+                    <span style="font:600 12.5px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.opp }}</span>
+                    <img src="{{ m.avatar }}" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover;opacity:.8">
+                  </div>
+                  <div style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.map }}</div>
+                  <div style="font:600 11.5px IBM Plex Mono,monospace"><span style="color:{{ m.color }}">{{ m.hp }}</span><span style="color:#5c5d70"> / {{ m.oppHp }}</span></div>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+                  <sc-for list="{{ m.epicStars }}" as="st" hint-placeholder-count="0"><i class="bi {{ st.icon }}" style="font-size:11px;color:{{ st.color }}"></i></sc-for>
+                </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:11px">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Against villains</div>
+                <sc-for list="{{ villainRows }}" as="r" hint-placeholder-count="0">
+                  <div style="display:grid;grid-template-columns:1fr 40px 40px 40px 52px;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.03)">
+                    <span style="font:600 12px Barlow,sans-serif">{{ r.name }}</span>
+                    <span style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;text-align:right">{{ r.total }}</span>
+                    <span style="font:500 11px IBM Plex Mono,monospace;color:#34d99b;text-align:right">{{ r.wins }}</span>
+                    <span style="font:500 11px IBM Plex Mono,monospace;color:#f2506b;text-align:right">{{ r.losses }}</span>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:{{ r.color }};text-align:right">{{ r.kd }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:11px">
+                <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Against minions</div>
+                <sc-for list="{{ minionRows }}" as="r" hint-placeholder-count="0">
+                  <div style="display:grid;grid-template-columns:1fr 40px 40px 40px 52px;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.03)">
+                    <span style="font:600 12px Barlow,sans-serif">{{ r.name }}</span>
+                    <span style="font:400 11px IBM Plex Mono,monospace;color:#8b8c9e;text-align:right">{{ r.total }}</span>
+                    <span style="font:500 11px IBM Plex Mono,monospace;color:#34d99b;text-align:right">{{ r.wins }}</span>
+                    <span style="font:500 11px IBM Plex Mono,monospace;color:#f2506b;text-align:right">{{ r.losses }}</span>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:{{ r.color }};text-align:right">{{ r.kd }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+<p class="dv-next">Chosen: <a class="dv-oid" href="#2a">2a</a> — the hero dossier.</p>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Three directions for the main screen — Heroes / leaderboard</span></div>
+<p class="dv-note">Base read from the repo: tokens in <b>wwwroot/css/theme/variables.css</b> (near-black surfaces, red #e63946 accent, win #90ee90 / loss #ffa293), Bootstrap-Icons nav from <b>NavMenu.razor</b>, the Syncfusion grid + place-colour cells from <b>HeroesStatistics.razor</b>, and <b>StatCard</b> / <b>HeroSummary</b> for the detail block. Per your answers I moved to a <b>cold indigo/violet</b> ramp, replaced the comic display face with <b>Chakra Petch</b> + <b>Barlow</b>, dropped the background-colour place cells for tiles with art, and set a single 8px spacing rhythm so density is even. Hero art in the repo is only 200×200 round tokens, so large key art is shown as a labelled placeholder — drop real art in later.</p>
+<div class="dv-opts">
+
+  <div class="dv-opt" id="1c">
+    <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Ladder Pro — dense ranked list, coloured win/loss edges, analysis column</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="display:flex;min-height:900px;background:#0b0b10">
+        <div style="width:64px;flex:none;background:#08080d;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px">
+          <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid #8b7dff;display:flex;align-items:center;justify-content:center;font:700 15px Chakra Petch,sans-serif;color:#8b7dff;margin-bottom:12px">U</div>
+          <sc-for list="{{ rail }}" as="r" hint-placeholder-count="0">
+            <div title="{{ r.label }}" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:{{ r.fg }};background:{{ r.bgFlat }};cursor:pointer" style-hover="color:#ecedf2"><i class="bi {{ r.icon }}"></i></div>
+          </sc-for>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:flex-end;gap:24px;padding:22px 26px 0">
+            <div>
+              <div style="font:700 26px/1 Chakra Petch,sans-serif;letter-spacing:.02em;text-transform:uppercase">Heroes ladder</div>
+              <div style="font:400 12px/1.5 Barlow,sans-serif;color:#8b8c9e;margin-top:6px">42 heroes · 1 284 matches · updated 4 min ago</div>
+            </div>
+            <div style="flex:1"></div>
+            <sc-for list="{{ miniStats }}" as="s" hint-placeholder-count="0">
+              <div style="padding-bottom:4px"><div style="font:400 10px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6b6c7e">{{ s.label }}</div><div style="font:700 19px Chakra Petch,sans-serif;color:{{ s.color }}">{{ s.value }}</div></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;padding:18px 26px 0">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="0">
+              <div style="padding:8px 14px;border-radius:9px 9px 0 0;border-bottom:2px solid {{ t.edge }};font:600 12.5px Barlow,sans-serif;color:{{ t.fg }};cursor:pointer" style-hover="color:#ecedf2">{{ t.label }}</div>
+            </sc-for>
+            <div style="flex:1;border-bottom:2px solid rgba(255,255,255,.07)"></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 316px;gap:18px;padding:20px 26px 26px">
+            <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+              <div style="display:grid;grid-template-columns:34px 1fr 58px 58px 90px 62px;gap:12px;padding:0 14px 8px;font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70">
+                <div>#</div><div>Hero</div><div style="text-align:right">Pts</div><div style="text-align:right">GP</div><div>W / L</div><div style="text-align:right">K/D</div>
+              </div>
+              <sc-for list="{{ ladder }}" as="h" hint-placeholder-count="0">
+                <div style="display:grid;grid-template-columns:34px 1fr 58px 58px 90px 62px;gap:12px;align-items:center;padding:9px 14px;border-radius:11px;background:{{ h.rowBg }};border:1px solid {{ h.rowBorder }};border-left:3px solid {{ h.edge }};cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
+                  <div style="font:700 14px Chakra Petch,sans-serif;color:{{ h.rankColor }}">{{ h.place }}</div>
+                  <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                    <img src="{{ h.art }}" alt="" style="width:32px;height:32px;border-radius:9px;object-fit:cover;border:1px solid rgba(255,255,255,.1)">
+                    <div style="min-width:0">
+                      <div style="font:600 13px/1.2 Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.name }}</div>
+                      <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;margin-top:2px">{{ h.set }}</div>
+                    </div>
+                    <img src="{{ h.typeIcon }}" alt="" style="height:13px;width:auto;opacity:.6;filter:invert(1);margin-left:auto">
+                  </div>
+                  <div style="text-align:right;font:700 14px Chakra Petch,sans-serif;color:{{ h.ptsColor }}">{{ h.pts }}</div>
+                  <div style="text-align:right;font:400 12px IBM Plex Mono,monospace;color:#8b8c9e">{{ h.matches }}</div>
+                  <div style="display:flex;flex-direction:column;gap:4px">
+                    <div style="display:flex;justify-content:space-between;font:500 10px IBM Plex Mono,monospace"><span style="color:#34d99b">{{ h.wins }}</span><span style="color:#f2506b">{{ h.losses }}</span></div>
+                    <div style="height:4px;border-radius:2px;background:rgba(242,80,107,.55);overflow:hidden"><div style="height:100%;width:{{ h.winPct }}%;background:#34d99b"></div></div>
+                  </div>
+                  <div style="text-align:right;font:600 12px IBM Plex Mono,monospace;color:{{ h.kdColor }}">{{ h.kd }}</div>
+                </div>
+              </sc-for>
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px">
+                <div style="height:30px;padding:0 12px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;font:500 11.5px Barlow,sans-serif;color:#8b8c9e">Prev</div>
+                <sc-for list="{{ pages }}" as="p" hint-placeholder-count="0">
+                  <div style="width:30px;height:30px;border-radius:8px;background:{{ p.bg }};border:1px solid {{ p.border }};display:flex;align-items:center;justify-content:center;font:600 11.5px Barlow,sans-serif;color:{{ p.fg }}">{{ p.n }}</div>
+                </sc-for>
+                <div style="height:30px;padding:0 12px;border-radius:8px;background:#14141c;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;font:500 11.5px Barlow,sans-serif;color:#ecedf2">Next</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+              <div style="background:#12121a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <img src="assets/heroes/medusa.png" alt="" style="width:40px;height:40px;border-radius:11px;object-fit:cover">
+                  <div><div style="font:700 14px Chakra Petch,sans-serif;letter-spacing:.02em;text-transform:uppercase">Medusa</div><div style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">selected · rank 04</div></div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <sc-for list="{{ sideStats }}" as="s" hint-placeholder-count="0">
+                    <div style="flex:1;background:rgba(255,255,255,.045);border-radius:9px;padding:8px 9px"><div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.08em;color:#6b6c7e">{{ s.label }}</div><div style="font:700 15px Chakra Petch,sans-serif;color:{{ s.color }}">{{ s.value }}</div></div>
+                  </sc-for>
+                </div>
+                <svg viewBox="0 0 120 120" style="width:100%;height:130px">
+                  <polygon points="60,14 106,60 60,106 14,60" fill="none" stroke="rgba(255,255,255,.09)"></polygon>
+                  <polygon points="60,37 83,60 60,83 37,60" fill="none" stroke="rgba(255,255,255,.07)"></polygon>
+                  <polygon points="{{ radarPoints2 }}" fill="rgba(168,85,247,.28)" stroke="#c084fc" stroke-width="2"></polygon>
+                  <text x="60" y="9" text-anchor="middle" style="font:500 7.5px IBM Plex Mono,monospace;fill:#8b8c9e">ATTACK</text>
+                  <text x="112" y="63" text-anchor="middle" style="font:500 7.5px IBM Plex Mono,monospace;fill:#8b8c9e">DEF</text>
+                  <text x="60" y="117" text-anchor="middle" style="font:500 7.5px IBM Plex Mono,monospace;fill:#8b8c9e">TRICKERY</text>
+                  <text x="10" y="63" text-anchor="middle" style="font:500 7.5px IBM Plex Mono,monospace;fill:#8b8c9e">DIF</text>
+                </svg>
+              </div>
+              <div style="background:#12121a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:11px">
+                <div style="font:600 11.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Best / worst matchups</div>
+                <sc-for list="{{ matchups }}" as="m" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <img src="{{ m.art }}" alt="" style="width:26px;height:26px;border-radius:8px;object-fit:cover">
+                    <span style="font:500 12px Barlow,sans-serif;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                    <div style="width:74px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden"><div style="height:100%;width:{{ m.pct }}%;background:{{ m.color }};border-radius:3px"></div></div>
+                    <span style="font:600 11px IBM Plex Mono,monospace;color:{{ m.color }};width:34px;text-align:right">{{ m.pct }}%</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#12121a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><div style="font:600 11.5px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#c9cad6">Collection</div><span style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">6 / 11 sets</span></div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+                  <sc-for list="{{ sets }}" as="s" hint-placeholder-count="0">
+                    <div style="border-radius:10px;border:1px solid {{ s.border }};background:{{ s.bg }};padding:9px;display:flex;flex-direction:column;gap:6px;opacity:{{ s.opacity }}">
+                      <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 2px,transparent 2px 8px);display:flex;align-items:center;justify-content:center;font:400 8px IBM Plex Mono,monospace;color:rgba(255,255,255,.3)">box art</div>
+                      <div style="font:600 10.5px/1.25 Barlow,sans-serif;color:#c9cad6">{{ s.name }}</div>
+                      <div style="font:400 9px IBM Plex Mono,monospace;color:{{ s.tagColor }}">{{ s.tag }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="dv-next">Chosen: <a class="dv-oid" href="#1c">1c</a> — the dense ladder, on the collapsible nav rail.</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+const A = n => `assets/heroes/${n}.png`;
+const P = n => `assets/players/${n}.png`;
+const GOLD = '#f0b429', SILVER = '#c9cad6', BRONZE = '#cd7f32';
+
+class Component extends DCLogic {
+  state = { navOpen: true, openMatch: 'm4', addMode: '1v1', addStep: 2, addWinner: 0, colSet: 1, colOwnedOnly: false };
+
+  addMatchVals() {
+    const navOpen = this.state.navOpen;
+    const mode = this.state.addMode, step = this.state.addStep, win = this.state.addWinner;
+    const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+    const navGroupsAdd = [
+      { title: 'Statistics', items: [
+        { icon: 'bi-shield-fill', label: 'Heroes', count: 48 },
+        { icon: 'bi-people', label: 'Players', count: 6 },
+        { icon: 'bi-map', label: 'Maps', count: 20 },
+        { icon: 'bi-bug', label: 'Minions', count: 6 },
+        { icon: 'bi-eye', label: 'Villains', count: 2 }
+      ]},
+      { title: 'Play', items: [
+        { icon: 'bi-plus-circle-fill', label: 'Add match', count: '', active: true },
+        { icon: 'bi-list-ul', label: 'Match log', count: 1284 },
+        { icon: 'bi-box-seam', label: 'Collection', count: '6/11' },
+        { icon: 'bi-award', label: 'Titles', count: 9 },
+        { icon: 'bi-flag', label: 'Tournaments', count: 3 }
+      ]}
+    ].map(g => ({ ...g, items: g.items.map(i => ({
+      ...i,
+      fg: i.active ? '#ffffff' : '#8b8c9e',
+      bg: i.active ? 'rgba(108,92,255,.18)' : 'transparent',
+      justify: navOpen ? 'flex-start' : 'center'
+    }))}));
+
+    const M = {
+      '1v1':  { label: '1 vs 1', short: '1v1', sub: 'Two fighters, one winner', icon: 'bi-person-fill', color: '#8b7dff', shape: '● VS ●' },
+      'team': { label: '2 vs 2', short: '2v2', sub: 'Two teams of two fighters', icon: 'bi-people-fill', color: '#c084fc', shape: '●● VS ●●' },
+      'ffa':  { label: 'Free for all', short: 'FFA', sub: 'Three or more, ranked by placement', icon: 'bi-diagram-3-fill', color: '#f0b429', shape: '● ● ●' },
+      'coop': { label: 'Co-op', short: 'Co-op', sub: 'Players together against a villain', icon: 'bi-shield-fill-check', color: '#38bdf8', shape: '●● VS ☠' }
+    };
+    const addModes = Object.keys(M).map(k => {
+      const m = M[k], on = k === mode;
+      return { ...m, key: k, active: on,
+        border: on ? m.color : 'rgba(255,255,255,.08)',
+        bg: on ? 'rgba(255,255,255,.05)' : '#101018',
+        fg: on ? '#ecedf2' : '#8b8c9e',
+        iconColor: on ? m.color : '#6b6c7e',
+        checkDisplay: on ? 'block' : 'none',
+        segBg: on ? 'rgba(139,125,255,.2)' : 'transparent',
+        segFg: on ? '#c4bcff' : '#8b8c9e',
+        onClick: () => this.setState({ addMode: k, addWinner: 0 })
+      };
+    });
+
+    const MEDAL = { 1: { color: GOLD, label: '1st', icon: 'bi-trophy-fill' }, 2: { color: SILVER, label: '2nd', icon: 'bi-award-fill' }, 3: { color: BRONZE, label: '3rd', icon: 'bi-award-fill' }, 4: { color: '#8b8c9e', label: '4th', icon: 'bi-award' } };
+    const fighter = (hero, player, hp, cards, sk, turn, place) => ({
+      name: hero, art: A(hero.toLowerCase().replace(/ /g, '-')),
+      player: player ? cap(player) : '', avatar: player ? P(player) : 'assets/Unknown.png',
+      playerDisplay: player ? 'flex' : 'none',
+      turn: turn ? 'TURN ' + turn : '', turnDisplay: turn ? 'flex' : 'none',
+      hp, cards, sidekick: sk, place,
+      fields: [
+        { label: 'Player', value: player ? cap(player) : '—', color: '#ecedf2', avatar: player ? P(player) : '', avatarDisplay: player ? 'block' : 'none', diceDisplay: 'none' },
+        { label: 'Hero', value: hero, color: '#ecedf2', avatar: 'assets/Unknown.png', avatarDisplay: 'none', diceDisplay: 'block' }
+      ],
+      stats: [
+        { label: 'HP', value: hp, w: 44, display: 'flex' },
+        { label: 'Cards', value: cards, w: 44, display: 'flex' },
+        { label: 'Sidekick', value: sk === '—' ? '—' : sk, w: 52, display: 'flex' }
+      ],
+      placeDisplay: place ? 'flex' : 'none',
+      placeLabel: place ? (MEDAL[place] || {}).label : '',
+      placeIcon: place ? (MEDAL[place] || {}).icon : '',
+      placeColor: place ? (MEDAL[place] || {}).color : '#8b8c9e',
+      minions: [], addMinionDisplay: 'none'
+    });
+
+    const villain = () => ({
+      name: 'Deadpool (villain)', art: 'assets/Unknown.png',
+      player: '', avatar: 'assets/Unknown.png', playerDisplay: 'none',
+      turn: '', turnDisplay: 'none', hp: 32, cards: '—', sidekick: '—', place: '',
+      fields: [
+        { label: 'Villain', value: 'Deadpool', color: '#ecedf2', avatar: 'assets/Unknown.png', avatarDisplay: 'none', diceDisplay: 'none' },
+        { label: 'Difficulty', value: 'Heroic', color: '#ecedf2', avatar: 'assets/Unknown.png', avatarDisplay: 'none', diceDisplay: 'none' }
+      ],
+      stats: [
+        { label: 'HP', value: 32, w: 44, display: 'flex' },
+        { label: 'Cards', value: '—', w: 44, display: 'none' },
+        { label: 'Sidekick', value: '—', w: 52, display: 'none' }
+      ],
+      placeDisplay: 'none', placeLabel: '', placeIcon: '', placeColor: '#8b8c9e',
+      minions: [{ name: 'Bob, agent of Hydra', count: 3, hp: 4 }, { name: 'Hydra trooper', count: 2, hp: 2 }],
+      addMinionDisplay: 'flex'
+    });
+
+    const side = (o) => ({
+      title: o.title, fighters: o.fighters,
+      cols: o.cols || '1fr', flex: o.flex || 1,
+      sepDisplay: o.sep ? 'flex' : 'none',
+      bg: o.tone ? 'rgba(255,255,255,.028)' : 'rgba(255,255,255,.02)',
+      border: o.borderColor || 'rgba(255,255,255,.07)',
+      titleColor: o.titleColor || '#8b8c9e',
+      addDisplay: o.add ? 'flex' : 'none', addLabel: o.add || '',
+      addClick: o.addClick || (() => {}),
+      add2Display: o.add2 ? 'flex' : 'none', add2Label: o.add2 || '',
+      removeDisplay: o.removable ? 'flex' : 'none',
+      minionRows: o.minionRows || []
+    });
+
+    let sides, winnerOptions, hint, sideColDisplay = 'none', resultColLabel = 'Result', winnerQuestion = 'Who won?', winnerPickerDisplay = 'flex';
+    if (mode === '1v1') {
+      sides = [
+        side({ title: 'Fighter', fighters: [fighter('Geralt of Rivia', 'vados', 4, 9, '7', 1)] }),
+        side({ title: 'Opponent', sep: true, fighters: [fighter('Medusa', 'ksuha', 0, 3, '—', 2)] })
+      ];
+      winnerOptions = ['Geralt of Rivia', 'Medusa'];
+      hint = 'Turn order is set automatically when you pick players — tap a badge to swap who went first.';
+    } else if (mode === 'team') {
+      sides = [
+        side({ title: 'Team 1', titleColor: '#c4bcff', fighters: [fighter('Geralt of Rivia', 'vados', 6, 8, '7', 1), fighter('Alice', 'tetyana', 2, 5, '4', 3)] }),
+        side({ title: 'Team 2', sep: true, fighters: [fighter('Medusa', 'ksuha', 0, 2, '—', 2), fighter('Dracula', 'zheka', 0, 4, '3', 4)] })
+      ];
+      winnerOptions = ['Team 1', 'Team 2'];
+      sideColDisplay = 'block';
+      hint = 'The winning team is set once — every fighter in it inherits the result.';
+    } else if (mode === 'ffa') {
+      const n = this.state.ffaCount || 3;
+      const pool = [fighter('Sherlock Holmes', 'andrii', 5, 7, '—', 0, 1), fighter('Robin Hood', 'oleksandr', 2, 4, '—', 0, 2), fighter('Bigfoot', 'zheka', 0, 6, '—', 0, 3), fighter('Alice', 'tetyana', 0, 5, '4', 0, 4)];
+      sides = [
+        side({ title: 'Players', cols: n === 4 ? '1fr 1fr' : '1fr 1fr 1fr', add: n < 4 ? 'Add player' : '',
+          addClick: () => this.setState({ ffaCount: 4 }),
+          removable: n > 3, fighters: pool.slice(0, n).map(f => ({ ...f, onRemove: () => this.setState({ ffaCount: 3 }) })) })
+      ];
+      winnerOptions = [];
+      winnerPickerDisplay = 'none';
+      winnerQuestion = 'Set the finishing order';
+      resultColLabel = 'Place';
+      hint = 'Free for all has no winner checkbox — first place is the winner, the rest are ranked.';
+    } else {
+      const v = villain();
+      sides = [
+        side({ title: 'Heroes', add: 'Add player', fighters: [fighter('King Arthur', 'oleksandr', 3, 6, '—', 1), fighter('Tomoe Gozen', 'ksuha', 8, 9, '5', 2)] }),
+        side({ title: 'The game', sep: true, titleColor: '#8fd8ff', borderColor: 'rgba(56,189,248,.2)', add: 'Add minion', fighters: [v],
+          minionRows: v.minions.map(mi => ({ ...mi, art: 'assets/Unknown.png' })) })
+      ];
+      winnerOptions = ['Heroes', 'The game'];
+      sideColDisplay = 'block';
+      hint = 'Minions belong to the villain, not to a player — they inherit the villain’s result.';
+    }
+
+    const addWinnerOptions = winnerOptions.map((label, i) => ({
+      label, icon: i === win ? 'bi-trophy-fill' : 'bi-circle',
+      bg: i === win ? 'rgba(52,217,155,.16)' : '#14141c',
+      border: i === win ? 'rgba(52,217,155,.42)' : 'rgba(255,255,255,.08)',
+      fg: i === win ? '#34d99b' : '#8b8c9e',
+      onClick: () => this.setState({ addWinner: i })
+    }));
+
+    const PLACE = { 1: GOLD, 2: SILVER, 3: BRONZE };
+    const addResultRows = [];
+    sides.forEach((s, si) => {
+      s.fighters.forEach(f => {
+        const isFfa = mode === 'ffa';
+        const won = isFfa ? f.place === 1 : si === win;
+        addResultRows.push({
+          name: f.name, art: f.art, player: f.player, avatar: f.avatar, playerDisplay: f.playerDisplay,
+          side: s.title, indent: 0, artOpacity: 1,
+          edge: won ? '#34d99b' : '#f2506b',
+          rowBg: won ? 'rgba(52,217,155,.05)' : 'rgba(242,80,107,.04)',
+          resultBadgeDisplay: isFfa ? 'none' : 'flex',
+          placeStepperDisplay: isFfa ? 'flex' : 'none',
+          result: won ? 'WIN' : 'LOSS',
+          resultBg: won ? 'rgba(52,217,155,.14)' : 'rgba(242,80,107,.14)',
+          resultFg: won ? '#34d99b' : '#f2506b',
+          place: f.place || '', placeColor: PLACE[f.place] || '#ecedf2',
+          hp: f.hp, cards: f.cards, cardsDisplay: f.cards === '—' ? 'none' : 'flex',
+          sidekick: f.sidekick === '—' ? '—' : f.sidekick + ' HP',
+          sidekickColor: f.sidekick === '—' ? '#5c5d70' : '#c9cad6'
+        });
+        (f.minions || []).forEach(mi => addResultRows.push({
+          name: mi.name + ' ×' + mi.count, art: 'assets/Unknown.png', player: '', avatar: 'assets/Unknown.png', playerDisplay: 'none',
+          side: s.title, indent: 18, artOpacity: 0.6,
+          edge: si === win ? '#34d99b' : '#f2506b',
+          rowBg: 'rgba(56,189,248,.035)',
+          resultBadgeDisplay: 'flex', placeStepperDisplay: 'none',
+          result: si === win ? 'WIN' : 'LOSS',
+          resultBg: si === win ? 'rgba(52,217,155,.14)' : 'rgba(242,80,107,.14)',
+          resultFg: si === win ? '#34d99b' : '#f2506b',
+          place: '', placeColor: '#ecedf2',
+          hp: 0, cards: '—', cardsDisplay: 'none', sidekick: '—', sidekickColor: '#5c5d70'
+        }));
+      });
+    });
+
+    const STEPS = [
+      { num: '01', label: 'Mode', hint: M[mode].label },
+      { num: '02', label: 'Participants', hint: addResultRows.length + ' entries' },
+      { num: '03', label: 'Result', hint: 'HP · cards · winner' },
+      { num: '04', label: 'Details', hint: 'Map · date · epic' }
+    ];
+    const addSteps = STEPS.map((s, i) => {
+      const n = i + 1, cur = n === step, done = n < step;
+      return { ...s,
+        num: done ? '✓' : s.num,
+        numBg: cur ? '#6c5cff' : done ? 'rgba(52,217,155,.16)' : '#14141c',
+        numBorder: cur ? '#6c5cff' : done ? 'rgba(52,217,155,.4)' : 'rgba(255,255,255,.09)',
+        numFg: cur ? '#fff' : done ? '#34d99b' : '#6b6c7e',
+        fg: cur ? '#ecedf2' : '#8b8c9e',
+        lineDisplay: n === 4 ? 'none' : 'block',
+        lineBg: done ? 'rgba(52,217,155,.35)' : 'rgba(255,255,255,.09)',
+        onClick: () => this.setState({ addStep: n })
+      };
+    });
+
+    const addDetailFields = [
+      { label: 'Map', value: 'Kaer Morhen', icon: 'bi-map', color: '#ecedf2', diceDisplay: 'block', chevronDisplay: 'block' },
+      { label: 'Tournament', value: 'Golden Halat League', icon: 'bi-flag', color: '#ecedf2', diceDisplay: 'none', chevronDisplay: 'block' },
+      { label: 'Stage', value: 'Semi-finals', icon: 'bi-diagram-2', color: '#ecedf2', diceDisplay: 'none', chevronDisplay: 'block' },
+      { label: 'Date', value: '12 Jul 2026', icon: 'bi-calendar3', color: '#ecedf2', diceDisplay: 'none', chevronDisplay: 'block' },
+      { label: 'Comment', value: 'Last card, last HP.', icon: 'bi-chat-left-text', color: '#8b8c9e', diceDisplay: 'none', chevronDisplay: 'none' }
+    ];
+
+    const winnerName = mode === 'ffa' ? (addResultRows[0] || {}).name : (winnerOptions[win] || '');
+    const addReview = [
+      { k: 'Mode', v: M[mode].label, color: '#ecedf2' },
+      { k: 'Participants', v: addResultRows.length, color: '#ecedf2' },
+      { k: 'Winner', v: winnerName, color: '#34d99b' },
+      { k: 'Map', v: 'Kaer Morhen', color: '#ecedf2' },
+      { k: 'Tournament', v: 'Golden Halat League · Semi-finals', color: '#c9cad6' },
+      { k: 'Date', v: '12 Jul 2026', color: '#c9cad6' }
+    ];
+
+    return {
+      navGroupsAdd, addModes, addSides: sides, addSteps, addResultRows, addWinnerOptions,
+      addDetailFields, addReview, addHint: hint,
+      sideColDisplay, resultColLabel, winnerQuestion, winnerPickerDisplay,
+      isStep1: step === 1, isStep2: step === 2, isStep3: step === 3, isStep4: step === 4,
+      modeChipLabel: M[mode].short.toUpperCase(), modeChipIcon: M[mode].icon,
+      modeChipFg: M[mode].color, modeChipBg: 'rgba(255,255,255,.06)',
+      addEpic: [1, 2, 3].map(i => ({ color: i <= 3 ? GOLD : 'rgba(255,255,255,.14)' })),
+      addPresets: [
+        { icon: 'bi-arrow-repeat', label: 'Rematch the last game', sub: 'Geralt of Rivia vs Medusa · Kaer Morhen' },
+        { icon: 'bi-flag', label: 'Golden Halat League', sub: 'Andrii vs Oleksandr · 1v1' },
+        { icon: 'bi-dice-5', label: 'Randomize everything', sub: 'Heroes and map from your collection' }
+      ],
+      addSummary: [
+        { icon: M[mode].icon, value: M[mode].label },
+        { icon: 'bi-people', value: addResultRows.length + ' participants' },
+        { icon: 'bi-map', value: 'Kaer Morhen' },
+        { icon: 'bi-calendar3', value: '12 Jul 2026' }
+      ],
+      addPrimaryLabel: step === 4 ? 'Save match' : 'Continue',
+      addPrimaryIcon: step === 4 ? 'bi-check-lg' : 'bi-chevron-right',
+      addPrimaryBg: step === 4 ? '#34d99b' : '#6c5cff',
+      addNext: () => this.setState({ addStep: Math.min(4, step + 1) }),
+      addPrev: () => this.setState({ addStep: Math.max(1, step - 1) })
+    };
+  }
+
+  detailVals() {
+    const navOpen = this.state.navOpen;
+    const groups = [
+      { title: 'Statistics', items: [
+        { icon: 'bi-shield-fill', label: 'Heroes', count: 48, active: true },
+        { icon: 'bi-people', label: 'Players', count: 6 },
+        { icon: 'bi-map', label: 'Maps', count: 20 },
+        { icon: 'bi-bug', label: 'Minions', count: 6 },
+        { icon: 'bi-eye', label: 'Villains', count: 2 }
+      ]},
+      { title: 'Play', items: [
+        { icon: 'bi-plus-circle', label: 'Add match', count: '' },
+        { icon: 'bi-list-ul', label: 'Match log', count: 1284 },
+        { icon: 'bi-box-seam', label: 'Collection', count: '6/11' },
+        { icon: 'bi-award', label: 'Titles', count: 9 },
+        { icon: 'bi-flag', label: 'Tournaments', count: 3 }
+      ]}
+    ].map(g => ({
+      ...g,
+      items: g.items.map(i => ({
+        ...i,
+        fg: i.active ? '#ffffff' : '#8b8c9e',
+        bg: i.active ? 'rgba(108,92,255,.18)' : 'transparent',
+        justify: navOpen ? 'flex-start' : 'center'
+      }))
+    }));
+
+    const dots = v => [1, 2, 3].map(i => ({ bg: i <= v ? '#8b7dff' : 'rgba(255,255,255,.12)' }));
+    const playStyle = [
+      { label: 'Attack', value: 3 }, { label: 'Defence', value: 2 },
+      { label: 'Trickery', value: 2 }, { label: 'Difficulty', value: 3 }
+    ].map(p => ({ ...p, dots: dots(p.value) }));
+
+    const deltas = [8, 6, -4, 10, 5, -6, 12, 7, -3, 9, 6, 11, -5, 8, 10, 6];
+    let acc = 120;
+    const series = deltas.map(d => (acc += d));
+    const min = Math.min(...series) - 8, max = Math.max(...series) + 8;
+    const W = 720, H = 190;
+    const xy = (v, i) => [((i * W) / (series.length - 1)).toFixed(1), (H - ((v - min) / (max - min)) * H).toFixed(1)];
+    const pts = series.map((v, i) => xy(v, i).join(',')).join(' ');
+    const ratingLine = {
+      points: pts,
+      area: `M0,${H} L${pts.split(' ').join(' L')} L${W},${H} Z`,
+      last: series[series.length - 1],
+      first: series[0],
+      labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      axis: [max, Math.round((max + min) / 2), min].map(v => Math.round(v))
+    };
+
+    const rows = [
+      ['12 Jul 2026', 'Medusa', 'vados', 'Kaer Morhen', 4, 0, true, '★★★', '1v1'],
+      ['09 Jul 2026', 'King Arthur', 'oleksandr', 'Castle', 0, 3, false, '★★☆', '1v1'],
+      ['05 Jul 2026', 'Dracula', 'zheka', 'London', 7, 0, true, '★★★', '1v1'],
+      ['02 Jul 2026', 'Alice', 'tetyana', 'Tavern', 2, 0, true, '★☆☆', '1v1'],
+      ['28 Jun 2026', 'Sherlock Holmes', 'andrii', 'London', 0, 5, false, '★★☆', '2v2'],
+      ['24 Jun 2026', 'Tomoe Gozen', 'ksuha', 'Kaer Morhen', 6, 0, true, '★★★', '1v1']
+    ].map(([date, opp, player, map, hp, oppHp, won, epic, mode]) => ({
+      date, opp, map, hp, oppHp, epic, mode, art: A(opp.toLowerCase().replace(/ /g, '-')), avatar: P(player),
+      epicStars: this.epicStars((epic.match(/★/g) || []).length, 11),
+      result: won ? 'WIN' : 'LOSS',
+      color: won ? '#34d99b' : '#f2506b',
+      edge: won ? 'rgba(52,217,155,.65)' : 'rgba(242,80,107,.65)',
+      bg: won ? 'rgba(52,217,155,.05)' : 'rgba(242,80,107,.05)'
+    }));
+
+    const monster = (name, total, wins) => ({
+      name, total, wins, losses: total - wins,
+      kd: (wins / Math.max(1, total - wins)).toFixed(2),
+      pct: Math.round((wins / total) * 100),
+      color: wins / total >= 0.5 ? '#34d99b' : '#f2506b'
+    });
+
+    return {
+      navOpen,
+      navW: navOpen ? 216 : 76,
+      navLabelDisplay: navOpen ? 'block' : 'none',
+      navToggleIcon: navOpen ? 'bi-chevron-double-left' : 'bi-chevron-double-right',
+      navHeaderH: navOpen ? 64 : 40,
+      navTileDisplay: navOpen ? 'none' : 'flex',
+      navToggle: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      navGroups: groups,
+      playStyle,
+      ratingLine,
+      detailStats: [
+        { label: 'Place', value: '01', color: GOLD },
+        { label: 'Points', value: '214', color: '#c4bcff' },
+        { label: 'HP', value: '18', color: '#ecedf2' },
+        { label: 'Deck size', value: '30', color: '#ecedf2' }
+      ],
+      detailChips: [
+        { icon: 'bi-heart-pulse', label: '18 HP', color: '#f2506b' },
+        { icon: 'bi-layers', label: '30 cards', color: '#6c5cff' },
+        { icon: 'bi-box-seam', label: 'Witcher', color: '#8b8c9e' },
+        { icon: 'bi-people', label: 'Sidekick ×1', color: '#8b8c9e' }
+      ],
+      titlesList: [
+        { name: 'Blade of the North', comment: 'season 3' },
+        { name: 'Most feared', comment: '2025' }
+      ],
+      matchRowsDetail: rows,
+      villainRows: [monster('Mothman', 12, 8), monster('Martian Invader', 7, 3)],
+      minionRows: [monster('Tarantula', 9, 6), monster('Blob', 6, 2), monster('Jersey Devil', 5, 4)],
+      nemesis: { name: 'King Arthur', art: A('king-arthur'), total: 14, wins: 5, losses: 9, kd: '0.56' }
+    };
+  }
+
+  epicStars(n, size) {
+    return [1, 2, 3].map(i => ({
+      icon: i <= n ? 'bi-star-fill' : 'bi-star',
+      color: i <= n ? GOLD : 'rgba(255,255,255,.16)',
+      size: size || 11
+    }));
+  }
+
+  playerVals() {
+    const A = f => `assets/heroes/${f}.png`, P = p => `assets/players/${p}.png`, UNK = 'assets/Unknown.png';
+    const spark = [-120, -40, 90, 210, 180, 340, 420, 560, 690, 640, 880, 1010, 1180, 1478];
+    const w = 1080, h = 150, min = -200, max = 1550;
+    const pts = spark.map((v, i) => `${((i * w) / (spark.length - 1)).toFixed(1)},${(h - ((v - min) / (max - min)) * h).toFixed(1)}`);
+
+    const HEROES = [
+      ['Dracula', 'dracula', 22, 15, 'Melee', 5],
+      ['Sherlock Holmes', 'sherlock-holmes', 18, 11, 'Ranged', 4],
+      ['Achilles', 'achilles', 16, 9, 'Melee', 4],
+      ['King Arthur', 'king-arthur', 14, 6, 'Melee', 2],
+      ['Medusa', 'medusa', 12, 7, 'Ranged', 4],
+      ['Robin Hood', 'robin-hood', 11, 4, 'Ranged', 3],
+      ['Geralt of Rivia', 'geralt-of-rivia', 10, 6, 'Melee', 5],
+      ['Tomoe Gozen', 'tomoe-gozen', 9, 5, 'Melee', 3],
+      ['Alice', 'alice', 9, 3, 'Melee', 2],
+      ['Bigfoot', 'bigfoot', 8, 3, 'Melee', 3],
+      ['Invisible Man', null, 7, 4, 'Melee', 3],
+      ['Sinbad', null, 6, 2, 'Melee', 2],
+      ['Loki', null, 5, 1, 'Ranged', 1],
+      ['Jekyll & Hyde', null, 5, 3, 'Melee', 4],
+      ['Yennefer', null, 4, 2, 'Ranged', 3],
+      ['Sun Wukong', null, 4, 3, 'Melee', 4],
+      ['Ciri', null, 3, 1, 'Melee', 2],
+      ['Blackbeard', null, 2, 0, 'Ranged', 1]
+    ];
+
+    const sort = this.state.plSort || 'played';
+    const main = this.state.plMain || 'Dracula';
+    const ratings = this.state.plRatings || {};
+
+    let heroes = HEROES.map(([name, file, matches, wins, type, defRating]) => {
+      const losses = matches - wins, kd = losses ? wins / losses : wins;
+      const pct = Math.round((wins / matches) * 100);
+      const mine = ratings[name] ?? defRating;
+      const isMain = name === main;
+      return {
+        name, art: file ? A(file) : UNK, matches, wins, losses, pct, kd: kd.toFixed(2), kdNum: kd, mine,
+        typeIcon: type === 'Melee' ? 'assets/Melee.png' : 'assets/Ranged.png',
+        pctColor: pct >= 55 ? '#34d99b' : pct >= 45 ? '#c9cad6' : '#f2506b',
+        kdColor: kd >= 1 ? '#34d99b' : '#f2506b',
+        barWin: `${(wins / matches) * 100}%`,
+        ring: isMain ? 'rgba(240,180,41,.75)' : 'rgba(255,255,255,.08)',
+        rowBg: isMain ? 'rgba(240,180,41,.05)' : 'transparent',
+        mainIcon: isMain ? 'bi-bookmark-star-fill' : 'bi-bookmark',
+        mainFg: isMain ? '#f0b429' : '#5c5d70',
+        mainBg: isMain ? 'rgba(240,180,41,.14)' : 'transparent',
+        mainBorder: isMain ? 'rgba(240,180,41,.45)' : 'rgba(255,255,255,.08)',
+        mainTitle: isMain ? 'Main hero' : 'Set as main hero',
+        setMain: () => this.setState({ plMain: name }),
+        rating: [1, 2, 3, 4, 5].map(i => ({
+          icon: i <= mine ? 'bi-star-fill' : 'bi-star',
+          color: i <= mine ? '#c4bcff' : 'rgba(255,255,255,.16)',
+          title: `Rate ${i} / 5`,
+          onClick: () => this.setState(st => ({ plRatings: { ...(st.plRatings || {}), [name]: i } }))
+        }))
+      };
+    });
+    if (sort === 'winrate') heroes = heroes.slice().sort((x, y) => y.pct - x.pct);
+    else if (sort === 'rating') heroes = heroes.slice().sort((x, y) => y.mine - x.mine || y.matches - x.matches);
+    else if (sort === 'kd') heroes = heroes.slice().sort((x, y) => y.kdNum - x.kdNum);
+
+    const match = (date, time, mode, modeColor, hero, heroFile, opponents, map, hp, oppHp, won, epic) => ({
+      date, time, mode, modeColor, hero, art: heroFile ? A(heroFile) : UNK, map, hp, oppHp,
+      opponents: opponents.map(([n, f]) => ({ name: n, art: f ? A(f) : UNK })),
+      result: won ? 'WIN' : 'LOSS',
+      resultIcon: won ? 'bi-arrow-up-short' : 'bi-arrow-down-short',
+      resultFg: won ? '#34d99b' : '#f2506b',
+      resultBg: won ? 'rgba(52,217,155,.14)' : 'rgba(242,80,107,.14)',
+      edge: won ? 'rgba(52,217,155,.7)' : 'rgba(242,80,107,.7)',
+      bg: won ? 'rgba(52,217,155,.05)' : 'rgba(242,80,107,.05)',
+      bgHover: won ? 'rgba(52,217,155,.1)' : 'rgba(242,80,107,.1)',
+      ring: won ? 'rgba(52,217,155,.45)' : 'rgba(242,80,107,.35)',
+      hpColor: won ? '#34d99b' : '#f2506b',
+      epicStars: this.epicStars(epic, 11)
+    });
+
+    const rival = (name, key, wins, losses) => {
+      const total = wins + losses, pct = Math.round((wins / total) * 100);
+      return { name, avatar: P(key), total: `${total} matches`, wins, losses, pct, barWin: `${pct}%`,
+        pctColor: pct >= 50 ? '#34d99b' : '#f2506b' };
+    };
+
+    return {
+      pl: {
+        name: 'Andrii', avatar: P('andrii'),
+        meta: 'Logged since Mar 2022 · 18 heroes played · favourite set: Cobble & Fog',
+        rank: '#2', rankOf: 'of 6 players',
+        titles: [
+          { label: 'Dracula main', icon: 'bi-bookmark-star-fill', color: '#f0b429' },
+          { label: '9-win streak', icon: 'bi-fire', color: '#f2506b' },
+          { label: 'Tournament finalist', icon: 'bi-flag-fill', color: '#8b7dff' }
+        ]
+      },
+      plKpis: [
+        { label: 'Matches', value: '168', sub: '18 heroes played', color: '#ecedf2' },
+        { label: 'Win rate', value: '54%', sub: '91 W · 77 L', color: '#34d99b' },
+        { label: 'K/D', value: '1.18', sub: 'league avg 1.00', color: '#ecedf2' }
+      ],
+      plRating: {
+        area: `0,${h} ${pts.join(' ')} ${w},${h}`,
+        line: pts.join(' '),
+        labels: ['Mar 22', 'Sep 22', 'Mar 23', 'Sep 23', 'Mar 24', 'Jul 26'],
+        axis: ['1 478', '640', '−200']
+      },
+      plModes: [
+        { label: '1v1', matches: 96, pct: 58, color: '#8b7dff' },
+        { label: '2v2', matches: 38, pct: 51, color: '#c084fc' },
+        { label: 'FFA', matches: 22, pct: 41, color: '#f0b429' },
+        { label: 'Co-op', matches: 12, pct: 67, color: '#38bdf8' }
+      ].map(m => ({ ...m, bar: `${m.pct}%`, pctColor: m.pct >= 55 ? '#34d99b' : m.pct >= 45 ? '#c9cad6' : '#f2506b' })),
+      plHeroes: heroes,
+      plHeroCount: `${HEROES.length} of 48 heroes`,
+      plMainName: main.toUpperCase(),
+      plHeroSorts: [
+        { key: 'played', label: 'played' },
+        { key: 'winrate', label: 'win %' },
+        { key: 'kd', label: 'k/d' },
+        { key: 'rating', label: 'my rating' }
+      ].map(z => ({
+        ...z,
+        bg: z.key === sort ? 'rgba(139,125,255,.18)' : 'transparent',
+        fg: z.key === sort ? '#c4bcff' : '#8b8c9e',
+        onClick: () => this.setState({ plSort: z.key })
+      })),
+      plMatchTallies: [
+        { label: 'W', value: 91, fg: '#34d99b', bg: 'rgba(52,217,155,.13)' },
+        { label: 'L', value: 77, fg: '#f2506b', bg: 'rgba(242,80,107,.13)' }
+      ],
+      plMatches: [
+        match('12 Jul 2026', '20:14', '1V1', '#8b7dff', 'Dracula', 'dracula', [['Medusa', 'medusa']], 'Baskerville Manor', 9, 0, true, 3),
+        match('11 Jul 2026', '19:02', '2V2', '#c084fc', 'Sherlock Holmes', 'sherlock-holmes', [['Alice', 'alice'], ['Bigfoot', 'bigfoot']], 'Castle', 0, 6, false, 2),
+        match('09 Jul 2026', '21:40', 'FFA', '#f0b429', 'Achilles', 'achilles', [['Tomoe Gozen', 'tomoe-gozen'], ['King Arthur', 'king-arthur']], 'Soho', 0, 5, false, 1),
+        match('05 Jul 2026', '18:25', 'CO-OP', '#38bdf8', 'King Arthur', 'king-arthur', [['Mothman', null]], 'Sleepy Hollow', 4, 2, false, 3),
+        match('04 Jul 2026', '20:50', '1V1', '#8b7dff', 'Sherlock Holmes', 'sherlock-holmes', [['Dracula', 'dracula']], 'Soho', 6, 0, true, 2),
+        match('28 Jun 2026', '21:10', '1V1', '#8b7dff', 'Geralt of Rivia', 'geralt-of-rivia', [['Bigfoot', 'bigfoot']], 'Kaer Morhen', 11, 0, true, 3)
+      ],
+      plRivals: [
+        rival('Ksuha', 'ksuha', 21, 14),
+        rival('Oleksandr', 'oleksandr', 17, 18),
+        rival('Zheka', 'zheka', 12, 16),
+        rival('Tetyana', 'tetyana', 9, 7),
+        rival('Vados', 'vados', 6, 9)
+      ],
+      plMaps: [
+        { name: 'Baskerville Manor', file: 'london', pct: 71, matches: 21 },
+        { name: 'Sherwood Forest', file: 'tavern', pct: 56, matches: 18 },
+        { name: 'Marmoreal', file: 'castle', pct: 44, matches: 16 },
+        { name: 'Kaer Morhen', file: 'kaer-morhen', pct: 33, matches: 9 }
+      ].map(m => ({
+        ...m, art: `assets/maps/${m.file}.png`, bar: `${m.pct}%`,
+        pctColor: m.pct >= 55 ? '#34d99b' : m.pct >= 45 ? '#c9cad6' : '#f2506b'
+      })),
+      navGroupsPlayer: [
+        { title: 'Statistics', items: [
+          { icon: 'bi-shield-fill', label: 'Heroes', count: 48 },
+          { icon: 'bi-people', label: 'Players', count: 6, active: true },
+          { icon: 'bi-map', label: 'Maps', count: 20 },
+          { icon: 'bi-bug', label: 'Minions', count: 6 },
+          { icon: 'bi-eye', label: 'Villains', count: 2 }
+        ] },
+        { title: 'Play', items: [
+          { icon: 'bi-plus-circle', label: 'Add match', count: '' },
+          { icon: 'bi-list-ul', label: 'Match log', count: 1284 },
+          { icon: 'bi-box-seam', label: 'Collection', count: '7/10' },
+          { icon: 'bi-award', label: 'Titles', count: 9 },
+          { icon: 'bi-flag', label: 'Tournaments', count: 3 }
+        ] }
+      ].map(g => ({ ...g, items: g.items.map(n => ({
+        ...n,
+        fg: n.active ? '#ffffff' : '#8b8c9e',
+        bg: n.active ? 'linear-gradient(150deg,rgba(108,92,255,.9),rgba(168,85,247,.7))' : 'transparent',
+        justify: this.state.navOpen ? 'flex-start' : 'center'
+      })) })),
+      plTitles: [
+        { name: 'Bloodline', sub: '15 wins as Dracula', icon: 'bi-award-fill', color: '#f0b429' },
+        { name: 'Deduction', sub: '10 wins as Sherlock', icon: 'bi-search', color: '#8b7dff' },
+        { name: 'Comeback', sub: 'won on 1 HP left', icon: 'bi-heart-pulse', color: '#f2506b' },
+        { name: 'Co-op captain', sub: '8 villains downed', icon: 'bi-shield-fill-check', color: '#38bdf8' }
+      ]
+    };
+  }
+
+  matchupsVals() {
+    const A = f => `assets/heroes/${f}.png`;
+    const all = [
+      ['Alice', 'alice', 78, 9], ['Dracula', 'dracula', 71, 7], ['Medusa', 'medusa', 66, 6],
+      ['Robin Hood', 'robin-hood', 60, 5], ['Tomoe Gozen', 'tomoe-gozen', 55, 11],
+      ['King Arthur', 'king-arthur', 52, 21], ['Achilles', 'achilles', 48, 8],
+      ['Sherlock Holmes', 'sherlock-holmes', 38, 13], ['Bigfoot', 'bigfoot', 33, 6],
+      ['Sinbad', null, 25, 4], ['Invisible Man', null, 20, 5], ['Loki', null, 0, 3]
+    ].map(([name, file, pct, meetings]) => ({
+      name, art: file ? A(file) : 'assets/Unknown.png', pct, meetings: `${meetings} met`,
+      bar: `${pct}%`, color: pct >= 55 ? '#34d99b' : pct >= 45 ? '#c9cad6' : '#f2506b'
+    }));
+    const size = 5, page = this.state.muPage || 0, last = Math.ceil(all.length / size) - 1;
+    const from = page * size;
+    return {
+      muRows: all.slice(from, from + size),
+      muRange: `${from + 1}–${Math.min(from + size, all.length)} of ${all.length}`,
+      muPrev: () => this.setState({ muPage: Math.max(0, page - 1) }),
+      muNext: () => this.setState({ muPage: Math.min(last, page + 1) }),
+      muPrevFg: page === 0 ? '#3c3d4c' : '#8b8c9e',
+      muNextFg: page === last ? '#3c3d4c' : '#8b8c9e'
+    };
+  }
+
+  matchLogVals() {
+    const MODES = {
+      '1v1':  { label: '1v1',  icon: 'bi-person-fill',   color: '#8b7dff', bg: 'rgba(139,125,255,.14)' },
+      'team': { label: '2v2',  icon: 'bi-people-fill',   color: '#c084fc', bg: 'rgba(168,85,247,.14)' },
+      'ffa':  { label: 'FFA',  icon: 'bi-diagram-3-fill', color: '#f0b429', bg: 'rgba(240,180,41,.14)' },
+      'coop': { label: 'CO-OP', icon: 'bi-shield-fill-check', color: '#38bdf8', bg: 'rgba(56,189,248,.14)' }
+    };
+    const chip = (hero, player, hp, won, extra) => ({
+      art: (extra && extra.art) || A(hero.toLowerCase().replace(/ /g, '-')), name: hero,
+      playerAvatar: player ? P(player) : 'assets/Unknown.png',
+      player: player ? player.charAt(0).toUpperCase() + player.slice(1) : 'Game',
+      playerDisplay: player ? 'block' : 'none',
+      hp, opacity: won ? 1 : 0.5,
+      border: won ? 'rgba(52,217,155,.45)' : 'rgba(255,255,255,.09)',
+      crownDisplay: won ? 'flex' : 'none',
+      place: (extra && extra.place) || '', placeDisplay: extra && extra.place ? 'flex' : 'none',
+      placeColor: extra && extra.placeColor ? extra.placeColor : '#8b8c9e',
+      minions: (extra && extra.minions) || []
+    });
+    const group = (name, won, chips, sep) => ({
+      name: name || '', nameDisplay: name ? 'block' : 'none',
+      chips, won,
+      color: won ? '#34d99b' : '#f2506b',
+      resultLabel: won ? 'WON' : 'LOST',
+      bg: won ? 'rgba(52,217,155,.07)' : 'rgba(242,80,107,.06)',
+      border: won ? 'rgba(52,217,155,.28)' : 'rgba(242,80,107,.22)',
+      sepLabel: sep || 'VS', sepDisplay: sep === null ? 'none' : 'flex'
+    });
+
+    const raw = [
+      { id: 'm1', date: '12 Jul 2026', time: '20:14', mode: '1v1', map: 'Kaer Morhen', epic: '★★★', focalWon: true,
+        summary: 'Geralt of Rivia beat Medusa · 4 HP left',
+        groups: [
+          group(null, true, [chip('Geralt of Rivia', 'vados', 4, true)], null),
+          group(null, false, [chip('Medusa', 'ksuha', 0, false)], 'VS')
+        ] },
+      { id: 'm2', date: '11 Jul 2026', time: '19:02', mode: 'team', map: 'Castle', epic: '★★☆', focalWon: false,
+        summary: 'Team 2 took it · Dracula closed the game with 9 HP',
+        comment: "Zheka drew the whole Dracula deck by turn six. We houseruled that a discarded scheme card stays face up — worked well, keep it.",
+        groups: [
+          group('Team 1', false, [chip('Geralt of Rivia', 'vados', 0, false), chip('Alice', 'tetyana', 3, false)], null),
+          group('Team 2', true, [chip('Medusa', 'ksuha', 6, true), chip('Dracula', 'zheka', 9, true)], 'VS')
+        ] },
+      { id: 'm3', date: '09 Jul 2026', time: '21:40', mode: 'ffa', map: 'London', epic: '★☆☆', focalWon: false,
+        summary: '4 fighters · Sherlock Holmes survived with 5 HP',
+        comment: "Bigfoot went out on turn three, so the rest was a three-way. Next time we start FFA on the larger map.",
+        groups: [
+          group(null, true, [chip('Sherlock Holmes', 'andrii', 5, true, { place: '1', placeColor: GOLD })], null),
+          group(null, false, [chip('Tomoe Gozen', 'tetyana', 0, false, { place: '2', placeColor: SILVER })], '›'),
+          group(null, false, [chip('Achilles', 'oleksandr', 0, false, { place: '3', placeColor: BRONZE })], '›'),
+          group(null, false, [chip('Bigfoot', 'zheka', 0, false, { place: '4' })], '›')
+        ] },
+      { id: 'm4', date: '05 Jul 2026', time: '18:25', mode: 'coop', map: 'Sleepy Hollow', epic: '★★★', focalWon: false,
+        summary: 'Mothman survived 3 heroes with 2 HP · Tarantula ×2 alive',
+        comment: "Closest co-op yet — Mothman on 2 HP with both Tarantulas alive. King Arthur held the far zone the entire game.",
+        groups: [
+          group('Heroes', false, [chip('Geralt of Rivia', 'vados', 0, false), chip('Robin Hood', 'ksuha', 0, false), chip('King Arthur', 'andrii', 4, false)], null),
+          group('Villains', true, [chip('Mothman', null, 2, true, { art: 'assets/Unknown.png', minions: [{ name: 'Tarantula', hp: 3 }, { name: 'Tarantula', hp: 1 }] })], 'VS')
+        ] },
+      { id: 'm5', date: '04 Jul 2026', time: '20:50', mode: '1v1', map: 'London', epic: '★★☆', focalWon: true,
+        summary: 'Sherlock Holmes beat Dracula · 6 HP left',
+        comment: "Watson never left the fight. Dracula never got a single bite in.",
+        groups: [
+          group(null, true, [chip('Sherlock Holmes', 'andrii', 6, true)], null),
+          group(null, false, [chip('Dracula', 'zheka', 0, false)], 'VS')
+        ] },
+      { id: 'm6', date: '02 Jul 2026', time: '19:35', mode: 'ffa', map: 'Tavern', epic: '★★★', focalWon: true,
+        summary: '3 fighters · King Arthur closed it with 7 HP',
+        groups: [
+          group(null, true, [chip('King Arthur', 'oleksandr', 7, true, { place: '1', placeColor: GOLD })], null),
+          group(null, false, [chip('Alice', 'tetyana', 0, false, { place: '2', placeColor: SILVER })], '›'),
+          group(null, false, [chip('Robin Hood', 'ksuha', 0, false, { place: '3', placeColor: BRONZE })], '›')
+        ] },
+      { id: 'm7', date: '28 Jun 2026', time: '21:10', mode: 'team', map: 'Kaer Morhen', epic: '★☆☆', focalWon: true,
+        summary: 'Team 1 swept it · Tomoe Gozen untouched on 12 HP',
+        comment: "Tomoe Gozen finished untouched. Bad matchup for Bigfoot on this map.",
+        groups: [
+          group('Team 1', true, [chip('Tomoe Gozen', 'tetyana', 12, true), chip('Achilles', 'oleksandr', 5, true)], null),
+          group('Team 2', false, [chip('Bigfoot', 'zheka', 0, false), chip('Alice', 'ksuha', 0, false)], 'VS')
+        ] },
+      { id: 'm8', date: '26 Jun 2026', time: '18:05', mode: 'coop', map: 'Visitor Center', epic: '★★☆', focalWon: true,
+        summary: 'Heroes downed Raptor Alpha · Medusa on 3 HP',
+        groups: [
+          group('Heroes', true, [chip('Medusa', 'ksuha', 3, true), chip('Robin Hood', 'andrii', 6, true)], null),
+          group('Villains', false, [chip('Raptor Alpha', null, 0, false, { art: 'assets/Unknown.png', minions: [{ name: 'Velociraptor', hp: 0 }] })], 'VS')
+        ] }
+    ];
+
+    const prow = (o) => ({
+      name: o.name,
+      art: o.art || A(o.name.toLowerCase().replace(/ /g, '-')),
+      avatar: o.player ? P(o.player) : 'assets/Unknown.png',
+      sub: o.player ? o.player.charAt(0).toUpperCase() + o.player.slice(1) : (o.kind || ''),
+      avatarDisplay: o.player ? 'block' : 'none',
+      side: o.side || '',
+      sideColor: o.side === 'Villains' ? '#38bdf8' : o.side === 'Team 2' ? '#c084fc' : '#8b7dff',
+      hp: o.hp, hpColor: o.won ? '#34d99b' : '#f2506b',
+      cards: (o.cards === null || o.cards === undefined) ? '—' : o.cards,
+      sidekick: o.sidekick ? o.sidekick.name + ' · ' + o.sidekick.hp + 'hp' : '—',
+      sidekickColor: o.sidekick ? '#c9cad6' : '#5c5d70',
+      place: o.place || '', placeDisplay: o.place ? 'flex' : 'none',
+      placeColor: o.placeColor || '#8b8c9e',
+      indent: o.kind === 'Minion' ? 20 : 0,
+      size: o.kind === 'Minion' ? 22 : 26,
+      opacity: o.kind === 'Minion' ? 0.9 : 1
+    });
+
+    const BOARDS = {
+      m1: { sideDisplay: 'none', sideW: 0, rows: [
+        prow({ name: 'Geralt of Rivia', player: 'vados', hp: 4, cards: 9, won: true, sidekick: { name: 'Roach', hp: 7 } }),
+        prow({ name: 'Medusa', player: 'ksuha', hp: 0, cards: 12, won: false })
+      ] },
+      m2: { sideDisplay: 'block', sideW: 68, rows: [
+        prow({ name: 'Geralt of Rivia', player: 'vados', side: 'Team 1', hp: 0, cards: 6, won: false, sidekick: { name: 'Roach', hp: 0 } }),
+        prow({ name: 'Alice', player: 'tetyana', side: 'Team 1', hp: 3, cards: 8, won: false }),
+        prow({ name: 'Medusa', player: 'ksuha', side: 'Team 2', hp: 6, cards: 11, won: true }),
+        prow({ name: 'Dracula', player: 'zheka', side: 'Team 2', hp: 9, cards: 14, won: true })
+      ] },
+      m3: { sideDisplay: 'none', sideW: 0, rows: [
+        prow({ name: 'Sherlock Holmes', player: 'andrii', hp: 5, cards: 10, won: true, place: '1', placeColor: GOLD, sidekick: { name: 'Watson', hp: 4 } }),
+        prow({ name: 'Tomoe Gozen', player: 'tetyana', hp: 0, cards: 7, won: false, place: '2', placeColor: SILVER }),
+        prow({ name: 'Achilles', player: 'oleksandr', hp: 0, cards: 4, won: false, place: '3', placeColor: BRONZE, sidekick: { name: 'Patroclus', hp: 0 } }),
+        prow({ name: 'Bigfoot', player: 'zheka', hp: 0, cards: 2, won: false, place: '4' })
+      ] },
+      m4: { sideDisplay: 'block', sideW: 68, rows: [
+        prow({ name: 'Geralt of Rivia', player: 'vados', side: 'Heroes', hp: 0, cards: 0, won: false, sidekick: { name: 'Roach', hp: 0 } }),
+        prow({ name: 'Robin Hood', player: 'ksuha', side: 'Heroes', hp: 0, cards: 2, won: false }),
+        prow({ name: 'King Arthur', player: 'andrii', side: 'Heroes', hp: 4, cards: 5, won: false, sidekick: { name: 'Merlin', hp: 3 } }),
+        prow({ name: 'Mothman', kind: 'Villain', art: 'assets/Unknown.png', side: 'Villains', hp: 2, cards: 7, won: true }),
+        prow({ name: 'Tarantula', kind: 'Minion', art: 'assets/Unknown.png', side: 'Villains', hp: 3, cards: null, won: true }),
+        prow({ name: 'Tarantula', kind: 'Minion', art: 'assets/Unknown.png', side: 'Villains', hp: 1, cards: null, won: true })
+      ] },
+      m5: { sideDisplay: 'none', sideW: 0, rows: [
+        prow({ name: 'Sherlock Holmes', player: 'andrii', hp: 6, cards: 11, won: true, sidekick: { name: 'Watson', hp: 5 } }),
+        prow({ name: 'Dracula', player: 'zheka', hp: 0, cards: 8, won: false, sidekick: { name: 'Sisters', hp: 0 } })
+      ] },
+      m6: { sideDisplay: 'none', sideW: 0, rows: [
+        prow({ name: 'King Arthur', player: 'oleksandr', hp: 7, cards: 9, won: true, place: '1', placeColor: GOLD, sidekick: { name: 'Merlin', hp: 6 } }),
+        prow({ name: 'Alice', player: 'tetyana', hp: 0, cards: 5, won: false, place: '2', placeColor: SILVER }),
+        prow({ name: 'Robin Hood', player: 'ksuha', hp: 0, cards: 3, won: false, place: '3', placeColor: BRONZE, sidekick: { name: 'Little John', hp: 0 } })
+      ] },
+      m7: { sideDisplay: 'block', sideW: 68, rows: [
+        prow({ name: 'Tomoe Gozen', player: 'tetyana', side: 'Team 1', hp: 12, cards: 13, won: true }),
+        prow({ name: 'Achilles', player: 'oleksandr', side: 'Team 1', hp: 5, cards: 10, won: true, sidekick: { name: 'Patroclus', hp: 2 } }),
+        prow({ name: 'Bigfoot', player: 'zheka', side: 'Team 2', hp: 0, cards: 4, won: false }),
+        prow({ name: 'Alice', player: 'ksuha', side: 'Team 2', hp: 0, cards: 6, won: false })
+      ] },
+      m8: { sideDisplay: 'block', sideW: 68, rows: [
+        prow({ name: 'Medusa', player: 'ksuha', side: 'Heroes', hp: 3, cards: 7, won: true }),
+        prow({ name: 'Robin Hood', player: 'andrii', side: 'Heroes', hp: 6, cards: 9, won: true, sidekick: { name: 'Little John', hp: 4 } }),
+        prow({ name: 'Raptor Alpha', kind: 'Villain', art: 'assets/Unknown.png', side: 'Villains', hp: 0, cards: 3, won: false }),
+        prow({ name: 'Velociraptor', kind: 'Minion', art: 'assets/Unknown.png', side: 'Villains', hp: 0, cards: null, won: false })
+      ] }
+    };
+
+    const logMatches = raw.map(m => {
+      const mode = MODES[m.mode];
+      const open = this.state.openMatch === m.id;
+      return {
+        ...m, modeKey: m.mode, mode, open, board: BOARDS[m.id],
+        epicStars: this.epicStars((m.epic.match(/★/g) || []).length, 11),
+        epicStarsBig: this.epicStars((m.epic.match(/★/g) || []).length, 15),
+        commentDisplay: m.comment ? 'block' : 'none',
+        commentText: m.comment || 'No comment on this match.',
+        commentColor: m.comment ? '#c9cad6' : '#5c5d70',
+        toggle: () => this.setState(s => ({ openMatch: s.openMatch === m.id ? null : m.id })),
+        chevron: open ? 'bi-chevron-up' : 'bi-chevron-down',
+        shape: m.mode === 'ffa' ? '4 fighters' : m.mode === 'coop' ? '3 heroes · 1 villain' : '',
+        shapeDisplay: m.mode === 'ffa' || m.mode === 'coop' ? 'block' : 'none',
+        neutralEdge: MODES[m.mode].color,
+        edge: m.focalWon ? 'rgba(52,217,155,.65)' : 'rgba(242,80,107,.65)',
+        rowBg: m.focalWon ? 'rgba(52,217,155,.045)' : 'rgba(242,80,107,.045)',
+        resultLabel: m.focalWon ? 'WIN' : 'LOSS',
+        resultColor: m.focalWon ? '#34d99b' : '#f2506b'
+      };
+    });
+
+    const fMode = this.state.logMode || 'all';
+    const filtered = logMatches.filter(m => fMode === 'all' || m.modeKey === fMode);
+    const size = this.state.logSize || 10;
+
+    return {
+      logMatches: logMatches.slice(0, 4),
+      logPage: filtered,
+      logModeFilters: [
+        { key: 'all', label: 'All', icon: 'bi-grid', color: '#ecedf2' },
+        { key: '1v1', label: '1v1', icon: MODES['1v1'].icon, color: MODES['1v1'].color },
+        { key: 'team', label: '2v2', icon: MODES.team.icon, color: MODES.team.color },
+        { key: 'ffa', label: 'FFA', icon: MODES.ffa.icon, color: MODES.ffa.color },
+        { key: 'coop', label: 'Co-op', icon: MODES.coop.icon, color: MODES.coop.color }
+      ].map(f => ({
+        ...f,
+        fg: f.key === fMode ? '#ffffff' : '#8b8c9e',
+        bg: f.key === fMode ? 'rgba(139,125,255,.2)' : 'transparent',
+        border: f.key === fMode ? 'rgba(139,125,255,.5)' : 'rgba(255,255,255,.07)',
+        onClick: () => this.setState({ logMode: f.key })
+      })),
+      logCount: `${filtered.length} of 1 284 matches`,
+      logPageLabel: `Page 1 of ${Math.ceil(1284 / size)}`,
+      logSizes: [10, 20, 50, 100].map(n => ({
+        n,
+        bg: n === size ? 'rgba(139,125,255,.18)' : 'transparent',
+        fg: n === size ? '#c4bcff' : '#8b8c9e',
+        onClick: () => this.setState({ logSize: n })
+      })),
+      navGroupsLog: [
+        { title: 'Statistics', items: [
+          { icon: 'bi-shield-fill', label: 'Heroes', count: 48 },
+          { icon: 'bi-people', label: 'Players', count: 6 },
+          { icon: 'bi-map', label: 'Maps', count: 20 },
+          { icon: 'bi-bug', label: 'Minions', count: 6 },
+          { icon: 'bi-eye', label: 'Villains', count: 2 }
+        ] },
+        { title: 'Play', items: [
+          { icon: 'bi-plus-circle', label: 'Add match', count: '' },
+          { icon: 'bi-list-ul', label: 'Match log', count: 1284, active: true },
+          { icon: 'bi-box-seam', label: 'Collection', count: '7/10' },
+          { icon: 'bi-award', label: 'Titles', count: 9 },
+          { icon: 'bi-flag', label: 'Tournaments', count: 3 }
+        ] }
+      ].map(g => ({ ...g, items: g.items.map(n => ({
+        ...n,
+        fg: n.active ? '#ffffff' : '#8b8c9e',
+        bg: n.active ? 'linear-gradient(150deg,rgba(108,92,255,.9),rgba(168,85,247,.7))' : 'transparent',
+        justify: this.state.navOpen ? 'flex-start' : 'center'
+      })) })),
+      logKpis: [
+        { icon: 'bi-controller', label: 'Matches', value: '1 284', sub: '+37 this week' },
+        { icon: 'bi-calendar3', label: 'This month', value: '96', sub: '24 sessions' },
+        { icon: 'bi-star-fill', label: 'Avg. epic', value: '2.4', sub: 'of 3' },
+        { icon: 'bi-fire', label: 'Longest streak', value: '9', sub: 'Ksuha · June' }
+      ],
+      logChips: [
+        { icon: 'bi-people', label: 'All players' },
+        { icon: 'bi-shield', label: 'All heroes' },
+        { icon: 'bi-map', label: 'All maps' },
+        { icon: 'bi-flag', label: 'All tournaments' },
+        { icon: 'bi-calendar-range', label: 'Jun – Jul 2026' }
+      ]
+    };
+  }
+
+  collectionVals() {
+    const A = f => `assets/heroes/${f}.png`, M = f => `assets/maps/${f}.png`, UNK = 'assets/Unknown.png';
+    const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    const H = (name, file, hp, deck, type) => ({ name, art: file ? A(file) : UNK, hp, deck, type });
+    const sel = this.state.colSet ?? 1;
+    const ownedOnly = !!this.state.colOwnedOnly;
+
+    const data = [
+      { name: 'Battle of Legends I', year: '2019 · Restoration Games', owned: true, cover: '',
+        heroes: [H('King Arthur', 'king-arthur', 17, 30, 'Melee'), H('Alice', 'alice', 15, 30, 'Melee'), H('Medusa', 'medusa', 16, 30, 'Ranged'), H('Sinbad', null, 16, 30, 'Melee')],
+        maps: [['Marmoreal', 'castle'], ['Sherwood Forest', 'tavern']] },
+      { name: 'Cobble & Fog', year: '2020 · Restoration Games', owned: true, cover: 'assets/sets/cobble-and-fog.png',
+        heroes: [H('Sherlock Holmes', 'sherlock-holmes', 14, 30, 'Ranged'), H('Dracula', 'dracula', 18, 30, 'Melee'), H('Invisible Man', null, 15, 30, 'Melee'), H('Jekyll & Hyde', null, 14, 30, 'Melee')],
+        maps: [['Baskerville Manor', 'london'], ['Soho', 'london']] },
+      { name: 'Battle of Legends III', year: '2023 · Restoration Games', owned: true, cover: 'assets/sets/battle-of-legends-3.png',
+        heroes: [H('Blackbeard', null, 17, 30, 'Ranged'), H('Chupacabra', null, 16, 30, 'Melee'), H('Pandora', null, 15, 30, 'Ranged'), H('Loki', null, 14, 30, 'Melee')],
+        maps: [['Queen Anne’s Revenge', 'tavern'], ['Mount Olympus', 'castle']] },
+      { name: 'Witcher: Steel & Silver', year: '2022 · Restoration Games', owned: true, cover: '',
+        heroes: [H('Geralt of Rivia', 'geralt-of-rivia', 18, 30, 'Melee'), H('Ciri', null, 16, 30, 'Melee'), H('Yennefer', null, 14, 30, 'Ranged')],
+        maps: [['Kaer Morhen', 'kaer-morhen']] },
+      { name: 'Jurassic Park: InGen', year: '2021 · Restoration Games', owned: true, cover: '',
+        heroes: [H('Dr. Sattler', null, 14, 30, 'Ranged'), H('Dr. Grant', null, 15, 30, 'Melee')],
+        maps: [['Visitor Center', 'castle']],
+        villain: { name: 'Raptor Alpha', hp: 22 },
+        minions: [{ name: 'Velociraptor', count: 3, hp: 6 }, { name: 'Dilophosaurus', count: 2, hp: 4 }] },
+      { name: 'Robin Hood vs Bigfoot', year: '2019 · Restoration Games', owned: true, cover: '',
+        heroes: [H('Robin Hood', 'robin-hood', 16, 30, 'Ranged'), H('Bigfoot', 'bigfoot', 17, 30, 'Melee')],
+        maps: [['Sherwood Forest', 'tavern']] },
+      { name: 'Battle of Legends II', year: '2020 · Restoration Games', owned: true, cover: '',
+        heroes: [H('Achilles', 'achilles', 17, 30, 'Melee'), H('Tomoe Gozen', 'tomoe-gozen', 16, 30, 'Melee'), H('Sun Wukong', null, 15, 30, 'Melee'), H('Yennenga', null, 16, 30, 'Ranged')],
+        maps: [['Palace of Versailles', 'castle'], ['Tavern', 'tavern']] },
+      { name: 'Buffy the Vampire Slayer', year: '2021 · Restoration Games', owned: false, cover: '',
+        heroes: [H('Buffy', null, 16, 30, 'Melee'), H('Spike', null, 17, 30, 'Melee'), H('Willow', null, 14, 30, 'Ranged'), H('Angel', null, 16, 30, 'Melee')],
+        maps: [['Sunnydale High', 'london']] },
+      { name: 'Marvel: Teen Spirit', year: '2021 · Restoration Games', owned: false, cover: '',
+        heroes: [H('Ms. Marvel', null, 16, 30, 'Melee'), H('Cloak & Dagger', null, 15, 30, 'Ranged'), H('Squirrel Girl', null, 17, 30, 'Melee')],
+        maps: [['Jersey City', 'london']] },
+      { name: 'Houdini vs The Genie', year: '2022 · Restoration Games', owned: false, cover: '',
+        heroes: [H('Houdini', null, 14, 30, 'Ranged'), H('The Genie', null, 18, 30, 'Melee')],
+        maps: [['Sultan’s Palace', 'castle']] }
+    ];
+
+    const saved = this.state.colSaved || {}, draft = this.state.colDraft || {};
+    data.forEach((x, i) => { if (i in saved) x.owned = saved[i]; if (i in draft) x.owned = draft[i]; });
+    const dirty = Object.keys(draft).length;
+    const shown = data.map((d, i) => ({ d, i })).filter(x => (ownedOnly ? x.d.owned : true));
+
+    const colSets = shown.map(({ d, i }) => {
+      const active = i === sel;
+      const chips = [
+        { icon: 'bi-shield-fill', value: `${d.heroes.length} heroes`, fg: '#c4bcff' },
+        { icon: 'bi-map', value: `${d.maps.length} maps`, fg: '#8b8c9e' }
+      ];
+      if (d.villain) chips.push({ icon: 'bi-eye', value: '1 villain', fg: '#f0b429' });
+      if (d.minions) chips.push({ icon: 'bi-bug', value: `${d.minions.reduce((a, m) => a + m.count, 0)} minions`, fg: '#38bdf8' });
+      return {
+        name: d.name, year: d.year.split(' · ')[0], cover: d.cover || BLANK,
+        artDisplay: d.cover ? 'block' : 'none', artOpacity: d.owned ? 1 : 0.45,
+        frameStyle: d.owned ? 'solid' : 'dashed',
+        chips, tokens: d.heroes.slice(0, 4),
+        opacity: d.owned ? 1 : 0.5,
+        tokenRing: active ? '#8b7dff' : '#12121a',
+        nameFg: d.owned ? '#ecedf2' : '#8b8c9e',
+        bg: active ? 'rgba(139,125,255,.1)' : d.owned ? '#101018' : 'rgba(255,255,255,.02)',
+        border: active ? 'rgba(139,125,255,.55)' : 'rgba(255,255,255,.07)',
+        shadow: active ? '0 10px 30px rgba(108,92,255,.22)' : 'none',
+        badge: i in draft ? 'UNSAVED' : d.owned ? 'OWNED' : 'ADD',
+        badgeBg: i in draft ? 'rgba(240,180,41,.14)' : d.owned ? 'rgba(52,217,155,.12)' : 'rgba(255,255,255,.05)',
+        badgeFg: i in draft ? GOLD : d.owned ? '#34d99b' : '#6b6c7e',
+        boxBorder: i in draft ? GOLD : d.owned ? '#34d99b' : 'rgba(255,255,255,.35)',
+        boxBg: d.owned ? (i in draft ? GOLD : '#34d99b') : 'rgba(10,10,16,.55)',
+        checkDisplay: d.owned ? 'block' : 'none',
+        onCheck: e => { e.stopPropagation(); this.setState(s => { const nd = { ...(s.colDraft || {}) }; if (i in nd) delete nd[i]; else nd[i] = !d.owned; return { colDraft: nd }; }); },
+        onClick: () => this.setState({ colSet: i })
+      };
+    });
+
+    const d = data[sel];
+    const sections = [
+      { title: 'Heroes', icon: 'bi-shield-fill', color: '#8b7dff', count: d.heroes.length,
+        rows: d.heroes.map(h => ({
+          name: h.name, art: h.art, artW: 30, artRadius: '50%', indent: 0,
+          sub: `${h.deck} cards · ${h.type}`, edge: 'rgba(139,125,255,.5)',
+          typeIcon: h.type === 'Melee' ? 'assets/Melee.png' : 'assets/Ranged.png', typeDisplay: 'block',
+          value: `${h.hp} HP`, valueColor: '#ecedf2'
+        })) },
+      { title: 'Maps', icon: 'bi-map', color: '#38bdf8', count: d.maps.length,
+        rows: d.maps.map(([name, file]) => ({
+          name, art: M(file), artW: 46, artRadius: '6px', indent: 0,
+          sub: 'double-sided board', edge: 'rgba(56,189,248,.45)',
+          typeIcon: BLANK, typeDisplay: 'none', value: '', valueColor: '#8b8c9e'
+        })) }
+    ];
+    if (d.villain) {
+      sections.push({
+        title: 'Villain & minions', icon: 'bi-eye', color: GOLD, count: 1 + d.minions.reduce((a, m) => a + m.count, 0),
+        rows: [
+          { name: d.villain.name, art: UNK, artW: 30, artRadius: '8px', indent: 0, sub: 'co-op villain · no sidekick',
+            edge: 'rgba(240,180,41,.55)', typeIcon: BLANK, typeDisplay: 'none', value: `${d.villain.hp} HP`, valueColor: GOLD }
+        ].concat(d.minions.map(m => ({
+          name: m.name, art: UNK, artW: 26, artRadius: '8px', indent: 16, sub: `×${m.count} in the box`,
+          edge: 'rgba(240,180,41,.28)', typeIcon: BLANK, typeDisplay: 'none', value: `${m.hp} HP`, valueColor: '#8b8c9e'
+        })))
+      });
+    }
+
+    const owned = data.filter(x => x.owned);
+    const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
+
+    return {
+      colSets, colSetsCount: `${shown.length} shown · ${owned.length} owned`,
+      colOne: {
+        name: d.name, cover: d.cover || BLANK, artDisplay: d.cover ? 'block' : 'none',
+        meta: d.year, sections,
+        stats: [
+          { label: 'Played', value: d.owned ? '312' : '—', color: '#ecedf2' },
+          { label: 'Best hero', value: d.heroes[0].name.split(' ')[0], color: '#c4bcff' },
+          { label: 'Win rate', value: d.owned ? '54%' : '—', color: d.owned ? '#34d99b' : '#6b6c7e' }
+        ],
+        ctaLabel: d.owned ? 'In your shelf' : 'Mark as owned',
+        ctaIcon: d.owned ? 'bi-check-circle-fill' : 'bi-plus-circle',
+        ctaFg: d.owned ? '#34d99b' : '#c4bcff',
+        ctaBg: d.owned ? 'rgba(52,217,155,.1)' : 'rgba(139,125,255,.12)',
+        ctaBorder: d.owned ? 'rgba(52,217,155,.35)' : 'rgba(139,125,255,.45)'
+      },
+      colKpis: [
+        { icon: 'bi-box-seam', label: 'Sets', value: owned.length, of: `/ ${data.length}` },
+        { icon: 'bi-shield-fill', label: 'Heroes', value: sum(owned, x => x.heroes.length), of: `/ ${sum(data, x => x.heroes.length)}` },
+        { icon: 'bi-map', label: 'Maps', value: sum(owned, x => x.maps.length), of: `/ ${sum(data, x => x.maps.length)}` },
+        { icon: 'bi-eye', label: 'Villains · minions', value: `${sum(owned, x => (x.villain ? 1 : 0))} · ${sum(owned, x => (x.minions ? x.minions.reduce((a, m) => a + m.count, 0) : 0))}`, of: '' }
+      ],
+      colDirtyLabel: dirty ? `${dirty} unsaved change${dirty > 1 ? 's' : ''}` : 'All changes saved',
+      colDirtyFg: dirty ? GOLD : '#5c5d70',
+      colSave: () => this.setState(s => ({ colSaved: { ...(s.colSaved || {}), ...(s.colDraft || {}) }, colDraft: {} })),
+      colSaveIcon: dirty ? 'bi-check-lg' : 'bi-cloud-check',
+      colSaveBg: dirty ? 'linear-gradient(150deg,#6c5cff,#a855f7)' : 'transparent',
+      colSaveBorder: dirty ? 'transparent' : 'rgba(255,255,255,.08)',
+      colSaveFg: dirty ? '#fff' : '#6b6c7e',
+      colToggleOwned: () => this.setState(s => ({ colOwnedOnly: !s.colOwnedOnly })),
+      colOwnedIcon: ownedOnly ? 'bi-toggle-on' : 'bi-toggle-off',
+      colOwnedFg: ownedOnly ? '#c4bcff' : '#8b8c9e',
+      colOwnedBg: ownedOnly ? 'rgba(139,125,255,.12)' : 'transparent',
+      colOwnedBorder: ownedOnly ? 'rgba(139,125,255,.45)' : 'rgba(255,255,255,.08)',
+      navGroupsCol: [
+        { title: 'Statistics', items: [
+          { icon: 'bi-shield-fill', label: 'Heroes', count: 48 },
+          { icon: 'bi-people', label: 'Players', count: 6 },
+          { icon: 'bi-map', label: 'Maps', count: 20 },
+          { icon: 'bi-bug', label: 'Minions', count: 6 },
+          { icon: 'bi-eye', label: 'Villains', count: 2 }
+        ] },
+        { title: 'Play', items: [
+          { icon: 'bi-plus-circle', label: 'Add match', count: '' },
+          { icon: 'bi-list-ul', label: 'Match log', count: 1284 },
+          { icon: 'bi-box-seam', label: 'Collection', count: '7/10', active: true },
+          { icon: 'bi-award', label: 'Titles', count: 9 },
+          { icon: 'bi-flag', label: 'Tournaments', count: 3 }
+        ] }
+      ].map(g => ({ ...g, items: g.items.map(n => ({
+        ...n,
+        fg: n.active ? '#ffffff' : '#8b8c9e',
+        bg: n.active ? 'linear-gradient(150deg,rgba(108,92,255,.9),rgba(168,85,247,.7))' : 'transparent',
+        justify: this.state.navOpen ? 'flex-start' : 'center'
+      })) }))
+    };
+  }
+
+  renderVals() {
+    const rail = [
+      { icon: 'bi-shield-fill', label: 'Heroes', active: true },
+      { icon: 'bi-people', label: 'Players' },
+      { icon: 'bi-map', label: 'Maps' },
+      { icon: 'bi-bug', label: 'Minions' },
+      { icon: 'bi-eye', label: 'Villains' },
+      { icon: 'bi-box-seam', label: 'Collection' },
+      { icon: 'bi-list-ul', label: 'Match log' },
+      { icon: 'bi-award', label: 'Titles' },
+      { icon: 'bi-flag', label: 'Tournaments' }
+    ].map(r => ({
+      ...r,
+      fg: r.active ? '#ffffff' : '#6b6c7e',
+      bg: r.active ? 'linear-gradient(150deg,rgba(108,92,255,.9),rgba(168,85,247,.75))' : 'transparent',
+      bgFlat: r.active ? 'rgba(139,125,255,.16)' : 'transparent',
+      ring: r.active ? '0 8px 22px rgba(108,92,255,.35)' : 'none'
+    }));
+
+    const kpis = [
+      { icon: 'bi-controller', label: 'Matches', value: '1 284', delta: '+37 this week', deltaColor: '#34d99b' },
+      { icon: 'bi-shield', label: 'Heroes played', value: '42 / 48', delta: '6 unowned', deltaColor: '#8b8c9e' },
+      { icon: 'bi-people', label: 'Players', value: '6', delta: 'Ksuha on +5', deltaColor: '#34d99b' },
+      { icon: 'bi-graph-up', label: 'Avg. epic', value: '2.4', delta: 'of 3', deltaColor: '#8b8c9e' }
+    ];
+
+    const arc = pct => (188.5 * (1 - pct / 100)).toFixed(1);
+    const podium = [
+      { place: 1, name: 'Geralt of Rivia', art: A('geralt-of-rivia'), pts: 214, kd: '1.64', matches: 103, winPct: 62, hp: 18, type: 'Melee', typeIcon: 'assets/Melee.png',
+        rankColor: GOLD, arcColor: '#6c5cff', border: 'rgba(240,180,41,.4)', bg: 'linear-gradient(180deg,#1b1830,#101018)', nameSize: 22, size: 128, top: 34 },
+      { place: 2, name: 'Medusa', art: A('medusa'), pts: 186, kd: '1.41', matches: 88, winPct: 57, hp: 16, type: 'Ranged', typeIcon: 'assets/Ranged.png',
+        rankColor: SILVER, arcColor: '#a855f7', border: 'rgba(255,255,255,.14)', bg: 'linear-gradient(180deg,#181428,#101018)', nameSize: 20, size: 108, top: 42 },
+      { place: 3, name: 'King Arthur', art: A('king-arthur'), pts: 171, kd: '1.33', matches: 79, winPct: 54, hp: 17, type: 'Melee', typeIcon: 'assets/Melee.png',
+        rankColor: BRONZE, arcColor: '#8b7dff', border: 'rgba(255,255,255,.14)', bg: 'linear-gradient(180deg,#161422,#101018)', nameSize: 20, size: 108, top: 42 }
+    ].map(p => ({ ...p, dash: arc(p.winPct) }));
+
+    const base = [
+      ['Geralt of Rivia', 'geralt-of-rivia', 214, 103, 64, 39, '1.64', 'Witcher', 'Melee'],
+      ['Medusa', 'medusa', 186, 88, 50, 38, '1.41', 'Battle of Legends I', 'Ranged'],
+      ['King Arthur', 'king-arthur', 171, 79, 43, 36, '1.33', 'Battle of Legends I', 'Melee'],
+      ['Sherlock Holmes', 'sherlock-holmes', 154, 74, 39, 35, '1.21', 'Cobble & Fog', 'Ranged'],
+      ['Tomoe Gozen', 'tomoe-gozen', 142, 71, 37, 34, '1.16', 'Battle of Legends II', 'Melee'],
+      ['Achilles', 'achilles', 118, 66, 33, 33, '1.02', 'Battle of Legends II', 'Melee'],
+      ['Alice', 'alice', 96, 61, 29, 32, '0.94', 'Battle of Legends I', 'Melee'],
+      ['Dracula', 'dracula', 74, 58, 26, 32, '0.87', 'Cobble & Fog', 'Melee'],
+      ['Robin Hood', 'robin-hood', 41, 52, 22, 30, '0.78', 'Robin Hood vs Bigfoot', 'Ranged'],
+      ['Bigfoot', 'bigfoot', -18, 47, 18, 29, '0.66', 'Robin Hood vs Bigfoot', 'Melee']
+    ].map((r, i) => {
+      const [name, file, pts, matches, wins, losses, kd, set, type] = r;
+      const place = i + 1;
+      return {
+        place: String(place).padStart(2, '0'), name, art: A(file), pts, matches, wins, losses, kd, set, type,
+        typeIcon: type === 'Melee' ? 'assets/Melee.png' : 'assets/Ranged.png',
+        winPct: Math.round((wins / matches) * 100),
+        rankColor: place === 1 ? GOLD : place === 2 ? SILVER : place === 3 ? BRONZE : '#8b8c9e',
+        ptsColor: pts < 0 ? '#f2506b' : place <= 3 ? '#c4bcff' : '#ecedf2',
+        kdColor: parseFloat(kd) >= 1 ? '#34d99b' : '#f2506b',
+        edge: place === 1 ? GOLD : place === 2 ? SILVER : place === 3 ? BRONZE : pts < 0 ? 'rgba(242,80,107,.7)' : 'rgba(255,255,255,.09)',
+        rowBg: place <= 3 ? 'rgba(139,125,255,.07)' : pts < 0 ? 'rgba(242,80,107,.05)' : 'rgba(255,255,255,.025)',
+        rowBorder: place <= 3 ? 'rgba(139,125,255,.2)' : 'rgba(255,255,255,.06)',
+        glow: ['rgba(108,92,255,.3)', 'rgba(168,85,247,.28)', 'rgba(139,125,255,.24)', 'rgba(96,165,250,.2)', 'rgba(52,217,155,.16)'][i % 5]
+      };
+    });
+
+    const radar = (a, d, t, f) => {
+      const r = v => 14 + (46 * v) / 3;
+      return `60,${60 - r(a)} ${60 + r(d)},60 60,${60 + r(t)} ${60 - r(f)},60`;
+    };
+
+    const form = ['W', 'W', 'L', 'W', 'W', 'W', 'L', 'W', 'W', 'L', 'W', 'W'].map(r => ({
+      r, bg: r === 'W' ? 'rgba(52,217,155,.18)' : 'rgba(242,80,107,.18)', fg: r === 'W' ? '#34d99b' : '#f2506b'
+    }));
+
+    const spark = [3, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15];
+    const sparkPoints = spark.map((v, i) => `${(i * 240) / (spark.length - 1)},${58 - (v / 16) * 52}`).join(' ');
+
+    const matchRows = [
+      ['12 Jul 2026', 'Geralt of Rivia', 'ksuha', 'Medusa', 'vados', 'Kaer Morhen', '★★★', true],
+      ['12 Jul 2026', 'Sherlock Holmes', 'andrii', 'Dracula', 'zheka', 'London', '★★☆', false],
+      ['09 Jul 2026', 'King Arthur', 'oleksandr', 'Alice', 'tetyana', 'Castle', '★★★', true],
+      ['09 Jul 2026', 'Tomoe Gozen', 'tetyana', 'Achilles', 'andrii', 'Tavern', '★☆☆', false],
+      ['05 Jul 2026', 'Medusa', 'vados', 'Bigfoot', 'zheka', 'Kaer Morhen', '★★☆', true]
+    ].map(([date, a, ap, b, bp, map, epic, aWon]) => ({
+      date, a, b, map, epic, aAvatar: P(ap), bAvatar: P(bp),
+      aColor: aWon ? '#34d99b' : '#f2506b', bColor: aWon ? '#f2506b' : '#34d99b',
+      edge: aWon ? 'rgba(52,217,155,.6)' : 'rgba(242,80,107,.6)',
+      bg: aWon ? 'rgba(52,217,155,.045)' : 'rgba(242,80,107,.045)'
+    }));
+
+    const heatVals = [78, 64, 55, 41, 33, 60, 72, 50, 45, 58, 66, 30, 48, 70, 52, 61, 39, 57, 63, 44, 36, 68, 54, 47, 59, 42, 71, 35, 66, 49, 53, 62];
+    const heat = heatVals.map((v, i) => ({
+      title: `${v}% win`,
+      bg: v >= 50
+        ? `rgba(52,217,155,${(0.14 + ((v - 50) / 50) * 0.6).toFixed(2)})`
+        : `rgba(242,80,107,${(0.14 + ((50 - v) / 50) * 0.6).toFixed(2)})`
+    }));
+
+    const sets = [
+      ['Battle of Legends I', 'owned', true], ['Cobble & Fog', 'owned', true], ['Witcher', 'owned', true],
+      ['Jurassic Park', 'owned', true], ['Marvel: Teen Spirit', 'missing', false], ['Deadpool', 'missing', false]
+    ].map(([name, tag, owned]) => ({
+      name, tag, owned,
+      border: owned ? 'rgba(139,125,255,.28)' : 'rgba(255,255,255,.07)',
+      bg: owned ? 'rgba(139,125,255,.08)' : 'rgba(255,255,255,.02)',
+      tagColor: owned ? '#8b7dff' : '#6b6c7e',
+      opacity: owned ? 1 : 0.55
+    }));
+
+    return {
+      ...this.detailVals(),
+      ...this.collectionVals(),
+      ...this.playerVals(),
+      ...this.matchupsVals(),
+      ...this.addMatchVals(),
+      ...this.matchLogVals(),
+      rail, kpis, podium,
+      heroes: base.slice(0, 8),
+      ladder: base,
+      rail5: base.slice(1, 6),
+      navStats: [
+        { icon: 'bi-shield', label: 'Heroes', count: 48, active: true },
+        { icon: 'bi-people', label: 'Players', count: 6 },
+        { icon: 'bi-map', label: 'Maps', count: 20 },
+        { icon: 'bi-bug', label: 'Minions', count: 6 },
+        { icon: 'bi-eye', label: 'Villains', count: 2 }
+      ].map(n => ({ ...n, fg: n.active ? '#ffffff' : '#8b8c9e', bg: n.active ? 'rgba(108,92,255,.18)' : 'transparent' })),
+      navPlay: [
+        { icon: 'bi-list-ul', label: 'Match log' },
+        { icon: 'bi-box-seam', label: 'Collection' },
+        { icon: 'bi-award', label: 'Titles' },
+        { icon: 'bi-flag', label: 'Tournaments' }
+      ],
+      spotlightDash: (301.6 * (1 - 62 / 100)).toFixed(1),
+      radarPoints: radar(3, 2, 2, 3),
+      radarPoints2: radar(2, 1, 3, 2),
+      form, sparkPoints,
+      matches: matchRows,
+      heat, sets,
+      miniStats: [
+        { label: 'Top win rate', value: '62%', color: '#34d99b' },
+        { label: 'Most played', value: 'Geralt', color: '#ecedf2' },
+        { label: 'Coldest', value: 'Bigfoot', color: '#f2506b' }
+      ],
+      tabs: [
+        { label: 'Points', active: true }, { label: 'Win rate' }, { label: 'K/D' }, { label: 'Recently played' }
+      ].map(t => ({ ...t, fg: t.active ? '#ecedf2' : '#8b8c9e', edge: t.active ? '#8b7dff' : 'rgba(255,255,255,.07)' })),
+      pages: [1, 2, 3, 4].map(n => ({
+        n, bg: n === 1 ? 'rgba(139,125,255,.18)' : '#14141c',
+        border: n === 1 ? 'rgba(139,125,255,.4)' : 'rgba(255,255,255,.08)',
+        fg: n === 1 ? '#c4bcff' : '#8b8c9e'
+      })),
+      sideStats: [
+        { label: 'PTS', value: 186, color: '#c4bcff' },
+        { label: 'WR', value: '57%', color: '#34d99b' },
+        { label: 'HP', value: 16, color: '#ecedf2' },
+        { label: 'DECK', value: 30, color: '#ecedf2' }
+      ],
+      matchups: [
+        ['Alice', 'alice', 78, '#34d99b'], ['Dracula', 'dracula', 66, '#34d99b'],
+        ['King Arthur', 'king-arthur', 52, '#c9cad6'], ['Sherlock Holmes', 'sherlock-holmes', 38, '#f2506b'],
+        ['Geralt of Rivia', 'geralt-of-rivia', 29, '#f2506b']
+      ].map(([name, file, pct, color]) => ({ name, art: A(file), pct, color }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+@*
+    The label-over-number tile. `card` is the bordered version behind the hero banner
+    (PLACE / POINTS / HP / DECK SIZE); `inset` is the smaller one used inside panels.
+*@
+<div class="um-stat um-stat-@Variant @Class">
+    <div class="um-stat-label">@Label</div>
+    <div class="um-stat-value" style="@(ValueColor is null ? null : $"color:{ValueColor}")">@Value</div>
+    @if (!string.IsNullOrEmpty(Sub))
+    {
+        <div class="um-stat-sub">@Sub</div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = string.Empty;
+
+    /// <summary>card | inset</summary>
+    [Parameter]
+    public string Variant { get; set; } = "card";
+
+    [Parameter]
+    public string? ValueColor { get; set; }
+
+    /// <summary>Optional caption under the value, e.g. "18 heroes played".</summary>
+    [Parameter]
+    public string? Sub { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

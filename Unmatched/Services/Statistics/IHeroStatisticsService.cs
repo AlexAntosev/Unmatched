@@ -12,4 +12,6 @@ public interface IHeroStatisticsService
     Task<IEnumerable<UiMatchLogDto>> GetHeroMatchesAsync(Guid heroId);
 
     Task<List<RatingChangeDto>> GetRatingChangesAsync(Guid heroId);
+
+    Task<string> UpdateImageAsync(Guid heroId, string imageFileName);
 }

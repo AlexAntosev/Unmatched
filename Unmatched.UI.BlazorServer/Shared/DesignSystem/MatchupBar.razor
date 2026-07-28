@@ -1,0 +1,47 @@
+@*
+    One line of the best/worst matchups list: opponent art, name, a win-rate bar and the figure.
+    Green above 50%, red below, neutral grey at exactly even.
+*@
+<div class="um-matchup @Class">
+    <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="@TokenSize" Radius="7"/>
+    <span class="um-matchup-name">@Name</span>
+    @if (Meta is not null)
+    {
+        <span class="um-matchup-meta">@Meta</span>
+    }
+    <div class="um-matchup-track" style="@($"width:{BarWidth}px")">
+        <div class="um-matchup-fill" style="width:@Percent%;background:@Color"></div>
+    </div>
+    <span class="um-matchup-value" style="color:@Color">@Percent%</span>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public int Percent { get; set; }
+
+    /// <summary>Caption between the name and the bar, e.g. "14 met".</summary>
+    [Parameter]
+    public string? Meta { get; set; }
+
+    [Parameter]
+    public int TokenSize { get; set; } = 26;
+
+    [Parameter]
+    public int BarWidth { get; set; } = 74;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string Color => Percent switch
+    {
+        > 50 => "var(--um-win)",
+        < 50 => "var(--um-loss)",
+        _ => "var(--um-text-bright)"
+    };
+}

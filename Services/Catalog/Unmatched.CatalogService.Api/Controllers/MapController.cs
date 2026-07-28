@@ -26,4 +26,11 @@ public class MapController(IMapper mapper, IMapService mapService) : ControllerB
         var result = mapper.Map<MapDto>(hero);
         return result;
     }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<MapDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var map = await mapService.UpdateImageAsync(id, imageFileName);
+        return map is null ? NotFound() : Ok(mapper.Map<MapDto>(map));
+    }
 }

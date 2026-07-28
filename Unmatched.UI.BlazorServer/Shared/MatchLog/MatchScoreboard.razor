@@ -1,0 +1,118 @@
+@using Unmatched.Dtos
+@using Unmatched.Services.Statistics
+@inject NavigationManager NavManager
+@*
+    The expanded half of a 3b row: every participant, villain and minions included. The Side column
+    only appears where the sides have names (2v2 and co-op) - never for 1v1 or free-for-all.
+
+    Never shows items used, actions made or time spent: the app does not track them.
+*@
+<div class="scoreboard">
+    <div class="scoreboard-head" style="@GridStyle">
+        <div>Participant</div>
+        @if (_hasSides)
+        {
+            <div>Side</div>
+        }
+        <div class="scoreboard-right">HP left</div>
+        <div class="scoreboard-right">Cards</div>
+        <div class="scoreboard-right">Sidekick</div>
+    </div>
+    @foreach (var entry in _entries)
+    {
+        var participant = entry.Participant;
+        <div class="scoreboard-row @(participant.IsWinner ? null : "is-loser")" style="@GridStyle">
+            <div class="scoreboard-participant" style="padding-left:@(entry.IsIndented ? "20px" : "0")">
+                <div class="scoreboard-art">
+                    <HeroToken ImageUrl="@participant.ImageUrl" Alt="@participant.Name"
+                               Size="@(entry.IsIndented ? 26 : 30)" Radius="8"/>
+                    @if (participant.Place is not null)
+                    {
+                        <span class="scoreboard-place" style="color:@PlaceColor.For(participant.Place)">@participant.Place</span>
+                    }
+                </div>
+                <div class="scoreboard-names">
+                    <div class="scoreboard-name">@participant.Name</div>
+                    <div class="scoreboard-sub">@SubLabel(participant)</div>
+                </div>
+                @if (participant.PlayerImageUrl is not null)
+                {
+                    <HeroToken ImageUrl="@participant.PlayerImageUrl" Alt="@participant.PlayerName"
+                               Size="20" Round="true" Opacity="0.85"/>
+                }
+            </div>
+            @if (_hasSides)
+            {
+                <div class="scoreboard-side" style="color:@SideColor(entry.SideLabel)">@entry.SideLabel</div>
+            }
+            <div class="scoreboard-right scoreboard-hp" style="color:@(participant.IsWinner ? "var(--um-win)" : "var(--um-loss)")">
+                @Value(participant.HpLeft)
+            </div>
+            <div class="scoreboard-right scoreboard-cards">@Value(participant.CardsLeft)</div>
+            <div class="scoreboard-right scoreboard-sidekick">@Sidekick(participant)</div>
+        </div>
+    }
+    <div class="scoreboard-footer">
+        <div class="scoreboard-footer-epic">
+            <span class="scoreboard-footer-label">Epic</span>
+            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="15"/>
+        </div>
+        <div class="scoreboard-footer-divider"></div>
+        <div class="scoreboard-footer-comment">
+            <span class="scoreboard-footer-label">Comment</span>
+            <span class="scoreboard-footer-comment-text @(HasComment ? null : "is-empty")">
+                @(HasComment ? Match.Comment : "No comment on this match.")
+            </span>
+        </div>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Icon="bi-pencil" OnClick="GoToEditMatch">Edit match</UmButton>
+    </div>
+</div>
+
+@code {
+    private const string Dash = "–";
+
+    private IReadOnlyList<ScoreboardEntry> _entries = [];
+    private bool _hasSides;
+
+    [Parameter, EditorRequired]
+    public UiMatchLogDto Match { get; set; } = default!;
+
+    private bool HasComment => !string.IsNullOrWhiteSpace(Match.Comment);
+
+    private void GoToEditMatch() => NavManager.NavigateTo($"{Urls.Match}/{Match.MatchId}");
+
+    private string GridStyle
+        => _hasSides
+            ? "grid-template-columns:1fr 68px 56px 52px 118px"
+            : "grid-template-columns:1fr 56px 52px 118px";
+
+    protected override void OnParametersSet()
+    {
+        _entries = MatchPresentation.Scoreboard(Match);
+        _hasSides = _entries.Any(e => e.SideLabel is not null);
+    }
+
+    private static string SubLabel(MatchParticipant participant)
+        => participant.Kind switch
+        {
+            ParticipantKind.Villain => "Villain",
+            ParticipantKind.Minion => "Minion",
+            _ => participant.PlayerName ?? string.Empty
+        };
+
+    private static string SideColor(string? label)
+        => label switch
+        {
+            "Villains" => "var(--um-info)",
+            "Team 2" => "var(--um-mode-2v2)",
+            _ => "var(--um-accent-soft)"
+        };
+
+    private static string Value(int? value) => value?.ToString() ?? Dash;
+
+    private static string Sidekick(MatchParticipant participant)
+        => participant.SidekickName is null
+            ? Dash
+            : $"{participant.SidekickName} · {participant.SidekickHp ?? 0}hp";
+}

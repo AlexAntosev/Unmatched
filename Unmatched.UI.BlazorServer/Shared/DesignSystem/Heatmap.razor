@@ -1,0 +1,33 @@
+@*
+    A win/loss grid. Positive cells shade green, negative red, and the intensity tracks the
+    magnitude - the same two hues the rest of the app uses for results.
+*@
+<div class="um-heatmap @Class" style="@($"grid-template-columns:repeat({Columns},1fr)")">
+    @foreach (var cell in Cells)
+    {
+        <div class="um-heatmap-cell" title="@cell.Title" style="@($"background:{CellColor(cell.Value)}")"></div>
+    }
+</div>
+
+@code {
+    /// <summary>A single square: <paramref name="Value"/> runs -1 (all losses) to 1 (all wins).</summary>
+    public record Cell(double Value, string? Title = null);
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Cell> Cells { get; set; } = Array.Empty<Cell>();
+
+    [Parameter]
+    public int Columns { get; set; } = 8;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private static string CellColor(double value)
+    {
+        var magnitude = Math.Clamp(Math.Abs(value), 0, 1);
+        var alpha = (0.08 + magnitude * 0.5).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        return value >= 0
+            ? $"rgba(52,217,155,{alpha})"
+            : $"rgba(242,80,107,{alpha})";
+    }
+}

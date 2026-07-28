@@ -8,6 +8,7 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 /// <summary>
 /// Rating math is stateful and sequential: each match's handicap bonus depends on the hero ratings
@@ -88,7 +89,7 @@ public class BackdatedMatchRatingTests
         unitOfWork.Setup(u => u.Matches).Returns(matchRepository.Object);
         unitOfWork.Setup(u => u.Ratings).Returns(ratingRepository);
 
-        var handler = new GoldenHalatLeagueMatchHandler(unitOfWork.Object, new RatingCalculator(unitOfWork.Object, catalogHeroCache.Object));
+        var handler = new GoldenHalatLeagueMatchHandler(unitOfWork.Object, new GameModeValidatorFactory(), new RatingCalculator(unitOfWork.Object, catalogHeroCache.Object));
 
         foreach (var match in matches)
         {

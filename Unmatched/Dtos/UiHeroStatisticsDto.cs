@@ -28,7 +28,7 @@ public class UiHeroStatisticsDto : IComparable<UiHeroStatisticsDto>
 
     public string Color { get; set; }
 
-    public int Place { get; set; }
+    public int? Place { get; set; }
 
     public int Points { get; set; }
 

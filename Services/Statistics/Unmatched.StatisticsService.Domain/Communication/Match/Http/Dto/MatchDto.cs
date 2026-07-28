@@ -21,4 +21,8 @@ public class MatchDto
     public Stage? Stage { get; set; }
 
     public Guid? TournamentId { get; set; }
+
+    public GameMode GameMode { get; set; }
+
+    public MatchVillainDto? Villain { get; set; }
 }

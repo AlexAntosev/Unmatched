@@ -26,4 +26,11 @@ public class MapController(ILogger<MapController> logger, IMapStatisticsService 
         var result = stats.Select(mapper.Map<MapStatsDto>).ToList();
         return Ok(result);
     }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<MapStatsDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var stats = await mapService.UpdateImageAsync(id, imageFileName);
+        return stats is null ? NotFound() : Ok(mapper.Map<MapStatsDto>(stats));
+    }
 }

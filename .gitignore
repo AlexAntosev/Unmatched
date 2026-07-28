@@ -6,3 +6,4 @@ riderModule.iml
 /.vs/
 /Unmatched.UI.BlazorServer/Unmatched.UI.BlazorServer.csproj.user
 /.env
+/data/minio/

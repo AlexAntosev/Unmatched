@@ -1,0 +1,45 @@
+@*
+    The 20px checkbox from the design system. `Accent` recolours the border and fill so the
+    collection can show a pending change in gold without a second component.
+*@
+<button type="button"
+        class="um-checkbox @(Checked ? "is-checked" : null) @Class"
+        style="@AccentStyle"
+        title="@Title"
+        @onclick="ToggleAsync"
+        @onclick:stopPropagation="StopPropagation">
+    @if (Checked)
+    {
+        <i class="bi bi-check-lg"></i>
+    }
+</button>
+
+@code {
+    [Parameter]
+    public bool Checked { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> CheckedChanged { get; set; }
+
+    /// <summary>Overrides the green fill, e.g. gold for an unsaved change.</summary>
+    [Parameter]
+    public string? Accent { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>Set when the checkbox sits on a clickable card that must not react to it.</summary>
+    [Parameter]
+    public bool StopPropagation { get; set; }
+
+    private string? AccentStyle => Accent is null ? null : $"--um-checkbox-accent:{Accent}";
+
+    private Task ToggleAsync()
+    {
+        Checked = !Checked;
+        return CheckedChanged.InvokeAsync(Checked);
+    }
+}

@@ -1,0 +1,142 @@
+.um-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid transparent;
+    border-radius: var(--um-radius-sm);
+    background: none;
+    font: 500 12.5px var(--um-font-body);
+    color: var(--um-text-bright);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+}
+
+.um-btn i {
+    font-size: 11px;
+    line-height: 1;
+}
+
+.um-btn:disabled {
+    cursor: default;
+    color: var(--um-text-faint);
+}
+
+/* ---- Sizes ---- */
+
+.um-btn-md {
+    height: var(--um-height-field);
+    padding: 0 14px;
+    border-radius: 10px;
+}
+
+.um-btn-sm {
+    height: var(--um-height-control);
+    padding: 0 12px;
+}
+
+.um-btn-xs {
+    height: 26px;
+    padding: 0 9px;
+    font-size: 11.5px;
+}
+
+/* ---- Variants ---- */
+
+.um-btn-primary {
+    background: var(--um-gradient-primary);
+    color: var(--um-text-on-accent);
+    font-weight: 600;
+    padding: 0 16px;
+}
+
+.um-btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.um-btn-primary:disabled {
+    background: var(--um-bg-hover);
+    color: var(--um-text-faint);
+}
+
+.um-btn-outline {
+    border-color: var(--um-border);
+}
+
+.um-btn-outline:hover:not(:disabled) {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
+}
+
+.um-btn-ghost {
+    color: var(--um-text-muted);
+}
+
+.um-btn-ghost:hover:not(:disabled) {
+    color: var(--um-text);
+    background: var(--um-bg-hover);
+}
+
+.um-btn-danger {
+    border-color: rgba(242, 80, 107, 0.35);
+    color: var(--um-loss);
+}
+
+.um-btn-danger:hover:not(:disabled) {
+    background: var(--um-loss-wash);
+}
+
+/* Square icon-only buttons ignore the size paddings and go fully square. */
+.um-btn-icon,
+.um-btn-dice {
+    padding: 0;
+    gap: 0;
+}
+
+.um-btn-icon.um-btn-md,
+.um-btn-dice.um-btn-md {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--um-radius-md);
+}
+
+.um-btn-icon.um-btn-sm,
+.um-btn-dice.um-btn-sm {
+    width: var(--um-height-control);
+    height: var(--um-height-control);
+    border-radius: var(--um-radius-md);
+}
+
+.um-btn-icon.um-btn-xs,
+.um-btn-dice.um-btn-xs {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+}
+
+.um-btn-icon {
+    border-color: var(--um-border);
+    color: var(--um-text-muted);
+}
+
+.um-btn-icon:hover:not(:disabled) {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
+}
+
+.um-btn-icon i,
+.um-btn-dice i {
+    font-size: 13px;
+}
+
+/* The violet dice appears everywhere a hero or map can be randomized. */
+.um-btn-dice {
+    background: rgba(139, 125, 255, 0.14);
+    border-color: rgba(139, 125, 255, 0.35);
+    color: var(--um-accent-text);
+}
+
+.um-btn-dice:hover:not(:disabled) {
+    background: rgba(139, 125, 255, 0.24);
+}

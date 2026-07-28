@@ -22,6 +22,10 @@ public interface IMatchService
 
     Task<IEnumerable<MatchLog>> GetFinishedByPlayerAsync(Guid playerId);
 
+    Task<IEnumerable<MatchLog>> GetFinishedByVillainAsync(Guid villainId);
+
+    Task<IEnumerable<MatchLog>> GetFinishedByMinionAsync(Guid minionId);
+
     Task<IEnumerable<MatchLog>> GetMatchLogAsync();
 
     Task UpdateEpicAsync(Guid matchId, int epic);

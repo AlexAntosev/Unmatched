@@ -6,6 +6,7 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class GoldenHalatLeagueMatchHandlerTests
 {
@@ -21,7 +22,7 @@ public class GoldenHalatLeagueMatchHandlerTests
         _unitOfWork.Setup(uow => uow.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(uow => uow.Ratings).Returns(_ratingRepository.Object);
         
-        _handler = new GoldenHalatLeagueMatchHandler(_unitOfWork.Object, _ratingCalculator.Object);
+        _handler = new GoldenHalatLeagueMatchHandler(_unitOfWork.Object, new GameModeValidatorFactory(), _ratingCalculator.Object);
     }
     
     [Fact]

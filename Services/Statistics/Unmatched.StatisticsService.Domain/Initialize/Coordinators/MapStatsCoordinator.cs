@@ -53,7 +53,7 @@ public class MapStatsCoordinator(
     {
         Logger.LogInformation("Data initialization requested.");
         Logger.LogInformation("Clearing Map statistics...");
-        await UnitOfWork.HeroStats.DeleteAllAsync();
+        await UnitOfWork.MapStats.DeleteAllAsync();
 
         var maps = await catalogMapCache.GetAsync();
         var orderedMatches = matches.OrderByDescending(x => x.Date);

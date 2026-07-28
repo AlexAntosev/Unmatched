@@ -1,0 +1,30 @@
+.um-checkbox {
+    --um-checkbox-accent: var(--um-win);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex: none;
+    padding: 0;
+    border: 1.5px solid var(--um-border-strong);
+    border-radius: var(--um-radius-chip);
+    background: rgba(12, 12, 17, 0.75);
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.um-checkbox:hover {
+    border-color: var(--um-checkbox-accent);
+}
+
+.um-checkbox.is-checked {
+    background: var(--um-checkbox-accent);
+    border-color: var(--um-checkbox-accent);
+}
+
+.um-checkbox i {
+    font-size: 12px;
+    color: var(--um-bg-app);
+}

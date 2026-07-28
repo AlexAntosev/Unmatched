@@ -19,4 +19,7 @@ public class CatalogHeroDto
     public IEnumerable<CatalogSidekickDto> Sidekicks { get; set; }
 
     public string? ImageFileName { get; set; }
+
+    /// <summary>Which box the hero ships in - used to roll hero stats up per expansion.</summary>
+    public Guid? ExpansionId { get; set; }
 }

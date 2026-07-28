@@ -21,4 +21,8 @@ public class UiMatchDto
     public Stage? Stage { get; set; }
 
     public int? Epic { get; set; }
+
+    public GameMode GameMode { get; set; }
+
+    public UiMatchVillainDto? Villain { get; set; }
 }

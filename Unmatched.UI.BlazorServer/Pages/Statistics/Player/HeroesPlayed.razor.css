@@ -1,0 +1,129 @@
+.hp-main-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--um-radius-chip);
+    background: var(--um-gold-bg);
+    border: 1px solid rgba(240, 180, 41, 0.35);
+    font: 600 10px var(--um-font-mono);
+    letter-spacing: 0.06em;
+    color: var(--um-gold);
+    white-space: nowrap;
+}
+
+.hp-main-chip i {
+    font-size: 10px;
+}
+
+::deep .hp-filter {
+    width: 190px;
+}
+
+.hp-count {
+    flex: none;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.hp-empty {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.hp-right {
+    text-align: right;
+}
+
+.hp-center {
+    text-align: center;
+}
+
+.hp-list {
+    display: flex;
+    flex-direction: column;
+    max-height: 430px;
+    overflow-y: auto;
+}
+
+.hp-row {
+    display: grid;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--um-border-soft);
+}
+
+.hp-row:last-child {
+    border-bottom: none;
+}
+
+.hp-row.is-main {
+    background: rgba(240, 180, 41, 0.05);
+}
+
+.hp-row.is-main ::deep .um-token {
+    border-color: var(--um-gold);
+}
+
+.hp-hero {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.hp-hero-name {
+    font: 600 12.5px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.hp-hero-name:hover {
+    color: var(--um-accent-text);
+}
+
+.hp-matches {
+    font: 400 12px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.hp-winrate,
+.hp-kd {
+    font: 600 12px var(--um-font-mono);
+}
+
+.hp-main-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin: 0 auto;
+    border: 1px solid transparent;
+    border-radius: var(--um-radius-sm);
+    background: none;
+    color: var(--um-text-faint);
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.hp-main-btn:hover {
+    background: var(--um-bg-hover);
+    color: var(--um-text-muted);
+}
+
+.hp-main-btn.is-active {
+    background: var(--um-gold-bg);
+    border-color: rgba(240, 180, 41, 0.45);
+    color: var(--um-gold);
+}
+
+.hp-footnote {
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+}

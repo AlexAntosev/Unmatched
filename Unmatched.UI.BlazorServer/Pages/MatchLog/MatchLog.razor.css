@@ -1,0 +1,36 @@
+.log-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 18px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+}
+
+.log-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 14px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+}
+
+.log-filters-divider {
+    width: 1px;
+    height: 22px;
+    background: var(--um-border);
+}
+
+.log-count {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.log-body {
+    padding: 18px var(--um-page-padding-x) 22px;
+}
+
+.um-spacer {
+    flex: 1;
+}

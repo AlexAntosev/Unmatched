@@ -1,16 +1,12 @@
-﻿@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
 @using BlazorBootstrap
 
 <PageTitle>Unmatched</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
-    
-    <Preload LoadingText="Loading..." />
-
-    <main>
+<div class="shell">
+    <NavRail/>
+    <Preload LoadingText="Loading..."/>
+    <main class="shell-main">
         @Body
     </main>
 </div>

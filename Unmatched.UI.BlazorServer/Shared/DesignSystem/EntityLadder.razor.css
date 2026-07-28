@@ -1,0 +1,36 @@
+.entity-ladder {
+    display: flex;
+    flex-direction: column;
+    padding: 22px var(--um-page-padding-x) var(--um-page-padding-x);
+}
+
+.entity-ladder-head {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.entity-ladder-lede {
+    margin-top: 6px;
+    font: 400 12px/1.5 var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.entity-ladder-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.entity-ladder-empty {
+    padding: 28px 16px;
+    text-align: center;
+    font: 400 12.5px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.entity-ladder-pagination {
+    justify-content: center;
+    margin-top: 12px;
+}

@@ -38,6 +38,13 @@ public class HeroController(IMapper mapper, IHeroService heroService, IPlayStyle
 
 
 
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<HeroDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var hero = await heroService.UpdateImageAsync(id, imageFileName);
+        return hero is null ? NotFound() : Ok(mapper.Map<HeroDto>(hero));
+    }
+
     [HttpPut("{heroId}/playstyle")]
     public async Task<ActionResult<Guid>> UpdatePlayStyle(Guid heroId, [FromBody] PlayStyleDto playStyle)
     {

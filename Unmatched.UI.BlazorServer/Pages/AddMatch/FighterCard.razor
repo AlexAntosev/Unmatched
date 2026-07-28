@@ -1,0 +1,137 @@
+@using Unmatched.Dtos
+@using Unmatched.Extensions
+@inject NotificationService NotificationService
+@*
+    One fighter inside a side box on screen 4b. The form records only what the app actually keeps:
+    player, hero, HP left, cards left, sidekick HP and - in free-for-all - the place.
+
+    Turn stays as a compact 1/2 switch: it is not on the mock, but the match service orders
+    fighters and generates tournament pairings by it.
+*@
+<div class="fighter">
+    <HeroToken ImageUrl="@Fighter.HeroImageUrl" Alt="@Fighter.Hero?.Name" Size="44" Radius="11"/>
+
+    <div class="fighter-selects">
+        <UmSelect TValue="Guid" Variant="chip" AvatarUrl="@Fighter.PlayerImageUrl"
+                  Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged" Options="PlayerOptions()"/>
+        <UmSelect TValue="Guid" Variant="chip" Highlighted="true"
+                  Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero" Options="HeroOptions()"/>
+    </div>
+
+    <div class="fighter-stats">
+        @if (ShowPlace)
+        {
+            <UmField Label="Place" Class="fighter-place">
+                <UmSelect TValue="int?" Variant="chip" Icon="bi-award"
+                          Value="Fighter.Placement" ValueChanged="OnPlacementChanged" Options="PlaceOptions()"/>
+            </UmField>
+        }
+        @if (ShowTurn)
+        {
+            <UmField Label="Turn" Class="fighter-narrow">
+                <UmSelect TValue="int?" Variant="chip" Value="Fighter.Turn" ValueChanged="OnTurnChanged" Options="TurnOptions"/>
+            </UmField>
+        }
+        <UmField Label="HP" Class="fighter-narrow">
+            <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.HpLeft?.ToString()"
+                         ValueChanged="@(v => Fighter.HpLeft = ParseInt(v))"/>
+        </UmField>
+        <UmField Label="Cards" Class="fighter-narrow">
+            <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.CardsLeft?.ToString()"
+                         ValueChanged="@(v => Fighter.CardsLeft = ParseInt(v))"/>
+        </UmField>
+        <UmField Label="Sidekick" Class="fighter-narrow">
+            <UmTextField Type="number" Variant="xs" Centered="true" Disabled="@(Fighter.SidekickName is null)"
+                         Value="@Fighter.SidekickHpLeft?.ToString()"
+                         ValueChanged="@(v => Fighter.SidekickHpLeft = ParseInt(v))"/>
+        </UmField>
+        @if (OnRemove.HasDelegate)
+        {
+            <button type="button" class="fighter-remove" title="Remove player" @onclick="OnRemove">
+                <i class="bi bi-trash3"></i>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<SelectOption<int?>> TurnOptions = [new(1, "1"), new(2, "2")];
+
+    [Parameter, EditorRequired]
+    public UiFighterDto Fighter { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<UiPlayerDto> Players { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<UiHeroDto> Heroes { get; set; } = [];
+
+    [Parameter]
+    public bool ShowPlace { get; set; }
+
+    [Parameter]
+    public bool ShowTurn { get; set; }
+
+    [Parameter]
+    public int MaxPlace { get; set; } = 4;
+
+    [Parameter]
+    public EventCallback OnRemove { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private static int? ParseInt(string? value) => int.TryParse(value, out var parsed) ? parsed : null;
+
+    private IReadOnlyList<SelectOption<Guid>> PlayerOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Player…") }
+            .Concat(Players.Select(p => new SelectOption<Guid>(p.Id, p.Name ?? "Unknown", AvatarUrl: p.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<Guid>> HeroOptions()
+        => new SelectOption<Guid>[] { new(Guid.Empty, "Hero…") }
+            .Concat(Heroes.Select(h => new SelectOption<Guid>(h.Id, h.Name, ArtUrl: h.ImageUrl)))
+            .ToList();
+
+    private IReadOnlyList<SelectOption<int?>> PlaceOptions()
+        => Enumerable.Range(1, MaxPlace).Select(place => new SelectOption<int?>(place, place.ToString())).ToList();
+
+    private Task OnPlayerChanged(Guid playerId)
+    {
+        Fighter.PlayerId = playerId;
+        Fighter.Player = Players.FirstOrDefault(p => p.Id == playerId);
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task OnHeroChanged(Guid heroId)
+    {
+        SetHero(Heroes.FirstOrDefault(h => h.Id == heroId));
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task OnPlacementChanged(int? placement)
+    {
+        Fighter.Placement = placement;
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task OnTurnChanged(int? turn)
+    {
+        Fighter.Turn = turn;
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task RandomizeHero()
+    {
+        SetHero(Heroes.ToList().GetRandomItem());
+        return OnChanged.InvokeAsync();
+    }
+
+    /// <summary>Picking a hero refills HP, cards and sidekick HP from that hero's profile.</summary>
+    private void SetHero(UiHeroDto? hero)
+    {
+        Fighter.Hero = hero;
+        Fighter.HeroId = hero?.Id ?? Guid.Empty;
+        Fighter.SetDefaultData();
+    }
+}

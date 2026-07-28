@@ -132,6 +132,30 @@ public class TitleServiceTests : IDisposable
         Assert.False(result.Single(h => h.Id == unassignedHeroId).IsAssigned);
     }
 
+    [Fact]
+    public async Task GetByHeroAsync_ReturnsEveryTitleTheHeroHolds()
+    {
+        var heroId = Guid.NewGuid();
+        var streakId = await SeedTitleAsync("Streak");
+        var punisherId = await SeedTitleAsync("Punisher");
+        await SeedTitleAsync("Rusher");
+        await _titleService.MergeAsync(streakId, new[] { heroId });
+        await _titleService.MergeAsync(punisherId, new[] { heroId });
+
+        var titles = (await _titleService.GetByHeroAsync(heroId)).Select(t => t.Name).Order().ToList();
+
+        Assert.Equal(new[] { "Punisher", "Streak" }, titles);
+    }
+
+    [Fact]
+    public async Task GetByHeroAsync_HeroWithoutTitles_ReturnsNothing()
+    {
+        var titleId = await SeedTitleAsync("Streak");
+        await _titleService.MergeAsync(titleId, new[] { Guid.NewGuid() });
+
+        Assert.Empty(await _titleService.GetByHeroAsync(Guid.NewGuid()));
+    }
+
     private async Task<Guid> SeedTitleAsync(string name)
     {
         var entity = new TitleEntity { Id = Guid.NewGuid(), Name = name, Comment = string.Empty, HeroTitles = new List<HeroTitleEntity>() };

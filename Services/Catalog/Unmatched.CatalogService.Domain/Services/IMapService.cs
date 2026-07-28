@@ -7,4 +7,6 @@ public interface IMapService
     Task<IEnumerable<Map>> GetAllAsync();
 
     Task<Map?> GetAsync(Guid id);
+
+    Task<Map?> UpdateImageAsync(Guid id, string imageFileName);
 }

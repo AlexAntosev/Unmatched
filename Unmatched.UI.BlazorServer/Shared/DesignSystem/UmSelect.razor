@@ -1,0 +1,181 @@
+@typeparam TValue
+@*
+    Every dropdown in the app: a form field (36px), a header control (32px) and a filter chip
+    (28px) are the same component at three sizes. This is a custom panel, never the browser's
+    native <select> popup (see README "Menus and settings") - the trigger opens a floating list of
+    Options, each an optional 20px token, a label, and a check mark on the current value. Lists
+    over ~8 entries get a filter field and scroll at 212px.
+*@
+<div class="um-select um-select-@Variant @(Highlighted ? "is-highlighted" : null) @(_isOpen ? "is-open" : null) @(Disabled ? "is-disabled" : null) @Class"
+     tabindex="@(Disabled ? -1 : 0)" role="button" aria-haspopup="listbox" aria-expanded="@_isOpen"
+     @onclick="Toggle" @onkeydown="OnTriggerKeyDown">
+    @if (!string.IsNullOrEmpty(SelectedArtUrl))
+    {
+        <img class="um-select-art" src="@SelectedArtUrl" alt=""/>
+    }
+    else if (!string.IsNullOrEmpty(SelectedAvatarUrl))
+    {
+        <img class="um-select-avatar" src="@SelectedAvatarUrl" alt=""/>
+    }
+    else if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="bi @Icon um-select-icon"></i>
+    }
+    <span class="um-select-value">@(SelectedLabel ?? Placeholder)</span>
+    <i class="bi bi-chevron-down um-select-chevron"></i>
+    @if (OnRandomize.HasDelegate)
+    {
+        <UmButton Variant="dice" Size="xs" Icon="bi-dice-5-fill" Title="Randomize"
+                  StopPropagation="true" OnClick="@(_ => OnRandomize.InvokeAsync())"/>
+    }
+
+    @if (_isOpen)
+    {
+        <div class="um-select-scrim" @onclick="Close" @onclick:stopPropagation="true"></div>
+        <div class="um-select-panel" @onclick:stopPropagation="true">
+            @if (ShowFilter)
+            {
+                <div class="um-select-filter">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Filter…" value="@_filter" @oninput="OnFilterInput"/>
+                </div>
+            }
+            <div class="um-select-list @(ShowFilter ? "is-scrollable" : null)" role="listbox">
+                @if (FilteredOptions.Count == 0)
+                {
+                    <div class="um-select-empty">No matches.</div>
+                }
+                @foreach (var option in FilteredOptions)
+                {
+                    var isSelected = EqualityComparer<TValue>.Default.Equals(option.Value, Value);
+                    <div class="um-select-option @(isSelected ? "is-selected" : null)" role="option"
+                         aria-selected="@isSelected" @onclick="@(() => SelectAsync(option.Value))">
+                        @if (!string.IsNullOrEmpty(option.ArtUrl))
+                        {
+                            <img class="um-select-option-art" src="@option.ArtUrl" alt=""/>
+                        }
+                        else if (!string.IsNullOrEmpty(option.AvatarUrl))
+                        {
+                            <img class="um-select-option-avatar" src="@option.AvatarUrl" alt=""/>
+                        }
+                        else if (option.Icon is not null)
+                        {
+                            <i class="bi @option.Icon" style="@(option.Color is not null ? $"color:{option.Color}" : null)"></i>
+                        }
+                        <span class="um-select-option-label">@option.Label</span>
+                        @if (isSelected)
+                        {
+                            <i class="bi bi-check-lg um-select-option-check"></i>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private const int FilterThreshold = 8;
+
+    private bool _isOpen;
+    private string _filter = string.Empty;
+
+    /// <summary>field (36px) | control (32px) | chip (28px)</summary>
+    [Parameter]
+    public string Variant { get; set; } = "field";
+
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SelectOption<TValue>> Options { get; set; } = Array.Empty<SelectOption<TValue>>();
+
+    [Parameter]
+    public string Placeholder { get; set; } = string.Empty;
+
+    /// <summary>Fixed thumbnail shown on the trigger regardless of which option is selected.</summary>
+    [Parameter]
+    public string? ArtUrl { get; set; }
+
+    /// <summary>Fixed avatar shown on the trigger regardless of which option is selected.</summary>
+    [Parameter]
+    public string? AvatarUrl { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    /// <summary>Draws the violet border the design uses on the hero field.</summary>
+    [Parameter]
+    public bool Highlighted { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>When set, a dice button appears inside the field.</summary>
+    [Parameter]
+    public EventCallback OnRandomize { get; set; }
+
+    private SelectOption<TValue>? SelectedOption
+        => Options.FirstOrDefault(o => EqualityComparer<TValue>.Default.Equals(o.Value, Value));
+
+    private string? SelectedLabel => SelectedOption?.Label;
+
+    private string? SelectedArtUrl => SelectedOption?.ArtUrl ?? ArtUrl;
+
+    private string? SelectedAvatarUrl => SelectedOption?.AvatarUrl ?? AvatarUrl;
+
+    private bool ShowFilter => Options.Count > FilterThreshold;
+
+    private IReadOnlyList<SelectOption<TValue>> FilteredOptions
+        => string.IsNullOrWhiteSpace(_filter)
+            ? Options
+            : Options.Where(o => o.Label.Contains(_filter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private void Toggle()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        _isOpen = !_isOpen;
+        if (!_isOpen)
+        {
+            _filter = string.Empty;
+        }
+    }
+
+    private void Close()
+    {
+        _isOpen = false;
+        _filter = string.Empty;
+    }
+
+    private void OnFilterInput(ChangeEventArgs args) => _filter = args.Value?.ToString() ?? string.Empty;
+
+    private Task SelectAsync(TValue value)
+    {
+        Value = value;
+        Close();
+        return ValueChanged.InvokeAsync(value);
+    }
+
+    private void OnTriggerKeyDown(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Enter" or " ":
+                Toggle();
+                break;
+            case "Escape" when _isOpen:
+                Close();
+                break;
+        }
+    }
+}

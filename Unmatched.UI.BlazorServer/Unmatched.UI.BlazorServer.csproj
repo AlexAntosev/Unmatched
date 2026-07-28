@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Unmatched.Initializer\Unmatched.Initializer.csproj" />
         <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
     </ItemGroup>
 
@@ -148,9 +147,6 @@
       <Content Update="wwwroot\T-Rex.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Update="wwwroot\css\fonts\Unmatched.otf">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
@@ -277,9 +273,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AWSSDK.S3" Version="4.0.101.4" />
       <PackageReference Include="Blazor.Bootstrap" Version="1.10.4" />
-      <PackageReference Include="Syncfusion.Blazor" Version="22.2.11" />
-      <PackageReference Include="Syncfusion.Blazor.Themes" Version="22.2.11" />
     </ItemGroup>
 
 </Project>

@@ -80,6 +80,20 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<MatchLogDto>>();
     }
 
+    public async Task<IEnumerable<MatchLogDto>> GetFinishedByVillainAsync(Guid villainId)
+    {
+        var response = await httpClient.GetAsync($"/match/log/villain/{villainId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<MatchLogDto>>();
+    }
+
+    public async Task<IEnumerable<MatchLogDto>> GetFinishedByMinionAsync(Guid minionId)
+    {
+        var response = await httpClient.GetAsync($"/match/log/minion/{minionId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<MatchLogDto>>();
+    }
+
     public async Task<IEnumerable<RatingChangeDto>> GetHeroRatingChangesAsync(Guid heroId)
     {
         var response = await httpClient.GetAsync($"/rating/changes/hero/{heroId}");
@@ -124,6 +138,13 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
     public async Task<IEnumerable<TitleDto>> GetTitlesAsync()
     {
         var response = await httpClient.GetAsync("/title");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<TitleDto>>();
+    }
+
+    public async Task<IEnumerable<TitleDto>> GetTitlesByHeroAsync(Guid heroId)
+    {
+        var response = await httpClient.GetAsync($"/title/hero/{heroId}");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<TitleDto>>();
     }

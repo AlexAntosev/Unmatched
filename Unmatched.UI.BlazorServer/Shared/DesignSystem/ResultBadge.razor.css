@@ -1,0 +1,18 @@
+.um-result {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: var(--um-radius-chip);
+    font: 600 9.5px var(--um-font-mono);
+    letter-spacing: 0.1em;
+}
+
+.um-result.is-win {
+    background: var(--um-win-bg);
+    color: var(--um-win);
+}
+
+.um-result.is-loss {
+    background: var(--um-loss-bg);
+    color: var(--um-loss);
+}

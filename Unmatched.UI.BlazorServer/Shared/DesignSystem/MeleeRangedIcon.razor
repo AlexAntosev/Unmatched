@@ -1,0 +1,22 @@
+@*
+    The melee/ranged glyph from the handoff assets, inverted and dimmed as the design specifies.
+*@
+<img class="um-type-icon @Class"
+     src="@(IsRanged ? "/Ranged.png" : "/Melee.png")"
+     alt="@(IsRanged ? "Ranged" : "Melee")"
+     title="@(IsRanged ? "Ranged" : "Melee")"
+     style="@($"height:{Height}px;opacity:{Opacity.ToString(System.Globalization.CultureInfo.InvariantCulture)}")"/>
+
+@code {
+    [Parameter, EditorRequired]
+    public bool IsRanged { get; set; }
+
+    [Parameter]
+    public int Height { get; set; } = 13;
+
+    [Parameter]
+    public double Opacity { get; set; } = 0.5;
+
+    [Parameter]
+    public string? Class { get; set; }
+}

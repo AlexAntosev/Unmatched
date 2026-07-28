@@ -1,81 +1,88 @@
-﻿@page "/titles"
+@page "/titles"
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
 @using Unmatched.Services.Contracts
 @inject ITitleService TitleService
+@*
+    Not in the design pack: a panel of rows plus an assign dialog, built from design-system parts.
+    A first pass - the layout is deliberately plain until this screen gets designed.
+*@
 
-<div class="page-content">
-    <h1 class="page-title">Titles</h1>
-    <div style="margin-bottom: 16px">
-        <SfGrid DataSource="@_titles" AllowPaging="true" AllowSorting="true">
-            <GridEvents CommandClicked="OnCommandClick" TValue="TitleDto"></GridEvents>
-            <GridPageSettings PageSize="20"></GridPageSettings>
-            <GridColumns>
-                <GridColumn Field=@nameof(TitleDto.Name) HeaderText="Title" Width="120"></GridColumn>
-                <GridColumn Width="150">
-                    <GridCommandColumns>
-                        <GridCommandColumn Type="CommandButtonType.Edit" Title="Assign" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                    </GridCommandColumns>
-                </GridColumn>
-            </GridColumns>
-        </SfGrid>
-    </div>
-    <div>
-        <EditForm Model=@_addTitleForm>
-            <div style="width: 256px; margin-bottom: 8px">
-                <label>Name:</label>
-                <InputText @bind-Value=_addTitleForm.Name name="Name" class="form-control"/>
+<PageHeader Breadcrumbs="Crumbs">
+    <Controls>
+        <UmTextField Placeholder="New title" Variant="control" Value="@_newTitleName"
+                     ValueChanged="@(v => _newTitleName = v)" Class="titles-new"/>
+        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" Disabled="@(!IsNewTitleValid)"
+                  OnClick="AddTitleAsync">Add title</UmButton>
+    </Controls>
+</PageHeader>
+
+<div class="um-page">
+    <Panel Title="Titles" Meta="@($"{_titles.Count} titles")">
+        @if (_titles.Count == 0)
+        {
+            <div class="titles-empty">No titles yet.</div>
+        }
+        @foreach (var title in _titles)
+        {
+            <div class="titles-row">
+                <i class="bi bi-award-fill"></i>
+                <div class="titles-names">
+                    <div class="titles-name">@title.Name</div>
+                    @if (!string.IsNullOrWhiteSpace(title.Comment))
+                    {
+                        <div class="titles-comment">@title.Comment</div>
+                    }
+                </div>
+                <UmButton Size="sm" Icon="bi-people" OnClick="@(() => OpenAssignAsync(title))">Assign heroes</UmButton>
+                <UmButton Size="sm" Variant="danger" Icon="bi-trash" OnClick="@(() => DeleteTitleAsync(title.Id))">Delete</UmButton>
             </div>
-            <button class="btn btn-primary" @onclick="OnAddTitleClick">Add title</button>
-        </EditForm>
-    </div>
-    
-    <div>
-        <BlazorBootstrap.Modal @ref="_heroesDialog" Title="Heroes">
-            <BodyTemplate>
-                <SfGrid @ref="_heroesGrid" DataSource="@_heroes" AllowSorting="true" AllowSelection="true">
-                    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple"></GridSelectionSettings>
-                    <GridPageSettings PageSize="10"></GridPageSettings>
-                    <GridEvents RowDataBound="OnRowDataBound" DataBound="OnDataBound" TValue="HeroTitleAssignDto"></GridEvents>
-                    <GridColumns>
-                        <GridColumn Field=@nameof(HeroTitleAssignDto.IsAssigned) Type="ColumnType.CheckBox" Width="50"></GridColumn>
-                        <GridColumn Field=@nameof(HeroTitleAssignDto.Name) HeaderText="Hero" Width="120"></GridColumn>
-                    </GridColumns>
-                </SfGrid>
-            </BodyTemplate>
-            <FooterTemplate>
-                <button class="btn btn-secondary" @onclick="OnCancelClick">Cancel</button>
-                <button class="btn btn-primary" @onclick="OnSaveClick">Save</button>
-            </FooterTemplate>
-        </BlazorBootstrap.Modal>
-    </div>
+        }
+    </Panel>
 </div>
 
+<BlazorBootstrap.Modal @ref="_assignDialog" Title="Assign heroes">
+    <BodyTemplate>
+        <div class="titles-assign">
+            @foreach (var hero in _assignableHeroes)
+            {
+                <label class="titles-assign-row">
+                    <UmCheckbox Checked="hero.IsAssigned" CheckedChanged="@(v => hero.IsAssigned = v)"/>
+                    <span>@hero.Name</span>
+                </label>
+            }
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <UmButton Size="sm" OnClick="@(() => _assignDialog.HideAsync())">Cancel</UmButton>
+        <UmButton Size="sm" Variant="primary" Icon="bi-check-lg" OnClick="SaveAssignmentsAsync">Save</UmButton>
+    </FooterTemplate>
+</BlazorBootstrap.Modal>
+
 @code {
-    private List<TitleDto> _titles = new ();
-    private List<HeroTitleAssignDto> _heroes = new();
-    private readonly TitleDto _addTitleForm = new();
-    private Guid _selectedTitleId = Guid.Empty;
-    private List<int> _selectedHeroesIndexes = new();
+    private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Titles")];
 
-    SfGrid<HeroTitleAssignDto> _heroesGrid;
-    private BlazorBootstrap.Modal _heroesDialog = default!;
-    
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private List<TitleDto> _titles = new();
+    private List<HeroTitleAssignDto> _assignableHeroes = new();
+    private BlazorBootstrap.Modal _assignDialog = default!;
+    private Guid _assigningTitleId;
+    private string? _newTitleName;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await RefreshTitlesAsync();
-    }
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
-    private async Task RefreshTitlesAsync()
+    private bool IsNewTitleValid
+        => !string.IsNullOrWhiteSpace(_newTitleName)
+        && _titles.All(t => !string.Equals(t.Name, _newTitleName, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync() => await RefreshAsync();
+
+    private async Task RefreshAsync()
     {
         try
         {
             PreloadService.Show();
-            
-            _titles = (await TitleService.GetAsync()).ToList();
+            _titles = (await TitleService.GetAsync()).OrderBy(t => t.Name).ToList();
         }
         finally
         {
@@ -83,115 +90,38 @@
         }
     }
 
-    private async Task OnAddTitleClick()
+    private async Task AddTitleAsync()
     {
-        if (IsInvalidTitleName(_addTitleForm.Name))
+        if (!IsNewTitleValid)
         {
             return;
         }
-        
-        await AddTitleAsync(_addTitleForm);
-    }
 
-    private bool IsInvalidTitleName(string? titleName)
-    {
-        return titleName is null || titleName == string.Empty || _titles.Any(t => t.Name == titleName);
-    }
-    
-    private async Task AddTitleAsync(TitleDto title)
-    {
-        try
-        {
-            PreloadService.Show();
-            title.Comment = string.Empty;
-            await TitleService.AddAsync(title);
-            _titles = (await TitleService.GetAsync()).ToList();
-        }
-        finally
-        {
-            PreloadService.Hide();
-        }
-    }
-
-    private async Task OnCommandClick(CommandClickEventArgs<TitleDto> args)
-    {
-        switch (args.CommandColumn.Type)
-        {
-            case CommandButtonType.Delete:
-                await DeleteTitleAsync(args.RowData.Id);
-                break;
-            case CommandButtonType.Edit:
-                await OnAssignClick(args);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-
-    private async Task OnAssignClick(CommandClickEventArgs<TitleDto> args)
-    {
-        _selectedHeroesIndexes = new List<int>();
-        _selectedTitleId = args.RowData.Id;
-        _heroes = (await TitleService.GetHeroesForTitleAssign(_selectedTitleId)).ToList();
-        await _heroesDialog.ShowAsync();
+        await TitleService.AddAsync(new TitleDto { Name = _newTitleName, Comment = string.Empty });
+        _newTitleName = null;
+        await RefreshAsync();
     }
 
     private async Task DeleteTitleAsync(Guid id)
     {
-        try
-        {
-            PreloadService.Show();
-            
-            await TitleService.DeleteAsync(id);
-            _titles = (await TitleService.GetAsync()).ToList();
-        }
-        finally
-        {
-            PreloadService.Hide();
-        }
-    }
-    
-    private async Task OnCancelClick()
-    {
-        await _heroesDialog.HideAsync();
-    }
-    
-    private async Task OnSaveClick()
-    {
-        try
-        {
-            PreloadService.Show();
-            
-            await TitleService.MergeAsync(_selectedTitleId, _heroesGrid.SelectedRecords.Select(h => h.Id));
-            _titles = (await TitleService.GetAsync()).ToList();
-            await _heroesDialog.HideAsync();
-        }
-        finally
-        {
-            PreloadService.Hide();
-        }
+        await TitleService.DeleteAsync(id);
+        await RefreshAsync();
     }
 
-    private async Task  OnDataBound(object args)
+    private async Task OpenAssignAsync(TitleDto title)
     {
-        await _heroesGrid.SelectRowsAsync(_selectedHeroesIndexes.ToArray());
+        _assigningTitleId = title.Id;
+        _assignableHeroes = (await TitleService.GetHeroesForTitleAssign(title.Id))
+            .OrderBy(h => h.Name)
+            .ToList();
+        await _assignDialog.ShowAsync();
     }
 
-    private void OnRowDataBound(RowDataBoundEventArgs<HeroTitleAssignDto> args)
+    private async Task SaveAssignmentsAsync()
     {
-        if (args.Data.IsAssigned)
-        {
-            var dataSource = _heroesGrid.DataSource;
-            var index = 0;
-            foreach (var data in dataSource)
-            {
-                if (data.Id == args.Data.Id)
-                {
-                    _selectedHeroesIndexes.Add(index);
-                    break;
-                }
-                index++;
-            }
-        }
+        var assignedHeroIds = _assignableHeroes.Where(h => h.IsAssigned).Select(h => h.Id);
+        await TitleService.MergeAsync(_assigningTitleId, assignedHeroIds);
+        await _assignDialog.HideAsync();
+        await RefreshAsync();
     }
 }

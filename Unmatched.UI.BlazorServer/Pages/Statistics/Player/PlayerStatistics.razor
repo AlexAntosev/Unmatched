@@ -1,63 +1,143 @@
-﻿@page "/players-statistics/{id}"
-@using Microsoft.AspNetCore.Components
+@page "/players-statistics/{id}"
 @using Unmatched.Dtos
-@using Unmatched.Dtos.Match
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Pages.Statistics
+@using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IPlayerStatisticsService PlayerStatisticsService
 @inject IFavoriteStatisticsService FavoriteStatisticsService
+@inject IFavoriteService FavoriteService
+@inject IHeroService HeroService
+@*
+    Not in the design pack: the 2a dossier pattern applied to a player - banner, heroes played, this
+    player's own coloured matches, and the villain/minion records.
+*@
 
-<div style="margin-bottom: 16px">
-    <PlayerSummary Statistics="Player" Matches="_matches" ChosenOne="@_chosenOne"></PlayerSummary>
-</div>
-<div class="page-content">
-    <TotalMatchesRecord Total="Player.TotalMatches" Wins="Player.TotalWins" Looses="Player.TotalLooses" Kd="Player.Kd"></TotalMatchesRecord>
-    <DuelMatches MatchLogEntries="_matchLogEntries" PageSize="10"></DuelMatches>
-    <Favorites FavoritesRecords="_favorites"></Favorites>
+<PageHeader Breadcrumbs="Crumbs"/>
+
+<PlayerSummary Statistics="_player" ChosenOne="_chosenOne" HeroesPlayedCount="_favorites.Count"/>
+
+<div class="um-page">
+    <HeroesPlayed Records="_favorites" TotalHeroCount="_totalHeroCount"
+                  MainToggled="ToggleMainAsync" RatingChanged="RateHeroAsync"/>
+
+    <PlayerMatches PlayerName="@_player.Name" Entries="_playerMatches"/>
+
+    <div class="player-duo">
+        <MonsterMatchupTable Title="Against villains" Rows="_villainMatchups"/>
+        <MonsterMatchupTable Title="Against minions" Rows="_minionMatchups"/>
+    </div>
 </div>
 
 @code {
     [Parameter]
-    public string Id { get; set; } = "";
-    
-    private List<UiMatchLogDto> _matchLogEntries = new();
-    private List<IGrouping<string, UiFighterDto>> _matches = new();
+    public string Id { get; set; } = string.Empty;
+
+    private PlayerStatisticsDto _player = new() { Name = string.Empty };
+    private List<UiMatchLogDto> _matchLog = new();
     private List<FavoriteStatisticsDto> _favorites = new();
-
-    private PlayerStatisticsDto Player { get; set; } = new ();
-
+    private List<PlayerMatchEntry> _playerMatches = new();
+    private List<MonsterMatchupRow> _villainMatchups = new();
+    private List<MonsterMatchupRow> _minionMatchups = new();
     private FavoriteStatisticsDto? _chosenOne;
-    
-    [Inject] protected BlazorBootstrap.PreloadService PreloadService { get; set; }
+    private Guid _playerId;
+    private int _totalHeroCount;
 
-    protected override async Task OnInitializedAsync()
+    [Inject]
+    protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private IReadOnlyList<Breadcrumb.Crumb> Crumbs =>
+    [
+        new("Players", Urls.PlayersStatistics), new(_player.Name)
+    ];
+
+    protected override async Task OnParametersSetAsync()
     {
+        if (!Guid.TryParse(Id, out var playerId) || playerId == Guid.Empty)
+        {
+            return;
+        }
+
+        _playerId = playerId;
+
         try
         {
             PreloadService.Show();
-            Guid.TryParse(Id, out var playerId);
-            if (playerId == Guid.Empty)
+
+            var stats = PlayerStatisticsService.GetPlayerStatisticsAsync(playerId);
+            var matches = PlayerStatisticsService.GetPlayerMatchesAsync(playerId);
+            var favorites = FavoriteStatisticsService.GetFavoritesStatisticsAsync(playerId);
+            var heroes = HeroService.GetAsync();
+            await Task.WhenAll(stats, matches, favorites, heroes);
+
+            _player = stats.Result;
+            _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
+            _totalHeroCount = heroes.Result.Count();
+
+            _favorites = favorites.Result.OrderByDescending(f => f.TotalMatches).ToList();
+            for (var i = 0; i < _favorites.Count; i++)
             {
-                return;
-            }
-            
-            Player = await PlayerStatisticsService.GetPlayerStatisticsAsync(playerId);
-            _matchLogEntries = (await PlayerStatisticsService.GetPlayerMatchesAsync(playerId)).OrderByDescending(x => x.Date).ToList();
-            foreach (var matchLogEntry in _matchLogEntries)
-            {
-                matchLogEntry.Fighters = matchLogEntry.Fighters.OrderByDescending(x => x.Player.Id == playerId);
+                _favorites[i].Place = i + 1;
             }
 
-            _matches = _matchLogEntries
-                .SelectMany(m => m.Fighters.Where(f => f.Player.Id == Player.PlayerId))
-                .GroupBy(f => f.Hero.Name)
-                .ToList();
-
-            _favorites = (await FavoriteStatisticsService.GetFavoritesStatisticsAsync(playerId)).ToList();
             _chosenOne = _favorites.FirstOrDefault(f => f.IsChosenOne);
+            _playerMatches = PlayerMatchPresentation.Build(playerId, _matchLog).ToList();
+            BuildMonsterMatchups();
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    /// <summary>Exactly one main hero per player - the backend already clears whoever had it before.</summary>
+    private async Task ToggleMainAsync(FavoriteStatisticsDto record)
+    {
+        var isMain = !record.IsChosenOne;
+        await FavoriteService.UpdateChosenOneAsync(_playerId, record.HeroId, isMain);
+
+        foreach (var favorite in _favorites)
+        {
+            favorite.IsChosenOne = favorite == record && isMain;
+        }
+
+        _chosenOne = _favorites.FirstOrDefault(f => f.IsChosenOne);
+    }
+
+    /// <summary>Subjective 1-5 note - never feeds the ladder or any computed stat.</summary>
+    private async Task RateHeroAsync((FavoriteStatisticsDto Record, int Rating) args)
+    {
+        args.Record.Favour = args.Rating;
+        await FavoriteService.UpdateFavourAsync(_playerId, args.Record.HeroId, args.Rating);
+    }
+
+    private void BuildMonsterMatchups()
+    {
+        var coopMatches = _matchLog.Where(m => m.Villain is not null).ToList();
+
+        _villainMatchups = coopMatches
+            .GroupBy(m => m.Villain!.Name ?? "Unknown")
+            .Select(g => new MonsterMatchupRow
+                {
+                    Name = g.Key,
+                    Total = g.Count(),
+                    Wins = g.Count(m => !m.Villain!.IsWinner),
+                    Looses = g.Count(m => m.Villain!.IsWinner)
+                })
+            .OrderByDescending(r => r.Total)
+            .ToList();
+
+        _minionMatchups = coopMatches
+            .SelectMany(m => m.Villain!.Minions)
+            .GroupBy(m => m.Name ?? "Unknown")
+            .Select(g => new MonsterMatchupRow
+                {
+                    Name = g.Key,
+                    Total = g.Count(),
+                    Wins = g.Count(m => !m.IsWinner),
+                    Looses = g.Count(m => m.IsWinner)
+                })
+            .OrderByDescending(r => r.Total)
+            .ToList();
     }
 }

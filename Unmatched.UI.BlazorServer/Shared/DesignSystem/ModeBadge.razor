@@ -1,0 +1,16 @@
+@using Unmatched.Enums
+@*
+    The badge only confirms the shape the row already shows - it never carries the result.
+*@
+<div class="um-mode-badge" style="background:@_style.Background;color:@_style.Color">
+    <i class="bi @_style.Icon"></i>@_style.Label
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public GameMode Mode { get; set; }
+
+    private GameModeStyle _style = GameModeStyle.For(GameMode.OneVsOne);
+
+    protected override void OnParametersSet() => _style = GameModeStyle.For(Mode);
+}

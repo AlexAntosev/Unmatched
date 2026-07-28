@@ -1,0 +1,30 @@
+.um-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: var(--um-height-control);
+    padding: 0 12px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    background: none;
+    color: var(--um-text-muted);
+    font: 500 12px var(--um-font-body);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.um-toggle i {
+    font-size: 12px;
+}
+
+.um-toggle:hover {
+    color: var(--um-text);
+    border-color: var(--um-focus-border);
+}
+
+.um-toggle.is-on {
+    background: var(--um-selected-bg);
+    border-color: var(--um-selected-border);
+    color: var(--um-accent-text);
+}

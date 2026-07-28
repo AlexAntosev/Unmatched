@@ -37,11 +37,21 @@ public class DomainMapper : Profile
         CreateMap<PlayerDto, FighterPlayer>().ReverseMap();
         CreateMap<TournamentEntity, Tournament>().ReverseMap();
         CreateMap<RatingEntity, Rating>();
+        CreateMap<MatchVillainEntity, MatchVillain>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom<MatchVillainNameResolver>())
+            .ReverseMap();
+        CreateMap<MatchMinionEntity, MatchMinion>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom<MatchMinionNameResolver>())
+            .ReverseMap();
 
 
         CreateMap<MatchEntity, MatchCreated>();
         CreateMap<FighterEntity, MatchCreated.Fighter>()
             .ForMember(dest => dest.ResultRating, opt => opt.Ignore());
+        CreateMap<MatchVillainEntity, MatchCreated.MatchVillain>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom<MatchCreatedVillainNameResolver>());
+        CreateMap<MatchMinionEntity, MatchCreated.MatchMinion>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom<MatchCreatedMinionNameResolver>());
     }
 
     private string TryGetTournamentName(TournamentEntity? tournament, Stage? stage)

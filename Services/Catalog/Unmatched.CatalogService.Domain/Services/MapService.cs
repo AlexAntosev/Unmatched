@@ -15,4 +15,18 @@ public class MapService(IUnitOfWork unitOfWork) : IMapService
     {
         return unitOfWork.Maps.GetByIdAsync(id);
     }
+
+    public async Task<Map?> UpdateImageAsync(Guid id, string imageFileName)
+    {
+        var map = await unitOfWork.Maps.GetByIdAsync(id);
+        if (map is null)
+        {
+            return null;
+        }
+
+        map.ImageFileName = imageFileName;
+        unitOfWork.Maps.AddOrUpdate(map, id);
+        await unitOfWork.SaveChangesAsync();
+        return map;
+    }
 }

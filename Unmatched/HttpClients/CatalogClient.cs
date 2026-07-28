@@ -60,6 +60,14 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogExpansionDto>>();
     }
 
+    public async Task<CatalogExpansionDto> UpdateExpansionImageAsync(Guid expansionId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/expansion/{expansionId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogExpansionDto>();
+    }
+
     public async Task<IEnumerable<Guid>> GetOwnedExpansionIdsAsync()
     {
         var response = await httpClient.GetAsync("/collection");
@@ -72,5 +80,51 @@ public class CatalogClient(HttpClient httpClient) : ICatalogClient
         var content = new StringContent(JsonSerializer.Serialize(expansionIds), Encoding.UTF8, "application/json");
         var response = await httpClient.PutAsync("/collection", content);
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<IEnumerable<CatalogVillainDto>> GetVillainsAsync()
+    {
+        var response = await httpClient.GetAsync("/villain");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogVillainDto>>();
+    }
+
+    public async Task<IEnumerable<CatalogMinionDto>> GetMinionsAsync()
+    {
+        var response = await httpClient.GetAsync("/minion");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CatalogMinionDto>>();
+    }
+
+    public async Task<CatalogHeroDto> UpdateHeroImageAsync(Guid heroId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/hero/{heroId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogHeroDto>();
+    }
+
+    public async Task<CatalogVillainDto> UpdateVillainImageAsync(Guid villainId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/villain/{villainId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogVillainDto>();
+    }
+
+    public async Task<CatalogMinionDto> UpdateMinionImageAsync(Guid minionId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/minion/{minionId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogMinionDto>();
+    }
+
+    public async Task<CatalogMapDto> UpdateMapImageAsync(Guid mapId, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/map/{mapId}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogMapDto>();
     }
 }

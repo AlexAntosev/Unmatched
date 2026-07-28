@@ -1,0 +1,117 @@
+@using Unmatched.Dtos
+@inject NavigationManager NavManager
+@*
+    Every hero this player has played - not a ladder, so no rank numbers and no top-3 highlight.
+    Main is a bookmark toggle (exactly one per player); My rating is a subjective 1-5 star note that
+    never feeds the ladder or any computed stat.
+*@
+<Panel Title="Heroes played">
+    <HeaderActions>
+        @if (MainHero?.Hero is not null)
+        {
+            <span class="hp-main-chip"><i class="bi bi-bookmark-star-fill"></i>MAIN &middot; @MainHero.Hero.Name.ToUpperInvariant()</span>
+        }
+        <UmSearchBox Value="_filter" ValueChanged="OnFilterChanged" Placeholder="Filter heroes…" Class="hp-filter"/>
+        <SegmentedControl TValue="string" Variant="bar" Options="SortOptions" Value="_sort" ValueChanged="v => _sort = v"/>
+        <span class="hp-count">@FilteredRecords().Count() of @TotalHeroCount heroes</span>
+    </HeaderActions>
+    <ChildContent>
+        @if (Records.Count == 0)
+        {
+            <div class="hp-empty">No heroes played yet.</div>
+        }
+        else
+        {
+            <ColumnHeader Columns="@Columns" Class="hp-head">
+                <div>Hero</div>
+                <div class="hp-right">Matches</div>
+                <div>W / L</div>
+                <div class="hp-right">Win %</div>
+                <div class="hp-right">K/D</div>
+                <div class="hp-center">Main</div>
+                <div>My rating</div>
+            </ColumnHeader>
+            <div class="hp-list">
+                @foreach (var record in SortedFilteredRecords())
+                {
+                    <div class="hp-row @(record.IsChosenOne ? "is-main" : null)" style="@($"grid-template-columns:{Columns}")">
+                        <div class="hp-hero">
+                            <HeroToken ImageUrl="@record.Hero?.ImageUrl" Alt="@(record.Hero?.Name ?? "Unknown")" Size="30" Radius="9"/>
+                            <span class="hp-hero-name" @onclick="@(() => OpenHero(record))">@(record.Hero?.Name ?? "Unknown")</span>
+                        </div>
+                        <div class="hp-right hp-matches">@record.TotalMatches</div>
+                        <WinLossBar Wins="record.TotalWins" Losses="record.TotalLooses"/>
+                        <div class="hp-right hp-winrate" style="color:@(record.WinRate >= 50 ? "var(--um-win)" : "var(--um-loss)")">@record.WinRate%</div>
+                        <div class="hp-right hp-kd" style="color:@(record.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">@record.Kd.ToString("0.00")</div>
+                        <div class="hp-center">
+                            <button type="button" class="hp-main-btn @(record.IsChosenOne ? "is-active" : null)"
+                                    title="@(record.IsChosenOne ? "Main hero" : "Set as main")"
+                                    @onclick="@(() => ToggleMainAsync(record))">
+                                <i class="bi @(record.IsChosenOne ? "bi-bookmark-star-fill" : "bi-bookmark")"></i>
+                            </button>
+                        </div>
+                        <EpicStars Value="record.Favour" Max="5" Size="15" Color="var(--um-accent-text)"
+                                   ValueChanged="@(rating => RateAsync(record, rating))"/>
+                    </div>
+                }
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <span class="hp-footnote">One main per player &middot; personal rating is subjective, 1-5, and never feeds the ladder.</span>
+    </Footer>
+</Panel>
+
+@code {
+    private const string Columns = "1fr 64px 120px 60px 60px 56px 140px";
+
+    private static readonly IReadOnlyList<SelectOption<string>> SortOptions =
+    [
+        new("played", "Played"), new("winrate", "Win %"), new("kd", "K/D"), new("rating", "My rating")
+    ];
+
+    private string _sort = "played";
+    private string _filter = string.Empty;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<FavoriteStatisticsDto> Records { get; set; } = [];
+
+    [Parameter]
+    public int TotalHeroCount { get; set; }
+
+    [Parameter]
+    public EventCallback<FavoriteStatisticsDto> MainToggled { get; set; }
+
+    [Parameter]
+    public EventCallback<(FavoriteStatisticsDto Record, int Rating)> RatingChanged { get; set; }
+
+    private FavoriteStatisticsDto? MainHero => Records.FirstOrDefault(r => r.IsChosenOne);
+
+    private IEnumerable<FavoriteStatisticsDto> FilteredRecords()
+        => string.IsNullOrWhiteSpace(_filter)
+            ? Records
+            : Records.Where(r => (r.Hero?.Name ?? string.Empty).Contains(_filter, StringComparison.OrdinalIgnoreCase));
+
+    private IEnumerable<FavoriteStatisticsDto> SortedFilteredRecords()
+        => _sort switch
+        {
+            "winrate" => FilteredRecords().OrderByDescending(r => r.WinRate),
+            "kd" => FilteredRecords().OrderByDescending(r => r.Kd),
+            "rating" => FilteredRecords().OrderByDescending(r => r.Favour),
+            _ => FilteredRecords().OrderByDescending(r => r.TotalMatches)
+        };
+
+    private void OnFilterChanged(string? value) => _filter = value ?? string.Empty;
+
+    private Task ToggleMainAsync(FavoriteStatisticsDto record) => MainToggled.InvokeAsync(record);
+
+    private Task RateAsync(FavoriteStatisticsDto record, int rating) => RatingChanged.InvokeAsync((record, rating));
+
+    private void OpenHero(FavoriteStatisticsDto record)
+    {
+        if (record.Hero is not null)
+        {
+            NavManager.NavigateTo($"{Urls.HeroesStatistics}/{record.Hero.Id}");
+        }
+    }
+}

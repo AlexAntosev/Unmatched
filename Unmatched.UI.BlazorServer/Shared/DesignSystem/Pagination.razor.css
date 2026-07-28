@@ -1,0 +1,54 @@
+.um-pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.um-pagination-meta {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+.um-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-sm);
+    background: none;
+    color: var(--um-text-muted);
+    font: 500 11.5px var(--um-font-mono);
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.um-page:hover:not(:disabled) {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
+}
+
+.um-page:disabled {
+    color: var(--um-text-faint);
+    cursor: default;
+}
+
+.um-page i {
+    font-size: 10px;
+}
+
+.um-page.is-current {
+    background: var(--um-selected-bg);
+    border-color: var(--um-selected-border);
+    color: var(--um-accent-text);
+}
+
+.um-page-wide {
+    width: auto;
+    height: 30px;
+    padding: 0 12px;
+    background: var(--um-bg-control);
+    font: 500 11.5px var(--um-font-body);
+}

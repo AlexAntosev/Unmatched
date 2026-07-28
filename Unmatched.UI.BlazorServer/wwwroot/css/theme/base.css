@@ -1,0 +1,134 @@
+/*
+  App-wide primitives that sit between the tokens and the components: page background, scrollbars,
+  focus rings, and the handful of surface utilities (.um-panel, .um-inset, .um-hairline) that show
+  up in nearly every component. Anything used by exactly one component belongs in that component's
+  scoped CSS instead.
+*/
+
+html, body {
+    margin: 0;
+    background: var(--um-bg-app);
+    color: var(--um-text);
+    font: 400 13px/1.6 var(--um-font-body);
+    -webkit-font-smoothing: antialiased;
+    /* Makes native select dropdowns, date pickers and scrollbars render dark to match the app. */
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    color: var(--um-accent-soft);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--um-accent-text);
+}
+
+:focus-visible {
+    outline: 2px solid var(--um-accent-soft);
+    outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.09);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+/* ---- Surface utilities ---- */
+
+.um-panel {
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-panel);
+}
+
+.um-card {
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-card);
+}
+
+.um-inset {
+    background: var(--um-bg-inset);
+    border-radius: var(--um-radius-md);
+}
+
+.um-hairline {
+    height: 1px;
+    background: var(--um-border);
+    border: 0;
+}
+
+/* Page shell: every routed page wraps its content in this. */
+.um-page {
+    padding: var(--um-page-padding-y) var(--um-page-padding-x) var(--um-space-7);
+    display: flex;
+    flex-direction: column;
+    gap: var(--um-space-6);
+}
+
+/* A caption + hairline + trailing value header, used above lists and inside side panels. */
+.um-section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.um-section-header > .um-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--um-border);
+}
+
+.um-numeric {
+    font-family: var(--um-font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.um-win-text {
+    color: var(--um-win);
+}
+
+.um-loss-text {
+    color: var(--um-loss);
+}
+
+.um-muted {
+    color: var(--um-text-muted);
+}
+
+.um-dim {
+    color: var(--um-text-dim);
+}
+
+.um-faint {
+    color: var(--um-text-faint);
+}
+
+.um-truncate {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.um-spacer {
+    flex: 1;
+}

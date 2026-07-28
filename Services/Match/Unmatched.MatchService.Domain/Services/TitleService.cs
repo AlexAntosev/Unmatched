@@ -48,6 +48,13 @@ public class TitleService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCa
         return titles;
     }
 
+    public async Task<IEnumerable<Title>> GetByHeroAsync(Guid heroId)
+    {
+        var entities = await unitOfWork.Titles.GetByHeroId(heroId);
+
+        return mapper.Map<IEnumerable<Title>>(entities);
+    }
+
     public async Task<IEnumerable<HeroTitleAssign>> GetHeroesForTitleAssign(Guid titleId)
     {
         var entities = await catalogHeroCache.GetAsync();

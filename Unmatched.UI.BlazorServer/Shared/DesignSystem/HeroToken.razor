@@ -1,0 +1,51 @@
+@*
+    The rounded art tile used for heroes, villains, minions and maps. Missing art falls back to
+    the shared Unknown placeholder rather than a broken image.
+*@
+<img class="um-token @(Round ? "is-round" : null) @Class"
+     src="@(string.IsNullOrEmpty(ImageUrl) ? Fallback : ImageUrl)"
+     alt="@Alt"
+     title="@Title"
+     style="@Style"
+     onerror="this.onerror=null;this.src='@Fallback'"/>
+
+@code {
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string? Alt { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Edge length in px.</summary>
+    [Parameter]
+    public int Size { get; set; } = 32;
+
+    /// <summary>Corner radius in px - ignored when <see cref="Round"/> is set.</summary>
+    [Parameter]
+    public int Radius { get; set; } = 9;
+
+    [Parameter]
+    public bool Round { get; set; }
+
+    /// <summary>Ring colour; defaults to the neutral hairline.</summary>
+    [Parameter]
+    public string? Border { get; set; }
+
+    [Parameter]
+    public double Opacity { get; set; } = 1;
+
+    [Parameter]
+    public string Fallback { get; set; } = "/Unknown.png";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string Style
+        => $"width:{Size}px;height:{Size}px;"
+         + (Round ? string.Empty : $"border-radius:{Radius}px;")
+         + $"border-color:{Border ?? "rgba(255,255,255,.1)"};"
+         + (Opacity < 1 ? $"opacity:{Opacity.ToString(System.Globalization.CultureInfo.InvariantCulture)};" : string.Empty);
+}

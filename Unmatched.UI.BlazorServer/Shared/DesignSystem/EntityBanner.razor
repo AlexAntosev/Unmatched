@@ -1,0 +1,67 @@
+@*
+    The 2a dossier banner, generalised for the entities the design never drew: maps, minions,
+    villains and players. Same shape as the hero banner - art on the left, identity and stat cards
+    on the right - so the undesigned screens stay in the same visual language.
+*@
+<section class="banner">
+    <div class="banner-glow"></div>
+    <div class="banner-content">
+        <div class="banner-art">
+            @if (OnFileSelected.HasDelegate)
+            {
+                <EditableImage ImageUrl="@ImageUrl" AltText="@Name" FallbackImageUrl="@Fallback"
+                               OnFileSelected="OnFileSelected"/>
+            }
+            else
+            {
+                <img src="@ImageUrl" alt="@Name" onerror="this.onerror=null;this.src='@Fallback'"/>
+            }
+        </div>
+        <div class="banner-identity">
+            <div class="um-section-caption">@Eyebrow</div>
+            <div class="banner-title-row">
+                <h1 class="banner-name">@Name</h1>
+                @TitleExtra
+            </div>
+            @if (Chips is not null)
+            {
+                <div class="banner-chips">@Chips</div>
+            }
+            @if (Stats is not null)
+            {
+                <div class="banner-stats">@Stats</div>
+            }
+            @ChildContent
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Eyebrow { get; set; } = "Profile";
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string Fallback { get; set; } = "/Unknown.png";
+
+    /// <summary>When set, the art gets a "Replace image" control.</summary>
+    [Parameter]
+    public EventCallback<IBrowserFile> OnFileSelected { get; set; }
+
+    [Parameter]
+    public RenderFragment? TitleExtra { get; set; }
+
+    [Parameter]
+    public RenderFragment? Chips { get; set; }
+
+    [Parameter]
+    public RenderFragment? Stats { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

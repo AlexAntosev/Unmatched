@@ -1,0 +1,82 @@
+@*
+    The ranked-list row from screen 1c, reused by every list screen (players, maps, minions,
+    villains). The shell owns the coloured left edge, the rank number, the art token, the
+    name/sub-label pair and the melee-ranged glyph; the page supplies the trailing metric cells
+    through <Metrics> so each list can carry its own columns.
+*@
+<div class="um-ladder-row @(Selected ? "is-selected" : null) @(OnClick.HasDelegate ? "is-clickable" : null) @Class"
+     style="@RowStyle"
+     @onclick="OnClick"
+     @onmouseenter="OnHover">
+    <div class="um-ladder-rank" style="color:@PlaceColor.For(Rank)">@(Rank is not null ? Rank.Value.ToString("00") : "-")</div>
+    <div class="um-ladder-identity">
+        <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="32" Radius="9" Round="@RoundArt" Fallback="@Fallback"/>
+        <div class="um-ladder-names">
+            <div class="um-ladder-name">@Name</div>
+            @if (!string.IsNullOrEmpty(Sub))
+            {
+                <div class="um-ladder-sub">@Sub</div>
+            }
+        </div>
+        @if (IsRanged is not null)
+        {
+            <MeleeRangedIcon IsRanged="IsRanged.Value" Height="13" Opacity="0.6" Class="um-ladder-type"/>
+        }
+    </div>
+    @Metrics
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>Grid template for the whole row - the shell occupies the first one or two tracks.</summary>
+    [Parameter]
+    public string Columns { get; set; } = "34px 1fr 58px 58px 90px 62px";
+
+    [Parameter]
+    public int? Rank { get; set; }
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string? Sub { get; set; }
+
+    /// <summary>Draws the melee/ranged glyph when the entity has that concept.</summary>
+    [Parameter]
+    public bool? IsRanged { get; set; }
+
+    /// <summary>Result colour for the 3px left edge; a 6% wash of the same hue fills the row.</summary>
+    [Parameter]
+    public string? EdgeColor { get; set; }
+
+    [Parameter]
+    public string? WashColor { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [Parameter]
+    public bool RoundArt { get; set; }
+
+    [Parameter]
+    public string Fallback { get; set; } = "/Unknown.png";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnHover { get; set; }
+
+    [Parameter]
+    public RenderFragment? Metrics { get; set; }
+
+    private string RowStyle
+        => $"grid-template-columns:{Columns};"
+         + (EdgeColor is null ? string.Empty : $"border-left-color:{EdgeColor};")
+         + (WashColor is null ? string.Empty : $"background:{WashColor};");
+}

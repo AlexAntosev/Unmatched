@@ -1,0 +1,103 @@
+@typeparam TItem
+@*
+    The 1c ladder pattern for the list screens the design never drew - players, maps, minions,
+    villains. The page supplies the row content; this owns the page header, the search box, the
+    column captions and the paging, so every list behaves the same way.
+*@
+<PageHeader Breadcrumbs="Breadcrumbs">
+    <Controls>
+        <UmSearchBox Value="@_search" ValueChanged="OnSearchChanged" Placeholder="@SearchPlaceholder"/>
+    </Controls>
+</PageHeader>
+
+<div class="entity-ladder">
+    <header class="entity-ladder-head">
+        <div>
+            <h1 class="um-page-title">@Title</h1>
+            <div class="entity-ladder-lede">@Lede</div>
+        </div>
+    </header>
+
+    <ColumnHeader Columns="@Columns" Class="entity-ladder-columns">
+        @Header
+    </ColumnHeader>
+
+    <div class="entity-ladder-rows">
+        @if (_page.Count == 0)
+        {
+            <div class="entity-ladder-empty">Nothing to show yet.</div>
+        }
+        @foreach (var item in _page)
+        {
+            @Row(item)
+        }
+    </div>
+
+    <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage" ShowLabels="true"
+                Class="entity-ladder-pagination"/>
+</div>
+
+@code {
+    private List<TItem> _filtered = new();
+    private List<TItem> _page = new();
+    private string? _search;
+    private int _currentPage = 1;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TItem> Items { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Lede { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<Breadcrumb.Crumb>? Breadcrumbs { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Columns { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public RenderFragment Header { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public RenderFragment<TItem> Row { get; set; } = default!;
+
+    /// <summary>How the search box matches an item - usually its name.</summary>
+    [Parameter, EditorRequired]
+    public Func<TItem, string> SearchText { get; set; } = default!;
+
+    [Parameter]
+    public string SearchPlaceholder { get; set; } = "Search…";
+
+    [Parameter]
+    public int PageSize { get; set; } = 10;
+
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(_filtered.Count / (double)PageSize));
+
+    protected override void OnParametersSet() => Rebuild();
+
+    private void Rebuild()
+    {
+        _filtered = string.IsNullOrWhiteSpace(_search)
+            ? Items.ToList()
+            : Items.Where(i => SearchText(i).Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        _page = _filtered.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    private void OnSearchChanged(string? search)
+    {
+        _search = search;
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        Rebuild();
+    }
+}

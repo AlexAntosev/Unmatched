@@ -7,6 +7,8 @@ using Moq;
 using Unmatched.MatchService.Contracts.Kafka;
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
+using Unmatched.MatchService.Domain.Communication.Player;
+using Unmatched.MatchService.Domain.Communication.Player.Dto;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
@@ -44,16 +46,22 @@ public class MatchServiceRecalculationFlagTests
         streakTitleHandler.Setup(h => h.HandleAsync()).Returns(Task.CompletedTask);
 
         var rusherTitleHandler = new Mock<IRusherTitleHandler>();
-        rusherTitleHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ReturnsAsync((Title?)null);
+        rusherTitleHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ReturnsAsync(new List<Title>());
 
         var punisherTitleHandler = new Mock<IPunisherTitleHandler>();
-        punisherTitleHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ReturnsAsync((Title?)null);
+        punisherTitleHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ReturnsAsync(new List<Title>());
 
         var catalogHeroCache = new Mock<ICatalogHeroCache>();
         catalogHeroCache.Setup(c => c.GetAsync()).ReturnsAsync(new[]
         {
             new CatalogHeroDto { Id = WinnerHeroId, Name = "Winner Hero" },
             new CatalogHeroDto { Id = LooserHeroId, Name = "Looser Hero" },
+        });
+
+        var playerCache = new Mock<IPlayerCache>();
+        playerCache.Setup(c => c.GetAsync()).ReturnsAsync(new[]
+        {
+            new PlayerDto { Id = Guid.Empty, Name = "Player" },
         });
 
         var kafkaProducer = new Mock<IKafkaProducer>();
@@ -101,6 +109,7 @@ public class MatchServiceRecalculationFlagTests
             rusherTitleHandler.Object,
             punisherTitleHandler.Object,
             catalogHeroCache.Object,
+            playerCache.Object,
             kafkaProducer.Object);
     }
 

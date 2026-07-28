@@ -11,6 +11,10 @@ public class UnitOfWork(UnmatchedDbContext context, IMapper mapper) : IUnitOfWor
 
     public IMapStatsRepository MapStats { get; } = new MapStatsRepository(context, mapper);
 
+    public IVillainStatsRepository VillainStats { get; } = new VillainStatsRepository(context, mapper);
+
+    public IMinionStatsRepository MinionStats { get; } = new MinionStatsRepository(context, mapper);
+
     public void Dispose() => context.Dispose();
 
     public Task SaveChangesAsync() => context.SaveChangesAsync();

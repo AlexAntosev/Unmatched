@@ -1,5 +1,7 @@
 ﻿namespace Unmatched.MatchService.Api.Dto;
 
+using Unmatched.MatchService.Domain.Enums;
+
 public class MatchLogDto
 {
     public string Comment { get; set; }
@@ -13,6 +15,10 @@ public class MatchLogDto
     public Guid MatchId { get; set; }
 
     public string TournamentName { get; set; }
-    
+
     public int? Epic { get; set; }
+
+    public GameMode GameMode { get; set; }
+
+    public MatchVillainDto? Villain { get; set; }
 }

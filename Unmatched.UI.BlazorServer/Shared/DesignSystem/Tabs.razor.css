@@ -1,0 +1,31 @@
+.um-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.um-tab {
+    padding: 8px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--um-radius-md) var(--um-radius-md) 0 0;
+    background: none;
+    color: var(--um-text-muted);
+    font: 600 12.5px var(--um-font-body);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+.um-tab:hover {
+    color: var(--um-text);
+}
+
+.um-tab.is-selected {
+    border-bottom-color: var(--um-accent);
+    color: var(--um-text);
+}
+
+.um-tabs-rule {
+    flex: 1;
+    border-bottom: 2px solid var(--um-border);
+}

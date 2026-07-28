@@ -1,10 +1,12 @@
-﻿// namespace Unmatched.StatisticsService.Domain.Services.Contracts;
-//
-// using Unmatched.StatisticsService.Domain.Models;
-//
-// public interface IMinionStatisticsService
-// {
-//     Task<IEnumerable<MinionStats>> GetMinionsStatisticsAsync();
-//     
-//     Task<MinionStats> GetMinionStatisticsAsync(Guid minionId);
-// }
+namespace Unmatched.StatisticsService.Domain.Services.Contracts;
+
+using Unmatched.StatisticsService.Domain.Models;
+
+public interface IMinionStatisticsService
+{
+    Task<IEnumerable<MinionStats>> GetMinionsStatisticsAsync();
+
+    Task<MinionStats?> GetMinionStatisticsAsync(Guid minionId);
+
+    Task<MinionStats?> UpdateImageAsync(Guid minionId, string imageFileName);
+}

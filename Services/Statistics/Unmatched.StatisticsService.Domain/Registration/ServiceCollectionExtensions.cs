@@ -28,9 +28,14 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IHeroStatisticsService, HeroStatisticsService>();
         services.AddTransient<IMapStatisticsService, MapStatisticsService>();
         services.AddTransient<IPlayerStatisticsService, PlayerStatisticsService>();
+        services.AddTransient<IVillainStatisticsService, VillainStatisticsService>();
+        services.AddTransient<IMinionStatisticsService, MinionStatisticsService>();
+        services.AddTransient<IExpansionStatisticsService, ExpansionStatisticsService>();
 
         services.AddSingleton<ICatalogHeroCache, CatalogHeroCache>();
         services.AddSingleton<ICatalogMapCache, CatalogMapCache>();
+        services.AddSingleton<ICatalogVillainCache, CatalogVillainCache>();
+        services.AddSingleton<ICatalogMinionCache, CatalogMinionCache>();
         services.AddSingleton<IPlayerCache, PlayerCache>();
 
         services.AddSingleton<IHeroPlaceAdjuster, HeroPlaceAdjuster>();
@@ -40,9 +45,13 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IStatsCoordinator, HeroStatsCoordinator>();
         services.AddTransient<IStatsCoordinator, MapStatsCoordinator>();
+        services.AddTransient<IStatsCoordinator, VillainStatsCoordinator>();
+        services.AddTransient<IStatsCoordinator, MinionStatsCoordinator>();
 
         services.AddTransient<IMatchCreatedHandler, MatchCreatedHeroHandler>();
         services.AddTransient<IMatchCreatedHandler, MatchCreatedMapHandler>();
+        services.AddTransient<IMatchCreatedHandler, MatchCreatedVillainHandler>();
+        services.AddTransient<IMatchCreatedHandler, MatchCreatedMinionHandler>();
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
                 {

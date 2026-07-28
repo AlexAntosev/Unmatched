@@ -1,0 +1,13 @@
+.um-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.um-field-label {
+    font: 500 9.5px var(--um-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
+}

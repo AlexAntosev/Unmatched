@@ -1,0 +1,327 @@
+.hero {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---- Banner ---- */
+
+.hero-banner {
+    position: relative;
+    padding: 26px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+    overflow: hidden;
+}
+
+.hero-banner-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(110% 130% at 8% 0%, rgba(108, 92, 255, 0.28), rgba(168, 85, 247, 0.1) 40%, rgba(10, 10, 16, 0) 74%);
+}
+
+.hero-banner-content {
+    position: relative;
+    display: flex;
+    gap: 24px;
+}
+
+.hero-art-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 262px;
+    flex: none;
+}
+
+.hero-art {
+    position: relative;
+    height: 330px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--um-radius-lg);
+    background: var(--um-bg-panel);
+    overflow: hidden;
+}
+
+.hero-colour {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+}
+
+.hero-colour-swatch {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    flex: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--um-radius-chip);
+    cursor: pointer;
+}
+
+.hero-colour-swatch input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.hero-colour-label {
+    font: 500 11.5px var(--um-font-body);
+    color: var(--um-text-bright);
+}
+
+.hero-colour-value {
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.hero-colour > i {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--um-text-dim);
+}
+
+/* ---- Identity ---- */
+
+.hero-identity {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero-rank {
+    padding: 3px 8px;
+    border-radius: var(--um-radius-chip);
+    background: var(--um-gold-bg);
+    font: 600 10px var(--um-font-mono);
+    letter-spacing: 0.1em;
+    color: var(--um-gold);
+}
+
+.hero-title-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.hero-name {
+    font: 700 48px/1 var(--um-font-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.hero-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.hero-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: var(--um-radius-sm);
+    background: var(--um-bg-inset-strong);
+    font: 500 11.5px var(--um-font-body);
+    color: var(--um-text-bright);
+}
+
+.hero-chip i {
+    font-size: 12px;
+}
+
+.hero-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.hero-analysis {
+    display: grid;
+    grid-template-columns: 1fr 1fr 200px;
+    gap: 12px;
+    align-items: start;
+}
+
+.hero-axis {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero-axis-label {
+    flex: 1;
+    font: 500 12px var(--um-font-body);
+    color: var(--um-text-bright);
+}
+
+.hero-axis-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.hero-axis-dot {
+    width: 16px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.hero-axis-dot.is-on {
+    background: var(--um-accent-soft);
+}
+
+.hero-title-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.hero-title-item i {
+    font-size: 13px;
+    color: var(--um-gold);
+}
+
+.hero-title-name {
+    font: 600 12px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.hero-title-comment {
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.hero-divider {
+    height: 1px;
+    background: var(--um-border);
+    margin: 2px 0;
+}
+
+.hero-sidekick {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero-sidekick-name {
+    font: 600 12px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.hero-sidekick-meta {
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+::deep .hero-winrate .um-panel-body {
+    align-items: center;
+}
+
+/* ---- Body ---- */
+
+.hero-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px var(--um-page-padding-x);
+}
+
+.hero-duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.hero-antagonist-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.hero-antagonist-name {
+    font: 700 15px var(--um-font-display);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.hero-antagonist-meta {
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.hero-antagonist-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+::deep .hero-antagonist .um-panel-heading {
+    color: var(--um-loss);
+}
+
+.hero-muted {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.hero-matchups-caption {
+    font: 400 9.5px var(--um-font-mono);
+    letter-spacing: 0.04em;
+    color: var(--um-text-faint);
+    margin-bottom: 2px;
+}
+
+.hero-matchup-pager {
+    display: flex;
+    gap: 6px;
+}
+
+.hero-matchup-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--um-border);
+    border-radius: 7px;
+    background: none;
+    color: #8b8c9e;
+    cursor: pointer;
+    transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.hero-matchup-page:hover:not(:disabled) {
+    border-color: var(--um-focus-border);
+    color: var(--um-text);
+}
+
+.hero-matchup-page:disabled {
+    color: #3c3d4c;
+    cursor: default;
+}
+
+.hero-matchup-page i {
+    font-size: 10px;
+}

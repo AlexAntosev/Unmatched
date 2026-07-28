@@ -1,0 +1,103 @@
+@using Unmatched.Dtos
+@using Unmatched.Enums
+@using Unmatched.Services.Statistics
+@*
+    Screen 3b: the one row shape used by the match log and every "recent matches" block. The left
+    edge carries the game mode, not the result - this app is a hub for everybody's games, so the
+    outcome only appears inside the expanded scoreboard.
+*@
+<div class="match-row @(IsOpen ? "is-open" : null)" style="border-left-color:@_mode.Color">
+    <div class="match-row-line" @onclick="OnToggle">
+        <div>
+            <div class="match-row-date">@Match.Date.ToString("dd MMM yyyy")</div>
+            @if (Match.Date.TimeOfDay != TimeSpan.Zero)
+            {
+                @* Matches logged before the form had a time field are stored at midnight. *@
+                <div class="match-row-time">@Match.Date.ToString("HH:mm")</div>
+            }
+        </div>
+        <div>
+            <ModeBadge Mode="Match.GameMode"/>
+        </div>
+        <div class="match-row-participants">
+            @foreach (var side in _sides)
+            {
+                @if (side.Separator is not null)
+                {
+                    <span class="match-row-separator">@side.Separator</span>
+                }
+                <SideBox Variant="@SideVariant(side)">
+                    @foreach (var participant in side.Participants)
+                    {
+                        <FighterChip ImageUrl="@participant.ImageUrl"
+                                     PlayerAvatarUrl="@participant.PlayerImageUrl"
+                                     Title="@ChipTitle(participant)"
+                                     IsWinner="participant.IsWinner"
+                                     Place="@(Match.GameMode == GameMode.FreeForAll ? participant.Place : null)"/>
+                    }
+                </SideBox>
+            }
+        </div>
+        <div class="match-row-map">@MapName</div>
+        <div class="match-row-comment">
+            @if (!string.IsNullOrWhiteSpace(Match.Comment))
+            {
+                <i class="bi bi-chat-left-text-fill" title="@Match.Comment"></i>
+            }
+        </div>
+        <div class="match-row-epic">
+            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="11"/>
+        </div>
+        <div class="match-row-chevron">
+            <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"></i>
+        </div>
+    </div>
+    @if (IsOpen)
+    {
+        <MatchScoreboard Match="Match"/>
+    }
+</div>
+
+@code {
+    private IReadOnlyList<MatchSide> _sides = [];
+    private GameModeStyle _mode = GameModeStyle.For(GameMode.OneVsOne);
+
+    [Parameter, EditorRequired]
+    public UiMatchLogDto Match { get; set; } = default!;
+
+    /// <summary>Resolved display name for the map - the log DTO only carries the internal name.</summary>
+    [Parameter]
+    public string? MapName { get; set; }
+
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggle { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _sides = MatchPresentation.Sides(Match);
+        _mode = GameModeStyle.For(Match.GameMode);
+        MapName ??= Match.MapName;
+    }
+
+    /// <summary>
+    /// Sides are washed win/loss only where a side is a team. A lone fighter already shows its
+    /// result through the chip's ring, and free-for-all places are shown by the medals.
+    /// </summary>
+    private string SideVariant(MatchSide side)
+    {
+        if (Match.GameMode is GameMode.OneVsOne or GameMode.FreeForAll)
+        {
+            return "neutral";
+        }
+
+        return side.IsWinner ? "win" : "loss";
+    }
+
+    private static string ChipTitle(MatchParticipant participant)
+        => participant.PlayerName is null
+            ? participant.Name
+            : $"{participant.Name} · {participant.PlayerName}";
+}

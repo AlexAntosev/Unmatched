@@ -1,0 +1,250 @@
+.um-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-inset);
+    cursor: pointer;
+    transition: border-color 0.12s ease;
+}
+
+.um-select:hover {
+    border-color: var(--um-focus-border);
+}
+
+.um-select.is-highlighted {
+    border-color: rgba(139, 125, 255, 0.45);
+}
+
+/* The trigger keeps its focused look while the panel is open. */
+.um-select.is-open {
+    border-color: var(--um-focus-border);
+}
+
+.um-select.is-disabled {
+    color: var(--um-text-faint);
+    cursor: default;
+    pointer-events: none;
+}
+
+.um-select-value {
+    flex: 1;
+    min-width: 0;
+    color: var(--um-text);
+    font: 500 12.5px var(--um-font-body);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.um-select-chevron {
+    flex: none;
+    font-size: 9px;
+    color: var(--um-text-faint);
+    transition: transform 0.12s ease;
+}
+
+.um-select.is-open .um-select-chevron {
+    transform: rotate(180deg);
+}
+
+.um-select-icon {
+    flex: none;
+    font-size: 12px;
+    color: var(--um-text-dim);
+}
+
+.um-select-avatar {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.um-select-art {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+/* ---- Sizes ---- */
+
+.um-select-field {
+    height: var(--um-height-field);
+    padding: 0 10px;
+}
+
+.um-select-control {
+    height: var(--um-height-control);
+    padding: 0 10px;
+    background: var(--um-bg-inset);
+}
+
+/* Filter chips carry a border only - no fill - and muted text until something is picked. */
+.um-select-chip {
+    height: var(--um-height-chip);
+    padding: 0 11px;
+    gap: 7px;
+    border-radius: var(--um-radius-sm);
+    background: none;
+}
+
+.um-select-chip .um-select-value {
+    font: 500 11.5px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.um-select-chip:hover .um-select-value {
+    color: var(--um-text);
+}
+
+.um-select-chip .um-select-icon {
+    font-size: 11px;
+}
+
+.um-select-chip .um-select-chevron {
+    font-size: 8px;
+    opacity: 0.6;
+}
+
+/* A dice button sits flush with the right edge of a field. ::deep because UmButton renders it. */
+.um-select-field ::deep .um-btn-dice {
+    margin-right: -5px;
+}
+
+/* ---- Custom panel (never the browser's native <select> popup) ---- */
+
+.um-select-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: none;
+    cursor: default;
+}
+
+.um-select-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 41;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 100%;
+    width: max-content;
+    max-width: 320px;
+    padding: 6px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-control);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+    cursor: default;
+}
+
+.um-select-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 0 9px;
+    border-radius: var(--um-radius-sm);
+    background: var(--um-bg-inset);
+    border: 1px solid var(--um-border);
+}
+
+.um-select-filter i {
+    font-size: 10px;
+    color: var(--um-text-faint);
+}
+
+.um-select-filter input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: none;
+    color: var(--um-text);
+    font: 400 11.5px var(--um-font-body);
+}
+
+.um-select-filter input:focus {
+    outline: none;
+}
+
+.um-select-filter input::placeholder {
+    color: var(--um-text-faint);
+}
+
+.um-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.um-select-list.is-scrollable {
+    max-height: 212px;
+    overflow-y: auto;
+}
+
+.um-select-option {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 32px;
+    padding: 0 9px;
+    border-radius: var(--um-radius-sm);
+    font: 500 12px var(--um-font-body);
+    color: var(--um-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.um-select-option:hover {
+    background: var(--um-bg-hover);
+    color: var(--um-text);
+}
+
+.um-select-option.is-selected {
+    background: rgba(139, 125, 255, 0.16);
+    color: var(--um-accent-text);
+}
+
+.um-select-option-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.um-select-option-check {
+    flex: none;
+    font-size: 11px;
+    color: var(--um-accent-text);
+}
+
+.um-select-option-art {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.um-select-option-avatar {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.um-select-empty {
+    padding: 8px 9px;
+    font: 400 11.5px var(--um-font-body);
+    color: var(--um-text-faint);
+}

@@ -1,69 +1,40 @@
-﻿@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
+@using Unmatched.UI.BlazorServer.Services
+@inject IMinionService MinionService
+@inject IMinionStatisticsService MinionStatisticsService
+@inject IImageUploadService ImageUploadService
 
-<div style="background: linear-gradient(180deg, @Statistics.Minion.Color 0%, rgba(255,255,255,1) 100%);">
-    <div style="display: flex; align-items: center; justify-content: center;" >
-        <h3 class="page-title">@Statistics.Minion.Name</h3>
-        <button style="background-color: transparent; border: 0px" onclick="@UpdateMinionColor">✎</button>
-        <input type="color" value="@Statistics.Minion.Color" onchange="@OnColorChange"/>
-    </div>
-    <div class="wrapper page-content">
-        <div class="image-container">
-            @if (Statistics.Minion is not null)
-            {
-                <img src="@Statistics.Minion.ImageUrl" onerror="this.onerror=null;this.src='/Unknown.png'"/>
-            }
-        </div>
-        <div>
-            <h5>Current Place: @_statistics.Place (@_statistics.Points points)</h5>
-            <img style="margin-bottom: 0.5rem;" src="@_statistics.Minion?.MeleeRangeImageUrl" alt="@_statistics.MinionId" width="64px" height="auto"/>
-            <h5>Hp: @_statistics.Minion.Hp</h5>
-            <h5>Deck size: @_statistics.Minion.DeckSize</h5>
-        </div>
-    </div>
-</div>
+<EntityBanner Name="@Statistics.Name" Eyebrow="Minion profile" ImageUrl="@BustCache(Statistics.ImageUrl)"
+              OnFileSelected="OnImageSelectedAsync">
+    <TitleExtra>
+        <MeleeRangedIcon IsRanged="Statistics.IsRanged" Height="20" Opacity="0.85"/>
+    </TitleExtra>
+    <Stats>
+        <StatTile Label="Matches" Value="@Statistics.TotalMatches.ToString()"/>
+        <StatTile Label="Wins" Value="@Statistics.TotalWins.ToString()" ValueColor="var(--um-win)"/>
+        <StatTile Label="Losses" Value="@Statistics.TotalLooses.ToString()" ValueColor="var(--um-loss)"/>
+        <StatTile Label="HP" Value="@Statistics.Hp.ToString()"/>
+    </Stats>
+</EntityBanner>
 
 @code {
     [Parameter]
-    public MinionStatisticsDto Statistics
-    {
-        get => _statistics;
-        set
-        {
-            _statistics = value;
-        }
-    }
-    
-    private MinionStatisticsDto _statistics = new();
+    public MinionStatisticsDto Statistics { get; set; } = new();
 
-    private void OnColorChange(ChangeEventArgs e)
+    private int _cacheBust;
+
+    private string BustCache(string? imageUrl) => imageUrl is null ? "/Unknown.png" : $"{imageUrl}?v={_cacheBust}";
+
+    private async Task OnImageSelectedAsync(IBrowserFile file)
     {
-        _statistics.Minion.Color = e.Value?.ToString();
-    }
-    
-    private void UpdateMinionColor()
-    {
-        var color = _statistics.Minion.Color;
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("minions", Statistics.Name, Statistics.ImageFileName, stream, file.Name);
+        await MinionService.UpdateImageAsync(Statistics.MinionId, fileName);
+        await MinionStatisticsService.UpdateImageAsync(Statistics.MinionId, fileName);
+        Statistics.ImageFileName = fileName;
+        _cacheBust++;
+        StateHasChanged();
     }
 }
-
-<style>
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      column-gap: 32px;
-      row-gap: 4px;
-    }
-    
-    .image-container {
-        width: 250px;
-        height: 200px;
-        text-align: center;
-        display: block;
-    }
-    
-    .container img {
-        margin: auto;
-        display: block;
-    }             
-</style>

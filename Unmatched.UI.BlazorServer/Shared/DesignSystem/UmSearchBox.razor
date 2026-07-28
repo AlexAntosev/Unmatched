@@ -1,0 +1,28 @@
+@*
+    The header search. It filters whatever list the page already has in memory - there is no
+    global search destination in the design.
+*@
+<div class="um-search @Class">
+    <i class="bi bi-search"></i>
+    <input type="search" value="@Value" placeholder="@Placeholder" @oninput="HandleInputAsync"/>
+</div>
+
+@code {
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Search hero, player, map…";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private Task HandleInputAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        return ValueChanged.InvokeAsync(Value);
+    }
+}

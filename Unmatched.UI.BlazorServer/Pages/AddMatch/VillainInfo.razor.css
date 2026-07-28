@@ -1,0 +1,69 @@
+.villain {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.fighter {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+}
+
+.fighter-selects {
+    width: 170px;
+    flex: none;
+}
+
+.fighter-stats {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.fighter-narrow {
+    width: 58px;
+    flex: none;
+}
+
+/* Minions are indented under their villain, matching the expanded scoreboard. */
+.minion {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-left: 14px;
+    padding: 7px 9px;
+    border: 1px solid var(--um-info-border);
+    border-radius: var(--um-radius-md);
+    background: var(--um-info-wash);
+}
+
+.minion-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.minion-hp {
+    width: 58px;
+    flex: none;
+}
+
+.minion-remove {
+    padding: 0 2px;
+    border: 0;
+    background: none;
+    color: var(--um-info);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.12s ease;
+}
+
+.minion-remove:hover {
+    color: var(--um-loss);
+}

@@ -1,0 +1,32 @@
+@*
+    The sticky top bar every page shares: breadcrumb on the left, then search and secondary
+    controls, and at most one gradient action on the right.
+*@
+<header class="um-page-header @Class">
+    @if (Breadcrumbs is not null)
+    {
+        <Breadcrumb Items="Breadcrumbs"/>
+    }
+    else if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="um-page-header-title">@Title</div>
+    }
+    <div class="um-spacer"></div>
+    @Controls
+</header>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<Breadcrumb.Crumb>? Breadcrumbs { get; set; }
+
+    /// <summary>Used when a page has no parent section to point at.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Search box, filters and actions - laid out right-aligned in the order given.</summary>
+    [Parameter]
+    public RenderFragment? Controls { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

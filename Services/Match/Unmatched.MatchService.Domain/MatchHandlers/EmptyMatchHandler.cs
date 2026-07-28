@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Validation;
 
 public class EmptyMatchHandler : BaseMatchHandler
 {
@@ -11,7 +12,8 @@ public class EmptyMatchHandler : BaseMatchHandler
 
     public EmptyMatchHandler(
         IUnitOfWork unitOfWork,
-        ILoggerFactory loggerFactory) : base(unitOfWork)
+        IGameModeValidatorFactory validatorFactory,
+        ILoggerFactory loggerFactory) : base(unitOfWork, validatorFactory)
     {
         _logger = loggerFactory.CreateLogger<EmptyMatchHandler>();
     }

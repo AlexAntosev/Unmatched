@@ -1,0 +1,14 @@
+.players-right {
+    text-align: right;
+}
+
+.players-matches {
+    text-align: right;
+    font: 400 12px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.players-kd {
+    text-align: right;
+    font: 600 12px var(--um-font-mono);
+}

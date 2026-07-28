@@ -34,4 +34,8 @@ public class FighterEntity
     public int? TimeSpentInSeconds { get; set; }
 
     public int? Turn { get; set; }
+
+    public int? Team { get; set; }
+
+    public int? Placement { get; set; }
 }

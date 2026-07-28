@@ -1,0 +1,72 @@
+.banner {
+    /* No overflow:hidden here - the glow is already inset:0-bounded, and giving a flex item (this
+       is one, inside .shell-main's column flex) non-visible overflow makes its automatic minimum
+       height resolve to 0, letting flex-shrink crush it once the page is tall enough. */
+    position: relative;
+    padding: 26px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+}
+
+.banner-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(110% 130% at 8% 0%, rgba(108, 92, 255, 0.28), rgba(168, 85, 247, 0.1) 40%, rgba(10, 10, 16, 0) 74%);
+}
+
+.banner-content {
+    position: relative;
+    display: flex;
+    gap: 24px;
+}
+
+.banner-art {
+    position: relative;
+    width: 262px;
+    height: 240px;
+    flex: none;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--um-radius-lg);
+    background: var(--um-bg-panel);
+    overflow: hidden;
+}
+
+.banner-art > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.banner-identity {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.banner-title-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.banner-name {
+    font: 700 38px/1 var(--um-font-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.banner-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.banner-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}

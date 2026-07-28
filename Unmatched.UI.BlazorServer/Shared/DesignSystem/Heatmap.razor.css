@@ -1,0 +1,9 @@
+.um-heatmap {
+    display: grid;
+    gap: 4px;
+}
+
+.um-heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+}
