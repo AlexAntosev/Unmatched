@@ -8,10 +8,7 @@
      style="@RowStyle"
      @onclick="OnClick"
      @onmouseenter="OnHover">
-    @if (Rank is not null)
-    {
-        <div class="um-ladder-rank" style="color:@PlaceColor.For(Rank)">@Rank.Value.ToString("00")</div>
-    }
+    <div class="um-ladder-rank" style="color:@PlaceColor.For(Rank)">@(Rank is not null ? Rank.Value.ToString("00") : "-")</div>
     <div class="um-ladder-identity">
         <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="32" Radius="9" Round="@RoundArt" Fallback="@Fallback"/>
         <div class="um-ladder-names">

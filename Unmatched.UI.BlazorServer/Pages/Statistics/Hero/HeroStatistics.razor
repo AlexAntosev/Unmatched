@@ -49,7 +49,7 @@
             <div class="hero-identity">
                 <div class="hero-eyebrow">
                     <span class="um-section-caption">Hero profile</span>
-                    <span class="hero-rank">RANK @_hero.Place.ToString("00")</span>
+                    <span class="hero-rank">RANK @(_hero.Place?.ToString("00") ?? "-")</span>
                 </div>
                 <div class="hero-title-row">
                     <h1 class="hero-name">@_hero.Name</h1>
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="hero-stat-cards">
-                    <StatTile Label="Place" Value="@_hero.Place.ToString("00")" ValueColor="@PlaceColor.For(_hero.Place)"/>
+                    <StatTile Label="Place" Value="@(_hero.Place?.ToString("00") ?? "-")" ValueColor="@PlaceColor.For(_hero.Place)"/>
                     <StatTile Label="Points" Value="@_hero.Points.ToString()"/>
                     <StatTile Label="HP" Value="@_hero.Hp.ToString()"/>
                     <StatTile Label="Deck size" Value="@_hero.DeckSize.ToString()"/>
@@ -357,7 +357,7 @@
     /// <summary>Prev/next walk the ladder in rank order, which is how the user got here.</summary>
     private void BuildNeighbours(List<UiHeroStatisticsDto> ladder, Guid heroId)
     {
-        var ordered = ladder.OrderBy(h => h.Place).ToList();
+        var ordered = ladder.OrderBy(h => h.Place ?? int.MaxValue).ToList();
         var index = ordered.FindIndex(h => h.HeroId == heroId);
         _previousHeroId = index > 0 ? ordered[index - 1].HeroId : null;
         _nextHeroId = index >= 0 && index < ordered.Count - 1 ? ordered[index + 1].HeroId : null;

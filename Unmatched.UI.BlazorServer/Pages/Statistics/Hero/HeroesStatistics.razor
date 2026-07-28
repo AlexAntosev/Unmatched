@@ -54,7 +54,7 @@
             @foreach (var hero in _page)
             {
                 <LadderRow Columns="@Columns"
-                           Rank="hero.Place"
+                           Rank="@DisplayRank(hero)"
                            Name="@hero.Name"
                            Sub="@ExpansionName(hero.HeroId)"
                            ImageUrl="@hero.ImageUrl"
@@ -89,7 +89,7 @@
                         <HeroToken ImageUrl="@_spotlight.ImageUrl" Alt="@_spotlight.Name" Size="40" Radius="11"/>
                         <div>
                             <div class="spotlight-name">@_spotlight.Name</div>
-                            <div class="spotlight-rank">selected · rank @_spotlight.Place.ToString("00")</div>
+                            <div class="spotlight-rank">selected · rank @(DisplayRank(_spotlight)?.ToString("00") ?? "-")</div>
                         </div>
                     </div>
                     <div class="spotlight-stats">
@@ -172,6 +172,7 @@
     private List<UiHeroStatisticsDto> _heroes = new();
     private List<UiHeroStatisticsDto> _sorted = new();
     private List<UiHeroStatisticsDto> _page = new();
+    private Dictionary<Guid, int?> _displayRanks = new();
     private List<UiMatchLogDto> _matches = new();
     private List<ExpansionDto> _expansions = new();
     private Dictionary<Guid, string?> _expansionNamesByHero = new();
@@ -255,18 +256,39 @@
             heroes = heroes.Where(h => h.Name.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
+        // Unranked heroes (no recorded matches) always sink to the bottom, regardless of sort tab.
         heroes = _sort switch
         {
-            LadderSort.WinRate => heroes.OrderByDescending(WinRate).ThenByDescending(h => h.TotalMatches),
-            LadderSort.Kd => heroes.OrderByDescending(h => h.Kd).ThenByDescending(h => h.TotalMatches),
-            LadderSort.RecentlyPlayed => heroes.OrderByDescending(h => _lastPlayedByHero.GetValueOrDefault(h.HeroId)),
-            _ => heroes.OrderByDescending(h => h.Points).ThenByDescending(h => h.Kd)
+            LadderSort.WinRate => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(WinRate).ThenByDescending(h => h.TotalMatches),
+            LadderSort.Kd => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(h => h.Kd).ThenByDescending(h => h.TotalMatches),
+            LadderSort.RecentlyPlayed => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(h => _lastPlayedByHero.GetValueOrDefault(h.HeroId)),
+            _ => heroes.OrderByDescending(h => h.Place is not null).ThenByDescending(h => h.Points).ThenByDescending(h => h.Kd)
         };
 
         _sorted = heroes.ToList();
+        _displayRanks = BuildDisplayRanks(_sorted);
         _currentPage = Math.Clamp(_currentPage, 1, PageCount);
         _page = _sorted.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
     }
+
+    /// <summary>
+    /// Renumbers the currently filtered/sorted list from 1, so unranked heroes (hidden by
+    /// collection filters or excluded because they have no matches) don't leave gaps in the
+    /// numbers shown on screen. Heroes with no recorded matches stay unranked.
+    /// </summary>
+    private static Dictionary<Guid, int?> BuildDisplayRanks(IReadOnlyList<UiHeroStatisticsDto> heroes)
+    {
+        var ranks = new Dictionary<Guid, int?>();
+        var place = 1;
+        foreach (var hero in heroes)
+        {
+            ranks[hero.HeroId] = hero.Place is not null ? place++ : null;
+        }
+
+        return ranks;
+    }
+
+    private int? DisplayRank(UiHeroStatisticsDto hero) => _displayRanks.GetValueOrDefault(hero.HeroId);
 
     private async Task SelectAsync(UiHeroStatisticsDto? hero)
     {
@@ -319,10 +341,16 @@
         => hero.TotalMatches == 0 ? 0 : (int)Math.Round((double)hero.TotalWins / hero.TotalMatches * 100);
 
     /// <summary>Medals mark the podium; a negative score marks a hero that is losing ground.</summary>
-    private static string? EdgeColor(UiHeroStatisticsDto hero)
-        => hero.Points < 0 ? "var(--um-loss)"
-            : hero.Place <= 3 ? PlaceColor.For(hero.Place)
-            : null;
+    private string? EdgeColor(UiHeroStatisticsDto hero)
+    {
+        if (hero.Points < 0)
+        {
+            return "var(--um-loss)";
+        }
+
+        var rank = DisplayRank(hero);
+        return rank is >= 1 and <= 3 ? PlaceColor.For(rank) : null;
+    }
 
     private static string? WashColor(UiHeroStatisticsDto hero)
         => hero.Points < 0 ? "var(--um-loss-wash)" : null;
