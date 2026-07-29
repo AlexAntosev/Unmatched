@@ -1,0 +1,154 @@
+@typeparam TValue
+@*
+    The multi-select filter dropdown (design/IMPLEMENTATION-PROMPT.md §2): a trigger with an icon,
+    a fixed label and a selection-count badge, and a custom panel of checkbox rows - never the
+    browser's native <select>. Checking a row only edits a draft; the filter itself only changes
+    when Apply is pressed, so a half-finished selection never flashes results at the list behind
+    it. Applied chips and "Clear all filters" are rendered by the page, since one page usually
+    hosts several of these side by side and needs one shared chip row.
+*@
+<div class="um-mselect @Class" @onkeydown="OnKeyDown">
+    <button type="button" class="um-mselect-trigger @(_isOpen ? "is-open" : null)" tabindex="0"
+            aria-haspopup="listbox" aria-expanded="@_isOpen" @onclick="Toggle">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <i class="bi @Icon um-mselect-icon"></i>
+        }
+        <span class="um-mselect-label @(Value.Count > 0 ? "is-active" : null)">@Label</span>
+        @if (Value.Count > 0)
+        {
+            <span class="um-mselect-badge">@Value.Count</span>
+        }
+        <i class="bi bi-chevron-down um-mselect-chevron"></i>
+    </button>
+
+    @if (_isOpen)
+    {
+        <div class="um-mselect-scrim" @onclick="Close" @onclick:stopPropagation="true"></div>
+        <div class="um-mselect-panel" @onclick:stopPropagation="true">
+            @if (ShowFilter)
+            {
+                <div class="um-mselect-filter">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Search…" value="@_filter" @oninput="OnFilterInput"/>
+                </div>
+            }
+            <div class="um-mselect-list @(ShowFilter ? "is-scrollable" : null)" role="listbox">
+                @if (FilteredOptions.Count == 0)
+                {
+                    <div class="um-mselect-empty">No matches.</div>
+                }
+                @foreach (var option in FilteredOptions)
+                {
+                    var isSelected = _draft.Contains(option.Value);
+                    <div class="um-mselect-option @(isSelected ? "is-selected" : null)" role="option"
+                         aria-selected="@isSelected" @onclick="@(() => ToggleDraft(option.Value))">
+                        <span class="um-mselect-check @(isSelected ? "is-checked" : null)">
+                            @if (isSelected)
+                            {
+                                <i class="bi bi-check-lg"></i>
+                            }
+                        </span>
+                        @if (!string.IsNullOrEmpty(option.ArtUrl))
+                        {
+                            <img class="um-mselect-token" src="@option.ArtUrl" alt=""/>
+                        }
+                        else if (!string.IsNullOrEmpty(option.AvatarUrl))
+                        {
+                            <img class="um-mselect-token is-round" src="@option.AvatarUrl" alt=""/>
+                        }
+                        <span class="um-mselect-option-label">@option.Label</span>
+                        @if (option.Count is not null)
+                        {
+                            <span class="um-mselect-option-count">@option.Count</span>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="um-mselect-footer">
+                <button type="button" class="um-mselect-clear" disabled="@(_draft.Count == 0)" @onclick="ClearDraft">
+                    Clear (@_draft.Count)
+                </button>
+                <div class="um-spacer"></div>
+                <UmButton Size="sm" Variant="primary" OnClick="ApplyAsync">Apply</UmButton>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private const int FilterThreshold = 8;
+
+    private bool _isOpen;
+    private string _filter = string.Empty;
+    private HashSet<TValue> _draft = new();
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TValue> Value { get; set; } = Array.Empty<TValue>();
+
+    [Parameter]
+    public EventCallback<IReadOnlyList<TValue>> ValueChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SelectOption<TValue>> Options { get; set; } = Array.Empty<SelectOption<TValue>>();
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private bool ShowFilter => Options.Count > FilterThreshold;
+
+    private IReadOnlyList<SelectOption<TValue>> FilteredOptions
+        => string.IsNullOrWhiteSpace(_filter)
+            ? Options
+            : Options.Where(o => o.Label.Contains(_filter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private void Toggle()
+    {
+        if (_isOpen)
+        {
+            Close();
+            return;
+        }
+
+        _draft = Value.ToHashSet();
+        _isOpen = true;
+    }
+
+    private void Close()
+    {
+        _isOpen = false;
+        _filter = string.Empty;
+    }
+
+    private void OnFilterInput(ChangeEventArgs args) => _filter = args.Value?.ToString() ?? string.Empty;
+
+    private void ToggleDraft(TValue value)
+    {
+        if (!_draft.Add(value))
+        {
+            _draft.Remove(value);
+        }
+    }
+
+    private void ClearDraft() => _draft.Clear();
+
+    private async Task ApplyAsync()
+    {
+        Close();
+        await ValueChanged.InvokeAsync(_draft.ToList());
+    }
+
+    private void OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape" && _isOpen)
+        {
+            Close();
+        }
+    }
+}

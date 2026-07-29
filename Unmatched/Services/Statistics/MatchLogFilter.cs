@@ -5,31 +5,43 @@ using Unmatched.Enums;
 
 /// <summary>
 /// The filter strip on the match log. Applied in memory over the log the page already loaded -
-/// at the volumes this app sees that is cheaper than a round trip per keystroke.
+/// at the volumes this app sees that is cheaper than a round trip per keystroke. Every dropdown is
+/// multi-select (design/IMPLEMENTATION-PROMPT.md §2): an empty set means "don't filter on this",
+/// a non-empty one means "match any of these".
 /// </summary>
 public class MatchLogFilter
 {
     public GameMode? Mode { get; set; }
 
-    public Guid? PlayerId { get; set; }
+    public HashSet<Guid> PlayerIds { get; set; } = [];
 
-    public Guid? HeroId { get; set; }
+    public HashSet<Guid> HeroIds { get; set; } = [];
 
-    public string? MapName { get; set; }
+    public HashSet<string> MapNames { get; set; } = [];
 
-    public string? TournamentName { get; set; }
+    public HashSet<string> TournamentNames { get; set; } = [];
 
-    public DateTime? From { get; set; }
-
-    public DateTime? To { get; set; }
+    /// <summary>Selected range presets in days (e.g. 30/90/365) - OR'd together, so only the
+    /// loosest (largest) one actually constrains anything.</summary>
+    public HashSet<int> RangeDays { get; set; } = [];
 
     /// <summary>Free text matched against hero, player and map names.</summary>
     public string? Search { get; set; }
 
     public bool IsEmpty
-        => Mode is null && PlayerId is null && HeroId is null
-        && string.IsNullOrWhiteSpace(MapName) && string.IsNullOrWhiteSpace(TournamentName)
-        && From is null && To is null && string.IsNullOrWhiteSpace(Search);
+        => Mode is null && PlayerIds.Count == 0 && HeroIds.Count == 0
+        && MapNames.Count == 0 && TournamentNames.Count == 0
+        && RangeDays.Count == 0 && string.IsNullOrWhiteSpace(Search);
+
+    public void Clear()
+    {
+        Mode = null;
+        PlayerIds.Clear();
+        HeroIds.Clear();
+        MapNames.Clear();
+        TournamentNames.Clear();
+        RangeDays.Clear();
+    }
 
     public IEnumerable<UiMatchLogDto> Apply(IEnumerable<UiMatchLogDto> matches)
     {
@@ -40,34 +52,30 @@ public class MatchLogFilter
             filtered = filtered.Where(m => m.GameMode == Mode);
         }
 
-        if (PlayerId is not null)
+        if (PlayerIds.Count > 0)
         {
-            filtered = filtered.Where(m => m.Fighters.Any(f => f.PlayerId == PlayerId));
+            filtered = filtered.Where(m => m.Fighters.Any(f => PlayerIds.Contains(f.PlayerId)));
         }
 
-        if (HeroId is not null)
+        if (HeroIds.Count > 0)
         {
-            filtered = filtered.Where(m => m.Fighters.Any(f => f.HeroId == HeroId));
+            filtered = filtered.Where(m => m.Fighters.Any(f => HeroIds.Contains(f.HeroId)));
         }
 
-        if (!string.IsNullOrWhiteSpace(MapName))
+        if (MapNames.Count > 0)
         {
-            filtered = filtered.Where(m => m.MapName == MapName);
+            filtered = filtered.Where(m => MapNames.Contains(m.MapName));
         }
 
-        if (!string.IsNullOrWhiteSpace(TournamentName))
+        if (TournamentNames.Count > 0)
         {
-            filtered = filtered.Where(m => m.TournamentName == TournamentName);
+            filtered = filtered.Where(m => TournamentNames.Contains(m.TournamentName));
         }
 
-        if (From is not null)
+        if (RangeDays.Count > 0)
         {
-            filtered = filtered.Where(m => m.Date.Date >= From.Value.Date);
-        }
-
-        if (To is not null)
-        {
-            filtered = filtered.Where(m => m.Date.Date <= To.Value.Date);
+            var from = DateTime.Today.AddDays(-RangeDays.Max());
+            filtered = filtered.Where(m => m.Date.Date >= from);
         }
 
         if (!string.IsNullOrWhiteSpace(Search))

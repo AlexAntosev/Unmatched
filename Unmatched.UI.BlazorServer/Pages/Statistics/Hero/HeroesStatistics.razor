@@ -43,6 +43,26 @@
 
     <Tabs TValue="LadderSort" Options="SortTabs" Value="_sort" ValueChanged="OnSortChanged" Class="ladder-tabs"/>
 
+    <div class="ladder-filters">
+        <UmMultiSelect TValue="Guid" Icon="bi-box-seam" Label="Sets" Value="_selectedExpansionIds.ToList()"
+                       ValueChanged="OnExpansionsChanged" Options="SetOptions()"/>
+        <UmMultiSelect TValue="bool" Icon="bi-arrows-angle-expand" Label="Attack type" Value="_selectedAttackTypes.ToList()"
+                       ValueChanged="OnAttackTypesChanged" Options="AttackTypeOptions()"/>
+
+        @if (_selectedExpansionIds.Count > 0 || _selectedAttackTypes.Count > 0)
+        {
+            @foreach (var expansionId in _selectedExpansionIds)
+            {
+                <FilterChip Label="@ExpansionSetName(expansionId)" OnRemove="@(() => RemoveExpansion(expansionId))"/>
+            }
+            @foreach (var isRanged in _selectedAttackTypes)
+            {
+                <FilterChip Label="@(isRanged ? "Ranged" : "Melee")" OnRemove="@(() => RemoveAttackType(isRanged))"/>
+            }
+            <ClearAllFiltersChip OnClick="ClearHeroFilters"/>
+        }
+    </div>
+
     <div class="ladder-body">
         <div class="ladder-list">
             @if (_viewMode == ListViewMode.List)
@@ -211,7 +231,10 @@
     private List<UiMatchLogDto> _matches = new();
     private List<ExpansionDto> _expansions = new();
     private Dictionary<Guid, string?> _expansionNamesByHero = new();
+    private Dictionary<Guid, Guid?> _expansionIdByHero = new();
     private HashSet<Guid> _ownedExpansionIds = new();
+    private HashSet<Guid> _selectedExpansionIds = new();
+    private HashSet<bool> _selectedAttackTypes = new();
     private Dictionary<Guid, DateTime> _lastPlayedByHero = new();
 
     private UiHeroStatisticsDto? _spotlight;
@@ -253,14 +276,14 @@
 
             var heroes = catalogHeroes.Result.ToList();
             _expansionNamesByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionName);
-            var expansionIdByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionId);
+            _expansionIdByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionId);
 
             _lastPlayedByHero = _matches
                 .SelectMany(m => m.Fighters.Select(f => (f.HeroId, m.Date)))
                 .GroupBy(x => x.HeroId)
                 .ToDictionary(g => g.Key, g => g.Max(x => x.Date));
 
-            _heroes = FilterByCollection(stats.Result.ToList(), expansionIdByHero);
+            _heroes = FilterByCollection(stats.Result.ToList(), _expansionIdByHero);
             Rebuild();
             await SelectAsync(_page.FirstOrDefault());
         }
@@ -307,6 +330,17 @@
         if (!string.IsNullOrWhiteSpace(_search))
         {
             heroes = heroes.Where(h => h.Name.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (_selectedExpansionIds.Count > 0)
+        {
+            heroes = heroes.Where(h => _expansionIdByHero.TryGetValue(h.HeroId, out var expansionId)
+                && expansionId is not null && _selectedExpansionIds.Contains(expansionId.Value));
+        }
+
+        if (_selectedAttackTypes.Count > 0)
+        {
+            heroes = heroes.Where(h => _selectedAttackTypes.Contains(h.IsRanged));
         }
 
         // Unranked heroes (no recorded matches) always sink to the bottom, regardless of sort tab.
@@ -375,6 +409,57 @@
     {
         _search = search;
         _currentPage = 1;
+        Rebuild();
+    }
+
+    private IReadOnlyList<SelectOption<Guid>> SetOptions()
+        => _expansions
+            .Select(e => new SelectOption<Guid>(e.Id, e.Name,
+                Count: _expansionIdByHero.Count(kv => kv.Value == e.Id)))
+            .Where(o => o.Count > 0)
+            .ToList();
+
+    private static readonly IReadOnlyList<SelectOption<bool>> AttackTypeOptionsStatic =
+        [new(false, "Melee", "bi-slash-circle"), new(true, "Ranged", "bi-bullseye")];
+
+    private IReadOnlyList<SelectOption<bool>> AttackTypeOptions()
+        => AttackTypeOptionsStatic
+            .Select(o => o with { Count = _heroes.Count(h => h.IsRanged == o.Value) })
+            .ToList();
+
+    private string ExpansionSetName(Guid expansionId)
+        => _expansions.FirstOrDefault(e => e.Id == expansionId)?.Name ?? "Unknown set";
+
+    private void OnExpansionsChanged(IReadOnlyList<Guid> expansionIds)
+    {
+        _selectedExpansionIds = expansionIds.ToHashSet();
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void OnAttackTypesChanged(IReadOnlyList<bool> attackTypes)
+    {
+        _selectedAttackTypes = attackTypes.ToHashSet();
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void RemoveExpansion(Guid expansionId)
+    {
+        _selectedExpansionIds.Remove(expansionId);
+        Rebuild();
+    }
+
+    private void RemoveAttackType(bool isRanged)
+    {
+        _selectedAttackTypes.Remove(isRanged);
+        Rebuild();
+    }
+
+    private void ClearHeroFilters()
+    {
+        _selectedExpansionIds.Clear();
+        _selectedAttackTypes.Clear();
         Rebuild();
     }
 

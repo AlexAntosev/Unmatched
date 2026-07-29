@@ -1,0 +1,22 @@
+.um-clear-all-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: var(--um-radius-sm);
+    border: 1px solid rgba(242, 80, 107, 0.35);
+    background: none;
+    color: var(--um-loss);
+    font: 500 12.5px var(--um-font-body);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.um-clear-all-chip:hover {
+    background: var(--um-loss-wash);
+}
+
+.um-clear-all-chip i {
+    font-size: 12px;
+}

@@ -35,6 +35,14 @@
     margin-top: 18px;
 }
 
+.ladder-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
 .ladder-body {
     display: grid;
     grid-template-columns: 1fr 316px;

@@ -42,24 +42,51 @@
                       Value="_filter.Mode" ValueChanged="OnModeChanged"/>
     <div class="log-filters-divider"></div>
 
-    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-people" Value="_filter.PlayerId" ValueChanged="OnPlayerChanged"
-              Options="PlayerOptions()"/>
+    <UmMultiSelect TValue="Guid" Icon="bi-people" Label="Players" Value="_filter.PlayerIds.ToList()"
+                   ValueChanged="OnPlayersChanged" Options="PlayerOptions()"/>
 
-    <UmSelect TValue="Guid?" Variant="chip" Icon="bi-shield" Value="_filter.HeroId" ValueChanged="OnHeroChanged"
-              Options="HeroOptions()"/>
+    <UmMultiSelect TValue="Guid" Icon="bi-shield" Label="Heroes" Value="_filter.HeroIds.ToList()"
+                   ValueChanged="OnHeroesChanged" Options="HeroOptions()"/>
 
-    <UmSelect TValue="string" Variant="chip" Icon="bi-map" Value="@_filter.MapName" ValueChanged="OnMapChanged"
-              Options="MapOptions()"/>
+    <UmMultiSelect TValue="string" Icon="bi-map" Label="Maps" Value="_filter.MapNames.ToList()"
+                   ValueChanged="OnMapsChanged" Options="MapOptions()"/>
 
-    <UmSelect TValue="string" Variant="chip" Icon="bi-flag" Value="@_filter.TournamentName" ValueChanged="OnTournamentChanged"
-              Options="TournamentOptions()"/>
+    <UmMultiSelect TValue="string" Icon="bi-flag" Label="Tournaments" Value="_filter.TournamentNames.ToList()"
+                   ValueChanged="OnTournamentsChanged" Options="TournamentOptions()"/>
 
-    <UmSelect TValue="string" Variant="chip" Icon="bi-calendar3" Value="@_range" ValueChanged="OnRangeChanged"
-              Options="RangeOptions"/>
+    <UmMultiSelect TValue="int" Icon="bi-calendar3" Label="Date range" Value="_filter.RangeDays.ToList()"
+                   ValueChanged="OnRangeChanged" Options="RangeOptions"/>
 
     <div class="um-spacer"></div>
     <div class="log-count">@($"{_filtered.Count} of {_all.Count} matches")</div>
 </div>
+
+@if (!_filter.IsEmpty)
+{
+    <div class="log-chips">
+        @foreach (var value in _filter.PlayerIds)
+        {
+            <FilterChip Label="@PlayerName(value)" OnRemove="@(() => RemovePlayer(value))"/>
+        }
+        @foreach (var value in _filter.HeroIds)
+        {
+            <FilterChip Label="@HeroName(value)" OnRemove="@(() => RemoveHero(value))"/>
+        }
+        @foreach (var value in _filter.MapNames)
+        {
+            <FilterChip Label="@MapDisplayName(value)" OnRemove="@(() => RemoveMap(value))"/>
+        }
+        @foreach (var value in _filter.TournamentNames)
+        {
+            <FilterChip Label="@value" OnRemove="@(() => RemoveTournament(value))"/>
+        }
+        @foreach (var value in _filter.RangeDays)
+        {
+            <FilterChip Label="@RangeLabel(value)" OnRemove="@(() => RemoveRange(value))"/>
+        }
+        <ClearAllFiltersChip OnClick="ClearAllFilters"/>
+    </div>
+}
 
 <div class="log-body">
     <MatchList Matches="_filtered" PageSize="_pageSize" AllowPageSizeControl="true" PageSizeChanged="OnPageSizeChanged"/>
@@ -77,9 +104,9 @@
         new(GameMode.Cooperative, "Co-op", "bi-shield-fill", "var(--um-mode-coop)")
     ];
 
-    private static readonly IReadOnlyList<SelectOption<string>> RangeOptions =
+    private static readonly IReadOnlyList<SelectOption<int>> RangeOptions =
     [
-        new(null!, "All time"), new("30", "Last 30 days"), new("90", "Last 3 months"), new("365", "Last year")
+        new(30, "Last 30 days"), new(90, "Last 3 months"), new(365, "Last year")
     ];
 
     private readonly MatchLogFilter _filter = new();
@@ -91,7 +118,6 @@
     private List<MapDto> _maps = new();
     private List<Dtos.Match.TournamentDto> _tournaments = new();
     private MatchLogMetrics _metrics = MatchLogMetrics.Empty;
-    private string? _range = string.Empty;
     private int _pageSize = 10;
 
     [Inject]
@@ -139,25 +165,38 @@
 
     private void ApplyFilter() => _filtered = _filter.Apply(_all).ToList();
 
-    private IReadOnlyList<SelectOption<Guid?>> PlayerOptions()
-        => new SelectOption<Guid?>[] { new(null, "All players") }
-            .Concat(_players.Select(p => new SelectOption<Guid?>(p.Id, p.Name ?? "Unknown", AvatarUrl: p.ImageUrl)))
+    private IReadOnlyList<SelectOption<Guid>> PlayerOptions()
+        => _players
+            .Select(p => new SelectOption<Guid>(p.Id, p.Name ?? "Unknown", AvatarUrl: p.ImageUrl,
+                Count: _all.Count(m => m.Fighters.Any(f => f.PlayerId == p.Id))))
             .ToList();
 
-    private IReadOnlyList<SelectOption<Guid?>> HeroOptions()
-        => new SelectOption<Guid?>[] { new(null, "All heroes") }
-            .Concat(_heroes.Select(h => new SelectOption<Guid?>(h.Id, h.Name, ArtUrl: h.ImageUrl)))
+    private IReadOnlyList<SelectOption<Guid>> HeroOptions()
+        => _heroes
+            .Select(h => new SelectOption<Guid>(h.Id, h.Name, ArtUrl: h.ImageUrl,
+                Count: _all.Count(m => m.Fighters.Any(f => f.HeroId == h.Id))))
             .ToList();
 
     private IReadOnlyList<SelectOption<string>> MapOptions()
-        => new SelectOption<string>[] { new(null!, "All maps") }
-            .Concat(_maps.Select(m => new SelectOption<string>(m.Name, m.DisplayName)))
+        => _maps
+            .Select(m => new SelectOption<string>(m.Name, m.DisplayName,
+                Count: _all.Count(match => match.MapName == m.Name)))
             .ToList();
 
     private IReadOnlyList<SelectOption<string>> TournamentOptions()
-        => new SelectOption<string>[] { new(null!, "All tournaments") }
-            .Concat(_tournaments.Select(t => new SelectOption<string>(t.Name, t.Name)))
+        => _tournaments
+            .Select(t => new SelectOption<string>(t.Name, t.Name,
+                Count: _all.Count(m => m.TournamentName == t.Name)))
             .ToList();
+
+    private string PlayerName(Guid playerId) => _players.FirstOrDefault(p => p.Id == playerId)?.Name ?? "Unknown";
+
+    private string HeroName(Guid heroId) => _heroes.FirstOrDefault(h => h.Id == heroId)?.Name ?? "Unknown";
+
+    private string MapDisplayName(string mapName)
+        => _maps.FirstOrDefault(m => m.Name == mapName)?.DisplayName ?? mapName;
+
+    private static string RangeLabel(int days) => RangeOptions.First(o => o.Value == days).Label;
 
     private void OnModeChanged(GameMode? mode)
     {
@@ -165,27 +204,33 @@
         ApplyFilter();
     }
 
-    private void OnPlayerChanged(Guid? playerId)
+    private void OnPlayersChanged(IReadOnlyList<Guid> playerIds)
     {
-        _filter.PlayerId = playerId;
+        _filter.PlayerIds = playerIds.ToHashSet();
         ApplyFilter();
     }
 
-    private void OnHeroChanged(Guid? heroId)
+    private void OnHeroesChanged(IReadOnlyList<Guid> heroIds)
     {
-        _filter.HeroId = heroId;
+        _filter.HeroIds = heroIds.ToHashSet();
         ApplyFilter();
     }
 
-    private void OnMapChanged(string? mapName)
+    private void OnMapsChanged(IReadOnlyList<string> mapNames)
     {
-        _filter.MapName = mapName;
+        _filter.MapNames = mapNames.ToHashSet();
         ApplyFilter();
     }
 
-    private void OnTournamentChanged(string? tournamentName)
+    private void OnTournamentsChanged(IReadOnlyList<string> tournamentNames)
     {
-        _filter.TournamentName = tournamentName;
+        _filter.TournamentNames = tournamentNames.ToHashSet();
+        ApplyFilter();
+    }
+
+    private void OnRangeChanged(IReadOnlyList<int> rangeDays)
+    {
+        _filter.RangeDays = rangeDays.ToHashSet();
         ApplyFilter();
     }
 
@@ -195,10 +240,39 @@
         ApplyFilter();
     }
 
-    private void OnRangeChanged(string? range)
+    private void RemovePlayer(Guid playerId)
     {
-        _range = range;
-        _filter.From = int.TryParse(range, out var days) ? DateTime.Today.AddDays(-days) : null;
+        _filter.PlayerIds.Remove(playerId);
+        ApplyFilter();
+    }
+
+    private void RemoveHero(Guid heroId)
+    {
+        _filter.HeroIds.Remove(heroId);
+        ApplyFilter();
+    }
+
+    private void RemoveMap(string mapName)
+    {
+        _filter.MapNames.Remove(mapName);
+        ApplyFilter();
+    }
+
+    private void RemoveTournament(string tournamentName)
+    {
+        _filter.TournamentNames.Remove(tournamentName);
+        ApplyFilter();
+    }
+
+    private void RemoveRange(int days)
+    {
+        _filter.RangeDays.Remove(days);
+        ApplyFilter();
+    }
+
+    private void ClearAllFilters()
+    {
+        _filter.Clear();
         ApplyFilter();
     }
 

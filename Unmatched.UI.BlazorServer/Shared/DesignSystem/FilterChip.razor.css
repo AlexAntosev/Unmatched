@@ -1,0 +1,30 @@
+.um-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 8px 0 11px;
+    border-radius: var(--um-radius-sm);
+    background: rgba(108, 92, 255, 0.14);
+    border: 1px solid rgba(139, 125, 255, 0.4);
+    color: var(--um-accent-text);
+    font: 500 12.5px var(--um-font-body);
+    white-space: nowrap;
+}
+
+.um-filter-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.um-filter-chip-remove:hover {
+    color: var(--um-text);
+}

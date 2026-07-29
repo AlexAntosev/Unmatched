@@ -27,6 +27,15 @@
     white-space: nowrap;
 }
 
+.log-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 var(--um-page-padding-x) 14px;
+    border-bottom: 1px solid var(--um-border);
+}
+
 .log-body {
     padding: 18px var(--um-page-padding-x) 22px;
 }
