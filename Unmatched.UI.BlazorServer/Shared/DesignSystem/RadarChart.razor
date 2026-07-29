@@ -20,8 +20,11 @@
 </div>
 
 @code {
-    // Centre of the 120x120 viewBox and the radius of the outer ring.
+    // Centre of the 120x120 viewBox and the radius of the outer ring. A value of 0 still sits
+    // MinRadius out from the centre rather than collapsing to a point, so an axis at zero stays
+    // visible in the polygon's shape (design/IMPLEMENTATION-PROMPT.md §3.2).
     private const double Centre = 60;
+    private const double MinRadius = 4;
     private const double MaxRadius = 46;
 
     [Parameter]
@@ -67,7 +70,8 @@
         }
     }
 
-    private double Scale(int value) => Math.Clamp(value, 0, Max) / (double)Math.Max(Max, 1) * MaxRadius;
+    private double Scale(int value)
+        => MinRadius + (MaxRadius - MinRadius) * Math.Clamp(value, 0, Max) / Math.Max(Max, 1);
 
     private static string F(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
 }

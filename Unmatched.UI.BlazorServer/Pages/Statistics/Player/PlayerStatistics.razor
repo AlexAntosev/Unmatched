@@ -8,12 +8,17 @@
 @inject IFavoriteStatisticsService FavoriteStatisticsService
 @inject IFavoriteService FavoriteService
 @inject IHeroService HeroService
+@inject NavigationManager NavManager
 @*
     Not in the design pack: the 2a dossier pattern applied to a player - banner, heroes played, this
     player's own coloured matches, and the villain/minion records.
 *@
 
-<PageHeader Breadcrumbs="Crumbs"/>
+<EntityNavBar EntityNoun="player" Breadcrumbs="Crumbs" PositionLabel="@PositionLabel"
+              PreviousName="@_previousPlayer?.Name" PreviousImageUrl="@_previousPlayer?.ImageUrl"
+              OnPreviousClick="@(() => GoToPlayer(_previousPlayer))"
+              NextName="@_nextPlayer?.Name" NextImageUrl="@_nextPlayer?.ImageUrl"
+              OnNextClick="@(() => GoToPlayer(_nextPlayer))"/>
 
 <PlayerSummary Statistics="_player" ChosenOne="_chosenOne" HeroesPlayedCount="_favorites.Count"/>
 
@@ -42,6 +47,10 @@
     private FavoriteStatisticsDto? _chosenOne;
     private Guid _playerId;
     private int _totalHeroCount;
+    private PlayerStatisticsDto? _previousPlayer;
+    private PlayerStatisticsDto? _nextPlayer;
+    private int _rank;
+    private int _ladderSize;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
@@ -50,6 +59,9 @@
     [
         new("Players", Urls.PlayersStatistics), new(_player.Name)
     ];
+
+    private string PositionLabel
+        => _ladderSize == 0 ? string.Empty : $"Player {_rank:00} of {_ladderSize} · sorted by matches played";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -68,7 +80,8 @@
             var matches = PlayerStatisticsService.GetPlayerMatchesAsync(playerId);
             var favorites = FavoriteStatisticsService.GetFavoritesStatisticsAsync(playerId);
             var heroes = HeroService.GetAsync();
-            await Task.WhenAll(stats, matches, favorites, heroes);
+            var ladder = PlayerStatisticsService.GetPlayersStatisticsAsync();
+            await Task.WhenAll(stats, matches, favorites, heroes, ladder);
 
             _player = stats.Result;
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
@@ -83,6 +96,7 @@
             _chosenOne = _favorites.FirstOrDefault(f => f.IsChosenOne);
             _playerMatches = PlayerMatchPresentation.Build(playerId, _matchLog).ToList();
             BuildMonsterMatchups();
+            BuildNeighbours(ladder.Result.ToList(), playerId);
         }
         finally
         {
@@ -109,6 +123,34 @@
     {
         args.Record.Favour = args.Rating;
         await FavoriteService.UpdateFavourAsync(_playerId, args.Record.HeroId, args.Rating);
+    }
+
+    /// <summary>Same order as the Players ladder (most matches played first), wrapping at the ends.</summary>
+    private void BuildNeighbours(List<PlayerStatisticsDto> ladder, Guid playerId)
+    {
+        var ordered = ladder.OrderByDescending(p => p.TotalMatches).ToList();
+        var index = ordered.FindIndex(p => p.PlayerId == playerId);
+        _ladderSize = ordered.Count;
+
+        if (index < 0 || ordered.Count <= 1)
+        {
+            _rank = index + 1;
+            _previousPlayer = null;
+            _nextPlayer = null;
+            return;
+        }
+
+        _rank = index + 1;
+        _previousPlayer = ordered[(index - 1 + ordered.Count) % ordered.Count];
+        _nextPlayer = ordered[(index + 1) % ordered.Count];
+    }
+
+    private void GoToPlayer(PlayerStatisticsDto? player)
+    {
+        if (player is not null)
+        {
+            NavManager.NavigateTo($"{Urls.PlayersStatistics}/{player.PlayerId}");
+        }
     }
 
     private void BuildMonsterMatchups()

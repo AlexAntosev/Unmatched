@@ -4,11 +4,16 @@
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMinionStatisticsService MinionStatisticsService
+@inject NavigationManager NavManager
 @*
     Not in the design pack: the 2a dossier pattern applied to a minion.
 *@
 
-<PageHeader Breadcrumbs="Crumbs"/>
+<EntityNavBar EntityNoun="minion" Breadcrumbs="Crumbs" PositionLabel="@PositionLabel"
+              PreviousName="@_previousMinion?.Name" PreviousImageUrl="@_previousMinion?.ImageUrl"
+              OnPreviousClick="@(() => GoToMinion(_previousMinion))"
+              NextName="@_nextMinion?.Name" NextImageUrl="@_nextMinion?.ImageUrl"
+              OnNextClick="@(() => GoToMinion(_nextMinion))"/>
 
 <MinionSummary Statistics="_minion"/>
 
@@ -24,6 +29,10 @@
     private MinionStatisticsDto _minion = new() { Name = string.Empty };
     private List<UiMatchLogDto> _matchLog = new();
     private List<MonsterMatchupRow> _heroMatchups = new();
+    private MinionStatisticsDto? _previousMinion;
+    private MinionStatisticsDto? _nextMinion;
+    private int _rank;
+    private int _ladderSize;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
@@ -32,6 +41,9 @@
     [
         new("Minions", Urls.MinionsStatistics), new(_minion.Name)
     ];
+
+    private string PositionLabel
+        => _ladderSize == 0 ? string.Empty : $"Minion {_rank:00} of {_ladderSize} · sorted by matches played";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -46,7 +58,8 @@
 
             var stats = MinionStatisticsService.GetMinionStatisticsAsync(minionId);
             var matches = MinionStatisticsService.GetMinionMatchesAsync(minionId);
-            await Task.WhenAll(stats, matches);
+            var ladder = MinionStatisticsService.GetMinionsStatisticsAsync();
+            await Task.WhenAll(stats, matches, ladder);
 
             _minion = stats.Result;
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
@@ -63,10 +76,40 @@
                     })
                 .OrderByDescending(r => r.Total)
                 .ToList();
+
+            BuildNeighbours(ladder.Result.ToList(), minionId);
         }
         finally
         {
             PreloadService.Hide();
+        }
+    }
+
+    /// <summary>Same order as the Minions ladder (most matches played first), wrapping at the ends.</summary>
+    private void BuildNeighbours(List<MinionStatisticsDto> ladder, Guid minionId)
+    {
+        var ordered = ladder.OrderByDescending(m => m.TotalMatches).ToList();
+        var index = ordered.FindIndex(m => m.MinionId == minionId);
+        _ladderSize = ordered.Count;
+
+        if (index < 0 || ordered.Count <= 1)
+        {
+            _rank = index + 1;
+            _previousMinion = null;
+            _nextMinion = null;
+            return;
+        }
+
+        _rank = index + 1;
+        _previousMinion = ordered[(index - 1 + ordered.Count) % ordered.Count];
+        _nextMinion = ordered[(index + 1) % ordered.Count];
+    }
+
+    private void GoToMinion(MinionStatisticsDto? minion)
+    {
+        if (minion is not null)
+        {
+            NavManager.NavigateTo($"{Urls.MinionsStatistics}/{minion.MinionId}");
         }
     }
 }

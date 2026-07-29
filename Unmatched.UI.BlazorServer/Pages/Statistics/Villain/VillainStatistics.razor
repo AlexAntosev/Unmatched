@@ -4,11 +4,16 @@
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IVillainStatisticsService VillainStatisticsService
+@inject NavigationManager NavManager
 @*
     Not in the design pack: the 2a dossier pattern applied to a villain.
 *@
 
-<PageHeader Breadcrumbs="Crumbs"/>
+<EntityNavBar EntityNoun="villain" Breadcrumbs="Crumbs" PositionLabel="@PositionLabel"
+              PreviousName="@_previousVillain?.Name" PreviousImageUrl="@_previousVillain?.ImageUrl"
+              OnPreviousClick="@(() => GoToVillain(_previousVillain))"
+              NextName="@_nextVillain?.Name" NextImageUrl="@_nextVillain?.ImageUrl"
+              OnNextClick="@(() => GoToVillain(_nextVillain))"/>
 
 <VillainSummary Statistics="_villain"/>
 
@@ -24,6 +29,10 @@
     private VillainStatisticsDto _villain = new() { Name = string.Empty };
     private List<UiMatchLogDto> _matchLog = new();
     private List<MonsterMatchupRow> _heroMatchups = new();
+    private VillainStatisticsDto? _previousVillain;
+    private VillainStatisticsDto? _nextVillain;
+    private int _rank;
+    private int _ladderSize;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
@@ -32,6 +41,9 @@
     [
         new("Villains", Urls.VillainsStatistics), new(_villain.Name)
     ];
+
+    private string PositionLabel
+        => _ladderSize == 0 ? string.Empty : $"Villain {_rank:00} of {_ladderSize} · sorted by matches played";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -46,7 +58,8 @@
 
             var stats = VillainStatisticsService.GetVillainStatisticsAsync(villainId);
             var matches = VillainStatisticsService.GetVillainMatchesAsync(villainId);
-            await Task.WhenAll(stats, matches);
+            var ladder = VillainStatisticsService.GetVillainsStatisticsAsync();
+            await Task.WhenAll(stats, matches, ladder);
 
             _villain = stats.Result;
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
@@ -63,10 +76,40 @@
                     })
                 .OrderByDescending(r => r.Total)
                 .ToList();
+
+            BuildNeighbours(ladder.Result.ToList(), villainId);
         }
         finally
         {
             PreloadService.Hide();
+        }
+    }
+
+    /// <summary>Same order as the Villains ladder (most matches played first), wrapping at the ends.</summary>
+    private void BuildNeighbours(List<VillainStatisticsDto> ladder, Guid villainId)
+    {
+        var ordered = ladder.OrderByDescending(v => v.TotalMatches).ToList();
+        var index = ordered.FindIndex(v => v.VillainId == villainId);
+        _ladderSize = ordered.Count;
+
+        if (index < 0 || ordered.Count <= 1)
+        {
+            _rank = index + 1;
+            _previousVillain = null;
+            _nextVillain = null;
+            return;
+        }
+
+        _rank = index + 1;
+        _previousVillain = ordered[(index - 1 + ordered.Count) % ordered.Count];
+        _nextVillain = ordered[(index + 1) % ordered.Count];
+    }
+
+    private void GoToVillain(VillainStatisticsDto? villain)
+    {
+        if (villain is not null)
+        {
+            NavManager.NavigateTo($"{Urls.VillainsStatistics}/{villain.VillainId}");
         }
     }
 }
