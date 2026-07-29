@@ -27,7 +27,7 @@
     border: 0;
     background: none;
     color: var(--um-text);
-    font: 400 12px var(--um-font-body);
+    font: 400 13px var(--um-font-body);
 }
 
 .um-search input:focus {

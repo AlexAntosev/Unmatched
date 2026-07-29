@@ -71,10 +71,10 @@
     display: flex;
     align-items: center;
     gap: 11px;
-    height: 38px;
+    height: var(--um-height-nav-item);
     padding: 0 10px;
     border-radius: var(--um-radius-md);
-    font: 500 13px var(--um-font-body);
+    font: 500 13.5px var(--um-font-body);
     color: var(--um-text-muted);
     white-space: nowrap;
     overflow: hidden;

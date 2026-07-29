@@ -34,7 +34,7 @@
     flex: 1;
     min-width: 0;
     color: var(--um-text);
-    font: 500 12.5px var(--um-font-body);
+    font: 500 13px var(--um-font-body);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -96,7 +96,7 @@
 }
 
 .um-select-chip .um-select-value {
-    font: 500 11.5px var(--um-font-body);
+    font: 500 12.5px var(--um-font-body);
     color: var(--um-text-muted);
 }
 
@@ -195,10 +195,10 @@
     display: flex;
     align-items: center;
     gap: 9px;
-    height: 32px;
+    height: var(--um-height-dropdown-row);
     padding: 0 9px;
-    border-radius: var(--um-radius-sm);
-    font: 500 12px var(--um-font-body);
+    border-radius: var(--um-radius-md);
+    font: 500 13px var(--um-font-body);
     color: var(--um-text-muted);
     cursor: pointer;
     white-space: nowrap;
@@ -229,16 +229,16 @@
 
 .um-select-option-art {
     flex: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
     object-fit: cover;
 }
 
 .um-select-option-avatar {
     flex: none;
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     object-fit: cover;
 }
