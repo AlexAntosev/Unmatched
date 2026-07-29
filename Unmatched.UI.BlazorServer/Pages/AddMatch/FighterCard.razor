@@ -61,10 +61,6 @@
                           Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged" Options="PlayerOptions()"/>
                 <UmSelect TValue="Guid" Variant="chip" Highlighted="true"
                           Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero" Options="HeroOptions()"/>
-                @if (ShowWinnerControl)
-                {
-                    <WinnerButton IsWinner="Fighter.IsWinner" OnClick="OnSetWinner"/>
-                }
             </div>
             <div class="plate-line">
                 <UmField Label="HP" Class="fighter-narrow">
@@ -129,9 +125,6 @@
     public bool ShowTurnBadge { get; set; } = true;
 
     [Parameter]
-    public bool ShowWinnerControl { get; set; }
-
-    [Parameter]
     public bool IsLoser { get; set; }
 
     [Parameter]
@@ -142,9 +135,6 @@
 
     [Parameter]
     public EventCallback OnChanged { get; set; }
-
-    [Parameter]
-    public EventCallback OnSetWinner { get; set; }
 
     [Parameter]
     public EventCallback<int?> HpChanged { get; set; }

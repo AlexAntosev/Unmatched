@@ -72,14 +72,10 @@
                             <span class="collection-badge" style="color:@state.BadgeColor">@state.Badge</span>
                         </div>
                         <div class="collection-tokens">
-                            @foreach (var hero in expansion.Heroes.Take(HeroTokensShown))
+                            @foreach (var hero in expansion.Heroes)
                             {
                                 <img class="collection-token" src="@hero.ImageUrl" alt="@hero.Name" title="@hero.Name"
                                      onerror="this.onerror=null;this.src='/Unknown.png'"/>
-                            }
-                            @if (expansion.Heroes.Count() > HeroTokensShown)
-                            {
-                                <div class="collection-token-overflow">+@(expansion.Heroes.Count() - HeroTokensShown)</div>
                             }
                         </div>
                         @if (expansion.Maps.Any())
@@ -167,8 +163,6 @@
 
 @code {
     private record CardState(bool IsOwned, bool IsPending, string Badge, string BadgeColor);
-
-    private const int HeroTokensShown = 3;
 
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Collection")];
 

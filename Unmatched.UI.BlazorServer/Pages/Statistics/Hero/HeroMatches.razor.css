@@ -1,7 +1,7 @@
 .pm-tally {
-    padding: 3px 9px;
+    padding: 4px 10px;
     border-radius: var(--um-radius-chip);
-    font: 600 11px var(--um-font-mono);
+    font: 600 12px var(--um-font-mono);
 }
 
 .pm-tally-win {
@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    font: 500 11.5px var(--um-font-body);
+    font: 500 12.5px var(--um-font-body);
     color: var(--um-accent-soft);
 }
 
@@ -27,13 +27,13 @@
 }
 
 .pm-full-log i {
-    font-size: 10px;
+    font-size: 11px;
 }
 
 ::deep .pm-head {
-    padding: 11px 16px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--um-border);
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 0.14em;
 }
 
@@ -44,53 +44,53 @@
 .pm-empty {
     padding: 28px 16px;
     text-align: center;
-    font: 400 12.5px var(--um-font-body);
+    font: 400 13.5px var(--um-font-body);
     color: var(--um-text-dim);
 }
 
 .pm-row {
     display: grid;
     align-items: center;
-    gap: 12px;
-    padding: 11px 16px;
+    gap: 14px;
+    padding: 13px 16px;
     border-bottom: 1px solid var(--um-border-soft);
     border-left: 3px solid transparent;
 }
 
 .pm-date {
-    font: 400 11px var(--um-font-mono);
+    font: 400 12.5px var(--um-font-mono);
     color: var(--um-text-bright);
     white-space: nowrap;
 }
 
 .pm-time {
     margin-top: 2px;
-    font: 400 9.5px var(--um-font-mono);
+    font: 400 10.5px var(--um-font-mono);
     color: var(--um-text-faint);
 }
 
 .pm-versus {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     min-width: 0;
     flex-wrap: wrap;
 }
 
 .pm-hero-name,
 .pm-opponent-name {
-    font: 500 12px var(--um-font-body);
+    font: 500 13px var(--um-font-body);
     color: var(--um-text);
     white-space: nowrap;
 }
 
 .pm-vs {
-    font: 600 9.5px var(--um-font-mono);
+    font: 600 10.5px var(--um-font-mono);
     color: var(--um-text-faint);
 }
 
 .pm-map {
-    font: 400 11px var(--um-font-mono);
+    font: 400 12.5px var(--um-font-mono);
     color: var(--um-text-muted);
     white-space: nowrap;
     overflow: hidden;
@@ -98,7 +98,7 @@
 }
 
 .pm-hp {
-    font: 600 12px var(--um-font-mono);
+    font: 600 13.5px var(--um-font-mono);
     color: var(--um-text-bright);
 }
 

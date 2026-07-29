@@ -77,11 +77,9 @@
                         <FighterCard Fighter="fighter" Players="_players" Heroes="_heroes"
                                      Layout="@(_match.GameMode == GameMode.FreeForAll ? "row" : "stacked")"
                                      ArtSize="ArtSize" ShowPlace="@(_match.GameMode == GameMode.FreeForAll)"
-                                     ShowWinnerControl="@(_match.GameMode == GameMode.OneVsOne)"
                                      IsLoser="@IsLoser(fighter)"
                                      MaxPlace="@_match.Fighters.Count()"
                                      OnChanged="StateHasChanged"
-                                     OnSetWinner="@(() => SetWinner(fighter.HeroId.ToString()))"
                                      HpChanged="@(v => OnFighterHpChanged(fighter, v))"
                                      OnDragStart="OnFighterDragStart"
                                      OnDroppedOn="@(target => OnFighterDropped(target, side.Team))"
@@ -374,8 +372,14 @@
             ],
             _ =>
             [
-                new SideModel("Fighter 1", fighters.Take(1).ToList()),
-                new SideModel("Fighter 2", fighters.Skip(1).Take(1).ToList())
+                new SideModel("Fighter 1", fighters.Take(1).ToList(),
+                    ShowWinnerControl: true,
+                    IsWinnerSide: WinnerSideState(IsFighterWinner(fighters, 0), IsFighterWinner(fighters, 1)),
+                    WinnerKey: fighters.ElementAtOrDefault(0)?.HeroId.ToString()),
+                new SideModel("Fighter 2", fighters.Skip(1).Take(1).ToList(),
+                    ShowWinnerControl: true,
+                    IsWinnerSide: WinnerSideState(IsFighterWinner(fighters, 1), IsFighterWinner(fighters, 0)),
+                    WinnerKey: fighters.ElementAtOrDefault(1)?.HeroId.ToString())
             ]
         };
     }
@@ -383,6 +387,9 @@
     /// <summary>true/false once a winner is decided either way, null while the match is undecided.</summary>
     private static bool? WinnerSideState(bool thisSideWon, bool otherSideWon)
         => thisSideWon || otherSideWon ? thisSideWon : null;
+
+    private static bool IsFighterWinner(IReadOnlyList<UiFighterDto> fighters, int index)
+        => fighters.ElementAtOrDefault(index)?.IsWinner == true;
 
     private bool IsTeamWinner(int team) => _match.Fighters.Any(f => (f.Team ?? 1) == team && f.IsWinner);
 

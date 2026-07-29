@@ -111,6 +111,7 @@
                         <EntityTile Rank="rank" Name="@hero.Name" Sub="@ExpansionName(hero.HeroId)"
                                     ImageUrl="@hero.ImageUrl" IsRanged="hero.IsRanged"
                                     Highlighted="@(rank is >= 1 and <= 3)"
+                                    OnHover="@(() => SelectAsync(hero))"
                                     OnClick="@(() => OpenHero(hero))">
                             <Metrics>
                                 <div class="ladder-tile-points" style="color:@(hero.Points < 0 ? "var(--um-loss)" : "var(--um-accent-text)")">

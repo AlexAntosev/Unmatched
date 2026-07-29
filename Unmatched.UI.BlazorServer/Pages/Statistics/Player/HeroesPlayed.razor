@@ -11,7 +11,7 @@
         {
             <span class="hp-main-chip"><i class="bi bi-bookmark-star-fill"></i>MAIN &middot; @MainHero.Hero.Name.ToUpperInvariant()</span>
         }
-        <UmSearchBox Value="_filter" ValueChanged="OnFilterChanged" Placeholder="Filter heroes…" Class="hp-filter"/>
+        <UmSearchBox Value="@_filter" ValueChanged="OnFilterChanged" Placeholder="Filter heroes…" Class="hp-filter"/>
         <SegmentedControl TValue="string" Variant="bar" Options="SortOptions" Value="_sort" ValueChanged="OnSortChanged"/>
         <span class="hp-count">@FilteredRecords().Count() of @TotalHeroCount heroes</span>
     </HeaderActions>

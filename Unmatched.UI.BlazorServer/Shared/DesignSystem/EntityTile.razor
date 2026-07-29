@@ -4,7 +4,8 @@
     every ladder screen the same way <LadderRow> is reused by the List view.
 *@
 <div class="um-tile @(Highlighted ? "is-highlighted" : null) @(OnClick.HasDelegate ? "is-clickable" : null) @Class"
-     @onclick="OnClick">
+     @onclick="OnClick"
+     @onmouseenter="OnHover">
     <div class="um-tile-art-wrap">
         <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="88" Round="true"
                    Border="@(Highlighted ? "rgba(139,125,255,.4)" : "rgba(255,255,255,.1)")"
@@ -15,7 +16,7 @@
         }
         @if (IsRanged is not null)
         {
-            <MeleeRangedIcon IsRanged="IsRanged.Value" Height="14" Opacity="0.6" Class="um-tile-type"/>
+            <MeleeRangedIcon IsRanged="IsRanged.Value" Height="18" Opacity="0.75" Class="um-tile-type"/>
         }
     </div>
     <div class="um-tile-name">@Name</div>
@@ -55,6 +56,9 @@
 
     [Parameter]
     public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnHover { get; set; }
 
     [Parameter]
     public RenderFragment? Metrics { get; set; }

@@ -10,6 +10,7 @@
 @inject IHeroService HeroService
 @inject IMapService MapService
 @inject ITournamentService TournamentService
+@inject ICollectionService CollectionService
 @inject NavigationManager NavigationManager
 @inject AppSettingsService AppSettingsService
 @*
@@ -117,6 +118,7 @@
     private List<UiHeroDto> _heroes = new();
     private List<MapDto> _maps = new();
     private List<Dtos.Match.TournamentDto> _tournaments = new();
+    private HashSet<Guid> _ownedExpansionIds = new();
     private MatchLogMetrics _metrics = MatchLogMetrics.Empty;
     private int _pageSize = 10;
 
@@ -145,12 +147,14 @@
             var heroes = HeroService.GetAsync();
             var maps = MapService.GetAsync();
             var tournaments = TournamentService.GetAsync();
-            await Task.WhenAll(matches, players, heroes, maps, tournaments);
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(matches, players, heroes, maps, tournaments, owned);
 
+            _ownedExpansionIds = owned.Result.ToHashSet();
             _all = matches.Result.OrderByDescending(m => m.Date).ToList();
             _players = players.Result.OrderBy(p => p.Name).ToList();
-            _heroes = heroes.Result.OrderBy(h => h.Name).ToList();
-            _maps = maps.Result.OrderBy(m => m.DisplayName).ToList();
+            _heroes = FilterByCollection(heroes.Result, h => h.ExpansionId).OrderBy(h => h.Name).ToList();
+            _maps = FilterByCollection(maps.Result, m => m.ExpansionId).OrderBy(m => m.DisplayName).ToList();
             _tournaments = tournaments.Result.OrderBy(t => t.Name).ToList();
 
             // The KPI strip describes the whole log, not the current filter.
@@ -164,6 +168,12 @@
     }
 
     private void ApplyFilter() => _filtered = _filter.Apply(_all).ToList();
+
+    /// <summary>Entities from sets you do not own are hidden - unless nothing is marked as owned yet.</summary>
+    private List<T> FilterByCollection<T>(IEnumerable<T> items, Func<T, Guid?> expansionIdSelector)
+        => _ownedExpansionIds.Count == 0
+            ? items.ToList()
+            : items.Where(i => expansionIdSelector(i) is not { } expansionId || _ownedExpansionIds.Contains(expansionId)).ToList();
 
     private IReadOnlyList<SelectOption<Guid>> PlayerOptions()
         => _players

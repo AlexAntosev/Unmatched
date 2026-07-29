@@ -39,18 +39,18 @@
                 <div><ModeBadge Mode="entry.Match.GameMode"/></div>
                 <div><ResultBadge IsWin="entry.Self.IsWinner"/></div>
                 <div class="pm-versus">
-                    <HeroToken ImageUrl="@entry.Self.HeroImageUrl" Alt="@entry.Self.Hero?.Name" Size="26" Radius="8"/>
+                    <HeroToken ImageUrl="@entry.Self.HeroImageUrl" Alt="@entry.Self.Hero?.Name" Size="30" Radius="8"/>
                     <span class="pm-hero-name">@(entry.Self.Hero?.Name ?? "Unknown")</span>
                     <span class="pm-vs">vs</span>
                     @foreach (var opponent in entry.Opponents)
                     {
-                        <HeroToken ImageUrl="@opponent.ImageUrl" Alt="@opponent.Name" Size="26" Radius="8"/>
+                        <HeroToken ImageUrl="@opponent.ImageUrl" Alt="@opponent.Name" Size="30" Radius="8"/>
                         <span class="pm-opponent-name">@opponent.Name</span>
                     }
                 </div>
                 <div class="pm-map">@MapDisplayName(entry.Match.MapName)</div>
                 <div class="pm-right pm-hp">@Value(entry.Self.HpLeft) / @Value(entry.Opponents.FirstOrDefault()?.HpLeft)</div>
-                <div class="pm-right"><EpicStars Value="@(entry.Match.Epic ?? 0)" ReadOnly="true" Size="11"/></div>
+                <div class="pm-right"><EpicStars Value="@(entry.Match.Epic ?? 0)" ReadOnly="true" Size="13"/></div>
             </div>
         }
     </ChildContent>
@@ -64,7 +64,7 @@
 </Panel>
 
 @code {
-    private const string Columns = "82px 84px 64px 1fr 130px 80px 60px";
+    private const string Columns = "82px 84px 64px 1fr 195px 80px 60px";
     private const int PageSize = 6;
 
     private Dictionary<string, string> _mapDisplayNames = new();

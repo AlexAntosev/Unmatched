@@ -30,6 +30,14 @@
     letter-spacing: 0.03em;
 }
 
+/* The HP/Cards/Sidekick line sat fixed-width and left-aligned, leaving the rest of the plate
+   empty - stretch those three fields to fill the line. Scoped to this component's own
+   .plate-line so the villain plate's solo HP field (also .fighter-narrow) is unaffected. */
+.plate-line ::deep .fighter-narrow {
+    flex: 1;
+    width: auto;
+}
+
 /* ---- Row layout: FFA's single-line grid ---- */
 
 .plate-row-fields {

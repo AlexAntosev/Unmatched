@@ -164,6 +164,7 @@
 
 .collection-tokens {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
@@ -177,22 +178,10 @@
     background: var(--um-bg-control);
 }
 
-.collection-token-overflow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    flex: none;
-    border: 1px solid var(--um-border);
-    border-radius: 11px;
-    background: var(--um-bg-inset-strong);
-    font: 600 12px var(--um-font-mono);
-    color: var(--um-text-muted);
-}
-
 .collection-map-thumbs {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 6px;
 }
 

@@ -8,10 +8,13 @@
     gap: 9px;
 }
 
-/* Minions are indented under their villain, matching the expanded scoreboard. */
+/* Minions are indented under their villain, matching the expanded scoreboard. The identity
+   column has no label above its select, unlike the HP field beside it, so the row top-aligns
+   and a spacer the height of a UmField label (see .um-field-label) sits above the select -
+   otherwise the select would float noticeably higher than the HP input beside it. */
 .minion {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 9px;
     margin-left: 16px;
     padding: 7px 9px;
@@ -20,12 +23,21 @@
     background: var(--um-info-wash);
 }
 
+.minion ::deep .um-token {
+    align-self: center;
+}
+
 .minion-identity {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 3px;
+}
+
+.minion-select-spacer {
+    height: 15px;
+    flex: none;
 }
 
 .minion-count {
@@ -39,6 +51,7 @@
 }
 
 .minion-remove {
+    align-self: center;
     padding: 0 2px;
     border: 0;
     background: none;

@@ -36,6 +36,7 @@
             <HeroToken ImageUrl="@(minion.Minion?.ImageUrl ?? "/Unknown.png")" Alt="@minion.Minion?.Name"
                        Size="30" Radius="9" Opacity="0.85"/>
             <div class="minion-identity">
+                <div class="minion-select-spacer"></div>
                 <UmSelect TValue="Guid" Variant="chip" Value="minion.MinionId"
                           ValueChanged="@(id => OnMinionChanged(minion, id))" Options="MinionOptions()"/>
                 <span class="minion-count">×1 on the board</span>

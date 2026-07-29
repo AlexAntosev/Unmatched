@@ -9,6 +9,6 @@
 }
 
 .maps-tile-matches {
-    font: 400 11px var(--um-font-mono);
+    font: 400 12.5px var(--um-font-mono);
     color: var(--um-text-muted);
 }

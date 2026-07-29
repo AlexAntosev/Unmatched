@@ -2,13 +2,13 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 3px 8px;
+    padding: 4px 9px;
     border-radius: var(--um-radius-chip);
-    font: 600 9.5px var(--um-font-mono);
+    font: 600 10.5px var(--um-font-mono);
     letter-spacing: 0.1em;
     white-space: nowrap;
 }
 
 .um-mode-badge i {
-    font-size: 10px;
+    font-size: 11px;
 }
