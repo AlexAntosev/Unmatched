@@ -16,6 +16,9 @@ public class AppSettingsService(IJSRuntime jsRuntime)
     /// <summary>List/Tiles is a per-screen preference (design/IMPLEMENTATION-PROMPT.md §1), keyed by screen.</summary>
     private const string ListViewModeKeyPrefix = "unmatched.listViewMode.";
 
+    /// <summary>Nav rail expanded/collapsed - a durable preference per §6, not just circuit-scoped.</summary>
+    private const string NavExpandedKey = "unmatched.navExpanded";
+
     private IJSObjectReference? _module;
 
     public async Task<int> GetMatchesPerPageAsync()
@@ -42,6 +45,19 @@ public class AppSettingsService(IJSRuntime jsRuntime)
     {
         var module = await ModuleAsync();
         await module.InvokeVoidAsync("setItem", ListViewModeKeyPrefix + screenKey, mode.ToString());
+    }
+
+    public async Task<bool> GetNavExpandedAsync()
+    {
+        var module = await ModuleAsync();
+        var raw = await module.InvokeAsync<string?>("getItem", NavExpandedKey);
+        return bool.TryParse(raw, out var expanded) ? expanded : true;
+    }
+
+    public async Task SetNavExpandedAsync(bool expanded)
+    {
+        var module = await ModuleAsync();
+        await module.InvokeVoidAsync("setItem", NavExpandedKey, expanded.ToString());
     }
 
     private async Task<IJSObjectReference> ModuleAsync()
