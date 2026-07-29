@@ -12,7 +12,7 @@
     and maps ladders.
 *@
 
-<EntityLadder TItem="MinionStatisticsDto" Items="_minions" Title="Minions"
+<EntityLadder TItem="MinionStatisticsDto" Items="_minions" Title="Minions" ScreenKey="minions"
               Lede="@($"{_minions.Count} minions · {_totalMatches:N0} appearances")"
               Breadcrumbs="Crumbs" Columns="@Columns" SearchText="@(m => m.Name)"
               SearchPlaceholder="Search minion…">
@@ -36,10 +36,22 @@
             </Metrics>
         </LadderRow>
     </Row>
+    <Tile>
+        <EntityTile Rank="@(_minions.IndexOf(context) + 1)" Name="@context.Name" ImageUrl="@context.ImageUrl"
+                    IsRanged="context.IsRanged" Highlighted="@(_minions.IndexOf(context) is >= 0 and <= 2)"
+                    OnClick="@(() => Open(context))">
+            <Metrics>
+                <div class="minions-tile-kd" style="color:@(context.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                    K/D @context.Kd.ToString("0.00")
+                </div>
+                <WinLossBar Wins="context.TotalWins" Losses="context.TotalLooses"/>
+            </Metrics>
+        </EntityTile>
+    </Tile>
 </EntityLadder>
 
 @code {
-    private const string Columns = "34px 1fr 58px 90px 62px";
+    private const string Columns = "44px 1fr 58px 90px 62px";
 
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Minions")];
 

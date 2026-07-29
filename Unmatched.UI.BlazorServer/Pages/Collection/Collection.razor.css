@@ -32,6 +32,10 @@
     gap: 14px;
 }
 
+.collection-footer {
+    margin-top: 4px;
+}
+
 /* ---- Shelf card ---- */
 
 .collection-card {

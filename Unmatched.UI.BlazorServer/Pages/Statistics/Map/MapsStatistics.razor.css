@@ -7,3 +7,8 @@
     font: 400 12px var(--um-font-mono);
     color: var(--um-text-muted);
 }
+
+.maps-tile-matches {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-muted);
+}

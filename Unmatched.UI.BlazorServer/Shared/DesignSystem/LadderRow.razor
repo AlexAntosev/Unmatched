@@ -10,7 +10,8 @@
      @onmouseenter="OnHover">
     <div class="um-ladder-rank" style="color:@PlaceColor.For(Rank)">@(Rank is not null ? Rank.Value.ToString("00") : "-")</div>
     <div class="um-ladder-identity">
-        <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="32" Radius="9" Round="@RoundArt" Fallback="@Fallback"/>
+        <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="46" Radius="13" Round="@RoundArt" Fallback="@Fallback"
+                   Border="rgba(255,255,255,.14)" Class="um-ladder-token"/>
         <div class="um-ladder-names">
             <div class="um-ladder-name">@Name</div>
             @if (!string.IsNullOrEmpty(Sub))
@@ -20,7 +21,7 @@
         </div>
         @if (IsRanged is not null)
         {
-            <MeleeRangedIcon IsRanged="IsRanged.Value" Height="13" Opacity="0.6" Class="um-ladder-type"/>
+            <MeleeRangedIcon IsRanged="IsRanged.Value" Height="15" Opacity="0.55" Class="um-ladder-type"/>
         }
     </div>
     @Metrics

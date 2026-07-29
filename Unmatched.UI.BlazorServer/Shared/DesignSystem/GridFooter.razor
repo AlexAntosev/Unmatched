@@ -1,0 +1,61 @@
+@*
+    The per-page footer required on every grid (design/IMPLEMENTATION-PROMPT.md §1): caption,
+    a segmented page-size control, the "a-b of n" range label, and pagination on the right.
+    "All" is modelled as <see cref="AllPageSize"/> so Skip/Take never need special-casing.
+*@
+<div class="um-grid-footer @Class">
+    <span class="um-grid-footer-caption">@Caption</span>
+    <SegmentedControl TValue="int" Variant="bar" Options="PageSizeOptions" Value="PageSize" ValueChanged="OnPageSizeChanged"/>
+    <span class="um-grid-footer-range">@RangeLabel</span>
+    <div class="um-spacer"></div>
+    <Pagination Page="CurrentPage" PageCount="PageCount" PageChanged="PageChanged" ShowLabels="true"/>
+</div>
+
+@code {
+    /// <summary>Sentinel page size for an "All" option - Skip/Take handle it with no overflow.</summary>
+    public const int AllPageSize = int.MaxValue;
+
+    [Parameter, EditorRequired]
+    public string Caption { get; set; } = "ROWS PER PAGE";
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SelectOption<int>> PageSizeOptions { get; set; } = [];
+
+    [Parameter]
+    public int PageSize { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
+
+    [Parameter]
+    public int PageCount { get; set; } = 1;
+
+    [Parameter]
+    public int TotalCount { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string RangeLabel
+    {
+        get
+        {
+            if (TotalCount == 0)
+            {
+                return "0 of 0";
+            }
+
+            long start = (CurrentPage - 1) * (long)PageSize + 1;
+            long end = Math.Min(TotalCount, start - 1 + PageSize);
+            return $"{start}–{end} of {TotalCount}";
+        }
+    }
+
+    private Task OnPageSizeChanged(int size) => PageSizeChanged.InvokeAsync(size);
+}

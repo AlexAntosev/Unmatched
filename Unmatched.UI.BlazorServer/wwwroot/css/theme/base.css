@@ -132,3 +132,11 @@ a:hover {
 .um-spacer {
     flex: 1;
 }
+
+/* Tiles view grid (design/IMPLEMENTATION-PROMPT.md §1) - shared by every ladder screen so the
+   5-up layout stays identical whether the tiles are heroes, players, maps, minions or villains. */
+.um-tile-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+}

@@ -12,3 +12,7 @@
     text-align: right;
     font: 600 12px var(--um-font-mono);
 }
+
+.villains-tile-kd {
+    font: 600 11px var(--um-font-mono);
+}

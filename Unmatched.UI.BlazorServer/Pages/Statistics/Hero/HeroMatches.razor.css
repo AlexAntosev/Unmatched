@@ -102,8 +102,3 @@
     color: var(--um-text-bright);
 }
 
-.pm-showing {
-    font: 400 11px var(--um-font-mono);
-    color: var(--um-text-faint);
-    flex: 1;
-}

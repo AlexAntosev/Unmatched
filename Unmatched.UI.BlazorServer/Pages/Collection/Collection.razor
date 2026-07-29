@@ -42,7 +42,7 @@
     <div class="collection-shelf">
         <SectionCaption Text="Expansions" Meta="@($"{_visible.Count} shown · {_ownedIds.Count} owned")"/>
         <div class="collection-grid">
-            @foreach (var expansion in _visible)
+            @foreach (var expansion in _pageItems)
             {
                 var state = StateOf(expansion);
                 <div class="collection-card @(IsSelected(expansion) ? "is-selected" : null) @(state.IsOwned ? null : "is-unowned")"
@@ -90,6 +90,9 @@
                 </div>
             }
         </div>
+        <GridFooter Caption="ROWS PER PAGE" PageSizeOptions="PageSizeOptions" PageSize="_pageSize"
+                    PageSizeChanged="OnPageSizeChanged" CurrentPage="_currentPage" PageCount="PageCount"
+                    TotalCount="_visible.Count" PageChanged="GoToPage" Class="collection-footer"/>
     </div>
 
     @if (_selected is not null)
@@ -159,11 +162,19 @@
 
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Collection")];
 
+    private const int DefaultPageSize = 10;
+
+    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(GridFooter.AllPageSize, "All")];
+
     /// <summary>Pending owned-flag changes, keyed by set - the handoff's colDraft.</summary>
     private readonly Dictionary<Guid, bool> _draft = new();
 
     private List<ExpansionDto> _expansions = new();
     private List<ExpansionDto> _visible = new();
+    private List<ExpansionDto> _pageItems = new();
+    private int _currentPage = 1;
+    private int _pageSize = DefaultPageSize;
     private HashSet<Guid> _ownedIds = new();
     private IReadOnlyDictionary<Guid, UiExpansionStatisticsDto> _stats =
         new Dictionary<Guid, UiExpansionStatisticsDto>();
@@ -178,6 +189,8 @@
 
     private UiExpansionStatisticsDto? SelectedStats
         => _selected is null ? null : _stats.GetValueOrDefault(_selected.Id);
+
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(_visible.Count / (double)_pageSize));
 
     private string DirtyLabel
         => _draft.Count == 0
@@ -224,6 +237,24 @@
         }
 
         _visible = expansions.ToList();
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        BuildPage();
+    }
+
+    private void BuildPage()
+        => _pageItems = _visible.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        BuildPage();
+    }
+
+    private void OnPageSizeChanged(int size)
+    {
+        _pageSize = size;
+        _currentPage = 1;
+        Rebuild();
     }
 
     /// <summary>Search reaches into the box: its name, its heroes, its maps.</summary>
@@ -302,12 +333,14 @@
     private void OnSearchChanged(string? search)
     {
         _search = search;
+        _currentPage = 1;
         Rebuild();
     }
 
     private void OnOwnedOnlyChanged(bool ownedOnly)
     {
         _ownedOnly = ownedOnly;
+        _currentPage = 1;
         Rebuild();
     }
 

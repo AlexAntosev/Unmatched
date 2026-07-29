@@ -1,11 +1,11 @@
 .um-ladder-row {
     display: grid;
     align-items: center;
-    gap: 12px;
-    padding: 9px 14px;
+    gap: 14px;
+    padding: 11px 16px;
     border: 1px solid transparent;
     border-left: 3px solid transparent;
-    border-radius: var(--um-radius-row);
+    border-radius: 12px;
     background: var(--um-bg-panel);
     transition: background-color 0.12s ease, border-color 0.12s ease;
 }
@@ -24,7 +24,7 @@
 }
 
 .um-ladder-rank {
-    font: 700 14px var(--um-font-display);
+    font: 700 17px var(--um-font-display);
 }
 
 .um-ladder-identity {
@@ -34,12 +34,16 @@
     min-width: 0;
 }
 
+.um-ladder-identity ::deep .um-ladder-token {
+    background: var(--um-bg-control);
+}
+
 .um-ladder-names {
     min-width: 0;
 }
 
 .um-ladder-name {
-    font: 600 13px/1.2 var(--um-font-body);
+    font: 600 15px/1.2 var(--um-font-body);
     color: var(--um-text);
     white-space: nowrap;
     overflow: hidden;
@@ -48,7 +52,7 @@
 
 .um-ladder-sub {
     margin-top: 2px;
-    font: 400 10px var(--um-font-mono);
+    font: 400 10.5px var(--um-font-mono);
     color: var(--um-text-dim);
     white-space: nowrap;
     overflow: hidden;

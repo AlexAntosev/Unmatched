@@ -11,7 +11,7 @@
     sets you do not own are hidden, matching the heroes ladder.
 *@
 
-<EntityLadder TItem="UiMapStatisticsDto" Items="_maps" Title="Maps"
+<EntityLadder TItem="UiMapStatisticsDto" Items="_maps" Title="Maps" ScreenKey="maps"
               Lede="@($"{_maps.Count} maps · {_totalMatches:N0} matches played")"
               Breadcrumbs="Crumbs" Columns="@Columns" SearchText="@(m => m.Name ?? string.Empty)"
               SearchPlaceholder="Search map…">
@@ -29,10 +29,19 @@
             </Metrics>
         </LadderRow>
     </Row>
+    <Tile>
+        <EntityTile Rank="@(_maps.IndexOf(context) + 1)" Name="@context.Name" ImageUrl="@context.ImageUrl"
+                    Fallback="/UnknownMap.png" Highlighted="@(_maps.IndexOf(context) is >= 0 and <= 2)"
+                    OnClick="@(() => Open(context))">
+            <Metrics>
+                <div class="maps-tile-matches">@context.TotalMatches matches</div>
+            </Metrics>
+        </EntityTile>
+    </Tile>
 </EntityLadder>
 
 @code {
-    private const string Columns = "34px 1fr 80px";
+    private const string Columns = "44px 1fr 80px";
 
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Maps")];
 
