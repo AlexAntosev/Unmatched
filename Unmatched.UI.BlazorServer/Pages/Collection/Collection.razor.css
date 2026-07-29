@@ -28,7 +28,7 @@
 
 .collection-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
 }
 
@@ -40,11 +40,12 @@
 
 .collection-card {
     display: flex;
-    gap: 13px;
+    flex-direction: column;
+    gap: 10px;
     min-width: 0;
-    padding: 11px;
+    padding: 13px;
     border: 1px solid var(--um-border);
-    border-radius: var(--um-radius-card);
+    border-radius: 14px;
     background: var(--um-bg-panel);
     cursor: pointer;
     transition: border-color 0.12s ease, background-color 0.12s ease;
@@ -61,22 +62,29 @@
 }
 
 .collection-card.is-unowned {
-    opacity: 0.5;
+    border-style: dashed;
+}
+
+.collection-card.is-unowned .collection-cover {
+    opacity: 0.6;
+}
+
+.collection-card.is-unowned .collection-name {
+    color: var(--um-text-muted);
 }
 
 .collection-cover {
     position: relative;
-    width: 76px;
-    height: 97px;
+    width: 100%;
+    height: 200px;
     flex: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 8px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--um-radius-sm);
+    border-radius: 10px;
     background: linear-gradient(155deg, #1b1830, #0d0d15);
     overflow: hidden;
     text-align: center;
@@ -95,7 +103,7 @@
 }
 
 .collection-cover-logo {
-    width: 52px;
+    width: 64px;
     filter: invert(1);
     opacity: 0.4;
 }
@@ -109,8 +117,15 @@
 
 .collection-check {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 8px;
+    right: 8px;
+}
+
+.collection-check ::deep .collection-check-box {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .collection-meta {
@@ -118,12 +133,11 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding-top: 2px;
+    gap: 8px;
 }
 
 .collection-name {
-    font: 600 13.5px/1.2 var(--um-font-display);
+    font: 600 14px/1.2 var(--um-font-display);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--um-text);
@@ -148,46 +162,53 @@
     white-space: nowrap;
 }
 
-.collection-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.collection-chip {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 7px;
-    border-radius: var(--um-radius-chip);
-    background: var(--um-bg-hover);
-    font: 500 10px var(--um-font-mono);
-}
-
-.collection-chip i {
-    font-size: 9px;
-}
-
 .collection-tokens {
     display: flex;
-    margin-top: auto;
-    padding-left: 7px;
+    gap: 6px;
 }
 
 .collection-token {
-    width: 26px;
-    height: 26px;
-    margin-left: -7px;
-    border: 1.5px solid var(--um-bg-panel);
-    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 11px;
     object-fit: cover;
-    background: #16161f;
+    background: var(--um-bg-control);
+}
+
+.collection-token-overflow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border: 1px solid var(--um-border);
+    border-radius: 11px;
+    background: var(--um-bg-inset-strong);
+    font: 600 12px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.collection-map-thumbs {
+    display: flex;
+    gap: 6px;
+}
+
+.collection-map-thumb-tile {
+    width: 46px;
+    height: 32px;
+    flex: none;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--um-bg-control);
 }
 
 /* ---- Side panel ---- */
 
 .collection-panel {
-    width: 396px;
+    width: 316px;
     flex: none;
     display: flex;
     flex-direction: column;
@@ -196,6 +217,36 @@
     border: 1px solid var(--um-border);
     border-radius: var(--um-radius-panel);
     background: var(--um-bg-panel);
+    position: sticky;
+    top: 16px;
+    align-self: flex-start;
+}
+
+.collection-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.collection-panel-eyebrow {
+    font: 500 10px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-accent-text);
+}
+
+.collection-panel-pin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font: 400 9.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.collection-panel-pin i {
+    font-size: 9px;
 }
 
 .collection-panel-head {

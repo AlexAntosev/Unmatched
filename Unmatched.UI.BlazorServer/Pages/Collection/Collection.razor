@@ -61,7 +61,7 @@
                             @* Ticking must not change which set the side panel shows. *@
                             <UmCheckbox Checked="state.IsOwned" StopPropagation="true"
                                         Accent="@(state.IsPending ? "var(--um-gold)" : null)"
-                                        Title="@state.Badge"
+                                        Title="@state.Badge" Class="collection-check-box"
                                         CheckedChanged="@(_ => ToggleOwned(expansion))"/>
                         </div>
                     </div>
@@ -71,21 +71,27 @@
                             <span class="collection-year">@(expansion.ReleaseYear?.ToString() ?? "—")</span>
                             <span class="collection-badge" style="color:@state.BadgeColor">@state.Badge</span>
                         </div>
-                        <div class="collection-chips">
-                            @foreach (var chip in ContentChips(expansion))
-                            {
-                                <span class="collection-chip" style="color:@chip.Color">
-                                    <i class="bi @chip.Icon"></i>@chip.Label
-                                </span>
-                            }
-                        </div>
                         <div class="collection-tokens">
-                            @foreach (var hero in expansion.Heroes.Take(5))
+                            @foreach (var hero in expansion.Heroes.Take(HeroTokensShown))
                             {
                                 <img class="collection-token" src="@hero.ImageUrl" alt="@hero.Name" title="@hero.Name"
                                      onerror="this.onerror=null;this.src='/Unknown.png'"/>
                             }
+                            @if (expansion.Heroes.Count() > HeroTokensShown)
+                            {
+                                <div class="collection-token-overflow">+@(expansion.Heroes.Count() - HeroTokensShown)</div>
+                            }
                         </div>
+                        @if (expansion.Maps.Any())
+                        {
+                            <div class="collection-map-thumbs">
+                                @foreach (var map in expansion.Maps)
+                                {
+                                    <img class="collection-map-thumb-tile" src="@map.ImageUrl" alt="@map.DisplayName" title="@map.DisplayName"
+                                         onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -98,6 +104,10 @@
     @if (_selected is not null)
     {
         <aside class="collection-panel">
+            <div class="collection-panel-header">
+                <span class="collection-panel-eyebrow">Selected set</span>
+                <span class="collection-panel-pin"><i class="bi bi-pin-angle-fill"></i>pinned while scrolling</span>
+            </div>
             <div class="collection-panel-head">
                 <div class="collection-panel-cover">
                     <EditableImage ImageUrl="@BustCache(_selected.ImageUrl)" AltText="@_selected.Name"
@@ -156,9 +166,9 @@
 </div>
 
 @code {
-    private record ContentChip(string Label, string Icon, string Color);
-
     private record CardState(bool IsOwned, bool IsPending, string Badge, string BadgeColor);
+
+    private const int HeroTokensShown = 3;
 
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Collection")];
 
@@ -348,32 +358,6 @@
         => _expansions.Where(e => StateOf(e).IsOwned).Sum(selector);
 
     private int TotalCount(Func<ExpansionDto, int> selector) => _expansions.Sum(selector);
-
-    private static IEnumerable<ContentChip> ContentChips(ExpansionDto expansion)
-    {
-        if (expansion.HeroCount > 0)
-        {
-            yield return new ContentChip(Pluralise(expansion.HeroCount, "hero", "heroes"), "bi-shield-fill", "var(--um-accent-soft)");
-        }
-
-        if (expansion.MapCount > 0)
-        {
-            yield return new ContentChip(Pluralise(expansion.MapCount, "map"), "bi-map", "var(--um-info)");
-        }
-
-        if (expansion.VillainCount > 0)
-        {
-            yield return new ContentChip(Pluralise(expansion.VillainCount, "villain"), "bi-eye", "var(--um-villain)");
-        }
-
-        if (expansion.MinionCount > 0)
-        {
-            yield return new ContentChip(Pluralise(expansion.MinionCount, "minion"), "bi-bug", "var(--um-info)");
-        }
-    }
-
-    private static string Pluralise(int count, string singular, string? plural = null)
-        => $"{count} {(count == 1 ? singular : plural ?? singular + "s")}";
 
     private string BustCache(string? imageUrl)
         => imageUrl is null ? "/Unmatched-logo.png" : $"{imageUrl}?v={_cacheBust}";
