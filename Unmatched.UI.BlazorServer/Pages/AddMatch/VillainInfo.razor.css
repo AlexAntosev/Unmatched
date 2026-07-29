@@ -1,35 +1,11 @@
+/* The shared .plate/.plate-art-wrap/.plate-stacked-fields/.fighter-narrow shell lives in
+   wwwroot/css/theme/base.css (shared with FighterCard.razor's fighter plates). Only the villain
+   box's own layout and the minion rows are scoped here. */
+
 .villain {
     display: flex;
     flex-direction: column;
     gap: 9px;
-}
-
-.fighter {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 10px;
-    border: 1px solid var(--um-border);
-    border-radius: var(--um-radius-row);
-    background: var(--um-bg-panel);
-}
-
-.fighter-selects {
-    width: 170px;
-    flex: none;
-}
-
-.fighter-stats {
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    gap: 7px;
-}
-
-.fighter-narrow {
-    width: 58px;
-    flex: none;
 }
 
 /* Minions are indented under their villain, matching the expanded scoreboard. */
@@ -37,16 +13,24 @@
     display: flex;
     align-items: center;
     gap: 9px;
-    margin-left: 14px;
+    margin-left: 16px;
     padding: 7px 9px;
     border: 1px solid var(--um-info-border);
     border-radius: var(--um-radius-md);
     background: var(--um-info-wash);
 }
 
-.minion-select {
+.minion-identity {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.minion-count {
+    font: 400 9.5px var(--um-font-mono);
+    color: var(--um-text-dim);
 }
 
 .minion-hp {

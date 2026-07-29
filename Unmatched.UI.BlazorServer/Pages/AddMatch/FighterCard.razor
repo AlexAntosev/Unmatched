@@ -1,61 +1,110 @@
 @using Unmatched.Dtos
 @using Unmatched.Extensions
-@inject NotificationService NotificationService
 @*
-    One fighter inside a side box on screen 4b. The form records only what the app actually keeps:
-    player, hero, HP left, cards left, sidekick HP and - in free-for-all - the place.
-
-    Turn stays as a compact 1/2 switch: it is not on the mock, but the match service orders
-    fighters and generates tournament pairings by it.
+    One fighter plate on screen 4b (design/IMPLEMENTATION-PROMPT.md §5.2-§5.4): drag handle, hero
+    art with the turn-order badge (and, in FFA, a place badge), then Player/Hero on one line and
+    HP/Cards/Sidekick on the next - or, in FFA, all five fields in a single row. The winner control
+    lives here only for 1v1/FFA; 2v2/co-op mark the winner on the side header instead.
 *@
-<div class="fighter">
-    <HeroToken ImageUrl="@Fighter.HeroImageUrl" Alt="@Fighter.Hero?.Name" Size="44" Radius="11"/>
+<div class="plate @(IsLoser ? "is-loser" : null) @(_isDragOver ? "is-drag-over" : null)"
+     draggable="true"
+     @ondragstart="HandleDragStart" @ondragstart:stopPropagation="true"
+     @ondragover="HandleDragOver" @ondragover:preventDefault="true" @ondragover:stopPropagation="true"
+     @ondragleave="HandleDragLeave"
+     @ondrop="HandleDrop" @ondrop:preventDefault="true" @ondrop:stopPropagation="true"
+     @ondragend="HandleDragEnd">
+    <i class="plate-handle bi bi-grip-vertical" title="Drag to reorder"></i>
 
-    <div class="fighter-selects">
-        <UmSelect TValue="Guid" Variant="chip" AvatarUrl="@Fighter.PlayerImageUrl"
-                  Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged" Options="PlayerOptions()"/>
-        <UmSelect TValue="Guid" Variant="chip" Highlighted="true"
-                  Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero" Options="HeroOptions()"/>
+    <div class="plate-art-wrap" style="@($"width:{ArtSize}px;height:{ArtSize}px")">
+        <img class="plate-art @(IsLoser ? "is-grayscale" : null)" src="@Fighter.HeroImageUrl" alt="@Fighter.Hero?.Name"
+             onerror="this.onerror=null;this.src='/Unknown.png'"/>
+        @if (ShowTurnBadge && Fighter.Turn is not null)
+        {
+            <div class="plate-order-badge">@Fighter.Turn</div>
+        }
+        @if (ShowPlace && PlaceBadge(Fighter.Placement) is { Label.Length: > 0 } badge)
+        {
+            <div class="plate-place-badge" style="color:@badge.Color">@badge.Label</div>
+        }
+        @if (IsLoser)
+        {
+            <div class="plate-loser-veil"><i class="bi bi-x-lg" style="font-size:@(VeilIconSize)px"></i></div>
+        }
     </div>
 
-    <div class="fighter-stats">
-        @if (ShowPlace)
-        {
-            <UmField Label="Place" Class="fighter-place">
+    @if (Layout == "row")
+    {
+        <div class="plate-row-fields">
+            <UmSelect TValue="Guid" Variant="chip" AvatarUrl="@Fighter.PlayerImageUrl"
+                      Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged" Options="PlayerOptions()"/>
+            <UmSelect TValue="Guid" Variant="chip" Highlighted="true"
+                      Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero" Options="HeroOptions()"/>
+            <UmField Label="HP">
+                <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.HpLeft?.ToString()"
+                             ValueChanged="OnHpChangedAsync"/>
+            </UmField>
+            <UmField Label="Cards">
+                <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.CardsLeft?.ToString()"
+                             ValueChanged="@(v => Fighter.CardsLeft = ParseInt(v))"/>
+            </UmField>
+            <UmField Label="Place">
                 <UmSelect TValue="int?" Variant="chip" Icon="bi-award"
                           Value="Fighter.Placement" ValueChanged="OnPlacementChanged" Options="PlaceOptions()"/>
             </UmField>
-        }
-        @if (ShowTurn)
-        {
-            <UmField Label="Turn" Class="fighter-narrow">
-                <UmSelect TValue="int?" Variant="chip" Value="Fighter.Turn" ValueChanged="OnTurnChanged" Options="TurnOptions"/>
-            </UmField>
-        }
-        <UmField Label="HP" Class="fighter-narrow">
-            <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.HpLeft?.ToString()"
-                         ValueChanged="@(v => Fighter.HpLeft = ParseInt(v))"/>
-        </UmField>
-        <UmField Label="Cards" Class="fighter-narrow">
-            <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.CardsLeft?.ToString()"
-                         ValueChanged="@(v => Fighter.CardsLeft = ParseInt(v))"/>
-        </UmField>
-        <UmField Label="Sidekick" Class="fighter-narrow">
-            <UmTextField Type="number" Variant="xs" Centered="true" Disabled="@(Fighter.SidekickName is null)"
-                         Value="@Fighter.SidekickHpLeft?.ToString()"
-                         ValueChanged="@(v => Fighter.SidekickHpLeft = ParseInt(v))"/>
-        </UmField>
-        @if (OnRemove.HasDelegate)
-        {
-            <button type="button" class="fighter-remove" title="Remove player" @onclick="OnRemove">
-                <i class="bi bi-trash3"></i>
-            </button>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="plate-stacked-fields">
+            <div class="plate-line">
+                <UmSelect TValue="Guid" Variant="chip" AvatarUrl="@Fighter.PlayerImageUrl"
+                          Value="Fighter.PlayerId" ValueChanged="OnPlayerChanged" Options="PlayerOptions()"/>
+                <UmSelect TValue="Guid" Variant="chip" Highlighted="true"
+                          Value="Fighter.HeroId" ValueChanged="OnHeroChanged" OnRandomize="RandomizeHero" Options="HeroOptions()"/>
+                @if (ShowWinnerControl)
+                {
+                    <WinnerButton IsWinner="Fighter.IsWinner" OnClick="OnSetWinner"/>
+                }
+            </div>
+            <div class="plate-line">
+                <UmField Label="HP" Class="fighter-narrow">
+                    <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.HpLeft?.ToString()"
+                                 ValueChanged="OnHpChangedAsync"/>
+                </UmField>
+                <UmField Label="Cards" Class="fighter-narrow">
+                    <UmTextField Type="number" Variant="xs" Centered="true" Value="@Fighter.CardsLeft?.ToString()"
+                                 ValueChanged="@(v => Fighter.CardsLeft = ParseInt(v))"/>
+                </UmField>
+                <UmField Label="Sidekick" Class="fighter-narrow">
+                    <UmTextField Type="number" Variant="xs" Centered="true" Disabled="@(Fighter.SidekickName is null)"
+                                 Value="@Fighter.SidekickHpLeft?.ToString()"
+                                 ValueChanged="@(v => Fighter.SidekickHpLeft = ParseInt(v))"/>
+                </UmField>
+            </div>
+        </div>
+    }
+
+    @if (OnRemove.HasDelegate)
+    {
+        <button type="button" class="fighter-remove" title="Remove player" @onclick="OnRemove" @onclick:stopPropagation="true">
+            <i class="bi bi-trash3"></i>
+        </button>
+    }
 </div>
 
 @code {
-    private static readonly IReadOnlyList<SelectOption<int?>> TurnOptions = [new(1, "1"), new(2, "2")];
+    private static readonly IReadOnlyDictionary<int, (string Label, string Color)> PlaceBadges = new Dictionary<int, (string, string)>
+    {
+        [1] = ("1ST", "var(--um-gold)"),
+        [2] = ("2ND", "var(--um-silver)"),
+        [3] = ("3RD", "var(--um-bronze)"),
+        [4] = ("4TH", "var(--um-text-muted)")
+    };
+
+    private bool _isDragOver;
+
+    /// <summary>Scales with the art (30px on a 64px plate, 44px on 1v1's 96px plate).</summary>
+    private int VeilIconSize => (int)Math.Round(ArtSize * 0.46);
 
     [Parameter, EditorRequired]
     public UiFighterDto Fighter { get; set; } = default!;
@@ -66,11 +115,24 @@
     [Parameter, EditorRequired]
     public IReadOnlyList<UiHeroDto> Heroes { get; set; } = [];
 
+    /// <summary>stacked (default, two lines) | row (FFA's single-line grid)</summary>
+    [Parameter]
+    public string Layout { get; set; } = "stacked";
+
+    [Parameter]
+    public int ArtSize { get; set; } = 64;
+
     [Parameter]
     public bool ShowPlace { get; set; }
 
     [Parameter]
-    public bool ShowTurn { get; set; }
+    public bool ShowTurnBadge { get; set; } = true;
+
+    [Parameter]
+    public bool ShowWinnerControl { get; set; }
+
+    [Parameter]
+    public bool IsLoser { get; set; }
 
     [Parameter]
     public int MaxPlace { get; set; } = 4;
@@ -81,7 +143,25 @@
     [Parameter]
     public EventCallback OnChanged { get; set; }
 
+    [Parameter]
+    public EventCallback OnSetWinner { get; set; }
+
+    [Parameter]
+    public EventCallback<int?> HpChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<UiFighterDto> OnDragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<UiFighterDto> OnDroppedOn { get; set; }
+
+    [Parameter]
+    public EventCallback OnDragEnd { get; set; }
+
     private static int? ParseInt(string? value) => int.TryParse(value, out var parsed) ? parsed : null;
+
+    private static (string Label, string Color) PlaceBadge(int? placement)
+        => placement is not null && PlaceBadges.TryGetValue(placement.Value, out var badge) ? badge : (string.Empty, string.Empty);
 
     private IReadOnlyList<SelectOption<Guid>> PlayerOptions()
         => new SelectOption<Guid>[] { new(Guid.Empty, "Player…") }
@@ -115,11 +195,7 @@
         return OnChanged.InvokeAsync();
     }
 
-    private Task OnTurnChanged(int? turn)
-    {
-        Fighter.Turn = turn;
-        return OnChanged.InvokeAsync();
-    }
+    private Task OnHpChangedAsync(string? value) => HpChanged.InvokeAsync(ParseInt(value));
 
     private Task RandomizeHero()
     {
@@ -133,5 +209,23 @@
         Fighter.Hero = hero;
         Fighter.HeroId = hero?.Id ?? Guid.Empty;
         Fighter.SetDefaultData();
+    }
+
+    private Task HandleDragStart() => OnDragStart.InvokeAsync(Fighter);
+
+    private void HandleDragOver() => _isDragOver = true;
+
+    private void HandleDragLeave() => _isDragOver = false;
+
+    private Task HandleDrop()
+    {
+        _isDragOver = false;
+        return OnDroppedOn.InvokeAsync(Fighter);
+    }
+
+    private Task HandleDragEnd()
+    {
+        _isDragOver = false;
+        return OnDragEnd.InvokeAsync();
     }
 }

@@ -140,3 +140,105 @@ a:hover {
     grid-template-columns: repeat(5, 1fr);
     gap: 14px;
 }
+
+/* Add match's fighter/villain "plate" shell (design/IMPLEMENTATION-PROMPT.md §5.2) - shared by
+   FighterCard.razor and VillainInfo.razor, which live in different Blazor CSS scopes. */
+.plate {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.plate.is-drag-over {
+    border-color: #8b7dff;
+    background: rgba(139, 125, 255, 0.06);
+}
+
+.plate-handle {
+    flex: none;
+    color: var(--um-text-faint);
+    font-size: 13px;
+    cursor: grab;
+}
+
+.plate-handle:active {
+    cursor: grabbing;
+}
+
+.plate-art-wrap {
+    position: relative;
+    flex: none;
+    border-radius: 14px;
+    overflow: visible;
+}
+
+.plate-art {
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--um-border);
+    object-fit: cover;
+    background: var(--um-bg-control);
+    transition: filter 0.12s ease, border-color 0.12s ease;
+}
+
+.plate-art.is-grayscale {
+    filter: grayscale(0.55);
+    border-color: rgba(242, 80, 107, 0.45);
+}
+
+.plate-loser-veil {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(242, 80, 107, 0.22);
+    color: #f2506b;
+}
+
+.plate-stacked-fields {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.plate-line {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.plate-line .um-select {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+}
+
+.fighter-narrow {
+    width: 68px;
+    flex: none;
+}
+
+.fighter-narrow .um-text-field-xs {
+    height: 32px;
+}
+
+/* HP forced to 0 for a declared loser reads red, per the auto-zero spec. */
+.plate.is-loser .plate-line .fighter-narrow:first-of-type .um-text-field {
+    background: rgba(242, 80, 107, 0.1);
+    border-color: rgba(242, 80, 107, 0.3);
+}
+
+.plate.is-loser .plate-line .fighter-narrow:first-of-type input {
+    color: #f2506b;
+}

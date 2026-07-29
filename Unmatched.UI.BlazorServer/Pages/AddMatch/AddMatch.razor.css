@@ -25,56 +25,67 @@
 
 .add-body {
     flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 280px;
-}
-
-.add-participants {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 18px 20px;
-    border-right: 1px solid var(--um-border);
+    padding: 18px var(--um-page-padding-x) 22px;
 }
 
 .add-section {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
 }
 
-.add-winner {
-    display: flex;
-    gap: 6px;
-}
-
-.add-winner-option {
+.add-hint {
     display: flex;
     align-items: center;
-    gap: 6px;
-    height: 26px;
-    padding: 0 10px;
-    border: 1px solid var(--um-border);
-    border-radius: var(--um-radius-sm);
-    background: none;
-    color: var(--um-text-muted);
-    font: 600 10.5px var(--um-font-body);
-    cursor: pointer;
-    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    gap: 5px;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-faint);
 }
 
-.add-winner-option i {
+.add-hint i {
     font-size: 10px;
 }
 
-.add-winner-option:hover {
-    color: var(--um-text);
+.add-order-summary {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.add-winner-option.is-selected {
-    background: var(--um-win-wash);
-    border-color: var(--um-win-border);
-    color: var(--um-win);
+.add-sides.is-versus {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: start;
+}
+
+.add-sides.is-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.add-vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 46px;
+}
+
+.add-vs img {
+    width: 34px;
+    height: 34px;
+}
+
+.add-vs span {
+    font: 700 16px var(--um-font-display);
+    letter-spacing: 0.04em;
+    color: var(--um-info);
 }
 
 .add-side {
@@ -85,6 +96,17 @@
     border: 1px solid var(--um-border);
     border-radius: var(--um-radius-card);
     background: rgba(255, 255, 255, 0.02);
+    transition: border-color 0.12s ease;
+}
+
+.add-side.is-winner-side {
+    border-color: var(--um-win-border);
+    background: var(--um-win-wash);
+}
+
+.add-side.is-loser-side {
+    border-color: var(--um-loss-border);
+    background: var(--um-loss-wash);
 }
 
 .add-side-head {
@@ -98,6 +120,14 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--um-text-muted);
+}
+
+.add-side.is-winner-side .add-side-title {
+    color: var(--um-win);
+}
+
+.add-side.is-loser-side .add-side-title {
+    color: var(--um-loss);
 }
 
 .add-side-add {
@@ -123,46 +153,21 @@
     font-size: 9px;
 }
 
-/* ---- Details column ---- */
+/* ---- Details row ---- */
 
 .add-details {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 18px;
+    align-items: flex-end;
+    gap: 14px;
 }
 
-.add-map-preview {
-    position: relative;
-    height: 120px;
-    border: 1px solid var(--um-border);
-    border-radius: 12px;
-    overflow: hidden;
+.add-details ::deep .um-field {
+    flex: 1;
+    min-width: 0;
 }
 
-.add-map-preview img {
+.add-comment {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.add-map-name {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 8px 11px;
-    background: linear-gradient(180deg, rgba(8, 8, 12, 0), rgba(8, 8, 12, 0.9));
-    font: 600 11.5px var(--um-font-display);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--um-text);
-}
-
-.add-when {
-    display: grid;
-    grid-template-columns: 1fr 88px;
-    gap: 8px;
 }
 
 /* ---- Footer ---- */
@@ -176,16 +181,21 @@
     background: var(--um-bg-nav);
 }
 
-.add-summary {
+.add-state-summary {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font: 400 11px var(--um-font-mono);
-    color: var(--um-text-dim);
+    gap: 7px;
+    font: 600 12px var(--um-font-body);
+    color: var(--um-win);
 }
 
-.add-summary i {
-    font-size: 11px;
+.add-state-summary.is-muted {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+.add-state-summary i {
+    font-size: 12px;
 }
 
 .um-spacer {
