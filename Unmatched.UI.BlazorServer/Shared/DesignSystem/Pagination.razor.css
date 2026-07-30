@@ -13,14 +13,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: var(--um-height-pagination);
+    height: var(--um-height-pagination);
     padding: 0;
     border: 1px solid var(--um-border);
     border-radius: var(--um-radius-sm);
     background: none;
     color: var(--um-text-muted);
-    font: 500 11.5px var(--um-font-mono);
+    font: 500 12px var(--um-font-mono);
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
@@ -47,8 +47,8 @@
 
 .um-page-wide {
     width: auto;
-    height: 30px;
+    height: var(--um-height-pagination);
     padding: 0 12px;
     background: var(--um-bg-control);
-    font: 500 11.5px var(--um-font-body);
+    font: 500 12px var(--um-font-body);
 }

@@ -1,0 +1,16 @@
+@*
+    Outlined red-ish chip at the end of the applied-filter row - only rendered by the page while at
+    least one filter is active (design/IMPLEMENTATION-PROMPT.md §2). Resets every dropdown and the
+    mode segmented filter on the page that hosts it.
+*@
+<button type="button" class="um-clear-all-chip @Class" @onclick="OnClick">
+    <i class="bi bi-x-circle"></i>Clear all filters
+</button>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

@@ -1,0 +1,38 @@
+.winner-btn {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: var(--um-radius-sm);
+    border: 1px solid var(--um-border);
+    background: none;
+    color: #6b6c7e;
+    font: 600 10.5px var(--um-font-body);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.winner-btn:hover {
+    color: var(--um-text);
+    border-color: var(--um-focus-border);
+}
+
+.winner-btn i {
+    font-size: 10px;
+}
+
+.winner-btn.is-winner {
+    background: #34d99b;
+    border-color: #34d99b;
+    color: #062a1c;
+    font: 700 10.5px var(--um-font-display);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.winner-btn.is-winner:hover {
+    filter: brightness(1.05);
+}

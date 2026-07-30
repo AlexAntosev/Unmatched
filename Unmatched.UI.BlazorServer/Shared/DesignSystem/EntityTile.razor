@@ -1,0 +1,65 @@
+@*
+    The Tiles-view card (design/IMPLEMENTATION-PROMPT.md §1): 88px round art with a rank badge and
+    an attack-type glyph over it, then name / set / whatever metrics the page supplies. Reused by
+    every ladder screen the same way <LadderRow> is reused by the List view.
+*@
+<div class="um-tile @(Highlighted ? "is-highlighted" : null) @(OnClick.HasDelegate ? "is-clickable" : null) @Class"
+     @onclick="OnClick"
+     @onmouseenter="OnHover">
+    <div class="um-tile-art-wrap">
+        <HeroToken ImageUrl="@ImageUrl" Alt="@Name" Size="88" Round="true"
+                   Border="@(Highlighted ? "rgba(139,125,255,.4)" : "rgba(255,255,255,.1)")"
+                   Fallback="@Fallback" Class="um-tile-art"/>
+        @if (Rank is not null)
+        {
+            <div class="um-tile-rank" style="color:@PlaceColor.For(Rank)">@Rank.Value.ToString("00")</div>
+        }
+        @if (IsRanged is not null)
+        {
+            <MeleeRangedIcon IsRanged="IsRanged.Value" Height="18" Opacity="0.75" Class="um-tile-type"/>
+        }
+    </div>
+    <div class="um-tile-name">@Name</div>
+    @if (!string.IsNullOrEmpty(Sub))
+    {
+        <div class="um-tile-sub">@Sub</div>
+    }
+    @Metrics
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public int? Rank { get; set; }
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public string? Sub { get; set; }
+
+    /// <summary>Draws the melee/ranged glyph top-right when the entity has that concept.</summary>
+    [Parameter]
+    public bool? IsRanged { get; set; }
+
+    /// <summary>Top-three finisher - gets the violet ring and the gradient background wash.</summary>
+    [Parameter]
+    public bool Highlighted { get; set; }
+
+    [Parameter]
+    public string Fallback { get; set; } = "/Unknown.png";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnHover { get; set; }
+
+    [Parameter]
+    public RenderFragment? Metrics { get; set; }
+}

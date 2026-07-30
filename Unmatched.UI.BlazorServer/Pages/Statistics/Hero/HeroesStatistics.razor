@@ -10,6 +10,7 @@
 @inject ICollectionService CollectionService
 @inject IExpansionService ExpansionService
 @inject IMatchService MatchService
+@inject Unmatched.UI.BlazorServer.Services.AppSettingsService AppSettingsService
 @*
     Screen 1c, the landing screen: a dense ranked list with an analysis column that follows the
     hovered or selected hero. Heroes from expansions you do not own are hidden, which is what the
@@ -19,6 +20,8 @@
 <PageHeader Breadcrumbs="Crumbs">
     <Controls>
         <UmSearchBox Value="@_search" ValueChanged="OnSearchChanged" Placeholder="Search hero…"/>
+        <SegmentedControl TValue="ListViewMode" Variant="bar" Options="ListViewModeOptions.Default"
+                           Value="_viewMode" ValueChanged="OnViewModeChanged"/>
     </Controls>
 </PageHeader>
 
@@ -40,45 +43,91 @@
 
     <Tabs TValue="LadderSort" Options="SortTabs" Value="_sort" ValueChanged="OnSortChanged" Class="ladder-tabs"/>
 
+    <div class="ladder-filters">
+        <UmMultiSelect TValue="Guid" Icon="bi-box-seam" Label="Sets" Value="_selectedExpansionIds.ToList()"
+                       ValueChanged="OnExpansionsChanged" Options="SetOptions()"/>
+        <UmMultiSelect TValue="bool" Icon="bi-arrows-angle-expand" Label="Attack type" Value="_selectedAttackTypes.ToList()"
+                       ValueChanged="OnAttackTypesChanged" Options="AttackTypeOptions()"/>
+
+        @if (_selectedExpansionIds.Count > 0 || _selectedAttackTypes.Count > 0)
+        {
+            @foreach (var expansionId in _selectedExpansionIds)
+            {
+                <FilterChip Label="@ExpansionSetName(expansionId)" OnRemove="@(() => RemoveExpansion(expansionId))"/>
+            }
+            @foreach (var isRanged in _selectedAttackTypes)
+            {
+                <FilterChip Label="@(isRanged ? "Ranged" : "Melee")" OnRemove="@(() => RemoveAttackType(isRanged))"/>
+            }
+            <ClearAllFiltersChip OnClick="ClearHeroFilters"/>
+        }
+    </div>
+
     <div class="ladder-body">
         <div class="ladder-list">
-            <ColumnHeader Columns="@Columns">
-                <div>#</div>
-                <div>Hero</div>
-                <div class="ladder-right">Pts</div>
-                <div class="ladder-right">GP</div>
-                <div>W / L</div>
-                <div class="ladder-right">K/D</div>
-            </ColumnHeader>
-
-            @foreach (var hero in _page)
+            @if (_viewMode == ListViewMode.List)
             {
-                <LadderRow Columns="@Columns"
-                           Rank="@DisplayRank(hero)"
-                           Name="@hero.Name"
-                           Sub="@ExpansionName(hero.HeroId)"
-                           ImageUrl="@hero.ImageUrl"
-                           IsRanged="hero.IsRanged"
-                           EdgeColor="@EdgeColor(hero)"
-                           WashColor="@WashColor(hero)"
-                           Selected="@(_spotlight?.HeroId == hero.HeroId)"
-                           OnHover="@(() => SelectAsync(hero))"
-                           OnClick="@(() => OpenHero(hero))">
-                    <Metrics>
-                        <div class="ladder-points" style="color:@(hero.Points < 0 ? "var(--um-loss)" : "var(--um-accent-text)")">
-                            @hero.Points
-                        </div>
-                        <div class="ladder-matches">@hero.TotalMatches</div>
-                        <WinLossBar Wins="hero.TotalWins" Losses="hero.TotalLooses"/>
-                        <div class="ladder-kd" style="color:@(hero.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
-                            @hero.Kd.ToString("0.00")
-                        </div>
-                    </Metrics>
-                </LadderRow>
+                <ColumnHeader Columns="@Columns">
+                    <div>#</div>
+                    <div>Hero</div>
+                    <div class="ladder-right">Pts</div>
+                    <div class="ladder-right">GP</div>
+                    <div>W / L</div>
+                    <div class="ladder-right">K/D</div>
+                </ColumnHeader>
+
+                @foreach (var hero in _page)
+                {
+                    <LadderRow Columns="@Columns"
+                               Rank="@DisplayRank(hero)"
+                               Name="@hero.Name"
+                               Sub="@ExpansionName(hero.HeroId)"
+                               ImageUrl="@hero.ImageUrl"
+                               IsRanged="hero.IsRanged"
+                               EdgeColor="@EdgeColor(hero)"
+                               WashColor="@WashColor(hero)"
+                               Selected="@(_spotlight?.HeroId == hero.HeroId)"
+                               OnHover="@(() => SelectAsync(hero))"
+                               OnClick="@(() => OpenHero(hero))">
+                        <Metrics>
+                            <div class="ladder-points" style="color:@(hero.Points < 0 ? "var(--um-loss)" : "var(--um-accent-text)")">
+                                @hero.Points
+                            </div>
+                            <div class="ladder-matches">@hero.TotalMatches</div>
+                            <WinLossBar Wins="hero.TotalWins" Losses="hero.TotalLooses"/>
+                            <div class="ladder-kd" style="color:@(hero.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                                @hero.Kd.ToString("0.00")
+                            </div>
+                        </Metrics>
+                    </LadderRow>
+                }
+            }
+            else
+            {
+                <div class="um-tile-grid">
+                    @foreach (var hero in _page)
+                    {
+                        var rank = DisplayRank(hero);
+                        <EntityTile Rank="rank" Name="@hero.Name" Sub="@ExpansionName(hero.HeroId)"
+                                    ImageUrl="@hero.ImageUrl" IsRanged="hero.IsRanged"
+                                    Highlighted="@(rank is >= 1 and <= 3)"
+                                    OnHover="@(() => SelectAsync(hero))"
+                                    OnClick="@(() => OpenHero(hero))">
+                            <Metrics>
+                                <div class="ladder-tile-points" style="color:@(hero.Points < 0 ? "var(--um-loss)" : "var(--um-accent-text)")">
+                                    @hero.Points pts
+                                </div>
+                                <WinLossBar Wins="hero.TotalWins" Losses="hero.TotalLooses"/>
+                            </Metrics>
+                        </EntityTile>
+                    }
+                </div>
             }
 
-            <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage" ShowLabels="true"
-                        Class="ladder-pagination"/>
+            <GridFooter Caption="@(_viewMode == ListViewMode.List ? "ROWS PER PAGE" : "TILES PER PAGE")"
+                        PageSizeOptions="PageSizeOptions" PageSize="_pageSize" PageSizeChanged="OnPageSizeChanged"
+                        CurrentPage="_currentPage" PageCount="PageCount" TotalCount="_sorted.Count"
+                        PageChanged="GoToPage" Class="ladder-footer"/>
         </div>
 
         <aside class="ladder-aside">
@@ -148,8 +197,15 @@
 </div>
 
 @code {
-    private const string Columns = "34px 1fr 58px 58px 90px 62px";
-    private const int PageSize = 10;
+    private const string Columns = "44px 1fr 78px 70px 118px 70px";
+    private const int DefaultPageSize = 10;
+    private const string ScreenKey = "heroes";
+
+    private static readonly IReadOnlyList<SelectOption<int>> ListPageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
+
+    private static readonly IReadOnlyList<SelectOption<int>> TilePageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(GridFooter.AllPageSize, "All")];
 
     public enum LadderSort
     {
@@ -176,7 +232,10 @@
     private List<UiMatchLogDto> _matches = new();
     private List<ExpansionDto> _expansions = new();
     private Dictionary<Guid, string?> _expansionNamesByHero = new();
+    private Dictionary<Guid, Guid?> _expansionIdByHero = new();
     private HashSet<Guid> _ownedExpansionIds = new();
+    private HashSet<Guid> _selectedExpansionIds = new();
+    private HashSet<bool> _selectedAttackTypes = new();
     private Dictionary<Guid, DateTime> _lastPlayedByHero = new();
 
     private UiHeroStatisticsDto? _spotlight;
@@ -186,12 +245,17 @@
     private LadderSort _sort = LadderSort.Points;
     private string? _search;
     private int _currentPage = 1;
+    private int _pageSize = DefaultPageSize;
+    private ListViewMode _viewMode = ListViewMode.List;
     private int _totalMatches;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
-    private int PageCount => Math.Max(1, (int)Math.Ceiling(_sorted.Count / (double)PageSize));
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(_sorted.Count / (double)_pageSize));
+
+    private IReadOnlyList<SelectOption<int>> PageSizeOptions
+        => _viewMode == ListViewMode.List ? ListPageSizeOptions : TilePageSizeOptions;
 
     protected override async Task OnInitializedAsync()
     {
@@ -213,20 +277,33 @@
 
             var heroes = catalogHeroes.Result.ToList();
             _expansionNamesByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionName);
-            var expansionIdByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionId);
+            _expansionIdByHero = heroes.ToDictionary(h => h.Id, h => h.ExpansionId);
 
             _lastPlayedByHero = _matches
                 .SelectMany(m => m.Fighters.Select(f => (f.HeroId, m.Date)))
                 .GroupBy(x => x.HeroId)
                 .ToDictionary(g => g.Key, g => g.Max(x => x.Date));
 
-            _heroes = FilterByCollection(stats.Result.ToList(), expansionIdByHero);
+            _heroes = FilterByCollection(stats.Result.ToList(), _expansionIdByHero);
             Rebuild();
             await SelectAsync(_page.FirstOrDefault());
         }
         finally
         {
             PreloadService.Hide();
+        }
+    }
+
+    /// <summary>
+    /// The persisted List/Tiles choice is read via JS interop (localStorage), which cannot run
+    /// during static prerendering - only once the circuit is interactive.
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _viewMode = await AppSettingsService.GetListViewModeAsync(ScreenKey);
+            StateHasChanged();
         }
     }
 
@@ -256,6 +333,17 @@
             heroes = heroes.Where(h => h.Name.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
+        if (_selectedExpansionIds.Count > 0)
+        {
+            heroes = heroes.Where(h => _expansionIdByHero.TryGetValue(h.HeroId, out var expansionId)
+                && expansionId is not null && _selectedExpansionIds.Contains(expansionId.Value));
+        }
+
+        if (_selectedAttackTypes.Count > 0)
+        {
+            heroes = heroes.Where(h => _selectedAttackTypes.Contains(h.IsRanged));
+        }
+
         // Unranked heroes (no recorded matches) always sink to the bottom, regardless of sort tab.
         heroes = _sort switch
         {
@@ -268,7 +356,7 @@
         _sorted = heroes.ToList();
         _displayRanks = BuildDisplayRanks(_sorted);
         _currentPage = Math.Clamp(_currentPage, 1, PageCount);
-        _page = _sorted.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+        _page = _sorted.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
     }
 
     /// <summary>
@@ -325,10 +413,77 @@
         Rebuild();
     }
 
+    private IReadOnlyList<SelectOption<Guid>> SetOptions()
+        => _expansions
+            .Select(e => new SelectOption<Guid>(e.Id, e.Name,
+                Count: _expansionIdByHero.Count(kv => kv.Value == e.Id)))
+            .Where(o => o.Count > 0)
+            .ToList();
+
+    private static readonly IReadOnlyList<SelectOption<bool>> AttackTypeOptionsStatic =
+        [new(false, "Melee", "bi-slash-circle"), new(true, "Ranged", "bi-bullseye")];
+
+    private IReadOnlyList<SelectOption<bool>> AttackTypeOptions()
+        => AttackTypeOptionsStatic
+            .Select(o => o with { Count = _heroes.Count(h => h.IsRanged == o.Value) })
+            .ToList();
+
+    private string ExpansionSetName(Guid expansionId)
+        => _expansions.FirstOrDefault(e => e.Id == expansionId)?.Name ?? "Unknown set";
+
+    private void OnExpansionsChanged(IReadOnlyList<Guid> expansionIds)
+    {
+        _selectedExpansionIds = expansionIds.ToHashSet();
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void OnAttackTypesChanged(IReadOnlyList<bool> attackTypes)
+    {
+        _selectedAttackTypes = attackTypes.ToHashSet();
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void RemoveExpansion(Guid expansionId)
+    {
+        _selectedExpansionIds.Remove(expansionId);
+        Rebuild();
+    }
+
+    private void RemoveAttackType(bool isRanged)
+    {
+        _selectedAttackTypes.Remove(isRanged);
+        Rebuild();
+    }
+
+    private void ClearHeroFilters()
+    {
+        _selectedExpansionIds.Clear();
+        _selectedAttackTypes.Clear();
+        Rebuild();
+    }
+
     private void GoToPage(int page)
     {
         _currentPage = page;
         Rebuild();
+    }
+
+    private void OnPageSizeChanged(int size)
+    {
+        _pageSize = size;
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private async Task OnViewModeChanged(ListViewMode mode)
+    {
+        _viewMode = mode;
+        _currentPage = 1;
+        _pageSize = DefaultPageSize;
+        Rebuild();
+        await AppSettingsService.SetListViewModeAsync(ScreenKey, mode);
     }
 
     private void OpenHero(UiHeroStatisticsDto hero)

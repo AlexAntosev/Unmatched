@@ -28,7 +28,7 @@
     border: 0;
     background: none;
     color: var(--um-text);
-    font: 500 12.5px var(--um-font-body);
+    font: 500 13px var(--um-font-body);
 }
 
 .um-text-field input:focus {

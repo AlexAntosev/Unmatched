@@ -11,7 +11,7 @@
     own are hidden, matching the heroes and maps ladders.
 *@
 
-<EntityLadder TItem="VillainStatisticsDto" Items="_villains" Title="Villains"
+<EntityLadder TItem="VillainStatisticsDto" Items="_villains" Title="Villains" ScreenKey="villains"
               Lede="@($"{_villains.Count} villains · {_totalMatches:N0} appearances")"
               Breadcrumbs="Crumbs" Columns="@Columns" SearchText="@(v => v.Name)"
               SearchPlaceholder="Search villain…">
@@ -35,10 +35,22 @@
             </Metrics>
         </LadderRow>
     </Row>
+    <Tile>
+        <EntityTile Rank="@(_villains.IndexOf(context) + 1)" Name="@context.Name" ImageUrl="@context.ImageUrl"
+                    IsRanged="context.IsRanged" Highlighted="@(_villains.IndexOf(context) is >= 0 and <= 2)"
+                    OnClick="@(() => Open(context))">
+            <Metrics>
+                <div class="villains-tile-kd" style="color:@(context.Kd >= 1 ? "var(--um-win)" : "var(--um-loss)")">
+                    K/D @context.Kd.ToString("0.00")
+                </div>
+                <WinLossBar Wins="context.TotalWins" Losses="context.TotalLooses"/>
+            </Metrics>
+        </EntityTile>
+    </Tile>
 </EntityLadder>
 
 @code {
-    private const string Columns = "34px 1fr 58px 90px 62px";
+    private const string Columns = "44px 1fr 58px 90px 62px";
 
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Statistics"), new("Villains")];
 

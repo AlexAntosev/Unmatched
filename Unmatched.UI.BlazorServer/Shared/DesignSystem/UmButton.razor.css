@@ -29,6 +29,7 @@
     height: var(--um-height-field);
     padding: 0 14px;
     border-radius: 10px;
+    font-size: 13px;
 }
 
 .um-btn-sm {
@@ -103,8 +104,8 @@
 
 .um-btn-icon.um-btn-sm,
 .um-btn-dice.um-btn-sm {
-    width: var(--um-height-control);
-    height: var(--um-height-control);
+    width: var(--um-height-icon);
+    height: var(--um-height-icon);
     border-radius: var(--um-radius-md);
 }
 

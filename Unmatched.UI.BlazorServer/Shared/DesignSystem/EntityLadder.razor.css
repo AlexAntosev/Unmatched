@@ -30,7 +30,6 @@
     color: var(--um-text-dim);
 }
 
-.entity-ladder-pagination {
-    justify-content: center;
+.entity-ladder-footer {
     margin-top: 12px;
 }

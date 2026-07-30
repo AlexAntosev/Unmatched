@@ -26,7 +26,7 @@
         {
             <div class="pm-empty">No matches yet.</div>
         }
-        @foreach (var entry in Entries.Take(_shown))
+        @foreach (var entry in _page)
         {
             <div class="pm-row" style="@($"grid-template-columns:{Columns};border-left-color:{EdgeColor(entry)};background:{WashColor(entry)}")">
                 <div>
@@ -39,36 +39,39 @@
                 <div><ModeBadge Mode="entry.Match.GameMode"/></div>
                 <div><ResultBadge IsWin="entry.Self.IsWinner"/></div>
                 <div class="pm-versus">
-                    <HeroToken ImageUrl="@entry.Self.PlayerImageUrl" Alt="@entry.Self.Player?.Name" Size="26" Radius="8"/>
+                    <HeroToken ImageUrl="@entry.Self.PlayerImageUrl" Alt="@entry.Self.Player?.Name" Size="30" Radius="8"/>
                     <span class="pm-hero-name">@(entry.Self.Player?.Name ?? "Unknown")</span>
                     <span class="pm-vs">vs</span>
                     @foreach (var opponent in entry.Opponents)
                     {
-                        <HeroToken ImageUrl="@opponent.ImageUrl" Alt="@opponent.Name" Size="26" Radius="8"/>
+                        <HeroToken ImageUrl="@opponent.ImageUrl" Alt="@opponent.Name" Size="30" Radius="8"/>
                         <span class="pm-opponent-name">@opponent.Name</span>
                     }
                 </div>
                 <div class="pm-map">@MapDisplayName(entry.Match.MapName)</div>
                 <div class="pm-right pm-hp">@Value(entry.Self.HpLeft) / @Value(entry.Opponents.FirstOrDefault()?.HpLeft)</div>
-                <div class="pm-right"><EpicStars Value="@(entry.Match.Epic ?? 0)" ReadOnly="true" Size="11"/></div>
+                <div class="pm-right"><EpicStars Value="@(entry.Match.Epic ?? 0)" ReadOnly="true" Size="13"/></div>
             </div>
         }
     </ChildContent>
     <Footer>
-        <span class="pm-showing">Showing @Math.Min(_shown, Entries.Count) of @Entries.Count</span>
-        @if (_shown < Entries.Count)
-        {
-            <UmButton Size="sm" OnClick="LoadMore">Load more</UmButton>
-        }
+        <GridFooter Caption="ROWS PER PAGE" PageSizeOptions="PageSizeOptions" PageSize="_pageSize"
+                    PageSizeChanged="OnPageSizeChanged" CurrentPage="_currentPage" PageCount="PageCount"
+                    TotalCount="Entries.Count" PageChanged="GoToPage"/>
     </Footer>
 </Panel>
 
 @code {
-    private const string Columns = "82px 84px 64px 1fr 130px 80px 60px";
-    private const int PageSize = 6;
+    private const string Columns = "82px 84px 64px 1fr 195px 80px 60px";
+    private const int DefaultPageSize = 10;
+
+    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
 
     private Dictionary<string, string> _mapDisplayNames = new();
-    private int _shown = PageSize;
+    private List<HeroMatchEntry> _page = [];
+    private int _currentPage = 1;
+    private int _pageSize = DefaultPageSize;
 
     [Parameter, EditorRequired]
     public string HeroName { get; set; } = string.Empty;
@@ -80,6 +83,8 @@
 
     private int Losses => Entries.Count(e => !e.Self.IsWinner);
 
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(Entries.Count / (double)_pageSize));
+
     protected override async Task OnInitializedAsync()
     {
         var maps = await MapService.GetAsync();
@@ -87,6 +92,15 @@
             .GroupBy(m => m.Name)
             .ToDictionary(group => group.Key, group => group.First().DisplayName);
     }
+
+    protected override void OnParametersSet()
+    {
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        BuildPage();
+    }
+
+    private void BuildPage()
+        => _page = Entries.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
 
     private string MapDisplayName(string mapName) => _mapDisplayNames.GetValueOrDefault(mapName, mapName);
 
@@ -98,5 +112,16 @@
     private static string WashColor(HeroMatchEntry entry)
         => entry.Self.IsWinner ? "var(--um-win-wash)" : "var(--um-loss-wash)";
 
-    private void LoadMore() => _shown = Math.Min(_shown + PageSize, Entries.Count);
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        BuildPage();
+    }
+
+    private void OnPageSizeChanged(int size)
+    {
+        _pageSize = size;
+        _currentPage = 1;
+        BuildPage();
+    }
 }

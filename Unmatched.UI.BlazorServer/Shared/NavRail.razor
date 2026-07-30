@@ -52,7 +52,7 @@
         }
     </NavLink>
 
-    <button type="button" class="rail-collapse" @onclick="NavState.Toggle"
+    <button type="button" class="rail-collapse" @onclick="NavState.ToggleAsync"
             title="@(NavState.IsExpanded ? "Collapse" : "Expand")">
         <i class="bi @(NavState.IsExpanded ? "bi-chevron-double-left" : "bi-chevron-double-right")"></i>
         @if (NavState.IsExpanded)
@@ -96,6 +96,14 @@
     }
 
     protected override async Task OnInitializedAsync() => _counts = await NavCountsService.GetAsync();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await NavState.EnsureLoadedAsync();
+        }
+    }
 
     private void OnStateChanged() => InvokeAsync(StateHasChanged);
 

@@ -96,10 +96,15 @@
     --um-radius-panel: 15px;
     --um-radius-lg: 16px;
 
-    /* ---- Control heights ---- */
-    --um-height-chip: 28px;
-    --um-height-control: 32px;
+    /* ---- Control heights ----
+       Revision 2 (design/IMPLEMENTATION-PROMPT.md §0): every control grew one step. */
+    --um-height-chip: 32px;
+    --um-height-control: 36px;
     --um-height-field: 36px;
+    --um-height-icon: 28px;
+    --um-height-nav-item: 40px;
+    --um-height-dropdown-row: 38px;
+    --um-height-pagination: 36px;
 
     /* ---- Spacing (step 8) ---- */
     --um-space-1: 4px;

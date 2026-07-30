@@ -11,8 +11,8 @@
         {
             <span class="hp-main-chip"><i class="bi bi-bookmark-star-fill"></i>MAIN &middot; @MainHero.Hero.Name.ToUpperInvariant()</span>
         }
-        <UmSearchBox Value="_filter" ValueChanged="OnFilterChanged" Placeholder="Filter heroes…" Class="hp-filter"/>
-        <SegmentedControl TValue="string" Variant="bar" Options="SortOptions" Value="_sort" ValueChanged="v => _sort = v"/>
+        <UmSearchBox Value="@_filter" ValueChanged="OnFilterChanged" Placeholder="Filter heroes…" Class="hp-filter"/>
+        <SegmentedControl TValue="string" Variant="bar" Options="SortOptions" Value="_sort" ValueChanged="OnSortChanged"/>
         <span class="hp-count">@FilteredRecords().Count() of @TotalHeroCount heroes</span>
     </HeaderActions>
     <ChildContent>
@@ -32,7 +32,7 @@
                 <div>My rating</div>
             </ColumnHeader>
             <div class="hp-list">
-                @foreach (var record in SortedFilteredRecords())
+                @foreach (var record in _page)
                 {
                     <div class="hp-row @(record.IsChosenOne ? "is-main" : null)" style="@($"grid-template-columns:{Columns}")">
                         <div class="hp-hero">
@@ -58,20 +58,32 @@
         }
     </ChildContent>
     <Footer>
-        <span class="hp-footnote">One main per player &middot; personal rating is subjective, 1-5, and never feeds the ladder.</span>
+        <div class="hp-footer">
+            <span class="hp-footnote">One main per player &middot; personal rating is subjective, 1-5, and never feeds the ladder.</span>
+            <GridFooter Caption="ROWS PER PAGE" PageSizeOptions="PageSizeOptions" PageSize="_pageSize"
+                        PageSizeChanged="OnPageSizeChanged" CurrentPage="_currentPage" PageCount="PageCount"
+                        TotalCount="FilteredRecords().Count()" PageChanged="GoToPage"/>
+        </div>
     </Footer>
 </Panel>
 
 @code {
     private const string Columns = "1fr 64px 120px 60px 60px 56px 140px";
+    private const int DefaultPageSize = 10;
 
     private static readonly IReadOnlyList<SelectOption<string>> SortOptions =
     [
         new("played", "Played"), new("winrate", "Win %"), new("kd", "K/D"), new("rating", "My rating")
     ];
 
+    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
+
     private string _sort = "played";
     private string _filter = string.Empty;
+    private List<FavoriteStatisticsDto> _page = [];
+    private int _currentPage = 1;
+    private int _pageSize = DefaultPageSize;
 
     [Parameter, EditorRequired]
     public IReadOnlyList<FavoriteStatisticsDto> Records { get; set; } = [];
@@ -87,6 +99,30 @@
 
     private FavoriteStatisticsDto? MainHero => Records.FirstOrDefault(r => r.IsChosenOne);
 
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(FilteredRecords().Count() / (double)_pageSize));
+
+    protected override void OnParametersSet()
+    {
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        BuildPage();
+    }
+
+    private void BuildPage()
+        => _page = SortedFilteredRecords().Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        BuildPage();
+    }
+
+    private void OnPageSizeChanged(int size)
+    {
+        _pageSize = size;
+        _currentPage = 1;
+        BuildPage();
+    }
+
     private IEnumerable<FavoriteStatisticsDto> FilteredRecords()
         => string.IsNullOrWhiteSpace(_filter)
             ? Records
@@ -101,7 +137,19 @@
             _ => FilteredRecords().OrderByDescending(r => r.TotalMatches)
         };
 
-    private void OnFilterChanged(string? value) => _filter = value ?? string.Empty;
+    private void OnFilterChanged(string? value)
+    {
+        _filter = value ?? string.Empty;
+        _currentPage = 1;
+        BuildPage();
+    }
+
+    private void OnSortChanged(string sort)
+    {
+        _sort = sort;
+        _currentPage = 1;
+        BuildPage();
+    }
 
     private Task ToggleMainAsync(FavoriteStatisticsDto record) => MainToggled.InvokeAsync(record);
 

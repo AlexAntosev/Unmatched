@@ -1,0 +1,21 @@
+@*
+    An applied filter value (design/IMPLEMENTATION-PROMPT.md §2). Removing it clears just that one
+    value - independent of any other value still selected in the same dropdown.
+*@
+<span class="um-filter-chip @Class">
+    @Label
+    <button type="button" class="um-filter-chip-remove" title="Remove" @onclick="OnRemove" @onclick:stopPropagation="true">
+        <i class="bi bi-x"></i>
+    </button>
+</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnRemove { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

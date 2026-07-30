@@ -6,11 +6,13 @@
 .um-segment {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    height: var(--um-height-chip);
     border: 1px solid transparent;
     background: none;
     color: var(--um-text-muted);
-    font: 600 11px var(--um-font-body);
+    font: 600 12.5px var(--um-font-body);
     cursor: pointer;
     white-space: nowrap;
     transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
@@ -35,7 +37,7 @@
 }
 
 .um-segmented-pill .um-segment {
-    padding: 5px 11px;
+    padding: 0 11px;
     border-radius: 7px;
 }
 
@@ -54,10 +56,8 @@
 }
 
 .um-segmented-bar .um-segment {
-    height: var(--um-height-chip);
     padding: 0 11px;
     border-radius: var(--um-radius-sm);
-    font-size: 11.5px;
 }
 
 .um-segmented-bar .um-segment.is-selected {

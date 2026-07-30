@@ -43,29 +43,50 @@ public class MatchLogFilterTests
     [Fact]
     public void Apply_Player_MatchesEitherSide()
     {
-        Assert.Equal(3, new MatchLogFilter { PlayerId = Ksuha.Id }.Apply(Log).Count());
+        Assert.Equal(3, new MatchLogFilter { PlayerIds = [Ksuha.Id] }.Apply(Log).Count());
+    }
+
+    [Fact]
+    public void Apply_MultiplePlayers_MatchesAnyOfThem()
+    {
+        // Every match in the fixture has either Ksuha or Andrii, so selecting both is a no-op filter.
+        Assert.Equal(3, new MatchLogFilter { PlayerIds = [Ksuha.Id, Andrii.Id] }.Apply(Log).Count());
     }
 
     [Fact]
     public void Apply_Map_MatchesExactName()
     {
-        var result = Assert.Single(new MatchLogFilter { MapName = "Castle" }.Apply(Log));
+        var result = Assert.Single(new MatchLogFilter { MapNames = ["Castle"] }.Apply(Log));
 
         Assert.Equal("Castle", result.MapName);
     }
 
     [Fact]
-    public void Apply_Tournament_MatchesExactName()
+    public void Apply_MultipleMaps_MatchesAnyOfThem()
     {
-        Assert.Equal(2, new MatchLogFilter { TournamentName = "Golden Halat League" }.Apply(Log).Count());
+        Assert.Equal(2, new MatchLogFilter { MapNames = ["Castle", "London"] }.Apply(Log).Count());
     }
 
     [Fact]
-    public void Apply_DateRange_IsInclusive()
+    public void Apply_Tournament_MatchesExactName()
     {
-        var filter = new MatchLogFilter { From = new DateTime(2026, 7, 5), To = new DateTime(2026, 7, 12) };
+        Assert.Equal(2, new MatchLogFilter { TournamentNames = ["Golden Halat League"] }.Apply(Log).Count());
+    }
 
-        Assert.Equal(2, filter.Apply(Log).Count());
+    [Fact]
+    public void Apply_RangeDays_KeepsTheLoosestSelectedWindow()
+    {
+        // Selecting both a 5-day and a 60-day preset should behave like the 60-day one alone -
+        // OR'ing date windows together is equivalent to keeping only the widest.
+        var recent = Match(DateTime.Today.AddDays(-3), [Fighter(Medusa, true, Ksuha), Fighter(Bigfoot, false, Andrii)],
+            GameMode.OneVsOne);
+        var old = Match(DateTime.Today.AddDays(-40), [Fighter(Medusa, true, Ksuha), Fighter(Bigfoot, false, Andrii)],
+            GameMode.OneVsOne);
+
+        var filter = new MatchLogFilter { RangeDays = [5, 60] };
+
+        Assert.Equal(2, filter.Apply([recent, old]).Count());
+        Assert.Single(new MatchLogFilter { RangeDays = [5] }.Apply([recent, old]));
     }
 
     [Fact]
@@ -85,7 +106,7 @@ public class MatchLogFilterTests
     [Fact]
     public void Apply_CriteriaCombine()
     {
-        var filter = new MatchLogFilter { Mode = GameMode.OneVsOne, PlayerId = Ksuha.Id, Search = "Kaer" };
+        var filter = new MatchLogFilter { Mode = GameMode.OneVsOne, PlayerIds = [Ksuha.Id], Search = "Kaer" };
 
         Assert.Single(filter.Apply(Log));
     }
@@ -95,6 +116,24 @@ public class MatchLogFilterTests
     {
         Assert.False(new MatchLogFilter { Search = "x" }.IsEmpty);
         Assert.False(new MatchLogFilter { Mode = GameMode.FreeForAll }.IsEmpty);
-        Assert.False(new MatchLogFilter { From = DateTime.Today }.IsEmpty);
+        Assert.False(new MatchLogFilter { RangeDays = [30] }.IsEmpty);
+    }
+
+    [Fact]
+    public void Clear_ResetsEveryCriterion()
+    {
+        var filter = new MatchLogFilter
+        {
+            Mode = GameMode.OneVsOne,
+            PlayerIds = [Ksuha.Id],
+            HeroIds = [Medusa.Id],
+            MapNames = ["Castle"],
+            TournamentNames = ["Golden Halat League"],
+            RangeDays = [30]
+        };
+
+        filter.Clear();
+
+        Assert.True(filter.IsEmpty);
     }
 }

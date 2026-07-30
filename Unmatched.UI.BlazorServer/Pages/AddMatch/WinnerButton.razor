@@ -1,0 +1,20 @@
+@*
+    Mark winner / Winner toggle (design/IMPLEMENTATION-PROMPT.md §5.4) - lives on the fighter plate
+    for 1v1/FFA and on the side header for 2v2/co-op. Only one winner at a time; the caller
+    (AddMatch) owns that exclusivity when the click comes in.
+*@
+<button type="button" class="winner-btn @(IsWinner ? "is-winner" : null) @Class"
+        @onclick="OnClick" @onclick:stopPropagation="true">
+    <i class="bi @(IsWinner ? "bi-trophy-fill" : "bi-trophy")"></i>@(IsWinner ? "Winner" : "Mark winner")
+</button>
+
+@code {
+    [Parameter]
+    public bool IsWinner { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

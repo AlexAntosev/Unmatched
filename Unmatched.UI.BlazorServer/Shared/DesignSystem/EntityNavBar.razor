@@ -1,0 +1,87 @@
+@*
+    The named prev/next sub-bar (design/IMPLEMENTATION-PROMPT.md §3.1), shared by every detail page
+    - Hero, Player, Map, Villain, Minion. Replaces the plain PageHeader breadcrumb on those pages:
+    the breadcrumb now lives in its centre, next to the entity's position in the list. Buttons
+    follow whatever order/filters the caller computed; wrap-around and disabling at the ends is the
+    caller's job (pass null for an end that has no neighbour). Left/right arrow keys move between
+    entities once the bar has focus, which it grabs on first render.
+*@
+<div class="um-entity-nav" tabindex="0" @ref="_root" @onkeydown="OnKeyDown">
+    <button type="button" class="um-entity-nav-btn is-prev" disabled="@(PreviousName is null)" @onclick="OnPreviousClick">
+        <i class="bi bi-chevron-left"></i>
+        <HeroToken ImageUrl="@PreviousImageUrl" Alt="@PreviousName" Size="34" Radius="10" Fallback="@Fallback"/>
+        <span class="um-entity-nav-text">
+            <span class="um-entity-nav-caption">PREVIOUS @EntityNoun.ToUpperInvariant()</span>
+            <span class="um-entity-nav-name">@(PreviousName ?? "—")</span>
+        </span>
+    </button>
+
+    <div class="um-entity-nav-center">
+        <Breadcrumb Items="Breadcrumbs"/>
+        @if (!string.IsNullOrEmpty(PositionLabel))
+        {
+            <span class="um-entity-nav-position">@PositionLabel</span>
+        }
+    </div>
+
+    <button type="button" class="um-entity-nav-btn is-next" disabled="@(NextName is null)" @onclick="OnNextClick">
+        <span class="um-entity-nav-text">
+            <span class="um-entity-nav-caption">NEXT @EntityNoun.ToUpperInvariant()</span>
+            <span class="um-entity-nav-name">@(NextName ?? "—")</span>
+        </span>
+        <HeroToken ImageUrl="@NextImageUrl" Alt="@NextName" Size="34" Radius="10" Fallback="@Fallback"/>
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
+
+@code {
+    private ElementReference _root;
+
+    /// <summary>Singular noun the captions build on, e.g. "hero" -> "PREVIOUS HERO".</summary>
+    [Parameter, EditorRequired]
+    public string EntityNoun { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Breadcrumb.Crumb> Breadcrumbs { get; set; } = Array.Empty<Breadcrumb.Crumb>();
+
+    /// <summary>e.g. "Hero 01 of 42 - sorted by points".</summary>
+    [Parameter]
+    public string? PositionLabel { get; set; }
+
+    [Parameter]
+    public string? PreviousName { get; set; }
+
+    [Parameter]
+    public string? PreviousImageUrl { get; set; }
+
+    [Parameter]
+    public EventCallback OnPreviousClick { get; set; }
+
+    [Parameter]
+    public string? NextName { get; set; }
+
+    [Parameter]
+    public string? NextImageUrl { get; set; }
+
+    [Parameter]
+    public EventCallback OnNextClick { get; set; }
+
+    [Parameter]
+    public string Fallback { get; set; } = "/Unknown.png";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _root.FocusAsync();
+        }
+    }
+
+    private Task OnKeyDown(KeyboardEventArgs args)
+        => args.Key switch
+        {
+            "ArrowLeft" when PreviousName is not null => OnPreviousClick.InvokeAsync(),
+            "ArrowRight" when NextName is not null => OnNextClick.InvokeAsync(),
+            _ => Task.CompletedTask
+        };
+}

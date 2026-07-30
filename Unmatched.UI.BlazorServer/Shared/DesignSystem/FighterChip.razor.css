@@ -15,8 +15,8 @@
     position: absolute;
     right: -4px;
     bottom: -3px;
-    width: 15px;
-    height: 15px;
+    width: 19px;
+    height: 19px;
     border-radius: 50%;
     border: 1.5px solid var(--um-bg-panel);
     object-fit: cover;
@@ -29,10 +29,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 15px;
-    height: 15px;
+    width: 19px;
+    height: 19px;
     border: 1px solid var(--um-border-strong);
     border-radius: 5px;
     background: #0c0c11;
-    font: 700 8.5px/1 var(--um-font-display);
+    font: 700 10px/1 var(--um-font-display);
 }

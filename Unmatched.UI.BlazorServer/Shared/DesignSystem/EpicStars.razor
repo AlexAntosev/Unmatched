@@ -1,7 +1,7 @@
 @*
     A 0-N star rating. Filled = bi-star-fill in Color (gold by default); empty is the OUTLINE glyph
     bi-star, never a dimmed fill (that reads as "half lit" at row size). Sized 11px in rows, 15px in
-    detail panels, 17px when editable (Size parameter). Read-only contexts (the match row, the
+    detail panels, 20px when editable (Size parameter). Read-only contexts (the match row, the
     scoreboard footer) render the same icons as the editable one, just non-interactive. The player
     page's personal 1-5 rating reuses this with Max="5" and the accent violet Color - it is a
     subjective note that never feeds the ladder or any computed stat.
@@ -37,9 +37,9 @@
     [Parameter]
     public bool ReadOnly { get; set; }
 
-    /// <summary>Glyph size in px - 11 in rows, 15 in detail panels, 17 when editable.</summary>
+    /// <summary>Glyph size in px - 11 in rows, 15 in detail panels, 20 when editable.</summary>
     [Parameter]
-    public int Size { get; set; } = 17;
+    public int Size { get; set; } = 20;
 
     /// <summary>Filled-star colour - gold for epic, accent violet for the player page's personal rating.</summary>
     [Parameter]

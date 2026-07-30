@@ -1,0 +1,123 @@
+@using Unmatched.Dtos
+@using Unmatched.Extensions
+@*
+    The map banner (design/IMPLEMENTATION-PROMPT.md §5.1): a full-width strip under the Add match
+    header with the map art as a dim backdrop, a small thumbnail that opens the fullscreen viewer,
+    the dice randomize button and the picker dropdown. "Shuffle turn order" lives at the right end
+    of this same strip in the mock, so it is exposed here rather than duplicated by the caller.
+*@
+<div class="map-banner">
+    <div class="map-banner-backdrop" style="background-image:url('@(SelectedMap?.ImageUrl ?? "/UnknownMap.png")')"></div>
+    <div class="map-banner-content">
+        <button type="button" class="map-banner-thumb" title="View fullscreen" @onclick="OpenFullscreen">
+            <img src="@(SelectedMap?.ImageUrl ?? "/UnknownMap.png")" alt="@SelectedMap?.DisplayName"
+                 onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+            <i class="bi bi-arrows-fullscreen"></i>
+        </button>
+        <div class="map-banner-text">
+            <span class="map-banner-caption">Battlefield</span>
+            <span class="map-banner-name">@(SelectedMap?.DisplayName ?? "No map")</span>
+        </div>
+        <UmButton Variant="dice" Size="sm" Icon="bi-dice-5-fill" Title="Randomize" OnClick="RandomizeMapAsync"/>
+        <div class="map-banner-picker">
+            <UmSelect TValue="Guid" Icon="bi-map" Value="@(SelectedMap?.Id ?? Guid.Empty)"
+                      ValueChanged="OnPickedAsync" Options="MapOptions()"/>
+        </div>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Icon="bi-shuffle" OnClick="OnShuffleTurnOrder">Shuffle turn order</UmButton>
+    </div>
+
+    @if (_fullscreen)
+    {
+        <div class="map-fullscreen-scrim" tabindex="0" @ref="_scrim" @onclick="CloseFullscreen" @onkeydown="OnScrimKeyDown">
+            <div class="map-fullscreen" @onclick:stopPropagation="true">
+                <div class="map-fullscreen-head">
+                    <div>
+                        <div class="map-fullscreen-name">@(SelectedMap?.DisplayName?.ToUpperInvariant() ?? "NO MAP")</div>
+                        @if (!string.IsNullOrEmpty(SelectedMap?.ExpansionName))
+                        {
+                            <div class="map-fullscreen-meta">@SelectedMap.ExpansionName</div>
+                        }
+                    </div>
+                    <div class="map-fullscreen-actions">
+                        <UmButton Variant="dice" Size="sm" Icon="bi-dice-5-fill" OnClick="RandomizeMapAsync">Randomize</UmButton>
+                        <UmButton Variant="icon" Size="sm" Icon="bi-x-lg" Title="Close" OnClick="CloseFullscreen"/>
+                    </div>
+                </div>
+                <div class="map-fullscreen-image">
+                    <img src="@(SelectedMap?.ImageUrl ?? "/UnknownMap.png")" alt="@SelectedMap?.DisplayName"
+                         onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                </div>
+                @if (Maps.Count > 1)
+                {
+                    <div class="map-fullscreen-strip">
+                        @foreach (var map in Maps)
+                        {
+                            <button type="button" class="map-fullscreen-strip-item @(map.Id == SelectedMap?.Id ? "is-active" : null)"
+                                    title="@map.DisplayName" @onclick="@(() => PickAsync(map))">
+                                <img src="@map.ImageUrl" alt="@map.DisplayName"
+                                     onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool _fullscreen;
+    private bool _shouldFocusScrim;
+    private ElementReference _scrim;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MapDto> Maps { get; set; } = [];
+
+    [Parameter]
+    public MapDto? SelectedMap { get; set; }
+
+    [Parameter]
+    public EventCallback<MapDto> SelectedMapChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnShuffleTurnOrder { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldFocusScrim)
+        {
+            _shouldFocusScrim = false;
+            await _scrim.FocusAsync();
+        }
+    }
+
+    private IReadOnlyList<SelectOption<Guid>> MapOptions()
+        => Maps.Select(m => new SelectOption<Guid>(m.Id, m.DisplayName, ArtUrl: m.ImageUrl)).ToList();
+
+    private void OpenFullscreen()
+    {
+        _fullscreen = true;
+        _shouldFocusScrim = true;
+    }
+
+    private void CloseFullscreen() => _fullscreen = false;
+
+    private Task OnScrimKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape")
+        {
+            CloseFullscreen();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task RandomizeMapAsync()
+        => Maps.Count == 0 ? Task.CompletedTask : PickAsync(Maps.ToList().GetRandomItem());
+
+    private Task OnPickedAsync(Guid mapId) => PickAsync(Maps.FirstOrDefault(m => m.Id == mapId));
+
+    private Task PickAsync(MapDto? map)
+        => map is null ? Task.CompletedTask : SelectedMapChanged.InvokeAsync(map);
+}

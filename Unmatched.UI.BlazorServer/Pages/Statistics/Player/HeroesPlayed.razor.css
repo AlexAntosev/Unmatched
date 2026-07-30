@@ -43,8 +43,6 @@
 .hp-list {
     display: flex;
     flex-direction: column;
-    max-height: 430px;
-    overflow-y: auto;
 }
 
 .hp-row {
@@ -121,6 +119,13 @@
     background: var(--um-gold-bg);
     border-color: rgba(240, 180, 41, 0.45);
     color: var(--um-gold);
+}
+
+.hp-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }
 
 .hp-footnote {

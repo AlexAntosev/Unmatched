@@ -16,14 +16,11 @@
     minion records.
 *@
 
-<PageHeader Breadcrumbs="Crumbs">
-    <Controls>
-        <UmButton Size="sm" Icon="bi-chevron-left" Disabled="@(_previousHeroId is null)"
-                  OnClick="@(() => GoToHero(_previousHeroId))">Prev hero</UmButton>
-        <UmButton Size="sm" TrailingIcon="bi-chevron-right" Disabled="@(_nextHeroId is null)"
-                  OnClick="@(() => GoToHero(_nextHeroId))">Next hero</UmButton>
-    </Controls>
-</PageHeader>
+<EntityNavBar EntityNoun="hero" Breadcrumbs="Crumbs" PositionLabel="@PositionLabel"
+              PreviousName="@_previousHero?.Name" PreviousImageUrl="@_previousHero?.ImageUrl"
+              OnPreviousClick="@(() => GoToHero(_previousHero))"
+              NextName="@_nextHero?.Name" NextImageUrl="@_nextHero?.ImageUrl"
+              OnNextClick="@(() => GoToHero(_nextHero))"/>
 
 <div class="hero">
     <section class="hero-banner">
@@ -76,49 +73,55 @@
                 </div>
 
                 <div class="hero-analysis">
-                    <Panel Title="Play style">
+                    <Panel Title="Play style" Meta="click a square to set" Class="hero-playstyle-card">
                         @foreach (var axis in PlayStyleAxes())
                         {
                             <div class="hero-axis">
                                 <span class="hero-axis-label">@axis.Label</span>
-                                <div class="hero-axis-dots">
+                                <div class="hero-axis-squares">
                                     @for (var level = 1; level <= 3; level++)
                                     {
-                                        <span class="hero-axis-dot @(level <= axis.Value ? "is-on" : null)"></span>
+                                        var square = level;
+                                        <button type="button" class="hero-axis-square @(square <= axis.Value ? "is-filled" : null)"
+                                                title="@($"Set {axis.Label} to {square}")"
+                                                @onclick="@(() => SetPlayStyleAsync(axis.Kind, square))"></button>
                                     }
                                 </div>
-                            </div>
-                        }
-                    </Panel>
-
-                    <Panel Title="Titles">
-                        @if (_hero.Titles?.Any() != true)
-                        {
-                            <div class="hero-muted">No titles yet.</div>
-                        }
-                        @foreach (var title in _hero.Titles ?? [])
-                        {
-                            <div class="hero-title-item">
-                                <i class="bi bi-award-fill"></i>
-                                <span class="hero-title-name">@title.Name</span>
-                                <span class="hero-title-comment">@title.Comment</span>
                             </div>
                         }
                         @if (_sidekick is not null)
                         {
                             <div class="hero-divider"></div>
                             <div class="hero-sidekick">
-                                <HeroToken ImageUrl="/Unknown.png" Alt="@_sidekick.Name" Size="28" Radius="8" Opacity="0.7"/>
-                                <div>
-                                    <div class="hero-sidekick-name">@_sidekick.Name</div>
-                                    <div class="hero-sidekick-meta">sidekick · @_sidekick.Hp HP</div>
-                                </div>
+                                <span class="hero-sidekick-label">Sidekick</span>
+                                <span class="hero-sidekick-value">@_sidekick.Name <span class="hero-sidekick-hp">@_sidekick.Hp HP</span></span>
                             </div>
                         }
                     </Panel>
 
+                    <Panel Title="Style radar" Class="hero-radar-card">
+                        <RadarChart Attack="_playStyle?.Attack ?? 0" Defence="_playStyle?.Defence ?? 0"
+                                    Trickery="_playStyle?.Trickery ?? 0" Difficulty="_playStyle?.Difficulty ?? 0"
+                                    Height="120"/>
+                        <div class="hero-radar-caption">
+                            A @(_playStyle?.Attack ?? 0) · D @(_playStyle?.Defence ?? 0) · T @(_playStyle?.Trickery ?? 0) · Dif @(_playStyle?.Difficulty ?? 0)
+                        </div>
+                    </Panel>
+
                     <Panel Title="Win rate" Class="hero-winrate">
                         <DonutChart Percent="_winRate" Caption="@($"{_hero.TotalWins}W · {_hero.TotalLooses}L")"/>
+                        <div class="hero-titles">
+                            @if (_hero.Titles?.Any() != true)
+                            {
+                                <div class="hero-muted">No titles yet.</div>
+                            }
+                            @foreach (var title in _hero.Titles ?? [])
+                            {
+                                <span class="hero-title-chip" title="@title.Comment">
+                                    <i class="bi bi-award-fill"></i>@title.Name
+                                </span>
+                            }
+                        </div>
                     </Panel>
                 </div>
             </div>
@@ -223,14 +226,27 @@
     private List<MonsterMatchupRow> _villainMatchups = new();
     private List<MonsterMatchupRow> _minionMatchups = new();
 
-    private Guid? _previousHeroId;
-    private Guid? _nextHeroId;
+    private UiHeroStatisticsDto? _previousHero;
+    private UiHeroStatisticsDto? _nextHero;
+    private int _rank;
+    private int _ladderSize;
     private int _ratingMonths = 6;
     private int _winRate;
     private int _cacheBust;
     private int _matchupPage = 1;
 
     private const int MatchupsPerPage = 5;
+
+    private enum PlayStyleAxisKind
+    {
+        Attack,
+        Defence,
+        Trickery,
+        Difficulty
+    }
+
+    private string PositionLabel
+        => _ladderSize == 0 ? string.Empty : $"Hero {_rank:00} of {_ladderSize} · sorted by points";
 
     private int MatchupPageCount => Math.Max(1, (int)Math.Ceiling(_matchups.Count / (double)MatchupsPerPage));
 
@@ -354,23 +370,74 @@
             .ToList();
     }
 
-    /// <summary>Prev/next walk the ladder in rank order, which is how the user got here.</summary>
+    /// <summary>
+    /// Prev/next walk the ladder in rank order, which is how the user got here, and wrap around at
+    /// the ends (design/IMPLEMENTATION-PROMPT.md §3.1).
+    /// </summary>
     private void BuildNeighbours(List<UiHeroStatisticsDto> ladder, Guid heroId)
     {
         var ordered = ladder.OrderBy(h => h.Place ?? int.MaxValue).ToList();
         var index = ordered.FindIndex(h => h.HeroId == heroId);
-        _previousHeroId = index > 0 ? ordered[index - 1].HeroId : null;
-        _nextHeroId = index >= 0 && index < ordered.Count - 1 ? ordered[index + 1].HeroId : null;
+        _ladderSize = ordered.Count;
+
+        if (index < 0 || ordered.Count <= 1)
+        {
+            _rank = index + 1;
+            _previousHero = null;
+            _nextHero = null;
+            return;
+        }
+
+        _rank = index + 1;
+        _previousHero = ordered[(index - 1 + ordered.Count) % ordered.Count];
+        _nextHero = ordered[(index + 1) % ordered.Count];
     }
 
-    private record Axis(string Label, int Value);
+    private record PlayStyleAxis(PlayStyleAxisKind Kind, string Label, int Value);
 
-    private IEnumerable<Axis> PlayStyleAxes()
+    private IEnumerable<PlayStyleAxis> PlayStyleAxes()
     {
-        yield return new Axis("Attack", _playStyle?.Attack ?? 0);
-        yield return new Axis("Defence", _playStyle?.Defence ?? 0);
-        yield return new Axis("Trickery", _playStyle?.Trickery ?? 0);
-        yield return new Axis("Difficulty", _playStyle?.Difficulty ?? 0);
+        yield return new PlayStyleAxis(PlayStyleAxisKind.Attack, "Attack", _playStyle?.Attack ?? 0);
+        yield return new PlayStyleAxis(PlayStyleAxisKind.Defence, "Defence", _playStyle?.Defence ?? 0);
+        yield return new PlayStyleAxis(PlayStyleAxisKind.Trickery, "Trickery", _playStyle?.Trickery ?? 0);
+        yield return new PlayStyleAxis(PlayStyleAxisKind.Difficulty, "Difficulty", _playStyle?.Difficulty ?? 0);
+    }
+
+    /// <summary>
+    /// Clicking square n sets the axis to n; clicking the currently highest lit square clears it to
+    /// 0 - the squares are the only control, no stepper or number. Persists optimistically: the UI
+    /// updates immediately and the save happens in the background, with no dialog or Save button.
+    /// </summary>
+    private async Task SetPlayStyleAsync(PlayStyleAxisKind axis, int square)
+    {
+        var current = axis switch
+        {
+            PlayStyleAxisKind.Attack => _playStyle?.Attack ?? 0,
+            PlayStyleAxisKind.Defence => _playStyle?.Defence ?? 0,
+            PlayStyleAxisKind.Trickery => _playStyle?.Trickery ?? 0,
+            _ => _playStyle?.Difficulty ?? 0
+        };
+
+        var value = current == square ? 0 : square;
+
+        _playStyle ??= new UiPlayStyleDto { HeroId = _hero.HeroId };
+        switch (axis)
+        {
+            case PlayStyleAxisKind.Attack:
+                _playStyle.Attack = value;
+                break;
+            case PlayStyleAxisKind.Defence:
+                _playStyle.Defence = value;
+                break;
+            case PlayStyleAxisKind.Trickery:
+                _playStyle.Trickery = value;
+                break;
+            default:
+                _playStyle.Difficulty = value;
+                break;
+        }
+
+        await PlayStyleService.AddOrUpdateAsync(_hero.HeroId, _playStyle);
     }
 
     private void OnRatingRangeChanged(int months)
@@ -384,11 +451,11 @@
 
     private void GoToMatchupPage(int page) => _matchupPage = Math.Clamp(page, 1, MatchupPageCount);
 
-    private void GoToHero(Guid? heroId)
+    private void GoToHero(UiHeroStatisticsDto? hero)
     {
-        if (heroId is not null)
+        if (hero is not null)
         {
-            NavManager.NavigateTo($"{Urls.HeroesStatistics}/{heroId}");
+            NavManager.NavigateTo($"{Urls.HeroesStatistics}/{hero.HeroId}");
         }
     }
 

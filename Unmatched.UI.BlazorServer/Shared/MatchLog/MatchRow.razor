@@ -33,7 +33,8 @@
                                      PlayerAvatarUrl="@participant.PlayerImageUrl"
                                      Title="@ChipTitle(participant)"
                                      IsWinner="participant.IsWinner"
-                                     Place="@(Match.GameMode == GameMode.FreeForAll ? participant.Place : null)"/>
+                                     Place="@(Match.GameMode == GameMode.FreeForAll ? participant.Place : null)"
+                                     Size="46"/>
                     }
                 </SideBox>
             }
@@ -46,7 +47,7 @@
             }
         </div>
         <div class="match-row-epic">
-            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="11"/>
+            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="13"/>
         </div>
         <div class="match-row-chevron">
             <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"></i>

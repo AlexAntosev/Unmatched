@@ -1,47 +1,64 @@
-.fighter {
+/* The shared plate shell (.plate, .plate-art-wrap, .plate-stacked-fields, .fighter-narrow, ...)
+   lives in wwwroot/css/theme/base.css since VillainInfo.razor's co-op plate reuses it too -
+   only FighterCard-specific pieces are scoped here. */
+
+.plate-order-badge {
+    position: absolute;
+    top: -6px;
+    left: -6px;
     display: flex;
     align-items: center;
-    gap: 11px;
-    padding: 10px;
-    border: 1px solid var(--um-border);
-    border-radius: var(--um-radius-row);
-    background: var(--um-bg-panel);
+    justify-content: center;
+    min-width: 23px;
+    height: 23px;
+    padding: 0 4px;
+    border-radius: 7px;
+    background: var(--um-accent);
+    color: #fff;
+    font: 600 11.5px var(--um-font-display);
 }
 
-.fighter-selects {
-    width: 170px;
-    flex: none;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.plate-place-badge {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--um-bg-nav);
+    border: 1px solid var(--um-border-strong);
+    font: 700 9.5px var(--um-font-display);
+    letter-spacing: 0.03em;
 }
 
-.fighter-stats {
+/* The HP/Cards/Sidekick line sat fixed-width and left-aligned, leaving the rest of the plate
+   empty - stretch those three fields to fill the line. Scoped to this component's own
+   .plate-line so the villain plate's solo HP field (also .fighter-narrow) is unaffected. */
+.plate-line ::deep .fighter-narrow {
     flex: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    gap: 7px;
+    width: auto;
 }
 
-.fighter-narrow {
-    width: 58px;
-    flex: none;
-}
+/* ---- Row layout: FFA's single-line grid ---- */
 
-.fighter-place {
-    width: 74px;
-    flex: none;
+.plate-row-fields {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 1.1fr 1.1fr 78px 78px 96px;
+    gap: 8px;
+    align-items: end;
 }
 
 .fighter-remove {
-    padding: 0 2px 7px;
+    flex: none;
+    padding: 0 2px;
     border: 0;
     background: none;
     color: var(--um-text-dim);
     font-size: 12px;
     cursor: pointer;
     transition: color 0.12s ease;
+    align-self: center;
 }
 
 .fighter-remove:hover {
