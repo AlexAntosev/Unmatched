@@ -14,4 +14,14 @@ public interface ITournamentService
     Task DeleteAsync(Guid id);
 
     Task GenerateMatchesAsync(Guid tournamentId);
+
+    Task<IEnumerable<TournamentStandingDto>> GetStandingsAsync(Guid tournamentId);
+
+    Task<TournamentDto> UpdateImageAsync(Guid id, string imageFileName);
+
+    Task<TournamentDto> UpdateTrophyImageAsync(Guid id, string imageFileName);
+
+    Task<TournamentDto> CompleteAsync(Guid id);
+
+    Task<IEnumerable<TournamentAwardDto>> GetAwardsAsync(Guid id);
 }

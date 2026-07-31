@@ -1,4 +1,6 @@
 @typeparam TValue
+@using Unmatched.UI.BlazorServer.Services
+@inject DropdownPositionService DropdownPosition
 @*
     The multi-select filter dropdown (design/IMPLEMENTATION-PROMPT.md §2): a trigger with an icon,
     a fixed label and a selection-count badge, and a custom panel of checkbox rows - never the
@@ -6,10 +8,14 @@
     when Apply is pressed, so a half-finished selection never flashes results at the list behind
     it. Applied chips and "Clear all filters" are rendered by the page, since one page usually
     hosts several of these side by side and needs one shared chip row.
+
+    The panel is position:fixed, positioned via JS from the trigger's on-screen bounds (see
+    DropdownPositionService) rather than CSS position:absolute - the latter gets clipped by any
+    ancestor with overflow:hidden (e.g. Panel), which is nearly everywhere this component is used.
 *@
 <div class="um-mselect @Class" @onkeydown="OnKeyDown">
-    <button type="button" class="um-mselect-trigger @(_isOpen ? "is-open" : null)" tabindex="0"
-            aria-haspopup="listbox" aria-expanded="@_isOpen" @onclick="Toggle">
+    <button type="button" class="um-mselect-trigger @(_isOpen ? "is-open" : null)" @ref="_triggerElement"
+            tabindex="0" aria-haspopup="listbox" aria-expanded="@_isOpen" @onclick="Toggle">
         @if (!string.IsNullOrEmpty(Icon))
         {
             <i class="bi @Icon um-mselect-icon"></i>
@@ -25,7 +31,7 @@
     @if (_isOpen)
     {
         <div class="um-mselect-scrim" @onclick="Close" @onclick:stopPropagation="true"></div>
-        <div class="um-mselect-panel" @onclick:stopPropagation="true">
+        <div class="um-mselect-panel" @ref="_panelElement" @onclick:stopPropagation="true">
             @if (ShowFilter)
             {
                 <div class="um-mselect-filter">
@@ -82,6 +88,8 @@
     private bool _isOpen;
     private string _filter = string.Empty;
     private HashSet<TValue> _draft = new();
+    private ElementReference _triggerElement;
+    private ElementReference _panelElement;
 
     [Parameter, EditorRequired]
     public IReadOnlyList<TValue> Value { get; set; } = Array.Empty<TValue>();
@@ -107,6 +115,14 @@
         => string.IsNullOrWhiteSpace(_filter)
             ? Options
             : Options.Where(o => o.Label.Contains(_filter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_isOpen)
+        {
+            await DropdownPosition.PositionAsync(_triggerElement, _panelElement);
+        }
+    }
 
     private void Toggle()
     {

@@ -10,6 +10,7 @@ using Moq;
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Mapping;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Services;
@@ -86,6 +87,63 @@ public class TitleServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task MergeAsync_RemovesMultipleHeroesFromTheMiddleOfTheList_DoesNotThrow()
+    {
+        // regression: MergeAsync used to mutate title.HeroTitles while a foreach was iterating it, which
+        // throws InvalidOperationException as soon as a non-trailing element is removed.
+        var titleId = await SeedTitleAsync("Streak");
+        var kept1 = Guid.NewGuid();
+        var removed1 = Guid.NewGuid();
+        var kept2 = Guid.NewGuid();
+        var removed2 = Guid.NewGuid();
+        await _titleService.MergeAsync(titleId, new[] { kept1, removed1, kept2, removed2 });
+
+        await _titleService.MergeAsync(titleId, new[] { kept1, kept2 });
+
+        var persisted = await RequeryHeroIdsAsync(titleId);
+        Assert.Equal(new[] { kept1, kept2 }.OrderBy(x => x), persisted.OrderBy(x => x));
+    }
+
+    [Fact]
+    public async Task MergeAsync_UniqueTitleWithMultipleHeroesRequested_Throws()
+    {
+        var titleId = await SeedTitleAsync("The Streak", TitleExclusivity.Unique);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _titleService.MergeAsync(titleId, new[] { Guid.NewGuid(), Guid.NewGuid() }));
+    }
+
+    [Fact]
+    public async Task MergeAsync_UniqueTitle_TransfersAwayFromThePreviousHolder()
+    {
+        var titleId = await SeedTitleAsync("The Streak", TitleExclusivity.Unique);
+        var previousHolder = Guid.NewGuid();
+        var newHolder = Guid.NewGuid();
+        await _titleService.MergeAsync(titleId, new[] { previousHolder });
+
+        await _titleService.MergeAsync(titleId, new[] { newHolder });
+
+        var persisted = await RequeryHeroIdsAsync(titleId);
+        Assert.Equal(new[] { newHolder }, persisted);
+    }
+
+    [Fact]
+    public async Task AssignAsync_UniqueTitle_TransfersAwayFromThePreviousHolder()
+    {
+        var titleId = await SeedTitleAsync("The Streak", TitleExclusivity.Unique);
+        var previousHolder = Guid.NewGuid();
+        var newHolder = Guid.NewGuid();
+        _catalogHeroCache.Setup(c => c.GetAsync(previousHolder)).ReturnsAsync(new CatalogHeroDto { Id = previousHolder });
+        _catalogHeroCache.Setup(c => c.GetAsync(newHolder)).ReturnsAsync(new CatalogHeroDto { Id = newHolder });
+        await _titleService.AssignAsync(titleId, previousHolder);
+
+        await _titleService.AssignAsync(titleId, newHolder);
+
+        var persisted = await RequeryHeroIdsAsync(titleId);
+        Assert.Equal(new[] { newHolder }, persisted);
+    }
+
+    [Fact]
     public async Task AssignAsync_AddsHeroToTitle_AndPersistsIt()
     {
         var titleId = await SeedTitleAsync("Streak");
@@ -156,9 +214,16 @@ public class TitleServiceTests : IDisposable
         Assert.Empty(await _titleService.GetByHeroAsync(Guid.NewGuid()));
     }
 
-    private async Task<Guid> SeedTitleAsync(string name)
+    private async Task<Guid> SeedTitleAsync(string name, TitleExclusivity exclusivity = TitleExclusivity.Shared)
     {
-        var entity = new TitleEntity { Id = Guid.NewGuid(), Name = name, Comment = string.Empty, HeroTitles = new List<HeroTitleEntity>() };
+        var entity = new TitleEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            Comment = string.Empty,
+            Exclusivity = exclusivity,
+            HeroTitles = new List<HeroTitleEntity>()
+        };
         _dbContext.Titles.Add(entity);
         await _dbContext.SaveChangesAsync();
         _dbContext.ChangeTracker.Clear();
@@ -181,6 +246,10 @@ public class TitleServiceTests : IDisposable
         public IRatingRecalculationStateRepository RatingRecalculationState => throw new NotImplementedException();
 
         public ITournamentRepository Tournaments => throw new NotImplementedException();
+
+        public ITournamentParticipantRepository TournamentParticipants => throw new NotImplementedException();
+
+        public ITournamentAwardRepository TournamentAwards => throw new NotImplementedException();
 
         public ITitleRepository Titles { get; } = new TitleRepository(dbContext);
 

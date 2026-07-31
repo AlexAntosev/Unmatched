@@ -20,12 +20,14 @@ public class UiMatchVillainDto
 
     public IEnumerable<UiMatchMinionDto> Minions { get; set; } = new List<UiMatchMinionDto>();
 
-    public void SetDefaultData()
+    /// <summary>Fills in the villain's co-op HP total for the given number of heroes - see
+    /// <see cref="VillainDto.EffectiveHp"/>.</summary>
+    public void SetDefaultData(int heroCount)
     {
         if (Villain is not null)
         {
             VillainId = Villain.Id;
-            HpLeft = Villain.Hp;
+            HpLeft = Villain.EffectiveHp(heroCount);
             CardsLeft = Villain.DeckSize;
         }
     }

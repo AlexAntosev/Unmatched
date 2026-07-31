@@ -29,6 +29,7 @@ builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<NavState>();
 builder.Services.AddScoped<NavCountsService>();
 builder.Services.AddScoped<AppSettingsService>();
+builder.Services.AddScoped<DropdownPositionService>();
 
 builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
 builder.Services.AddSingleton<IAmazonS3>(sp =>

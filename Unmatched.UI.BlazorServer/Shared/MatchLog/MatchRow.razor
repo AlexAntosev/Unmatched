@@ -18,6 +18,10 @@
         </div>
         <div>
             <ModeBadge Mode="Match.GameMode"/>
+            @if (ShowUnrankedBadge)
+            {
+                <span class="match-row-unranked" title="Unranked - doesn't affect hero rating"><i class="bi bi-dash-circle"></i>Unranked</span>
+            }
         </div>
         <div class="match-row-participants">
             @foreach (var side in _sides)
@@ -75,6 +79,10 @@
 
     [Parameter]
     public EventCallback OnToggle { get; set; }
+
+    /// <summary>Co-op is excluded - it never affects rating regardless of IsRanked, so the label
+    /// would only raise a question the game mode itself already answers.</summary>
+    private bool ShowUnrankedBadge => !Match.IsRanked && Match.GameMode != GameMode.Cooperative;
 
     protected override void OnParametersSet()
     {

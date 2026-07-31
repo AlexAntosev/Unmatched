@@ -1,11 +1,16 @@
 @page "/titles"
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
+@using Unmatched.Enums
 @using Unmatched.Services.Contracts
 @inject ITitleService TitleService
+@inject IHeroService HeroService
 @*
     Not in the design pack: a panel of rows plus an assign dialog, built from design-system parts.
-    A first pass - the layout is deliberately plain until this screen gets designed.
+    A first pass - the layout is deliberately plain until this screen gets designed. Grouped by how a
+    title behaves rather than alphabetically: Shared titles can have many holders at once, Unique titles
+    have exactly one (assigning a new one transfers it away from whoever held it), Tournament titles are
+    each scoped to the tournament that awarded them.
 *@
 
 <PageHeader Breadcrumbs="Crumbs">
@@ -18,36 +23,51 @@
 </PageHeader>
 
 <div class="um-page">
-    <Panel Title="Titles" Meta="@($"{_titles.Count} titles")">
-        @if (_titles.Count == 0)
+    <Panel Title="Shared" Meta="@($"{SharedTitles.Count}")">
+        @if (SharedTitles.Count == 0)
         {
-            <div class="titles-empty">No titles yet.</div>
+            <div class="titles-empty">No shared titles yet.</div>
         }
-        @foreach (var title in _titles)
+        @foreach (var title in SharedTitles)
         {
-            <div class="titles-row">
-                <i class="bi bi-award-fill"></i>
-                <div class="titles-names">
-                    <div class="titles-name">@title.Name</div>
-                    @if (!string.IsNullOrWhiteSpace(title.Comment))
-                    {
-                        <div class="titles-comment">@title.Comment</div>
-                    }
-                </div>
-                <UmButton Size="sm" Icon="bi-people" OnClick="@(() => OpenAssignAsync(title))">Assign heroes</UmButton>
-                <UmButton Size="sm" Variant="danger" Icon="bi-trash" OnClick="@(() => DeleteTitleAsync(title.Id))">Delete</UmButton>
-            </div>
+            @TitleRow(title)
+        }
+    </Panel>
+
+    <Panel Title="Unique" Meta="@($"{UniqueTitles.Count}")">
+        @if (UniqueTitles.Count == 0)
+        {
+            <div class="titles-empty">No unique titles yet.</div>
+        }
+        @foreach (var title in UniqueTitles)
+        {
+            @TitleRow(title)
+        }
+    </Panel>
+
+    <Panel Title="Tournament" Meta="@($"{TournamentTitlesList.Count}")">
+        @if (TournamentTitlesList.Count == 0)
+        {
+            <div class="titles-empty">No tournament has awarded a title yet.</div>
+        }
+        @foreach (var title in TournamentTitlesList)
+        {
+            @TitleRow(title)
         }
     </Panel>
 </div>
 
 <BlazorBootstrap.Modal @ref="_assignDialog" Title="Assign heroes">
     <BodyTemplate>
+        @if (_assigningTitle?.Exclusivity == TitleExclusivity.Unique)
+        {
+            <div class="titles-assign-hint">Unique title - picking a hero transfers it away from whoever holds it now.</div>
+        }
         <div class="titles-assign">
             @foreach (var hero in _assignableHeroes)
             {
                 <label class="titles-assign-row">
-                    <UmCheckbox Checked="hero.IsAssigned" CheckedChanged="@(v => hero.IsAssigned = v)"/>
+                    <UmCheckbox Checked="hero.IsAssigned" CheckedChanged="@(v => OnHeroToggled(hero, v))"/>
                     <span>@hero.Name</span>
                 </label>
             }
@@ -63,13 +83,23 @@
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Titles")];
 
     private List<TitleDto> _titles = new();
+    private List<UiHeroDto> _heroes = new();
     private List<HeroTitleAssignDto> _assignableHeroes = new();
     private BlazorBootstrap.Modal _assignDialog = default!;
-    private Guid _assigningTitleId;
+    private TitleDto? _assigningTitle;
     private string? _newTitleName;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
+
+    private List<TitleDto> SharedTitles
+        => _titles.Where(t => t.TournamentId is null && t.Exclusivity == TitleExclusivity.Shared).ToList();
+
+    private List<TitleDto> UniqueTitles
+        => _titles.Where(t => t.TournamentId is null && t.Exclusivity == TitleExclusivity.Unique).ToList();
+
+    private List<TitleDto> TournamentTitlesList
+        => _titles.Where(t => t.TournamentId is not null).ToList();
 
     private bool IsNewTitleValid
         => !string.IsNullOrWhiteSpace(_newTitleName)
@@ -82,13 +112,55 @@
         try
         {
             PreloadService.Show();
-            _titles = (await TitleService.GetAsync()).OrderBy(t => t.Name).ToList();
+            var titles = TitleService.GetAsync();
+            var heroes = HeroService.GetAsync();
+            await Task.WhenAll(titles, heroes);
+
+            _titles = titles.Result.OrderBy(t => t.Name).ToList();
+            _heroes = heroes.Result.ToList();
         }
         finally
         {
             PreloadService.Hide();
         }
     }
+
+    private UiHeroDto? HeroFor(Guid heroId) => _heroes.FirstOrDefault(h => h.Id == heroId);
+
+    private RenderFragment TitleRow(TitleDto title) => @<div class="titles-row">
+        <div class="titles-head">
+            <i class="bi bi-award-fill"></i>
+            <div class="titles-names">
+                <div class="titles-name">@title.Name</div>
+                @if (!string.IsNullOrWhiteSpace(title.Comment))
+                {
+                    <div class="titles-comment">@title.Comment</div>
+                }
+            </div>
+            <UmButton Size="sm" Icon="bi-people" OnClick="@(() => OpenAssignAsync(title))">Assign heroes</UmButton>
+            <UmButton Size="sm" Variant="danger" Icon="bi-trash" Disabled="@(title.RuleKey is not null)"
+                      Title="@(title.RuleKey is not null ? "Rule-backed titles can't be deleted" : null)"
+                      OnClick="@(() => DeleteTitleAsync(title.Id))"/>
+        </div>
+        <div class="titles-holders">
+            @if (!title.Holders.Any())
+            {
+                <span class="titles-vacant">Vacant</span>
+            }
+            @foreach (var holder in title.Holders)
+            {
+                var hero = HeroFor(holder.HeroId);
+                <div class="titles-holder">
+                    <HeroToken ImageUrl="@(hero?.ImageUrl ?? "/Unknown.png")" Size="26" Title="@(hero?.Name ?? "Unknown")"/>
+                    <span class="titles-holder-name">@(hero?.Name ?? "Unknown")</span>
+                    @if (holder.EarnedAt is not null)
+                    {
+                        <span class="titles-holder-date">@holder.EarnedAt.Value.ToShortDateString()</span>
+                    }
+                </div>
+            }
+        </div>
+    </div>;
 
     private async Task AddTitleAsync()
     {
@@ -110,17 +182,35 @@
 
     private async Task OpenAssignAsync(TitleDto title)
     {
-        _assigningTitleId = title.Id;
+        _assigningTitle = title;
         _assignableHeroes = (await TitleService.GetHeroesForTitleAssign(title.Id))
             .OrderBy(h => h.Name)
             .ToList();
         await _assignDialog.ShowAsync();
     }
 
+    private void OnHeroToggled(HeroTitleAssignDto hero, bool value)
+    {
+        if (value && _assigningTitle?.Exclusivity == TitleExclusivity.Unique)
+        {
+            foreach (var other in _assignableHeroes.Where(h => h != hero))
+            {
+                other.IsAssigned = false;
+            }
+        }
+
+        hero.IsAssigned = value;
+    }
+
     private async Task SaveAssignmentsAsync()
     {
+        if (_assigningTitle is null)
+        {
+            return;
+        }
+
         var assignedHeroIds = _assignableHeroes.Where(h => h.IsAssigned).Select(h => h.Id);
-        await TitleService.MergeAsync(_assigningTitleId, assignedHeroIds);
+        await TitleService.MergeAsync(_assigningTitle.Id, assignedHeroIds);
         await _assignDialog.HideAsync();
         await RefreshAsync();
     }

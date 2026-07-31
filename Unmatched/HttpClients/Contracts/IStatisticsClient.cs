@@ -34,4 +34,9 @@ public interface IStatisticsClient
     Task<MinionStatisticsDto> UpdateMinionImageAsync(Guid minionId, string imageFileName);
 
     Task<MapStatisticsDto> UpdateMapImageAsync(Guid mapId, string imageFileName);
+
+    /// <summary>Rebuilds every statistics read model from the Match service's current data. Needed
+    /// after a hero rating recalculation, which never publishes the Kafka event these read models are
+    /// otherwise kept in sync by.</summary>
+    Task RebuildAsync();
 }

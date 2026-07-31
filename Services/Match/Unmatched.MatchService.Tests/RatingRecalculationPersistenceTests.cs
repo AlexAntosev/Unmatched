@@ -8,7 +8,9 @@ using Moq;
 
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
+using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Services;
@@ -28,8 +30,7 @@ public class RatingRecalculationPersistenceTests
     private static readonly Guid HeroAId = Guid.NewGuid();
     private static readonly Guid HeroBId = Guid.NewGuid();
 
-    private const int UnrankedWin = 250;
-    private const int UnrankedLoss = -150;
+    private static readonly CatalogHeroDto ReferenceHero = new() { Hp = 16, DeckSize = 10, Sidekicks = Array.Empty<CatalogSidekickDto>() };
 
     [Fact]
     public async Task RecalculateAsync_KeepsTheWholeMatchHistory()
@@ -56,13 +57,15 @@ public class RatingRecalculationPersistenceTests
             await CreateRatingService(dbContext).RecalculateAsync();
         }
 
+        var (_, expectedAPoints, expectedBPoints) = ExpectedRatingsAfterJanThenFeb();
+
         await using var assertContext = CreateDbContext(databaseName);
         var ratings = await assertContext.Ratings.ToListAsync();
 
-        // one win and one loss each across the two finished matches - the seeded junk rating is gone
+        // one win and one loss each across the two finished (Ranked) matches - the seeded junk rating is gone
         Assert.Equal(2, ratings.Count);
-        Assert.Equal(UnrankedWin + UnrankedLoss, ratings.Single(r => r.HeroId == HeroAId).Points);
-        Assert.Equal(UnrankedWin + UnrankedLoss, ratings.Single(r => r.HeroId == HeroBId).Points);
+        Assert.Equal(expectedAPoints, ratings.Single(r => r.HeroId == HeroAId).Points);
+        Assert.Equal(expectedBPoints, ratings.Single(r => r.HeroId == HeroBId).Points);
     }
 
     [Fact]
@@ -91,10 +94,12 @@ public class RatingRecalculationPersistenceTests
             await CreateRatingService(dbContext).RecalculateAsync();
         }
 
-        await using var assertContext = CreateDbContext(databaseName);
-        var fighters = await assertContext.Fighters.Include(f => f.Match).Where(f => !f.Match.IsPlanned).ToListAsync();
+        var (janDelta, _, _) = ExpectedRatingsAfterJanThenFeb();
 
-        Assert.All(fighters, fighter => Assert.Equal(fighter.IsWinner ? UnrankedWin : UnrankedLoss, fighter.MatchPoints));
+        await using var assertContext = CreateDbContext(databaseName);
+        var janMatch = await assertContext.Matches.Include(m => m.Fighters).SingleAsync(m => m.Date == new DateTime(2026, 1, 1));
+
+        Assert.All(janMatch.Fighters, fighter => Assert.Equal(fighter.IsWinner ? janDelta : -janDelta, fighter.MatchPoints));
     }
 
     [Fact]
@@ -139,8 +144,160 @@ public class RatingRecalculationPersistenceTests
         Assert.Equal(2, await assertContext.Ratings.CountAsync());
     }
 
+    [Fact]
+    public async Task RecalculateAsync_UnrankedMatch_ContributesNoPointsAndCreatesNoRatingRow()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+
+        await using (var seedContext = CreateDbContext(databaseName))
+        {
+            seedContext.Matches.Add(CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId, isRanked: false));
+            await seedContext.SaveChangesAsync();
+        }
+
+        await using (var dbContext = CreateDbContext(databaseName))
+        {
+            await CreateRatingService(dbContext).RecalculateAsync();
+        }
+
+        await using var assertContext = CreateDbContext(databaseName);
+        Assert.Empty(await assertContext.Ratings.ToListAsync());
+        var fighters = await assertContext.Fighters.ToListAsync();
+        Assert.All(fighters, fighter => Assert.Equal(0, fighter.MatchPoints));
+    }
+
     /// <summary>
-    /// Two finished unranked 1v1s (each hero wins one) plus a planned one, and a stale rating that the
+    /// Ranked-data completeness (non-null HP/cards/sidekick HP) is enforced on the save path in
+    /// <c>MatchService.AddOrUpdateAsync</c>, not inside <see cref="IMatchHandler"/> - deliberately, so
+    /// that a recalculation replaying matches saved before that rule existed never trips over them.
+    /// This seeds exactly that: a Ranked match with no stats recorded at all.
+    /// </summary>
+    [Fact]
+    public async Task RecalculateAsync_RankedMatchWithMissingStats_DoesNotThrow()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+
+        await using (var seedContext = CreateDbContext(databaseName))
+        {
+            seedContext.Matches.Add(CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId, statsRecorded: false));
+            await seedContext.SaveChangesAsync();
+        }
+
+        await using (var dbContext = CreateDbContext(databaseName))
+        {
+            await CreateRatingService(dbContext).RecalculateAsync();
+        }
+
+        await using var assertContext = CreateDbContext(databaseName);
+        Assert.Equal(2, await assertContext.Ratings.CountAsync());
+    }
+
+    [Fact]
+    public async Task RecalculateAsync_TournamentAwardsSurviveARecalculation()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+
+        await using (var seedContext = CreateDbContext(databaseName))
+        {
+            seedContext.Matches.Add(CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId));
+            seedContext.TournamentAwards.Add(CreateAward(HeroAId, points: 50, awardedAt: new DateTime(2026, 2, 1)));
+            await seedContext.SaveChangesAsync();
+        }
+
+        await using (var dbContext = CreateDbContext(databaseName))
+        {
+            await CreateRatingService(dbContext).RecalculateAsync();
+        }
+
+        var matchDelta = EloRating.Delta(RatingConstants.InitialRating, RatingConstants.InitialRating, ReferencePerformance());
+
+        await using var assertContext = CreateDbContext(databaseName);
+        var heroARating = await assertContext.Ratings.SingleAsync(r => r.HeroId == HeroAId);
+        Assert.Equal(RatingConstants.InitialRating + matchDelta + 50, heroARating.Points);
+    }
+
+    /// <summary>
+    /// The core reason matches and awards must be replayed through one merged timeline rather than two
+    /// separate passes: Elo's expected score depends on the rating *at that instant*, so an award dated
+    /// between two matches changes the second match's delta.
+    /// </summary>
+    [Fact]
+    public async Task RecalculateAsync_AwardDatedMidHistory_ChangesTheLaterMatchsDelta()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        const int awardPoints = 60;
+
+        await using (var seedContext = CreateDbContext(databaseName))
+        {
+            seedContext.Matches.AddRange(
+                CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId),
+                CreateMatch(new DateTime(2026, 3, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId));
+            seedContext.TournamentAwards.Add(CreateAward(HeroAId, points: awardPoints, awardedAt: new DateTime(2026, 2, 1)));
+            await seedContext.SaveChangesAsync();
+        }
+
+        await using (var dbContext = CreateDbContext(databaseName))
+        {
+            await CreateRatingService(dbContext).RecalculateAsync();
+        }
+
+        var performance = ReferencePerformance();
+        var janDelta = EloRating.Delta(RatingConstants.InitialRating, RatingConstants.InitialRating, performance);
+        var aAfterJan = RatingConstants.InitialRating + janDelta;
+        var bAfterJan = RatingConstants.InitialRating - janDelta;
+        var aAfterAward = aAfterJan + awardPoints;
+
+        var marchDeltaWithAward = EloRating.Delta(aAfterAward, bAfterJan, performance);
+        var marchDeltaIgnoringAward = EloRating.Delta(aAfterJan, bAfterJan, performance);
+        Assert.NotEqual(marchDeltaIgnoringAward, marchDeltaWithAward);
+
+        await using var assertContext = CreateDbContext(databaseName);
+        var marchMatch = await assertContext.Matches.Include(m => m.Fighters).SingleAsync(m => m.Date == new DateTime(2026, 3, 1));
+        Assert.Equal(marchDeltaWithAward, marchMatch.Fighters.Single(f => f.HeroId == HeroAId).MatchPoints);
+
+        var heroARating = await assertContext.Ratings.SingleAsync(r => r.HeroId == HeroAId);
+        Assert.Equal(aAfterAward + marchDeltaWithAward, heroARating.Points);
+    }
+
+    private static TournamentAwardEntity CreateAward(Guid heroId, int points, DateTime awardedAt)
+        => new()
+        {
+            Id = Guid.NewGuid(),
+            TournamentId = Guid.NewGuid(),
+            HeroId = heroId,
+            AwardKind = TournamentAwardKind.Winner,
+            Points = points,
+            AwardedAt = awardedAt
+        };
+
+    /// <summary>Replays the same Jan-then-Feb 1v1 sequence <see cref="SeedAsync"/> creates through the
+    /// production Elo primitives directly, so the persistence assertions above stay correct even if
+    /// the tuning constants in <see cref="RatingConstants"/> change.</summary>
+    private static (int JanDelta, int HeroAFinalPoints, int HeroBFinalPoints) ExpectedRatingsAfterJanThenFeb()
+    {
+        var performance = ReferencePerformance();
+        var janDelta = EloRating.Delta(RatingConstants.InitialRating, RatingConstants.InitialRating, performance);
+        var aAfterJan = RatingConstants.InitialRating + janDelta;
+        var bAfterJan = RatingConstants.InitialRating - janDelta;
+
+        // February: Hero B beats Hero A
+        var febDelta = EloRating.Delta(bAfterJan, aAfterJan, performance);
+        var aFinal = aAfterJan - febDelta;
+        var bFinal = bAfterJan + febDelta;
+
+        return (janDelta, aFinal, bFinal);
+    }
+
+    private static double ReferencePerformance()
+    {
+        var fullyResolvedFighter = new FighterEntity { HpLeft = 0, CardsLeft = 0, SidekickHpLeft = 0 };
+        return PerformanceModifier.Calculate(
+            winningSide: [PerformanceModifier.From(fullyResolvedFighter, ReferenceHero)],
+            losingSide: [PerformanceModifier.From(fullyResolvedFighter, ReferenceHero)]);
+    }
+
+    /// <summary>
+    /// Two finished Ranked 1v1s (each hero wins one) plus a planned one, and a stale rating that the
     /// replay is expected to throw away. Seeds through its own context so the recalculation runs against
     /// a cold change tracker, the way it does behind a request.
     /// </summary>
@@ -159,17 +316,34 @@ public class RatingRecalculationPersistenceTests
         return databaseName;
     }
 
-    private static MatchEntity CreateMatch(DateTime date, Guid winnerHeroId, Guid looserHeroId, bool isPlanned = false, Guid? tournamentId = null)
+    private static MatchEntity CreateMatch(
+        DateTime date,
+        Guid winnerHeroId,
+        Guid looserHeroId,
+        bool isPlanned = false,
+        bool isRanked = true,
+        bool statsRecorded = true,
+        Guid? tournamentId = null)
         => new()
             {
                 Id = Guid.NewGuid(),
                 Date = date,
+                GameMode = GameMode.OneVsOne,
                 IsPlanned = isPlanned,
+                IsRanked = isRanked,
                 TournamentId = tournamentId,
                 Fighters = new List<FighterEntity>
                     {
-                        new() { Id = Guid.NewGuid(), HeroId = winnerHeroId, PlayerId = Guid.NewGuid(), IsWinner = true, HpLeft = 0, SidekickHpLeft = 0, CardsLeft = 0 },
-                        new() { Id = Guid.NewGuid(), HeroId = looserHeroId, PlayerId = Guid.NewGuid(), IsWinner = false, HpLeft = 0, SidekickHpLeft = 0, CardsLeft = 0 },
+                        new()
+                        {
+                            Id = Guid.NewGuid(), HeroId = winnerHeroId, PlayerId = Guid.NewGuid(), IsWinner = true,
+                            HpLeft = statsRecorded ? 0 : null, SidekickHpLeft = statsRecorded ? 0 : null, CardsLeft = statsRecorded ? 0 : null
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(), HeroId = looserHeroId, PlayerId = Guid.NewGuid(), IsWinner = false,
+                            HpLeft = statsRecorded ? 0 : null, SidekickHpLeft = statsRecorded ? 0 : null, CardsLeft = statsRecorded ? 0 : null
+                        },
                     },
             };
 
@@ -180,21 +354,15 @@ public class RatingRecalculationPersistenceTests
     {
         var unitOfWork = new UnitOfWork(dbContext);
 
-        // only the tournament matches score through RatingCalculator and need reference hero data
         var catalogHeroCache = new Mock<ICatalogHeroCache>();
         catalogHeroCache.Setup(c => c.GetAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = 16, DeckSize = 10, Sidekicks = Array.Empty<CatalogSidekickDto>() });
+            .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = ReferenceHero.Hp, DeckSize = ReferenceHero.DeckSize, Sidekicks = ReferenceHero.Sidekicks });
 
-        var matchHandlerFactory = new MatchHandlerFactory(
+        var matchHandler = new MatchHandler(
             unitOfWork,
             new GameModeValidatorFactory(),
-            new RatingCalculator(unitOfWork, catalogHeroCache.Object),
-            new FirstTournamentRatingCalculator(catalogHeroCache.Object),
-            new UnrankedRatingCalculator(),
-            new TeamVsTeamRatingCalculator(),
-            new FreeForAllRatingCalculator(),
-            new CooperativeRatingCalculator());
+            new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object));
 
-        return new RatingService(matchHandlerFactory, unitOfWork, new Mock<IMapper>().Object);
+        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork));
     }
 }

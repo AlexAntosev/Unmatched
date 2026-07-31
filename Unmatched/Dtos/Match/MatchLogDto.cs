@@ -14,7 +14,11 @@ public class MatchLogDto
 
     public Guid MatchId { get; set; }
 
+    public Guid? TournamentId { get; set; }
+
     public string TournamentName { get; set; }
+
+    public bool IsRanked { get; set; }
 
     public int? Epic { get; set; }
 

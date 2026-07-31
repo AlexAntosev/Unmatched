@@ -31,6 +31,21 @@
     color: var(--um-text-faint);
 }
 
+.match-row-unranked {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font: 500 10px var(--um-font-mono);
+    letter-spacing: 0.06em;
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.match-row-unranked i {
+    font-size: 10px;
+}
+
 .match-row-participants {
     display: flex;
     align-items: center;

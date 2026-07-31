@@ -4,14 +4,24 @@
 
 .titles-row {
     display: flex;
-    align-items: center;
-    gap: 11px;
+    flex-direction: column;
+    gap: 8px;
     padding: 9px 12px;
     border-radius: var(--um-radius-row);
     background: rgba(255, 255, 255, 0.03);
 }
 
-.titles-row > i {
+.titles-row + .titles-row {
+    margin-top: 6px;
+}
+
+.titles-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.titles-head > i {
     font-size: 14px;
     color: var(--um-gold);
 }
@@ -34,6 +44,43 @@
 
 .titles-empty {
     font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.titles-holders {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding-left: 25px;
+}
+
+.titles-vacant {
+    font: 500 11px var(--um-font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
+}
+
+.titles-holder {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.titles-holder-name {
+    font: 500 12px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.titles-holder-date {
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.titles-assign-hint {
+    margin-bottom: 8px;
+    font: 400 11.5px var(--um-font-body);
     color: var(--um-text-dim);
 }
 

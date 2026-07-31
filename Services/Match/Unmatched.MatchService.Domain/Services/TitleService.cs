@@ -3,6 +3,7 @@
 using AutoMapper;
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
 
@@ -23,11 +24,22 @@ public class TitleService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCa
         if (title != null
          && title.HeroTitles.All(h => h.HeroesId != hero.Id))
         {
+            if (title.Exclusivity == TitleExclusivity.Unique)
+            {
+                // a Unique title has exactly one holder - assigning a new one transfers it away from
+                // whoever held it before, rather than creating a second holder.
+                foreach (var previousHolder in title.HeroTitles.ToList())
+                {
+                    title.HeroTitles.Remove(previousHolder);
+                }
+            }
+
             title.HeroTitles.Add(
                 new HeroTitleEntity
                     {
                         HeroesId = heroId,
-                        TitlesId = titleId
+                        TitlesId = titleId,
+                        EarnedAt = DateTime.UtcNow
                     });
             await unitOfWork.Titles.AddOrUpdateAsync(title);
             await unitOfWork.SaveChangesAsync();
@@ -76,31 +88,33 @@ public class TitleService(IUnitOfWork unitOfWork, IMapper mapper, ICatalogHeroCa
     public async Task MergeAsync(Guid titleId, IEnumerable<Guid> heroesIds)
     {
         var title = await unitOfWork.Titles.GetByIdAsync(titleId);
+        var requestedHeroIds = heroesIds.ToList();
 
-        foreach (var titleHero in title.HeroTitles)
+        if (title.Exclusivity == TitleExclusivity.Unique && requestedHeroIds.Count > 1)
         {
-            if (heroesIds.All(id => id != titleHero.HeroesId))
-            {
-                title.HeroTitles.Remove(titleHero);
-            }
+            throw new InvalidOperationException("A Unique title can only have one holder - assign it to a single hero to transfer it.");
         }
 
-        foreach (var heroId in heroesIds)
+        // materialise the removals first: HeroTitles can't be mutated while it's being enumerated.
+        foreach (var stale in title.HeroTitles.Where(titleHero => requestedHeroIds.All(id => id != titleHero.HeroesId)).ToList())
+        {
+            title.HeroTitles.Remove(stale);
+        }
+
+        foreach (var heroId in requestedHeroIds)
         {
             if (title.HeroTitles.Any(h => h.HeroesId == heroId))
             {
                 continue;
             }
 
-            if (title.HeroTitles.All(h => h.HeroesId != heroId))
-            {
-                title.HeroTitles.Add(
-                    new HeroTitleEntity
-                        {
-                            HeroesId = heroId,
-                            TitlesId = titleId
-                        });
-            }
+            title.HeroTitles.Add(
+                new HeroTitleEntity
+                    {
+                        HeroesId = heroId,
+                        TitlesId = titleId,
+                        EarnedAt = DateTime.UtcNow
+                    });
         }
 
         await unitOfWork.SaveChangesAsync();

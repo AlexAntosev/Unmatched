@@ -5,6 +5,7 @@ using Moq;
 using Unmatched.MatchService.Domain.Communication.Catalog;
 using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
@@ -61,11 +62,13 @@ public class BackdatedMatchRatingTests
     {
         return new MatchEntity
         {
+            IsRanked = true,
+            GameMode = GameMode.OneVsOne,
             Date = date ?? DateTime.UtcNow,
             Fighters = new List<FighterEntity>
             {
                 new() { HeroId = winnerHeroId, IsWinner = true, HpLeft = 0, SidekickHpLeft = 0, CardsLeft = 0 },
-                new() { HeroId = looserHeroId, IsWinner = false, HpLeft = 0, SidekickHpLeft = 0 },
+                new() { HeroId = looserHeroId, IsWinner = false, HpLeft = 0, SidekickHpLeft = 0, CardsLeft = 0 },
             },
         };
     }
@@ -89,7 +92,7 @@ public class BackdatedMatchRatingTests
         unitOfWork.Setup(u => u.Matches).Returns(matchRepository.Object);
         unitOfWork.Setup(u => u.Ratings).Returns(ratingRepository);
 
-        var handler = new GoldenHalatLeagueMatchHandler(unitOfWork.Object, new GameModeValidatorFactory(), new RatingCalculator(unitOfWork.Object, catalogHeroCache.Object));
+        var handler = new MatchHandler(unitOfWork.Object, new GameModeValidatorFactory(), new RatingCalculatorFactory(unitOfWork.Object, catalogHeroCache.Object));
 
         foreach (var match in matches)
         {
@@ -107,12 +110,6 @@ public class BackdatedMatchRatingTests
 
         public Task<RatingEntity?> GetByHeroIdAsync(Guid heroId)
             => Task.FromResult(_byHeroId.TryGetValue(heroId, out var rating) ? rating : null);
-
-        public Task ClearAllRatingsAsync()
-        {
-            _byHeroId.Clear();
-            return Task.CompletedTask;
-        }
 
         public Task<RatingEntity> AddAsync(RatingEntity model)
         {

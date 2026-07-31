@@ -13,7 +13,8 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Services;
-using Unmatched.MatchService.Domain.TitleHandlers;
+using Unmatched.MatchService.Domain.Titles;
+using Unmatched.MatchService.Domain.Validation;
 
 using Match = Unmatched.MatchService.Domain.Models.Match;
 using Title = Unmatched.MatchService.Domain.Models.Title;
@@ -23,7 +24,6 @@ public class MatchServiceRecalculationFlagTests
     private static readonly Guid WinnerHeroId = Guid.NewGuid();
     private static readonly Guid LooserHeroId = Guid.NewGuid();
 
-    private readonly Mock<IMatchHandlerFactory> _matchHandlerFactory = new();
     private readonly Mock<IMatchHandler> _matchHandler = new();
     private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
@@ -39,17 +39,9 @@ public class MatchServiceRecalculationFlagTests
         _unitOfWork.Setup(u => u.Ratings).Returns(_ratingRepository.Object);
         _unitOfWork.Setup(u => u.RatingRecalculationState).Returns(_recalculationStateRepository.Object);
 
-        _matchHandlerFactory.Setup(f => f.Create(It.IsAny<MatchEntity>())).Returns(_matchHandler.Object);
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
-        var streakTitleHandler = new Mock<IStreakTitleHandler>();
-        streakTitleHandler.Setup(h => h.HandleAsync()).Returns(Task.CompletedTask);
-
-        var rusherTitleHandler = new Mock<IRusherTitleHandler>();
-        rusherTitleHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ReturnsAsync(new List<Title>());
-
-        var punisherTitleHandler = new Mock<IPunisherTitleHandler>();
-        punisherTitleHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).ReturnsAsync(new List<Title>());
+        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, _mapper.Object, []);
 
         var catalogHeroCache = new Mock<ICatalogHeroCache>();
         catalogHeroCache.Setup(c => c.GetAsync()).ReturnsAsync(new[]
@@ -102,12 +94,11 @@ public class MatchServiceRecalculationFlagTests
             });
 
         _matchService = new MatchService(
-            _matchHandlerFactory.Object,
+            _matchHandler.Object,
+            new RankedMatchDataValidator(catalogHeroCache.Object),
             _mapper.Object,
             _unitOfWork.Object,
-            streakTitleHandler.Object,
-            rusherTitleHandler.Object,
-            punisherTitleHandler.Object,
+            titleEvaluator,
             catalogHeroCache.Object,
             playerCache.Object,
             kafkaProducer.Object);

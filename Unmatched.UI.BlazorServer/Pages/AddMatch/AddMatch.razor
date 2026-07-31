@@ -31,6 +31,10 @@
     <header class="add-head">
         <div class="add-title">@(IsEditing ? "Edit match" : "Add match")</div>
         <div class="um-spacer"></div>
+        @if (_match.GameMode != GameMode.Cooperative)
+        {
+            <SegmentedControl TValue="bool" Options="RankedOptions" Value="_match.IsRanked" ValueChanged="OnRankedChanged"/>
+        }
         <SegmentedControl TValue="GameMode" Options="Modes" Value="_match.GameMode" ValueChanged="OnModeChangedAsync"/>
     </header>
 
@@ -74,7 +78,7 @@
                     </div>
                     @foreach (var fighter in side.Fighters)
                     {
-                        <FighterCard Fighter="fighter" Players="_players" Heroes="_heroes"
+                        <FighterCard Fighter="fighter" Players="_players" Heroes="_heroes" IsRanked="_match.IsRanked"
                                      Layout="@(_match.GameMode == GameMode.FreeForAll ? "row" : "stacked")"
                                      ArtSize="ArtSize" ShowPlace="@(_match.GameMode == GameMode.FreeForAll)"
                                      IsLoser="@IsLoser(fighter)"
@@ -89,6 +93,7 @@
                     @if (side.IsVillain && _match.Villain is not null)
                     {
                         <VillainInfo Villains="_villains" Minions="_minions" MatchVillain="_match.Villain"
+                                     HeroCount="@_match.Fighters.Count()"
                                      IsLoser="IsVillainLoser()" OnChanged="StateHasChanged"
                                      HpChanged="OnVillainHpChanged" MinionHpChanged="OnMinionHpChanged"/>
                     }
@@ -111,7 +116,7 @@
 
         <div class="add-details">
             <UmField Label="Tournament">
-                <UmSelect TValue="Guid?" Icon="bi-flag" Value="_match.TournamentId"
+                <UmSelect TValue="Guid?" Icon="bi-flag" Value="_match.TournamentId" Disabled="IsTournamentLockedByContext"
                           ValueChanged="@(id => _match.TournamentId = id)" Options="TournamentOptions()"/>
             </UmField>
             <UmField Label="Stage">
@@ -177,6 +182,14 @@
         new(GameMode.Cooperative, "Co-op", "bi-shield-fill")
     ];
 
+    /// <summary>Not offered for Co-op - it never affects rating (see RatingCalculatorFactory), so the
+    /// choice would have nothing to mean.</summary>
+    private static readonly IReadOnlyList<SelectOption<bool>> RankedOptions =
+    [
+        new(true, "Ranked", "bi-graph-up-arrow", Color: "var(--um-gold)"),
+        new(false, "Unranked", "bi-dash-circle")
+    ];
+
     private static readonly Stage[] Stages =
     [
         Stage.EighthFinals, Stage.QuarterFinals, Stage.SemiFinals, Stage.ThirdPlaceDecider, Stage.GrandFinals
@@ -191,7 +204,8 @@
         {
             Fighters = [new UiFighterDto(), new UiFighterDto()],
             Date = DateTime.Now,
-            Comment = string.Empty
+            Comment = string.Empty,
+            IsRanked = true
         };
 
     /// <summary>Fighters/villain/minions whose HP the user typed by hand - the auto-zero pass
@@ -212,6 +226,12 @@
 
     [Parameter]
     public string Id { get; set; } = string.Empty;
+
+    /// <summary>Set when this page was opened from a tournament ("New match in this tournament") -
+    /// the tournament is context, not a choice, so the Tournament field becomes read-only for it too.</summary>
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public Guid? TournamentId { get; set; }
 
     [Inject]
     protected PreloadService PreloadService { get; set; } = default!;
@@ -275,7 +295,8 @@
                 Fighters = [new UiFighterDto(), new UiFighterDto()],
                 Date = DateTime.Now,
                 Comment = string.Empty,
-                TournamentId = _tournaments.FirstOrDefault(t => t.Name == TournamentNames.GoldenHalatLeague)?.Id,
+                IsRanked = true,
+                TournamentId = TournamentId,
                 Map = _maps.FirstOrDefault(m => m.Name == MapNames.Castle) ?? _maps.FirstOrDefault()
             };
 
@@ -448,7 +469,12 @@
                 break;
         }
 
-        ApplyLoserAutoZero();
+        // Unranked matches are allowed to have no stat data at all - auto-zeroing losers would inject
+        // a fabricated "0" into fields the user may be deliberately leaving blank.
+        if (_match.IsRanked)
+        {
+            ApplyLoserAutoZero();
+        }
     }
 
     /// <summary>
@@ -601,6 +627,9 @@
             case GameMode.Cooperative:
                 _match.Fighters = EnsureFighterCount(2);
                 _match.Villain ??= new UiMatchVillainDto();
+                // Co-op never affects rating (see RatingCalculatorFactory) - the toggle is hidden for
+                // it, so keep the stored value consistent with what the UI shows.
+                _match.IsRanked = false;
                 break;
         }
 
@@ -663,10 +692,37 @@
 
     // ---- Details ----
 
+    /// <summary>A match opened from a tournament - either an existing planned match (already carries
+    /// its TournamentId) or a fresh one started from "New match in this tournament" (?tournamentId=
+    /// on the query string) - has its tournament as context, not a choice, so the field becomes
+    /// read-only instead of a picker. Standalone matches (TournamentId set by hand) stay editable.</summary>
+    private bool IsTournamentLockedByContext
+        => (IsEditing && _match.TournamentId is not null) || (!IsEditing && TournamentId is not null);
+
     private IReadOnlyList<SelectOption<Guid?>> TournamentOptions()
         => new SelectOption<Guid?>[] { new(null, "No tournament") }
             .Concat(_tournaments.Select(t => new SelectOption<Guid?>(t.Id, t.Name)))
             .ToList();
+
+    /// <summary>Ranked→Unranked clears the stat fields Ranked scoring needs (Unranked allows nulls
+    /// instead of storing fabricated data); Unranked→Ranked refills them from each fighter's hero.
+    /// Fighters whose HP was already typed by hand are left alone either way.</summary>
+    private void OnRankedChanged(bool isRanked)
+    {
+        _match.IsRanked = isRanked;
+
+        foreach (var fighter in _match.Fighters.Where(f => !_manuallyEditedHp.Contains(f)))
+        {
+            if (isRanked)
+            {
+                fighter.SetDefaultData();
+            }
+            else
+            {
+                fighter.ClearStatData();
+            }
+        }
+    }
 
     private void SetMap(MapDto map) => _match.Map = map;
 
@@ -741,8 +797,23 @@
             return "Co-op matches need a villain.";
         }
 
+        if (RequiresRankedData() && _match.Fighters.Any(f => f.HpLeft is null || f.CardsLeft is null))
+        {
+            return "Ranked matches need HP and cards left for every fighter.";
+        }
+
+        if (RequiresRankedData() && _match.Fighters.Any(f => f.SidekickName is not null && f.SidekickHpLeft is null))
+        {
+            return "Ranked matches need sidekick HP left for every fighter whose hero has a sidekick.";
+        }
+
         return null;
     }
+
+    /// <summary>Mirrors RankedMatchDataValidator on the server: Ranked, or any match tied to a
+    /// tournament, needs complete stat data; Co-op never does (it never affects rating).</summary>
+    private bool RequiresRankedData()
+        => _match.GameMode != GameMode.Cooperative && (_match.IsRanked || _match.TournamentId is not null);
 
     private async Task SaveAsync(bool addAnother)
     {

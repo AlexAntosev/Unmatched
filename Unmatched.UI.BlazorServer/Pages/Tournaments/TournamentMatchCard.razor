@@ -1,0 +1,29 @@
+@using Unmatched.Dtos
+@*
+    One match card shared by the bracket view (SingleElimination/GroupStage playoffs) and the Swiss
+    round view - same shape either way: who's playing, who's winning, where. Only a planned match
+    (still waiting for a result) is clickable.
+*@
+<div class="bracket-match @(Match.IsPlanned ? "is-planned" : null)" @onclick="@(() => OnOpen.InvokeAsync(Match))">
+    @foreach (var fighter in Match.Fighters)
+    {
+        <div class="bracket-fighter">
+            <FighterChip ImageUrl="@fighter.HeroImageUrl" PlayerAvatarUrl="@fighter.PlayerImageUrl"
+                         IsWinner="@(Match.IsPlanned || fighter.IsWinner)" Size="26"
+                         Title="@fighter.Hero?.Name"/>
+            <span class="bracket-name">@fighter.Hero?.Name</span>
+            <span class="bracket-hp">@(Match.IsPlanned ? "–" : fighter.HpLeft?.ToString() ?? "–")</span>
+        </div>
+    }
+    <div class="bracket-meta">
+        @(Match.Map?.DisplayName ?? "No map") · @Match.Date.ToString("dd MMM yyyy")
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public UiMatchDto Match { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<UiMatchDto> OnOpen { get; set; }
+}

@@ -15,9 +15,9 @@ public class TitleRepository(UnmatchedDbContext dbContext) : BaseRepository<Titl
         return entities;
     }
 
-    public async Task<TitleEntity?> GetByNameAsync(string name)
+    public async Task<TitleEntity?> GetByRuleKeyAsync(string ruleKey)
     {
-        var entity = await DbContext.Titles.Include(t => t.HeroTitles).AsNoTracking().FirstOrDefaultAsync(t => t.Name.Equals(name));
+        var entity = await DbContext.Titles.Include(t => t.HeroTitles).FirstOrDefaultAsync(t => t.RuleKey == ruleKey);
 
         return entity;
     }

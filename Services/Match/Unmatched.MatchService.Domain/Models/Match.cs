@@ -17,9 +17,13 @@ public class Match
 
     public Guid? TournamentId { get; set; }
 
+    public bool IsRanked { get; set; }
+
     public bool IsPlanned { get; set; }
 
     public Stage? Stage { get; set; }
+
+    public int? Round { get; set; }
 
     public int? Epic { get; set; }
 

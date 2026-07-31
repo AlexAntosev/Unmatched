@@ -8,7 +8,9 @@ public class VillainStats
 
     public string Color { get; set; }
 
-    public int Hp { get; set; }
+    public int BaseHp { get; set; }
+
+    public int HpPerExtraPlayer { get; set; }
 
     public int DeckSize { get; set; }
 

@@ -56,6 +56,12 @@ public class UnmatchedDbContext : DbContext
 
     public DbSet<TournamentEntity> Tournaments { get; set; }
 
+    public DbSet<TournamentParticipantEntity> TournamentParticipants { get; set; }
+
+    public DbSet<TournamentTitleEntity> TournamentTitles { get; set; }
+
+    public DbSet<TournamentAwardEntity> TournamentAwards { get; set; }
+
     public DbSet<TitleEntity> Titles { get; set; }
 
 
@@ -71,6 +77,39 @@ public class UnmatchedDbContext : DbContext
             .HasOne(m => m.Villain)
             .WithOne()
             .HasForeignKey<MatchVillainEntity>(v => v.MatchId);
+
+        modelBuilder.Entity<RatingEntity>()
+            .HasIndex(r => r.HeroId)
+            .IsUnique();
+
+        modelBuilder.Entity<TournamentEntity>()
+            .HasMany(t => t.Participants)
+            .WithOne()
+            .HasForeignKey(p => p.TournamentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TournamentParticipantEntity>()
+            .HasIndex(p => new { p.TournamentId, p.HeroId })
+            .IsUnique();
+
+        modelBuilder.Entity<TournamentEntity>()
+            .HasMany(t => t.TournamentTitles)
+            .WithOne()
+            .HasForeignKey(t => t.TournamentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TournamentTitleEntity>()
+            .HasIndex(t => new { t.TournamentId, t.Kind })
+            .IsUnique();
+
+        modelBuilder.Entity<TournamentAwardEntity>()
+            .HasIndex(a => new { a.TournamentId, a.HeroId, a.AwardKind })
+            .IsUnique();
+
+        modelBuilder.Entity<TitleEntity>()
+            .HasIndex(t => t.RuleKey)
+            .IsUnique()
+            .HasFilter("[RuleKey] IS NOT NULL");
 
         base.OnModelCreating(modelBuilder);
     }

@@ -127,6 +127,11 @@
     [Parameter]
     public bool IsLoser { get; set; }
 
+    /// <summary>Whether the match is Ranked - gates whether picking a hero fills in the stat fields
+    /// (Ranked) or clears them (Unranked, which allows nulls instead of stale/fabricated numbers).</summary>
+    [Parameter]
+    public bool IsRanked { get; set; }
+
     [Parameter]
     public int MaxPlace { get; set; } = 4;
 
@@ -193,12 +198,22 @@
         return OnChanged.InvokeAsync();
     }
 
-    /// <summary>Picking a hero refills HP, cards and sidekick HP from that hero's profile.</summary>
+    /// <summary>Picking a hero refills HP, cards and sidekick HP from that hero's profile when the
+    /// match is Ranked; when it's Unranked, those fields are cleared instead - not required, and
+    /// left blank rather than carrying over the previous hero's numbers.</summary>
     private void SetHero(UiHeroDto? hero)
     {
         Fighter.Hero = hero;
         Fighter.HeroId = hero?.Id ?? Guid.Empty;
-        Fighter.SetDefaultData();
+
+        if (IsRanked)
+        {
+            Fighter.SetDefaultData();
+        }
+        else
+        {
+            Fighter.ClearStatData();
+        }
     }
 
     private Task HandleDragStart() => OnDragStart.InvokeAsync(Fighter);

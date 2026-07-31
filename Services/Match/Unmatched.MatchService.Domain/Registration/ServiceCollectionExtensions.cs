@@ -8,7 +8,9 @@ using Unmatched.MatchService.Domain.Mapping;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Services;
-using Unmatched.MatchService.Domain.TitleHandlers;
+using Unmatched.MatchService.Domain.Titles;
+using Unmatched.MatchService.Domain.Titles.Rules;
+using Unmatched.MatchService.Domain.Tournaments;
 using Unmatched.MatchService.Domain.Validation;
 
 public static class ServiceCollectionExtensions
@@ -26,21 +28,33 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IMatchService, MatchService>();
         services.AddTransient<IRatingService, RatingService>();
+        services.AddTransient<RatingTimeline>();
         services.AddTransient<ITournamentService, TournamentService>();
+        services.AddTransient<ITournamentFormatGeneratorFactory, TournamentFormatGeneratorFactory>();
+        services.AddTransient<Tournaments.TournamentAwardScheduler>();
         services.AddTransient<ITitleService, TitleService>();
 
-        services.AddTransient<IRatingCalculator, RatingCalculator>();
-        services.AddTransient<IUnrankedRatingCalculator, UnrankedRatingCalculator>();
-        services.AddTransient<IFirstTournamentRatingCalculator, FirstTournamentRatingCalculator>();
-        services.AddTransient<ITeamVsTeamRatingCalculator, TeamVsTeamRatingCalculator>();
-        services.AddTransient<IFreeForAllRatingCalculator, FreeForAllRatingCalculator>();
-        services.AddTransient<ICooperativeRatingCalculator, CooperativeRatingCalculator>();
+        services.AddTransient<IRatingCalculatorFactory, RatingCalculatorFactory>();
         services.AddTransient<IGameModeValidatorFactory, GameModeValidatorFactory>();
+        services.AddTransient<RankedMatchDataValidator>();
 
-        services.AddTransient<IStreakTitleHandler, StreakTitleHandler>();
-        services.AddTransient<IRusherTitleHandler, RusherTitleHandler>();
-        services.AddTransient<IPunisherTitleHandler, PunisherTitleHandler>();
-        services.AddTransient<IMatchHandlerFactory, MatchHandlerFactory>();
+        services.AddTransient<TitleEvaluator>();
+        services.AddTransient<TournamentTitleAwarder>();
+        services.AddTransient<ITitleRule, RusherTitleRule>();
+        services.AddTransient<ITitleRule, PunisherTitleRule>();
+        services.AddTransient<ITitleRule, FlawlessTitleRule>();
+        services.AddTransient<ITitleRule, LastBreathTitleRule>();
+        services.AddTransient<ITitleRule, GiantSlayerTitleRule>();
+        services.AddTransient<ITitleRule, DeckMillerTitleRule>();
+        services.AddTransient<ITitleRule, StreakTitleRule>();
+        services.AddTransient<ITitleRule, SuffererTitleRule>();
+        services.AddTransient<ITitleRule, GrandChampionTitleRule>();
+        services.AddTransient<ITitleRule, KingslayerTitleRule>();
+        services.AddTransient<ITitleRule, ExecutionerTitleRule>();
+        services.AddTransient<ITitleRule, WallTitleRule>();
+        services.AddTransient<ITitleRule, WorkhorseTitleRule>();
+        services.AddTransient<ITitleRule, BountyHolderTitleRule>();
+        services.AddTransient<IMatchHandler, MatchHandler>();
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
             {

@@ -2,11 +2,14 @@
 
 using AutoMapper;
 
+using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Models;
+using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
 
-public class RatingService(IMatchHandlerFactory matchHandlerFactory, IUnitOfWork unitOfWork, IMapper mapper) : IRatingService
+public class RatingService(
+    IMatchHandler matchHandler, IUnitOfWork unitOfWork, IMapper mapper, RatingTimeline ratingTimeline) : IRatingService
 {
     public async Task<IEnumerable<Rating>> GetAllAsync()
     {
@@ -20,34 +23,22 @@ public class RatingService(IMatchHandlerFactory matchHandlerFactory, IUnitOfWork
         return mapper.Map<Rating>(ratingEntity);
     }
 
+    /// <remarks>
+    /// Walked forward from <see cref="RatingConstants.InitialRating"/> over the same merged
+    /// matches+awards timeline a recalculation replays - not backward from the current total, which
+    /// would drift by the hero's award total the moment tournament bonuses exist.
+    /// </remarks>
     public async Task<List<RatingChange>> GetRatingChangesAsync(Guid heroId)
     {
+        var heroEvents = (await ratingTimeline.BuildAsync()).Where(e => Involves(e, heroId)).ToList();
+
         var ratingChanges = new List<RatingChange>();
-        var currentRating = await unitOfWork.Ratings.GetByHeroIdAsync(heroId);
-        ratingChanges.Add(
-            new RatingChange
-                {
-                    Date = "Current",
-                    RatingDelta = currentRating?.Points ?? 0
-                });
-
-        var points = currentRating?.Points ?? 0;
-
-        var heroMatches = await unitOfWork.Matches.GetFinishedByHeroIdAsync(heroId);
-
-        foreach (var heroMatch in heroMatches)
+        var points = RatingConstants.InitialRating;
+        foreach (var ratingEvent in heroEvents)
         {
-            var matchPoints = heroMatch.Fighters.FirstOrDefault(f => f.HeroId == heroId)?.MatchPoints ?? 0;
-            points -= matchPoints;
-            ratingChanges.Add(
-                new RatingChange
-                    {
-                        Date = heroMatch.Date.ToShortDateString(),
-                        RatingDelta = points
-                    });
+            points += DeltaFor(ratingEvent, heroId);
+            ratingChanges.Add(new RatingChange { Date = ratingEvent.OccurredAt.ToShortDateString(), RatingDelta = points });
         }
-
-        ratingChanges.Reverse();
 
         return ratingChanges;
     }
@@ -57,14 +48,14 @@ public class RatingService(IMatchHandlerFactory matchHandlerFactory, IUnitOfWork
 
     /// <remarks>
     /// Ratings and Fighters.MatchPoints are values derived from the match history, so a recalculation only
-    /// resets those and replays the history over them - the matches and fighters themselves are never
-    /// deleted. Replaying goes straight through the match handlers rather than through IMatchService so
-    /// that re-deriving old ratings doesn't re-publish a match-created event per match (which would
-    /// double-count every match in the statistics service) or re-award titles.
+    /// resets those and replays the history over them - the matches, fighters and awards themselves are
+    /// never deleted. Replaying matches goes straight through the match handler rather than through
+    /// IMatchService so that re-deriving old ratings doesn't re-publish a match-created event per match
+    /// (which would double-count every match in the statistics service) or re-award titles.
     /// </remarks>
     public async Task RecalculateAsync()
     {
-        var matches = (await unitOfWork.Matches.GetFinishedForRatingReplayAsync()).OrderBy(m => m.Date).ToList();
+        var timeline = await ratingTimeline.BuildAsync();
 
         // if the replay dies halfway through, the ratings left behind are derived from only part of the
         // history - keep the flag raised until it has fully succeeded so the UI keeps asking for a re-run.
@@ -73,12 +64,27 @@ public class RatingService(IMatchHandlerFactory matchHandlerFactory, IUnitOfWork
         unitOfWork.Ratings.DeleteAll();
         await unitOfWork.SaveChangesAsync();
 
-        foreach (var match in matches)
+        foreach (var ratingEvent in timeline)
         {
-            var handler = matchHandlerFactory.Create(match);
-            await handler.HandleAsync(match);
+            if (ratingEvent.Match is not null)
+            {
+                await matchHandler.HandleAsync(ratingEvent.Match);
+            }
+            else if (ratingEvent.Award is not null)
+            {
+                await RatingLedger.ApplyAsync(unitOfWork, new Dictionary<Guid, int> { [ratingEvent.Award.HeroId] = ratingEvent.Award.Points });
+                await unitOfWork.SaveChangesAsync();
+            }
         }
 
         await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(false);
     }
+
+    private static bool Involves(RatingEvent ratingEvent, Guid heroId)
+        => ratingEvent.Match?.Fighters.Any(f => f.HeroId == heroId) == true || ratingEvent.Award?.HeroId == heroId;
+
+    private static int DeltaFor(RatingEvent ratingEvent, Guid heroId)
+        => ratingEvent.Match is not null
+            ? ratingEvent.Match.Fighters.First(f => f.HeroId == heroId).MatchPoints ?? 0
+            : ratingEvent.Award!.Points;
 }

@@ -1,13 +1,19 @@
 @typeparam TValue
+@using Unmatched.UI.BlazorServer.Services
+@inject DropdownPositionService DropdownPosition
 @*
     Every dropdown in the app: a form field (36px), a header control (32px) and a filter chip
     (28px) are the same component at three sizes. This is a custom panel, never the browser's
     native <select> popup (see README "Menus and settings") - the trigger opens a floating list of
     Options, each an optional 20px token, a label, and a check mark on the current value. Lists
     over ~8 entries get a filter field and scroll at 212px.
+
+    The panel is position:fixed, positioned via JS from the trigger's on-screen bounds (see
+    DropdownPositionService) rather than CSS position:absolute - the latter gets clipped by any
+    ancestor with overflow:hidden (e.g. Panel), which is nearly everywhere this component is used.
 *@
 <div class="um-select um-select-@Variant @(Highlighted ? "is-highlighted" : null) @(_isOpen ? "is-open" : null) @(Disabled ? "is-disabled" : null) @Class"
-     tabindex="@(Disabled ? -1 : 0)" role="button" aria-haspopup="listbox" aria-expanded="@_isOpen"
+     @ref="_triggerElement" tabindex="@(Disabled ? -1 : 0)" role="button" aria-haspopup="listbox" aria-expanded="@_isOpen"
      @onclick="Toggle" @onkeydown="OnTriggerKeyDown">
     @if (!string.IsNullOrEmpty(SelectedArtUrl))
     {
@@ -32,7 +38,7 @@
     @if (_isOpen)
     {
         <div class="um-select-scrim" @onclick="Close" @onclick:stopPropagation="true"></div>
-        <div class="um-select-panel" @onclick:stopPropagation="true">
+        <div class="um-select-panel" @ref="_panelElement" @onclick:stopPropagation="true">
             @if (ShowFilter)
             {
                 <div class="um-select-filter">
@@ -79,6 +85,8 @@
 
     private bool _isOpen;
     private string _filter = string.Empty;
+    private ElementReference _triggerElement;
+    private ElementReference _panelElement;
 
     /// <summary>field (36px) | control (32px) | chip (28px)</summary>
     [Parameter]
@@ -136,6 +144,14 @@
         => string.IsNullOrWhiteSpace(_filter)
             ? Options
             : Options.Where(o => o.Label.Contains(_filter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_isOpen)
+        {
+            await DropdownPosition.PositionAsync(_triggerElement, _panelElement);
+        }
+    }
 
     private void Toggle()
     {

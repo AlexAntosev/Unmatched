@@ -60,4 +60,15 @@ public class UiFighterDto
             TimeSpentInSeconds = null;
         }
     }
+
+    /// <summary>Clears the stat fields Ranked scoring needs. Unranked matches allow them to be null
+    /// instead of holding stale or fabricated numbers - the counterpart to <see cref="SetDefaultData"/>.</summary>
+    public void ClearStatData()
+    {
+        HpLeft = null;
+        SidekickHpLeft = null;
+        CardsLeft = null;
+        ActionsMade = null;
+        TimeSpentInSeconds = null;
+    }
 }

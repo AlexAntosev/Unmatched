@@ -3,83 +3,105 @@
 @using Unmatched.Enums
 @using Unmatched.Extensions
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Shared.DesignSystem
 @inject ITournamentService TournamentService
 @inject NavigationManager NavManager
 @*
-    Not in the design pack: a panel of rows plus a create form, built from design-system parts.
-    A first pass - the layout is deliberately plain until this screen gets designed.
+    Not in the design pack: a shelf of tournament covers, built to the Collection.razor standard
+    (design/README.md flags Tournaments as a deliberate follow-up). Each card is a box on a shelf,
+    same as a collection expansion - cover art, name, a format/status badge, how many are signed up.
 *@
 
-<PageHeader Breadcrumbs="Crumbs"/>
+<PageHeader Breadcrumbs="Crumbs">
+    <Controls>
+        <UmSearchBox Value="@_search" ValueChanged="OnSearchChanged" Placeholder="Search tournaments…"/>
+        <UmMultiSelect TValue="TournamentFormat" Icon="bi-funnel" Label="Format"
+                       Value="_formatFilter" ValueChanged="OnFormatFilterChanged" Options="FormatOptions"/>
+        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" OnClick="@(() => NavManager.NavigateTo(Urls.TournamentCreate))">
+            New tournament
+        </UmButton>
+    </Controls>
+</PageHeader>
 
-<div class="um-page">
-    <Panel Title="Tournaments" Meta="@($"{_tournaments.Count} tournaments")">
-        @if (_tournaments.Count == 0)
-        {
-            <div class="tournaments-empty">No tournaments yet.</div>
-        }
-        @foreach (var tournament in _tournaments)
-        {
-            <div class="tournaments-row" @onclick="@(() => Open(tournament))">
-                <i class="bi bi-flag-fill"></i>
-                <div class="tournaments-names">
-                    <div class="tournaments-name">@tournament.Name</div>
-                    <div class="tournaments-meta">
-                        @tournament.Type · @tournament.CurrentStage.GetStageName()
+<div class="tournaments-kpis">
+    <KpiCard Icon="bi-flag-fill" Label="Tournaments" Value="@_tournaments.Count.ToString()"/>
+    <KpiCard Icon="bi-pencil" Label="Draft" Value="@CountByStatus(TournamentStatus.Draft).ToString()"/>
+    <KpiCard Icon="bi-play-fill" Label="In progress" Value="@CountByStatus(TournamentStatus.InProgress).ToString()"/>
+    <KpiCard Icon="bi-trophy-fill" Label="Completed" Value="@CountByStatus(TournamentStatus.Completed).ToString()"/>
+</div>
+
+<div class="um-page tournaments-page">
+    <SectionCaption Text="Tournaments" Meta="@($"{_visible.Count} shown")"/>
+
+    @if (_pageItems.Count == 0)
+    {
+        <div class="tournaments-empty">
+            @(_tournaments.Count == 0 ? "No tournaments yet." : "No tournaments match your filters.")
+        </div>
+    }
+    else
+    {
+        <div class="tournaments-grid">
+            @foreach (var tournament in _pageItems)
+            {
+                var style = TournamentFormatStyle.For(tournament.Format);
+                <div class="tournament-card" @onclick="@(() => Open(tournament))">
+                    <div class="tournament-cover">
+                        @if (tournament.ImageUrl is not null)
+                        {
+                            <img class="tournament-cover-art" src="@tournament.ImageUrl" alt="@tournament.Name"/>
+                        }
+                        else
+                        {
+                            <img class="tournament-cover-logo" src="/Unmatched-logo.png" alt=""/>
+                        }
+                        <div class="tournament-format-badge"><i class="bi @style.Icon"></i>@style.Label</div>
+                        <UmButton Size="xs" Variant="danger" Icon="bi-trash" StopPropagation="true"
+                                  Class="tournament-delete" OnClick="@(() => DeleteAsync(tournament.Id))"/>
+                    </div>
+                    <div class="tournament-meta">
+                        <div class="tournament-name">@tournament.Name</div>
+                        <div class="tournament-subline">
+                            <span class="tournament-status @StatusClass(tournament.Status)">@tournament.Status</span>
+                            <span class="tournament-participants">
+                                <i class="bi bi-people"></i>@tournament.ParticipantHeroIds.Count() participants
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <UmButton Size="sm" Variant="danger" Icon="bi-trash" StopPropagation="true"
-                          OnClick="@(() => DeleteAsync(tournament.Id))">Delete</UmButton>
-            </div>
-        }
-    </Panel>
-
-    <Panel Title="New tournament">
-        <div class="tournaments-form">
-            <UmField Label="Name">
-                <UmTextField Placeholder="Tournament name" Value="@_form.Name"
-                             ValueChanged="@(v => _form.Name = v)"/>
-            </UmField>
-            <UmField Label="Initial stage">
-                <UmSelect TValue="Stage" Icon="bi-diagram-2" Value="_form.InitialStage"
-                          ValueChanged="@(stage => _form.InitialStage = stage)" Options="StageOptions"/>
-            </UmField>
-            <UmField Label="Type">
-                <UmSelect TValue="TournamentType" Icon="bi-trophy" Value="_form.Type"
-                          ValueChanged="@(type => _form.Type = type)" Options="TypeOptions"/>
-            </UmField>
-            <UmButton Variant="primary" Icon="bi-plus-lg" Disabled="@(!IsFormValid)" OnClick="AddAsync">
-                Add tournament
-            </UmButton>
+            }
         </div>
-    </Panel>
+        <GridFooter Caption="ROWS PER PAGE" PageSizeOptions="PageSizeOptions" PageSize="_pageSize"
+                    PageSizeChanged="OnPageSizeChanged" CurrentPage="_currentPage" PageCount="PageCount"
+                    TotalCount="_visible.Count" PageChanged="GoToPage" Class="tournaments-footer"/>
+    }
 </div>
 
 @code {
+    private const int DefaultPageSize = 20;
+
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Tournaments")];
 
-    private static readonly Stage[] AllStages =
-    [
-        Stage.EighthFinals, Stage.QuarterFinals, Stage.SemiFinals, Stage.ThirdPlaceDecider, Stage.GrandFinals
-    ];
+    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
+        [new(10, "10"), new(20, "20"), new(GridFooter.AllPageSize, "All")];
 
-    private static readonly TournamentType[] AllTypes = [TournamentType.Championship, TournamentType.League];
-
-    private static readonly IReadOnlyList<SelectOption<Stage>> StageOptions =
-        AllStages.Select(stage => new SelectOption<Stage>(stage, stage.GetStageName())).ToList();
-
-    private static readonly IReadOnlyList<SelectOption<TournamentType>> TypeOptions =
-        AllTypes.Select(type => new SelectOption<TournamentType>(type, type.ToString())).ToList();
+    private static readonly IReadOnlyList<SelectOption<TournamentFormat>> FormatOptions =
+        Enum.GetValues<TournamentFormat>()
+            .Select(format => new SelectOption<TournamentFormat>(format, TournamentFormatStyle.For(format).Label))
+            .ToList();
 
     private List<TournamentDto> _tournaments = new();
-    private TournamentDto _form = new();
+    private List<TournamentDto> _visible = new();
+    private List<TournamentDto> _pageItems = new();
+    private IReadOnlyList<TournamentFormat> _formatFilter = [];
+    private string? _search;
+    private int _currentPage = 1;
+    private int _pageSize = DefaultPageSize;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
 
-    private bool IsFormValid
-        => !string.IsNullOrWhiteSpace(_form.Name)
-        && _tournaments.All(t => !string.Equals(t.Name, _form.Name, StringComparison.OrdinalIgnoreCase));
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(_visible.Count / (double)_pageSize));
 
     protected override async Task OnInitializedAsync() => await RefreshAsync();
 
@@ -88,7 +110,11 @@
         try
         {
             PreloadService.Show();
-            _tournaments = (await TournamentService.GetAsync()).OrderBy(t => t.Name).ToList();
+            _tournaments = (await TournamentService.GetAsync())
+                .OrderByDescending(t => t.Status == TournamentStatus.InProgress)
+                .ThenBy(t => t.Name)
+                .ToList();
+            Rebuild();
         }
         finally
         {
@@ -96,27 +122,64 @@
         }
     }
 
-    private async Task AddAsync()
+    private void Rebuild()
     {
-        if (!IsFormValid)
+        IEnumerable<TournamentDto> tournaments = _tournaments;
+
+        if (_formatFilter.Count > 0)
         {
-            return;
+            tournaments = tournaments.Where(t => _formatFilter.Contains(t.Format));
         }
 
-        try
+        if (!string.IsNullOrWhiteSpace(_search))
         {
-            PreloadService.Show();
-            _form.CurrentStage = _form.InitialStage;
-            var created = await TournamentService.AddAsync(_form);
-            await TournamentService.GenerateMatchesAsync(created.Id);
-            _form = new TournamentDto();
-            await RefreshAsync();
+            var term = _search.Trim();
+            tournaments = tournaments.Where(t => t.Name.Contains(term, StringComparison.OrdinalIgnoreCase));
         }
-        finally
-        {
-            PreloadService.Hide();
-        }
+
+        _visible = tournaments.ToList();
+        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
+        BuildPage();
     }
+
+    private void BuildPage()
+        => _pageItems = _visible.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        BuildPage();
+    }
+
+    private void OnPageSizeChanged(int size)
+    {
+        _pageSize = size;
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void OnSearchChanged(string? search)
+    {
+        _search = search;
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private void OnFormatFilterChanged(IReadOnlyList<TournamentFormat> formats)
+    {
+        _formatFilter = formats;
+        _currentPage = 1;
+        Rebuild();
+    }
+
+    private int CountByStatus(TournamentStatus status) => _tournaments.Count(t => t.Status == status);
+
+    private static string StatusClass(TournamentStatus status) => status switch
+    {
+        TournamentStatus.InProgress => "is-in-progress",
+        TournamentStatus.Completed => "is-completed",
+        _ => "is-draft"
+    };
 
     private async Task DeleteAsync(Guid id)
     {
