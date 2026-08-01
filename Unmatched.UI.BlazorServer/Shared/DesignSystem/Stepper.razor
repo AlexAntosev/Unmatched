@@ -3,7 +3,8 @@
     inputs on the match sheet - HP left / Cards / Sidekick on a fighter card, HP/Cards on a villain
     card, HP on a minion card. Dash renders "-" with no buttons for a field that does not apply to
     this fighter (villain cards, a hero with no sidekick); IsAlert paints the whole pill red,
-    matching a loser's auto-zeroed HP.
+    matching a loser's auto-zeroed HP. The value itself is a real number input - typing is faster
+    than clicking +/- a dozen times - styled to look like the old plain span.
 *@
 <div class="um-stepper @(IsAlert ? "is-alert" : null) @Class">
     <span class="um-stepper-label">@Label</span>
@@ -14,8 +15,13 @@
                 @onclick="Decrement" @onclick:stopPropagation="true">
             <i class="bi bi-dash"></i>
         </button>
+        <input type="number" class="um-stepper-value" min="@Min" max="@Max" value="@Value"
+               @onchange="OnInputChanged" @onclick:stopPropagation="true"/>
     }
-    <span class="um-stepper-value">@(Dash ? "—" : Value?.ToString() ?? "—")</span>
+    else
+    {
+        <span class="um-stepper-value um-stepper-value-dash">—</span>
+    }
     @if (!Dash)
     {
         <button type="button" class="um-stepper-btn" disabled="@((Value ?? Min) >= Max)"
@@ -56,4 +62,10 @@
     private Task Decrement() => ValueChanged.InvokeAsync(Math.Max(Min, (Value ?? Min) - 1));
 
     private Task Increment() => ValueChanged.InvokeAsync(Math.Min(Max, (Value ?? Min) + 1));
+
+    /// <summary>An empty or unparseable field falls back to Min, same as the buttons clamp to it.</summary>
+    private Task OnInputChanged(ChangeEventArgs e)
+        => int.TryParse(e.Value?.ToString(), out var parsed)
+            ? ValueChanged.InvokeAsync(Math.Clamp(parsed, Min, Max))
+            : ValueChanged.InvokeAsync(Min);
 }

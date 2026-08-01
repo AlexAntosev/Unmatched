@@ -1,0 +1,94 @@
+.fighter-plate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.fighter-plate-art {
+    position: relative;
+    flex: none;
+    line-height: 0;
+}
+
+.fighter-plate-token {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--um-radius-md);
+    border: 1.5px solid rgba(255, 255, 255, 0.09);
+    object-fit: cover;
+    background: #16161f;
+}
+
+.fighter-plate-place {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--um-border-strong);
+    border-radius: 5px;
+    background: #0c0c11;
+    font: 700 9px/1 var(--um-font-display);
+}
+
+.fighter-plate-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.fighter-plate-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.fighter-plate-name {
+    font: 600 12px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fighter-plate-sub {
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fighter-plate-avatar {
+    flex: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.fighter-plate-dot {
+    color: var(--um-text-faint);
+}
+
+.fighter-plate-delta {
+    flex: none;
+    margin-left: auto;
+    padding-left: 6px;
+    font: 600 11px var(--um-font-mono);
+    white-space: nowrap;
+}
+
+.fighter-plate-delta.is-positive {
+    color: var(--um-win);
+}
+
+.fighter-plate-delta.is-negative {
+    color: var(--um-loss);
+}

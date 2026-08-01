@@ -1,8 +1,11 @@
+/* Fighter plates are stacked vertically rather than laid out side by side - a 2v2 team's two
+   plates (or co-op's several heroes) sit one above the other inside one box, per turn 10f/11c,
+   instead of widening the box with each extra participant. */
 .um-side {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 9px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 10px;
     border: 1px solid transparent;
     border-radius: var(--um-radius-row);
 }
@@ -18,5 +21,5 @@
 }
 
 .um-side-neutral {
-    padding: 6px 0;
+    padding: 6px 2px;
 }

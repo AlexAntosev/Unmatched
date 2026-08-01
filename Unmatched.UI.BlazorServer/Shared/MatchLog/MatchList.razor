@@ -1,18 +1,20 @@
 @using Unmatched.Dtos
 @using Unmatched.Services.Contracts
 @inject IMapService MapService
+@inject IVillainService VillainService
+@inject IMinionService MinionService
 @*
     A panel of 3b rows with a column header and paging. Only one row is expanded at a time, which
     is the `openMatch` state from the handoff.
 *@
-<Panel Title="@Title" Meta="@Meta" Flush="true">
+<Panel Title="@Title" Meta="@Meta" Flush="true" HeaderActions="@HeaderActions">
     <ChildContent>
         <ColumnHeader Columns="@Columns" Class="match-list-head">
             <div>Date</div>
             <div>Mode</div>
             <div>Participants</div>
             <div>Map</div>
-            <div></div>
+            <div>Tournament</div>
             <div class="match-list-right">Epic</div>
             <div></div>
         </ColumnHeader>
@@ -23,7 +25,8 @@
         @foreach (var match in _page)
         {
             <MatchRow Match="match"
-                      MapName="@MapDisplayName(match.MapName)"
+                      Map="@ResolvedMap(match.MapName)"
+                      MapName="@match.MapName"
                       IsOpen="@(_openMatchId == match.MatchId)"
                       OnToggle="@(() => Toggle(match.MatchId))"/>
         }
@@ -47,9 +50,14 @@
 </Panel>
 
 @code {
-    private const string Columns = "96px 96px 1fr 195px 26px 74px 28px";
+    // Must stay identical to the grid-template-columns in MatchRow.razor.css - ColumnHeader sets
+    // this as an inline style from a child component, which scoped CSS there can't override.
+    private const string Columns =
+        "clamp(88px,7.5vw,132px) clamp(84px,6vw,104px) minmax(0,1fr) clamp(150px,14vw,260px) clamp(140px,13vw,240px) clamp(70px,5.5vw,96px) clamp(26px,2vw,30px)";
 
-    private Dictionary<string, string> _mapDisplayNames = new();
+    private Dictionary<string, MapDto> _mapsByName = new();
+    private Dictionary<Guid, VillainDto> _villainsById = new();
+    private Dictionary<Guid, MinionDto> _minionsById = new();
     private List<UiMatchLogDto> _all = new();
     private List<UiMatchLogDto> _page = new();
     private Guid? _openMatchId;
@@ -63,6 +71,11 @@
 
     [Parameter]
     public string? Meta { get; set; }
+
+    /// <summary>Extra header content (tallies, a "Full log" link) for callers embedding this as a
+    /// scoped mini-log, e.g. on a hero or player page.</summary>
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
 
     [Parameter]
     public int PageSize { get; set; } = 8;
@@ -81,18 +94,44 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var maps = await MapService.GetAsync();
-        _mapDisplayNames = maps
+        var maps = MapService.GetAsync();
+        var villains = VillainService.GetAsync();
+        var minions = MinionService.GetAsync();
+        await Task.WhenAll(maps, villains, minions);
+
+        _mapsByName = maps.Result
             .GroupBy(m => m.Name)
-            .ToDictionary(group => group.Key, group => group.First().DisplayName);
+            .ToDictionary(group => group.Key, group => group.First());
+        _villainsById = villains.Result.ToDictionary(v => v.Id);
+        _minionsById = minions.Result.ToDictionary(m => m.Id);
     }
 
     protected override void OnParametersSet()
     {
         _all = Matches.ToList();
+        foreach (var match in _all)
+        {
+            EnrichVillain(match.Villain);
+        }
         // Filters can shrink the list under the current page - fall back to the last one that exists.
         _currentPage = Math.Clamp(_currentPage, 1, PageCount);
         BuildPage();
+    }
+
+    /// <summary>The match log only carries a villain/minion's id and name - the row needs their
+    /// catalogue art too, so it's joined in here the same way the map thumbnail is.</summary>
+    private void EnrichVillain(UiMatchVillainDto? villain)
+    {
+        if (villain is null)
+        {
+            return;
+        }
+
+        villain.Villain ??= _villainsById.GetValueOrDefault(villain.VillainId);
+        foreach (var minion in villain.Minions)
+        {
+            minion.Minion ??= _minionsById.GetValueOrDefault(minion.MinionId);
+        }
     }
 
     private void BuildPage()
@@ -114,6 +153,6 @@
         return PageSizeChanged.InvokeAsync(size);
     }
 
-    private string MapDisplayName(string mapName)
-        => _mapDisplayNames.GetValueOrDefault(mapName, mapName);
+    private MapDto? ResolvedMap(string mapName)
+        => _mapsByName.GetValueOrDefault(mapName);
 }

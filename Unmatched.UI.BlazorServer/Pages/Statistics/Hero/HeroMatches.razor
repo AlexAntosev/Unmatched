@@ -1,78 +1,18 @@
-@using Unmatched.Dtos
-@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
-@inject IMapService MapService
 @*
-    "<Name>'s matches" - unlike the shared 3b row, this section belongs to one hero, so rows ARE
-    coloured by result: a 3px win/loss edge plus a 5% wash of the same hue.
+    "<Name>'s matches" - the same turn 11c row/scoreboard the main match log uses (MatchList),
+    scoped to one hero's matches, with a win/loss tally and a link back to the full log.
 *@
-<Panel Title="@($"{HeroName}'s matches")" Flush="true">
+<MatchList Matches="@Entries.Select(e => e.Match)" Title="@($"{HeroName}'s matches")"
+           PageSize="10" AllowPageSizeControl="true">
     <HeaderActions>
         <span class="pm-tally pm-tally-win">W @Wins</span>
         <span class="pm-tally pm-tally-loss">L @Losses</span>
         <a class="pm-full-log" href="@Urls.MatchLog">Full log<i class="bi bi-arrow-right"></i></a>
     </HeaderActions>
-    <ChildContent>
-        <ColumnHeader Columns="@Columns" Class="pm-head">
-            <div>Date</div>
-            <div>Mode</div>
-            <div>Result</div>
-            <div>Played by &middot; Against</div>
-            <div>Map</div>
-            <div class="pm-right">HP left</div>
-            <div class="pm-right">Epic</div>
-        </ColumnHeader>
-        @if (Entries.Count == 0)
-        {
-            <div class="pm-empty">No matches yet.</div>
-        }
-        @foreach (var entry in _page)
-        {
-            <div class="pm-row" style="@($"grid-template-columns:{Columns};border-left-color:{EdgeColor(entry)};background:{WashColor(entry)}")">
-                <div>
-                    <div class="pm-date">@entry.Match.Date.ToString("dd MMM yyyy")</div>
-                    @if (entry.Match.Date.TimeOfDay != TimeSpan.Zero)
-                    {
-                        <div class="pm-time">@entry.Match.Date.ToString("HH:mm")</div>
-                    }
-                </div>
-                <div><ModeBadge Mode="entry.Match.GameMode"/></div>
-                <div><ResultBadge IsWin="entry.Self.IsWinner"/></div>
-                <div class="pm-versus">
-                    <HeroToken ImageUrl="@entry.Self.PlayerImageUrl" Alt="@entry.Self.Player?.Name" Size="30" Radius="8"/>
-                    <span class="pm-hero-name">@(entry.Self.Player?.Name ?? "Unknown")</span>
-                    <span class="pm-vs">vs</span>
-                    @foreach (var opponent in entry.Opponents)
-                    {
-                        <HeroToken ImageUrl="@opponent.ImageUrl" Alt="@opponent.Name" Size="30" Radius="8"/>
-                        <span class="pm-opponent-name">@opponent.Name</span>
-                    }
-                </div>
-                <div class="pm-map">@MapDisplayName(entry.Match.MapName)</div>
-                <div class="pm-right pm-hp">@Value(entry.Self.HpLeft) / @Value(entry.Opponents.FirstOrDefault()?.HpLeft)</div>
-                <div class="pm-right"><EpicStars Value="@(entry.Match.Epic ?? 0)" ReadOnly="true" Size="13"/></div>
-            </div>
-        }
-    </ChildContent>
-    <Footer>
-        <GridFooter Caption="ROWS PER PAGE" PageSizeOptions="PageSizeOptions" PageSize="_pageSize"
-                    PageSizeChanged="OnPageSizeChanged" CurrentPage="_currentPage" PageCount="PageCount"
-                    TotalCount="Entries.Count" PageChanged="GoToPage"/>
-    </Footer>
-</Panel>
+</MatchList>
 
 @code {
-    private const string Columns = "82px 84px 64px 1fr 195px 80px 60px";
-    private const int DefaultPageSize = 10;
-
-    private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
-        [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
-
-    private Dictionary<string, string> _mapDisplayNames = new();
-    private List<HeroMatchEntry> _page = [];
-    private int _currentPage = 1;
-    private int _pageSize = DefaultPageSize;
-
     [Parameter, EditorRequired]
     public string HeroName { get; set; } = string.Empty;
 
@@ -82,46 +22,4 @@
     private int Wins => Entries.Count(e => e.Self.IsWinner);
 
     private int Losses => Entries.Count(e => !e.Self.IsWinner);
-
-    private int PageCount => Math.Max(1, (int)Math.Ceiling(Entries.Count / (double)_pageSize));
-
-    protected override async Task OnInitializedAsync()
-    {
-        var maps = await MapService.GetAsync();
-        _mapDisplayNames = maps
-            .GroupBy(m => m.Name)
-            .ToDictionary(group => group.Key, group => group.First().DisplayName);
-    }
-
-    protected override void OnParametersSet()
-    {
-        _currentPage = Math.Clamp(_currentPage, 1, PageCount);
-        BuildPage();
-    }
-
-    private void BuildPage()
-        => _page = Entries.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
-
-    private string MapDisplayName(string mapName) => _mapDisplayNames.GetValueOrDefault(mapName, mapName);
-
-    private static string Value(int? value) => value?.ToString() ?? "–";
-
-    private static string EdgeColor(HeroMatchEntry entry)
-        => entry.Self.IsWinner ? "rgba(52,217,155,.7)" : "rgba(242,80,107,.7)";
-
-    private static string WashColor(HeroMatchEntry entry)
-        => entry.Self.IsWinner ? "var(--um-win-wash)" : "var(--um-loss-wash)";
-
-    private void GoToPage(int page)
-    {
-        _currentPage = page;
-        BuildPage();
-    }
-
-    private void OnPageSizeChanged(int size)
-    {
-        _pageSize = size;
-        _currentPage = 1;
-        BuildPage();
-    }
 }

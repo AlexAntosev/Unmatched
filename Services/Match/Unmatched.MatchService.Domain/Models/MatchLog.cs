@@ -20,6 +20,10 @@ public class MatchLog
 
     public bool IsRanked { get; set; }
 
+    public Stage? Stage { get; set; }
+
+    public int? Round { get; set; }
+
     public int? Epic { get; set; }
 
     public GameMode GameMode { get; set; }

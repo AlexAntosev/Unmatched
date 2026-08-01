@@ -24,6 +24,32 @@
     color: var(--um-text);
 }
 
+input.um-stepper-value {
+    width: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    outline: none;
+    /* Native up/down arrows would duplicate the +/- buttons either side of this field. */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input.um-stepper-value::-webkit-outer-spin-button,
+input.um-stepper-value::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+input.um-stepper-value:focus {
+    background: var(--um-bg-hover);
+}
+
+.um-stepper-value-dash {
+    color: var(--um-text-faint);
+}
+
 .um-stepper-btn {
     display: flex;
     align-items: center;
