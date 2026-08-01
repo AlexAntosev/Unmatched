@@ -1,0 +1,51 @@
+@*
+    The 5-step progress rail (design/IMPLEMENTATION-PROMPT.md §5A): only steps already reached are
+    clickable, so a player can jump back to fix an earlier pick but never skip ahead.
+*@
+<div class="draft-rail">
+    @for (var i = 0; i < Steps.Count; i++)
+    {
+        var step = Steps[i];
+        var isCurrent = State.CurrentStep == step.Number;
+        var isDone = step.Number < State.CurrentStep;
+        var isClickable = step.Number <= State.HighestReachedStep;
+        <button type="button" class="draft-rail-step @(isCurrent ? "is-current" : null) @(isDone ? "is-done" : null)"
+                disabled="@(!isClickable)" @onclick="@(() => OnStepSelected.InvokeAsync(step.Number))">
+            <span class="draft-rail-num">
+                @if (isDone)
+                {
+                    <i class="bi bi-check-lg"></i>
+                }
+                else
+                {
+                    @step.Number
+                }
+            </span>
+            <span class="draft-rail-label">@step.Label</span>
+        </button>
+        @if (i < Steps.Count - 1)
+        {
+            <div class="draft-rail-connector @(isDone ? "is-done" : null)"></div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<int> OnStepSelected { get; set; }
+
+    private IReadOnlyList<(int Number, string Label)> Steps => State.IsCoop
+        ?
+        [
+            (DraftState.Step1Players, "Players"), (DraftState.Step2Map, "Map"), (DraftState.Step3Heroes, "Heroes"),
+            (DraftState.Step4TurnOrOrVillain, "Villain"), (DraftState.Step5Sheet, "Sheet")
+        ]
+        :
+        [
+            (DraftState.Step1Players, "Players"), (DraftState.Step2Map, "Map"), (DraftState.Step3Heroes, "Heroes"),
+            (DraftState.Step4TurnOrOrVillain, "Turn order"), (DraftState.Step5Sheet, "Sheet")
+        ];
+}

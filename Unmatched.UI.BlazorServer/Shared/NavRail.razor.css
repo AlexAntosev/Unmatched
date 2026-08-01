@@ -67,14 +67,20 @@
     color: var(--um-text-faint);
 }
 
+/* Shared by the NavLink anchors and the "Add match" button (opens the New match modal instead of
+   navigating) - the reset properties are no-ops on an <a> and normalize a <button> to match. */
 .rail ::deep .rail-item {
     display: flex;
     align-items: center;
+    width: 100%;
     gap: 11px;
     height: var(--um-height-nav-item);
     padding: 0 10px;
+    border: 0;
     border-radius: var(--um-radius-md);
+    background: none;
     font: 500 13.5px var(--um-font-body);
+    text-align: left;
     color: var(--um-text-muted);
     white-space: nowrap;
     overflow: hidden;

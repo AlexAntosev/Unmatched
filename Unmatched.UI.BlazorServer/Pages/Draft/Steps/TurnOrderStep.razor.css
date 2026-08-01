@@ -1,0 +1,56 @@
+.turn-order-empty {
+    padding: 24px;
+    text-align: center;
+    font: 400 12.5px var(--um-font-body);
+    color: var(--um-text-faint);
+    border: 1px dashed var(--um-border);
+    border-radius: var(--um-radius-card);
+}
+
+.turn-order-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.turn-order-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 13px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+}
+
+.turn-order-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: var(--um-radius-sm);
+    background: var(--um-accent);
+    color: #fff;
+    font: 700 12px var(--um-font-display);
+}
+
+.turn-order-player {
+    flex: 1;
+    min-width: 0;
+    font: 500 13px var(--um-font-body);
+    color: var(--um-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.turn-order-team {
+    flex: none;
+    padding: 2px 8px;
+    border-radius: var(--um-radius-chip);
+    background: rgba(192, 132, 252, 0.16);
+    color: var(--um-mode-2v2);
+    font: 600 10.5px var(--um-font-mono);
+}

@@ -2,6 +2,7 @@
 @using Unmatched.UI.BlazorServer.Services
 @inject NavState NavState
 @inject NavCountsService NavCountsService
+@inject NewMatchModalService NewMatchModalService
 @*
     The fixed left rail. Expanded it is 216px with group captions, labels and counts; collapsed it
     is 76px of centred icons whose `title` carries the label. The two states share one width
@@ -28,14 +29,28 @@
             }
             @foreach (var item in group.Items)
             {
-                <NavLink class="rail-item" href="@item.Href" Match="NavLinkMatch.Prefix" title="@item.Label">
-                    <i class="bi @item.Icon"></i>
-                    @if (NavState.IsExpanded)
-                    {
-                        <span class="rail-item-label">@item.Label</span>
-                        <span class="rail-item-count">@item.Count(_counts)</span>
-                    }
-                </NavLink>
+                @if (item.OpensModal)
+                {
+                    <button type="button" class="rail-item" title="@item.Label" @onclick="@(() => OnItemClick(item))">
+                        <i class="bi @item.Icon"></i>
+                        @if (NavState.IsExpanded)
+                        {
+                            <span class="rail-item-label">@item.Label</span>
+                            <span class="rail-item-count">@item.Count(_counts)</span>
+                        }
+                    </button>
+                }
+                else
+                {
+                    <NavLink class="rail-item" href="@item.Href" Match="NavLinkMatch.Prefix" title="@item.Label">
+                        <i class="bi @item.Icon"></i>
+                        @if (NavState.IsExpanded)
+                        {
+                            <span class="rail-item-label">@item.Label</span>
+                            <span class="rail-item-count">@item.Count(_counts)</span>
+                        }
+                    </NavLink>
+                }
             }
         </div>
     }
@@ -63,7 +78,7 @@
 </nav>
 
 @code {
-    private record Item(string Label, string Icon, string Href, Func<NavCounts, string> Count);
+    private record Item(string Label, string Icon, string Href, Func<NavCounts, string> Count, bool OpensModal = false);
 
     private record Group(string Title, Item[] Items);
 
@@ -79,7 +94,7 @@
         ]),
         new("Play",
         [
-            new("Add match", "bi-plus-circle", Urls.AddMatch, _ => string.Empty),
+            new("Add match", "bi-plus-circle", Urls.AddMatch, _ => string.Empty, OpensModal: true),
             new("Match log", "bi-list-ul", Urls.MatchLog, c => c.Matches.ToString()),
             new("Collection", "bi-box-seam", Urls.Collection, c => c.Collection),
             new("Titles", "bi-award", Urls.Titles, c => c.Titles.ToString()),
@@ -102,6 +117,14 @@
         if (firstRender)
         {
             await NavState.EnsureLoadedAsync();
+        }
+    }
+
+    private void OnItemClick(Item item)
+    {
+        if (item.OpensModal)
+        {
+            NewMatchModalService.RequestOpen();
         }
     }
 

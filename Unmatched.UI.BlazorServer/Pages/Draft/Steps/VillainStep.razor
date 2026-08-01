@@ -1,0 +1,118 @@
+@using Unmatched.Dtos
+@using Unmatched.Extensions
+@*
+    Draft step 4, co-op replacement (design/IMPLEMENTATION-PROMPT.md §5A.4): pick one of three
+    random villains and any number of minions by checkbox, or let the draft choose both at once.
+*@
+<div class="draft-step">
+    <div class="draft-step-head">
+        <span class="draft-step-caption">Villain</span>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Icon="bi-shuffle" OnClick="RerollPool">Reroll pool</UmButton>
+        <UmButton Size="sm" Variant="primary" Icon="bi-dice-5-fill" OnClick="RandomFromCollection">Random from collection</UmButton>
+    </div>
+
+    <div class="villain-step-pool">
+        @foreach (var villain in _pool)
+        {
+            var isSelected = State.Villain?.Id == villain.Id;
+            <button type="button" class="villain-step-card @(isSelected ? "is-selected" : null)" @onclick="@(() => SelectVillainAsync(villain))">
+                <img src="@villain.ImageUrl" alt="@villain.Name" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                <span>@villain.Name</span>
+            </button>
+        }
+    </div>
+
+    @if (State.Villain is not null)
+    {
+        <span class="draft-step-caption">Minions</span>
+        <div class="villain-step-minions">
+            @foreach (var minion in AllMinions)
+            {
+                var isChecked = State.Minions.Any(m => m.Id == minion.Id);
+                <label class="villain-step-minion-row">
+                    <UmCheckbox Checked="isChecked" CheckedChanged="@(v => ToggleMinionAsync(minion, v))"/>
+                    <HeroToken ImageUrl="@minion.ImageUrl" Alt="@minion.Name" Size="26" Radius="8"/>
+                    <span>@minion.Name</span>
+                </label>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<VillainDto> AllVillains { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MinionDto> AllMinions { get; set; } = [];
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private List<VillainDto> _pool = [];
+
+    protected override void OnParametersSet()
+    {
+        if (_pool.Count == 0)
+        {
+            RerollPoolInternal();
+        }
+    }
+
+    private Task SelectVillainAsync(VillainDto villain)
+    {
+        State.Villain = villain;
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task ToggleMinionAsync(MinionDto minion, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (State.Minions.All(m => m.Id != minion.Id))
+            {
+                State.Minions.Add(minion);
+            }
+        }
+        else
+        {
+            State.Minions.RemoveAll(m => m.Id == minion.Id);
+        }
+
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task RerollPool()
+    {
+        RerollPoolInternal();
+        return OnChanged.InvokeAsync();
+    }
+
+    private void RerollPoolInternal()
+    {
+        _pool = AllVillains.Count == 0 ? [] : AllVillains.ToList().Shuffle().Take(3).ToList();
+    }
+
+    private Task RandomFromCollection()
+    {
+        RerollPoolInternal();
+        State.Minions.Clear();
+        if (_pool.Count == 0)
+        {
+            State.Villain = null;
+            return OnChanged.InvokeAsync();
+        }
+
+        State.Villain = _pool.GetRandomItem();
+        if (AllMinions.Count > 0)
+        {
+            State.Minions.AddRange(AllMinions.ToList().Shuffle().Take(Math.Min(2, AllMinions.Count)));
+        }
+
+        return OnChanged.InvokeAsync();
+    }
+}

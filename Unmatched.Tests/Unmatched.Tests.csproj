@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Unmatched\Unmatched.csproj" />
+    <ProjectReference Include="..\Unmatched.UI.BlazorServer\Unmatched.UI.BlazorServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,63 @@
+.villain-step-pool {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.villain-step-card {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-card);
+    background: var(--um-bg-panel);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.12s ease;
+}
+
+.villain-step-card:hover {
+    border-color: var(--um-focus-border);
+}
+
+.villain-step-card.is-selected {
+    border-color: var(--um-selected-border);
+    background: var(--um-selected-bg);
+    box-shadow: var(--um-shadow-selected);
+}
+
+.villain-step-card img {
+    width: 100%;
+    height: 96px;
+    object-fit: cover;
+    background: var(--um-bg-control);
+}
+
+.villain-step-card span {
+    padding: 0 10px 10px;
+    font: 500 12.5px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.villain-step-minions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+}
+
+.villain-step-minion-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    cursor: pointer;
+    font: 500 12.5px var(--um-font-body);
+    color: var(--um-text);
+}

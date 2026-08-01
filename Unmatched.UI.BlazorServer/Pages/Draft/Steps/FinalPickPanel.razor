@@ -1,0 +1,55 @@
+@using Unmatched.Dtos
+@*
+    Draft step 3.1 (design/IMPLEMENTATION-PROMPT.md §5A.3.1): each player's two snake-picked heroes
+    side by side - clicking the one they keep marks it FINAL, the other is auto-crossed CUT.
+    Everyone decides in silence first; nothing here enforces simultaneity.
+*@
+<div class="final-pick">
+    <div class="draft-step-caption">Final pick</div>
+    <div class="final-pick-grid">
+        @foreach (var player in State.Players)
+        {
+            var heroes = State.PickedHeroesByPlayer.GetValueOrDefault(player.Id) ?? [];
+            <div class="final-pick-player">
+                <div class="final-pick-player-name">
+                    <HeroToken ImageUrl="@player.ImageUrl" Alt="@player.Name" Size="20" Round="true"/>
+                    <span>@player.Name</span>
+                </div>
+                <div class="final-pick-cards">
+                    @foreach (var hero in heroes)
+                    {
+                        var isFinal = State.FinalHeroByPlayer.GetValueOrDefault(player.Id) == hero.Id;
+                        var isCut = State.FinalHeroByPlayer.TryGetValue(player.Id, out var finalId) && finalId != hero.Id;
+                        <button type="button" class="final-pick-card @(isFinal ? "is-final" : null) @(isCut ? "is-cut" : null)"
+                                @onclick="@(() => PickAsync(player, hero))">
+                            <img src="@hero.ImageUrl" alt="@hero.Name" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                            <span>@hero.Name</span>
+                            @if (isFinal)
+                            {
+                                <div class="final-pick-tag is-final">FINAL</div>
+                            }
+                            @if (isCut)
+                            {
+                                <div class="final-pick-tag is-cut">CUT</div>
+                            }
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private Task PickAsync(UiPlayerDto player, UiHeroDto hero)
+    {
+        State.FinalHeroByPlayer[player.Id] = hero.Id;
+        return OnChanged.InvokeAsync();
+    }
+}

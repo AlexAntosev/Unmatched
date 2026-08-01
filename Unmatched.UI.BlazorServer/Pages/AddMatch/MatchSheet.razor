@@ -1,0 +1,914 @@
+@using BlazorBootstrap
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Enums
+@using Unmatched.Extensions
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
+@using Unmatched.UI.BlazorServer.Shared.TurnOrder
+@inject IMatchService MatchService
+@inject NavCountsService NavCountsService
+@inject PreloadService PreloadService
+@*
+    Match sheet, revision 3 (design/IMPLEMENTATION-PROMPT.md §5.1-5.6): one screen, no stepper
+    wizard. Mounted three places - Add match, Edit match and step 5 of the draft session
+    (Prefilled + Embedded) - so it owns its own save call rather than delegating it to the host.
+    The mode switch rebuilds the participants area with 180px vertical FighterCards; turn order
+    comes from dragging a card by its grip strip (or Shuffle) - co-op has none at all. The winner
+    control always lives on the side header, never the card - FFA's Place field is its own
+    "winner" signal instead - and marking a winner auto-zeroes every loser. Tournament/Stage are
+    never editable here; they only ever arrive from a tournament bracket (see
+    IsTournamentLockedByContext), which shows as a read-only badge instead of a picker.
+*@
+
+<div class="add-match">
+    @if (Prefilled)
+    {
+        <div class="add-prefilled-banner">
+            <i class="bi bi-check-circle-fill"></i>
+            <span class="add-prefilled-title">Prefilled from draft</span>
+            @if (!string.IsNullOrEmpty(BannerSub))
+            {
+                <span class="add-prefilled-sub">@BannerSub</span>
+            }
+        </div>
+    }
+
+    <Modal @ref="_savedPopup" Title="Match saved"/>
+
+    <header class="add-head">
+        <div class="add-title">@(IsEditing ? "Edit match" : "Add match")</div>
+        <div class="um-spacer"></div>
+        @if (Embedded)
+        {
+            <div class="add-mode-chip"><i class="bi @CurrentMode.Icon"></i>@CurrentMode.Label</div>
+        }
+        else
+        {
+            <SegmentedControl TValue="GameMode" Options="Modes" Value="Match.GameMode" ValueChanged="OnModeChangedAsync"/>
+        }
+    </header>
+
+    <MapBanner Maps="Maps" SelectedMap="Match.Map" SelectedMapChanged="SetMap" OnShuffleTurnOrder="ShuffleTurnOrder"
+               ShowShuffle="@(Match.GameMode != GameMode.Cooperative)" ShowDraftedBadge="Prefilled"/>
+
+    @if (!string.IsNullOrEmpty(DraftLog))
+    {
+        <div class="add-draft-log">
+            <span class="add-draft-log-caption">Draft log</span>
+            <span class="add-draft-log-text">@DraftLog</span>
+        </div>
+    }
+
+    @if (_error is not null)
+    {
+        <div class="add-error alert alert-danger" role="alert">@_error</div>
+    }
+
+    <div class="add-body">
+        <div class="add-section">
+            <span class="um-section-caption">Participants</span>
+            @if (Match.GameMode != GameMode.Cooperative)
+            {
+                <span class="add-hint"><i class="bi bi-grip-vertical"></i>drag the grip to change turn order</span>
+            }
+            <div class="um-spacer"></div>
+            @if (!string.IsNullOrEmpty(OrderSummary()))
+            {
+                <span class="add-order-summary">@OrderSummary()</span>
+            }
+        </div>
+
+        @{ var sides = Sides(); }
+        <div class="add-sides @(sides.Count == 2 ? "is-versus" : "is-stacked")">
+            @for (var sideIndex = 0; sideIndex < sides.Count; sideIndex++)
+            {
+                var side = sides[sideIndex];
+                <div class="add-side @(side.IsWinnerSide == true ? "is-winner-side" : null) @(side.IsWinnerSide == false ? "is-loser-side" : null)">
+                    <div class="add-side-head">
+                        <span class="add-side-title">@side.Title</span>
+                        @if (side.ShowWinnerControl)
+                        {
+                            <WinnerButton IsWinner="side.IsWinnerSide == true" OnClick="@(() => SetWinner(side.WinnerKey!))"/>
+                        }
+                        <div class="um-spacer"></div>
+                        @if (side.CanAdd)
+                        {
+                            <button type="button" class="add-side-add" @onclick="side.OnAdd">
+                                <i class="bi bi-plus-lg"></i>@side.AddLabel
+                            </button>
+                        }
+                    </div>
+                    <div class="add-side-fighters">
+                        @foreach (var fighter in side.Fighters)
+                        {
+                            <FighterCard Fighter="fighter" Players="Players" Heroes="Heroes" IsRanked="Match.IsRanked"
+                                         ShowPlace="@(Match.GameMode == GameMode.FreeForAll)"
+                                         ShowTurnBadge="@(Match.GameMode != GameMode.Cooperative)"
+                                         AllowDrag="@(Match.GameMode != GameMode.Cooperative)"
+                                         IsWinner="@IsWinnerFighter(fighter)"
+                                         IsLoser="@IsLoser(fighter)"
+                                         MaxPlace="@Match.Fighters.Count()"
+                                         OnChanged="StateHasChanged"
+                                         HpChanged="@(v => OnFighterHpChanged(fighter, v))"
+                                         OnDragStart="OnFighterDragStart"
+                                         OnDroppedOn="@(target => OnFighterDropped(target, side.Team))"
+                                         OnDragEnd="OnFighterDragEnd"
+                                         OnRemove="@(side.CanRemove ? EventCallback.Factory.Create(this, () => RemoveFighter(fighter)) : default)"/>
+                        }
+                    </div>
+                    @if (side.IsVillain && Match.Villain is not null)
+                    {
+                        <VillainInfo Villains="Villains" Minions="Minions" MatchVillain="Match.Villain"
+                                     HeroCount="@Match.Fighters.Count()"
+                                     IsWinner="IsVillainWinner()" IsLoser="IsVillainLoser()" OnChanged="StateHasChanged"
+                                     OnAddMinion="AddMinion"
+                                     HpChanged="OnVillainHpChanged" MinionHpChanged="OnMinionHpChanged"/>
+                    }
+                </div>
+                @if (sideIndex == 0 && sides.Count == 2)
+                {
+                    <div class="add-vs">
+                        @if (Match.GameMode == GameMode.OneVsOne)
+                        {
+                            <img src="/Vs.png" alt="vs"/>
+                        }
+                        else
+                        {
+                            <span>VS</span>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="add-details">
+            @if (IsTournamentLockedByContext)
+            {
+                <UmField Label="Tournament">
+                    <InfoChip Icon="bi-flag" Text="@TournamentContextLabel()"/>
+                </UmField>
+            }
+            @if (Match.GameMode != GameMode.Cooperative)
+            {
+                <UmField Label="Match type">
+                    <SegmentedControl TValue="bool" Options="RankedOptions" Value="Match.IsRanked" ValueChanged="OnRankedChanged"/>
+                </UmField>
+            }
+            <UmField Label="Date">
+                <UmTextField Type="date" Icon="bi-calendar3" Value="@Match.Date.ToString("yyyy-MM-dd")"
+                             ValueChanged="OnDateChanged"/>
+            </UmField>
+            <UmField Label="Time">
+                <UmTextField Type="time" Value="@Match.Date.ToString("HH:mm")" ValueChanged="OnTimeChanged"/>
+            </UmField>
+            <UmField Label="Epic">
+                <EpicStars Value="@(Match.Epic ?? 0)" ValueChanged="@(epic => Match.Epic = epic)"/>
+            </UmField>
+        </div>
+
+        @if (!IsTournamentLockedByContext)
+        {
+            <div class="add-tournament-hint">
+                <i class="bi bi-info-circle"></i>
+                <span>Tournament and stage come from the bracket — never set on this screen.</span>
+            </div>
+        }
+
+        <UmField Label="Comment" Class="add-comment">
+            <UmTextField Icon="bi-chat-left-text" Placeholder="Last card, last HP…"
+                         Value="@Match.Comment" ValueChanged="@(v => Match.Comment = v ?? string.Empty)"/>
+        </UmField>
+    </div>
+
+    @if (!Embedded)
+    {
+        <footer class="add-footer">
+            @if (HasAnyWinner())
+            {
+                <span class="add-state-summary"><i class="bi bi-trophy-fill"></i>@StateSummary()</span>
+            }
+            else
+            {
+                <span class="add-state-summary is-muted">@StateSummary()</span>
+            }
+            <div class="um-spacer"></div>
+            <UmButton Size="sm" Disabled="_isSaving" OnClick="@(() => SaveAsync(addAnother: true))">Save &amp; add another</UmButton>
+            <UmButton Size="sm" Variant="primary" Icon="bi-check-lg" Disabled="_isSaving"
+                      OnClick="@(() => SaveAsync(addAnother: false))">Save match</UmButton>
+        </footer>
+    }
+</div>
+
+@code {
+    private const int FreeForAllMin = 3;
+    private const int FreeForAllMax = 4;
+
+    private record SideModel(
+        string Title,
+        IReadOnlyList<UiFighterDto> Fighters,
+        bool CanAdd = false,
+        string AddLabel = "Add player",
+        Action? OnAdd = null,
+        bool CanRemove = false,
+        bool IsVillain = false,
+        bool ShowWinnerControl = false,
+        bool? IsWinnerSide = null,
+        string? WinnerKey = null,
+        int? Team = null);
+
+    private static readonly IReadOnlyList<SelectOption<GameMode>> Modes =
+    [
+        new(GameMode.OneVsOne, "1v1", "bi-person-fill"),
+        new(GameMode.TeamVsTeam, "2v2", "bi-people-fill"),
+        new(GameMode.FreeForAll, "FFA", "bi-diagram-3-fill"),
+        new(GameMode.Cooperative, "Co-op", "bi-shield-fill")
+    ];
+
+    /// <summary>Not offered for Co-op - it never affects rating (see RatingCalculatorFactory), so the
+    /// choice would have nothing to mean.</summary>
+    private static readonly IReadOnlyList<SelectOption<bool>> RankedOptions =
+    [
+        new(true, "Ranked", "bi-graph-up-arrow", Color: "var(--um-gold)"),
+        new(false, "Unranked", "bi-dash-circle")
+    ];
+
+    /// <summary>Fighters/villain/minions whose HP the user typed by hand - the auto-zero pass
+    /// leaves these alone (design/IMPLEMENTATION-PROMPT.md §5.4). Cleared whenever a new Match
+    /// instance is bound (Save &amp; add another, or a fresh draft-prefilled sheet).</summary>
+    private readonly HashSet<object> _manuallyEditedHp = new();
+
+    private UiMatchDto? _lastMatch;
+    private UiFighterDto? _draggedFighter;
+    private Modal _savedPopup = default!;
+    private string? _error;
+    private bool _isSaving;
+
+    [Parameter, EditorRequired]
+    public UiMatchDto Match { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<UiPlayerDto> Players { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<UiHeroDto> Heroes { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<VillainDto> Villains { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MinionDto> Minions { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MapDto> Maps { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TournamentDto> Tournaments { get; set; } = [];
+
+    /// <summary>Set when this page was opened from a tournament ("New match in this tournament") -
+    /// the tournament is context, not a choice, so the badge in the details row reflects it too.</summary>
+    [Parameter]
+    public Guid? TournamentId { get; set; }
+
+    /// <summary>Shows the green "Prefilled from draft" banner and the map banner's DRAFTED badge -
+    /// this sheet was built from a completed draft session, not typed by hand.</summary>
+    [Parameter]
+    public bool Prefilled { get; set; }
+
+    [Parameter]
+    public string? BannerSub { get; set; }
+
+    [Parameter]
+    public string? DraftLog { get; set; }
+
+    /// <summary>Mounted inside the draft session's step 5: hides this sheet's own footer and mode
+    /// switch (the draft already chose the mode in step 1) - the draft's own footer saves by
+    /// calling <see cref="SaveAsync"/> directly.</summary>
+    [Parameter]
+    public bool Embedded { get; set; }
+
+    /// <summary>Fires after a non-"add another" save succeeds. Regular Add/Edit match doesn't need
+    /// to react (the sheet already shows its own "Match saved" popup) - the draft session uses this
+    /// to navigate away once <see cref="Embedded"/> suppresses that popup.</summary>
+    [Parameter]
+    public EventCallback<SaveMatchResultDto> OnSaved { get; set; }
+
+    /// <summary>Fires after a "Save &amp; add another" succeeds - only the host knows how to build
+    /// the next default match (favourite heroes, random turn), so it owns the reset.</summary>
+    [Parameter]
+    public EventCallback OnSavedAddAnother { get; set; }
+
+    private bool IsEditing => Match.Id != Guid.Empty;
+
+    private SelectOption<GameMode> CurrentMode => Modes.First(m => m.Value == Match.GameMode);
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(Match, _lastMatch))
+        {
+            return;
+        }
+
+        _lastMatch = Match;
+        _manuallyEditedHp.Clear();
+    }
+
+    // ---- Participants shape ----
+
+    private IReadOnlyList<SideModel> Sides()
+    {
+        var fighters = Match.Fighters.ToList();
+
+        return Match.GameMode switch
+        {
+            GameMode.TeamVsTeam =>
+            [
+                new SideModel("Team 1", fighters.Where(f => (f.Team ?? 1) != 2).ToList(),
+                    ShowWinnerControl: true, IsWinnerSide: WinnerSideState(IsTeamWinner(1), IsTeamWinner(2)), WinnerKey: "team1", Team: 1),
+                new SideModel("Team 2", fighters.Where(f => f.Team == 2).ToList(),
+                    ShowWinnerControl: true, IsWinnerSide: WinnerSideState(IsTeamWinner(2), IsTeamWinner(1)), WinnerKey: "team2", Team: 2)
+            ],
+            GameMode.FreeForAll =>
+            [
+                new SideModel(
+                    "Fighters",
+                    fighters,
+                    CanAdd: fighters.Count < FreeForAllMax,
+                    OnAdd: AddFighter,
+                    CanRemove: fighters.Count > FreeForAllMin)
+            ],
+            GameMode.Cooperative =>
+            [
+                new SideModel("Heroes", fighters, CanAdd: true, OnAdd: AddFighter, CanRemove: fighters.Count > 1,
+                    ShowWinnerControl: true, IsWinnerSide: WinnerSideState(IsHeroesWinner(), IsVillainWinner()), WinnerKey: "heroes"),
+                new SideModel("Villain", [], IsVillain: true,
+                    ShowWinnerControl: true, IsWinnerSide: WinnerSideState(IsVillainWinner(), IsHeroesWinner()), WinnerKey: "villains")
+            ],
+            _ =>
+            [
+                new SideModel("Fighter 1", fighters.Take(1).ToList(),
+                    ShowWinnerControl: true,
+                    IsWinnerSide: WinnerSideState(IsFighterWinner(fighters, 0), IsFighterWinner(fighters, 1)),
+                    WinnerKey: fighters.ElementAtOrDefault(0)?.HeroId.ToString()),
+                new SideModel("Fighter 2", fighters.Skip(1).Take(1).ToList(),
+                    ShowWinnerControl: true,
+                    IsWinnerSide: WinnerSideState(IsFighterWinner(fighters, 1), IsFighterWinner(fighters, 0)),
+                    WinnerKey: fighters.ElementAtOrDefault(1)?.HeroId.ToString())
+            ]
+        };
+    }
+
+    /// <summary>true/false once a winner is decided either way, null while the match is undecided.</summary>
+    private static bool? WinnerSideState(bool thisSideWon, bool otherSideWon)
+        => thisSideWon || otherSideWon ? thisSideWon : null;
+
+    private static bool IsFighterWinner(IReadOnlyList<UiFighterDto> fighters, int index)
+        => fighters.ElementAtOrDefault(index)?.IsWinner == true;
+
+    private bool IsTeamWinner(int team) => Match.Fighters.Any(f => (f.Team ?? 1) == team && f.IsWinner);
+
+    private bool IsHeroesWinner() => Match.Fighters.Any(f => f.IsWinner);
+
+    private bool IsVillainWinner() => Match.Villain?.IsWinner == true;
+
+    private bool HasAnyWinner() => Match.Fighters.Any(f => f.IsWinner) || IsVillainWinner();
+
+    /// <summary>FFA has no winner/loser concept here - Place already carries that (design/IMPLEMENTATION-PROMPT.md §5.4).</summary>
+    private bool IsLoser(UiFighterDto fighter)
+        => Match.GameMode != GameMode.FreeForAll && HasAnyWinner() && !fighter.IsWinner;
+
+    private bool IsWinnerFighter(UiFighterDto fighter)
+        => Match.GameMode != GameMode.FreeForAll && HasAnyWinner() && fighter.IsWinner;
+
+    private bool IsVillainLoser()
+        => Match.GameMode == GameMode.Cooperative && HasAnyWinner() && Match.Villain is not null && !Match.Villain.IsWinner;
+
+    private void SetWinner(string key)
+    {
+        switch (key)
+        {
+            case "team1":
+            case "team2":
+                var winningTeam = key == "team2" ? 2 : 1;
+                foreach (var fighter in Match.Fighters)
+                {
+                    fighter.IsWinner = (fighter.Team ?? 1) == winningTeam;
+                }
+
+                break;
+
+            case "heroes":
+            case "villains":
+                var heroesWon = key == "heroes";
+                foreach (var fighter in Match.Fighters)
+                {
+                    fighter.IsWinner = heroesWon;
+                }
+
+                if (Match.Villain is not null)
+                {
+                    Match.Villain.IsWinner = !heroesWon;
+                    foreach (var minion in Match.Villain.Minions)
+                    {
+                        minion.IsWinner = !heroesWon;
+                    }
+                }
+
+                break;
+
+            default: // 1v1: key is the winning fighter's HeroId.
+                foreach (var fighter in Match.Fighters)
+                {
+                    fighter.IsWinner = fighter.HeroId.ToString() == key;
+                }
+
+                break;
+        }
+
+        // Unranked matches are allowed to have no stat data at all - auto-zeroing losers would inject
+        // a fabricated "0" into fields the user may be deliberately leaving blank.
+        if (Match.IsRanked)
+        {
+            ApplyLoserAutoZero();
+        }
+    }
+
+    /// <summary>
+    /// Every loser flips to 0 HP (and 0 sidekick HP) at once - unless the user already typed a
+    /// value for that fighter by hand, which sticks (design/IMPLEMENTATION-PROMPT.md §5.4). FFA is
+    /// exempt: it has no winner/loser HP mechanic.
+    /// </summary>
+    private void ApplyLoserAutoZero()
+    {
+        if (Match.GameMode == GameMode.FreeForAll)
+        {
+            return;
+        }
+
+        foreach (var fighter in Match.Fighters.Where(f => !f.IsWinner && !_manuallyEditedHp.Contains(f)))
+        {
+            fighter.HpLeft = 0;
+            if (fighter.SidekickName is not null)
+            {
+                fighter.SidekickHpLeft = 0;
+            }
+        }
+
+        if (Match.Villain is not null && !Match.Villain.IsWinner)
+        {
+            if (!_manuallyEditedHp.Contains(Match.Villain))
+            {
+                Match.Villain.HpLeft = 0;
+            }
+
+            foreach (var minion in Match.Villain.Minions.Where(m => !_manuallyEditedHp.Contains(m)))
+            {
+                minion.HpLeft = 0;
+            }
+        }
+    }
+
+    private void OnFighterHpChanged(UiFighterDto fighter, int? value)
+    {
+        fighter.HpLeft = value;
+        _manuallyEditedHp.Add(fighter);
+    }
+
+    private void OnVillainHpChanged(int? value)
+    {
+        if (Match.Villain is null)
+        {
+            return;
+        }
+
+        Match.Villain.HpLeft = value;
+        _manuallyEditedHp.Add(Match.Villain);
+    }
+
+    private void OnMinionHpChanged((UiMatchMinionDto Minion, int? Value) args)
+    {
+        args.Minion.HpLeft = args.Value;
+        _manuallyEditedHp.Add(args.Minion);
+    }
+
+    // ---- Turn order ----
+
+    private string OrderSummary()
+    {
+        if (Match.GameMode == GameMode.Cooperative)
+        {
+            return "No turn order in co-op";
+        }
+
+        var names = Match.Fighters
+            .OrderBy(f => f.Turn ?? int.MaxValue)
+            .Select(f => f.Hero?.Name)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToList();
+
+        return names.Count < 2 ? string.Empty : "Order: " + string.Join(" → ", names);
+    }
+
+    /// <summary>1v1/FFA get a plain sequence; 2v2 alternates teams (team 1 → 1,3 / team 2 → 2,4),
+    /// each team's own order independent of the other's. Co-op has no turn order at all - callers
+    /// skip this and clear Turn to null instead (design/IMPLEMENTATION-PROMPT.md §5.4).</summary>
+    private static void RenumberTurns(GameMode mode, IReadOnlyList<UiFighterDto> fighters)
+    {
+        if (mode == GameMode.TeamVsTeam)
+        {
+            RenumberTeam(fighters.Where(f => (f.Team ?? 1) != 2).ToList(), team: 1);
+            RenumberTeam(fighters.Where(f => f.Team == 2).ToList(), team: 2);
+            return;
+        }
+
+        for (var i = 0; i < fighters.Count; i++)
+        {
+            fighters[i].Turn = i + 1;
+        }
+    }
+
+    private static void RenumberTeam(IReadOnlyList<UiFighterDto> teamFighters, int team)
+    {
+        for (var i = 0; i < teamFighters.Count; i++)
+        {
+            teamFighters[i].Turn = TeamAlternatingTurns.TurnFor(team, i);
+        }
+    }
+
+    private void ShuffleTurnOrder()
+    {
+        var fighters = Match.Fighters.ToList();
+        if (fighters.Count == 0 || Match.GameMode == GameMode.Cooperative)
+        {
+            return;
+        }
+
+        if (Match.GameMode == GameMode.TeamVsTeam)
+        {
+            ShuffleTeam(fighters.Where(f => (f.Team ?? 1) != 2).ToList(), team: 1);
+            ShuffleTeam(fighters.Where(f => f.Team == 2).ToList(), team: 2);
+            return;
+        }
+
+        var shuffledTurns = Enumerable.Range(1, fighters.Count).OrderBy(_ => Guid.NewGuid()).ToList();
+        for (var i = 0; i < fighters.Count; i++)
+        {
+            fighters[i].Turn = shuffledTurns[i];
+        }
+    }
+
+    /// <summary>Re-rolls only the numbers a team already holds ({1,3} or {2,4}), so a shuffle can
+    /// never break the team-alternating invariant.</summary>
+    private static void ShuffleTeam(IReadOnlyList<UiFighterDto> teamFighters, int team)
+    {
+        var numbers = Enumerable.Range(0, teamFighters.Count)
+            .Select(i => TeamAlternatingTurns.TurnFor(team, i))
+            .OrderBy(_ => Guid.NewGuid())
+            .ToList();
+
+        for (var i = 0; i < teamFighters.Count; i++)
+        {
+            teamFighters[i].Turn = numbers[i];
+        }
+    }
+
+    private void OnFighterDragStart(UiFighterDto fighter) => _draggedFighter = fighter;
+
+    private void OnFighterDragEnd() => _draggedFighter = null;
+
+    /// <summary>
+    /// Dropping a card inserts it just before the card it was dropped on and renumbers every turn
+    /// from the resulting order. In 2v2 a card never changes team by dragging - a drop across teams
+    /// no-ops - so the drop is confined to the dragged card's own team and only that team's numbers
+    /// are renumbered (design/IMPLEMENTATION-PROMPT.md §5.4).
+    /// </summary>
+    private void OnFighterDropped(UiFighterDto target, int? targetTeam)
+    {
+        var dragged = _draggedFighter;
+        _draggedFighter = null;
+
+        if (dragged is null || ReferenceEquals(dragged, target))
+        {
+            return;
+        }
+
+        if (Match.GameMode == GameMode.TeamVsTeam)
+        {
+            var team = dragged.Team ?? 1;
+            if ((target.Team ?? 1) != team)
+            {
+                return;
+            }
+
+            var teamFighters = Match.Fighters.Where(f => (f.Team ?? 1) == team).ToList();
+            teamFighters.Remove(dragged);
+            var teamTargetIndex = teamFighters.IndexOf(target);
+            teamFighters.Insert(teamTargetIndex < 0 ? teamFighters.Count : teamTargetIndex, dragged);
+            RenumberTeam(teamFighters, team == 2 ? 2 : 1);
+
+            // Splice the team's new order back into the full fighter list, keeping the other
+            // team's fighters and relative order untouched.
+            var teamQueue = new Queue<UiFighterDto>(teamFighters);
+            Match.Fighters = Match.Fighters.Select(f => (f.Team ?? 1) == team ? teamQueue.Dequeue() : f).ToList();
+            return;
+        }
+
+        var fighters = Match.Fighters.ToList();
+        fighters.Remove(dragged);
+        var targetIndex = fighters.IndexOf(target);
+        fighters.Insert(targetIndex < 0 ? fighters.Count : targetIndex, dragged);
+
+        RenumberTurns(Match.GameMode, fighters);
+        Match.Fighters = fighters;
+    }
+
+    private void OnModeChangedAsync(GameMode mode)
+    {
+        Match.GameMode = mode;
+
+        switch (mode)
+        {
+            case GameMode.OneVsOne:
+                Match.Fighters = EnsureFighterCount(2);
+                Match.Villain = null;
+                break;
+            case GameMode.TeamVsTeam:
+                Match.Fighters = EnsureFighterCount(4);
+                AssignTeams();
+                Match.Villain = null;
+                break;
+            case GameMode.FreeForAll:
+                Match.Fighters = EnsureFighterCount(FreeForAllMin);
+                AssignPlacements();
+                Match.Villain = null;
+                break;
+            case GameMode.Cooperative:
+                Match.Fighters = EnsureFighterCount(2);
+                Match.Villain ??= new UiMatchVillainDto();
+                // Co-op never affects rating (see RatingCalculatorFactory) - the toggle is hidden for
+                // it, so keep the stored value consistent with what the UI shows.
+                Match.IsRanked = false;
+                break;
+        }
+
+        if (mode == GameMode.Cooperative)
+        {
+            // No turn order in co-op at all - not just hidden, actually unset.
+            foreach (var fighter in Match.Fighters)
+            {
+                fighter.Turn = null;
+            }
+        }
+        else
+        {
+            RenumberTurns(mode, Match.Fighters.ToList());
+        }
+    }
+
+    private List<UiFighterDto> EnsureFighterCount(int count)
+    {
+        var fighters = Match.Fighters.ToList();
+        while (fighters.Count < count)
+        {
+            fighters.Add(new UiFighterDto());
+        }
+
+        return fighters.Count > count ? fighters.Take(count).ToList() : fighters;
+    }
+
+    private void AssignTeams()
+    {
+        var fighters = Match.Fighters.ToList();
+        for (var i = 0; i < fighters.Count; i++)
+        {
+            fighters[i].Team = i < 2 ? 1 : 2;
+        }
+    }
+
+    private void AssignPlacements()
+    {
+        var fighters = Match.Fighters.ToList();
+        for (var i = 0; i < fighters.Count; i++)
+        {
+            fighters[i].Placement ??= i + 1;
+        }
+    }
+
+    private void AddFighter()
+    {
+        var fighters = Match.Fighters.Append(new UiFighterDto()).ToList();
+        Match.Fighters = fighters;
+        if (Match.GameMode == GameMode.FreeForAll)
+        {
+            AssignPlacements();
+        }
+
+        if (Match.GameMode != GameMode.Cooperative)
+        {
+            RenumberTurns(Match.GameMode, fighters);
+        }
+    }
+
+    private void AddMinion()
+    {
+        Match.Villain ??= new UiMatchVillainDto();
+        Match.Villain.Minions = Match.Villain.Minions.Append(new UiMatchMinionDto()).ToList();
+    }
+
+    private void RemoveFighter(UiFighterDto fighter)
+    {
+        var fighters = Match.Fighters.Where(f => f != fighter).ToList();
+        Match.Fighters = fighters;
+        if (Match.GameMode != GameMode.Cooperative)
+        {
+            RenumberTurns(Match.GameMode, fighters);
+        }
+    }
+
+    // ---- Details ----
+
+    /// <summary>A match opened from a tournament - either an existing planned match (already carries
+    /// its TournamentId) or a fresh one started from "New match in this tournament" (?tournamentId=
+    /// on the query string) - has its tournament as context, not a choice, so it renders as a
+    /// read-only badge instead of a picker. Standalone matches never show one at all.</summary>
+    private bool IsTournamentLockedByContext
+        => (IsEditing && Match.TournamentId is not null) || (!IsEditing && TournamentId is not null);
+
+    /// <summary>Read-only "Tournament · Stage" badge shown instead of a picker when the match is
+    /// tied to a tournament bracket - there is no Tournament or Stage field on this screen in any
+    /// mode (design/IMPLEMENTATION-PROMPT.md §5.5).</summary>
+    private string TournamentContextLabel()
+    {
+        var name = Tournaments.FirstOrDefault(t => t.Id == Match.TournamentId)?.Name ?? "Tournament";
+        return Match.Stage is { } stage ? $"{name} · {stage.GetStageName()}" : name;
+    }
+
+    /// <summary>Ranked→Unranked clears the stat fields Ranked scoring needs (Unranked allows nulls
+    /// instead of storing fabricated data); Unranked→Ranked refills them from each fighter's hero.
+    /// Fighters whose HP was already typed by hand are left alone either way.</summary>
+    private void OnRankedChanged(bool isRanked)
+    {
+        Match.IsRanked = isRanked;
+
+        foreach (var fighter in Match.Fighters.Where(f => !_manuallyEditedHp.Contains(f)))
+        {
+            if (isRanked)
+            {
+                fighter.SetDefaultData();
+            }
+            else
+            {
+                fighter.ClearStatData();
+            }
+        }
+    }
+
+    private void SetMap(MapDto map) => Match.Map = map;
+
+    private void OnDateChanged(string? value)
+    {
+        if (DateTime.TryParse(value, out var date))
+        {
+            Match.Date = date.Date + Match.Date.TimeOfDay;
+        }
+    }
+
+    private void OnTimeChanged(string? value)
+    {
+        if (TimeSpan.TryParse(value, out var time))
+        {
+            Match.Date = Match.Date.Date + time;
+        }
+    }
+
+    /// <summary>Plainly states what happens on save, matching the footer copy in the mock.</summary>
+    private string StateSummary()
+    {
+        switch (Match.GameMode)
+        {
+            case GameMode.FreeForAll:
+                var first = Match.Fighters.FirstOrDefault(f => f.Placement == 1);
+                return first?.Hero?.Name is { } firstName ? $"{firstName} took 1st" : "Set placements to see a summary";
+
+            case GameMode.TeamVsTeam:
+                if (!HasAnyWinner())
+                {
+                    return "Mark a winner to see a summary";
+                }
+
+                return $"{(IsTeamWinner(2) ? "Team 2" : "Team 1")} won · losers set to 0 HP";
+
+            case GameMode.Cooperative:
+                if (Match.Villain is null || !HasAnyWinner())
+                {
+                    return "Mark a winner to see a summary";
+                }
+
+                return IsHeroesWinner() ? "Heroes won · villain and minions at 0 HP" : "Villain won · heroes set to 0 HP";
+
+            default:
+                var winner = Match.Fighters.FirstOrDefault(f => f.IsWinner);
+                return winner?.Hero?.Name is { } winnerName ? $"{winnerName} won" : "Mark a winner to see a summary";
+        }
+    }
+
+    // ---- Saving ----
+
+    private string? Validate()
+    {
+        if (Match.Fighters.Any(f => f.PlayerId == Guid.Empty))
+        {
+            return "Every fighter needs a player.";
+        }
+
+        if (Match.Fighters.Any(f => f.HeroId == Guid.Empty))
+        {
+            return "Every fighter needs a hero.";
+        }
+
+        if (Match.Map is null || Match.Map.Id == Guid.Empty)
+        {
+            return "Pick a map.";
+        }
+
+        if (Match.GameMode == GameMode.Cooperative && (Match.Villain is null || Match.Villain.VillainId == Guid.Empty))
+        {
+            return "Co-op matches need a villain.";
+        }
+
+        if (RequiresRankedData() && Match.Fighters.Any(f => f.HpLeft is null || f.CardsLeft is null))
+        {
+            return "Ranked matches need HP and cards left for every fighter.";
+        }
+
+        if (RequiresRankedData() && Match.Fighters.Any(f => f.SidekickName is not null && f.SidekickHpLeft is null))
+        {
+            return "Ranked matches need sidekick HP left for every fighter whose hero has a sidekick.";
+        }
+
+        return null;
+    }
+
+    /// <summary>Mirrors RankedMatchDataValidator on the server: Ranked, or any match tied to a
+    /// tournament, needs complete stat data; Co-op never does (it never affects rating).</summary>
+    private bool RequiresRankedData()
+        => Match.GameMode != GameMode.Cooperative && (Match.IsRanked || Match.TournamentId is not null);
+
+    /// <summary>Validates and saves, exposed for the draft session's own footer (step 5 hides this
+    /// sheet's footer via <see cref="Embedded"/> and calls this directly through a component ref).
+    /// Returns whether the save succeeded.</summary>
+    public async Task<bool> SaveAsync(bool addAnother)
+    {
+        _error = Validate();
+        if (_error is not null)
+        {
+            return false;
+        }
+
+        _isSaving = true;
+        try
+        {
+            PreloadService.Show();
+
+            if (Match.GameMode == GameMode.FreeForAll)
+            {
+                foreach (var fighter in Match.Fighters)
+                {
+                    fighter.IsWinner = fighter.Placement == 1;
+                }
+            }
+
+            var result = IsEditing
+                ? await MatchService.UpdateAsync(Match)
+                : await MatchService.AddAsync(Match);
+
+            NavCountsService.Invalidate();
+
+            if (addAnother)
+            {
+                await OnSavedAddAnother.InvokeAsync();
+                return true;
+            }
+
+            if (!Embedded)
+            {
+                await _savedPopup.ShowAsync<MatchSavedPopup>(
+                    title: "Match saved",
+                    parameters: new Dictionary<string, object> { ["Result"] = result });
+            }
+
+            await OnSaved.InvokeAsync(result);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            _error = $"Failed to save the match: {exception.Message}";
+            return false;
+        }
+        finally
+        {
+            _isSaving = false;
+            PreloadService.Hide();
+        }
+    }
+}

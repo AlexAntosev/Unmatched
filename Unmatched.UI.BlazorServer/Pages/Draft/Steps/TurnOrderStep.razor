@@ -1,0 +1,53 @@
+@using Unmatched.Dtos
+@*
+    Draft step 4, non-coop (design/IMPLEMENTATION-PROMPT.md §5A.4): roll a turn order for the
+    players just drafted - 1v1/FFA get a plain random order, 2v2 alternates teams.
+*@
+<div class="draft-step">
+    <div class="draft-step-head">
+        <span class="draft-step-caption">Turn order</span>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Variant="primary" Icon="bi-dice-5-fill" OnClick="Roll">Roll turn order</UmButton>
+    </div>
+
+    @if (State.TurnOrder.Count == 0)
+    {
+        <div class="turn-order-empty">Roll to see who goes first.</div>
+    }
+    else
+    {
+        <div class="turn-order-rows">
+            @foreach (var entry in State.TurnOrder.OrderBy(t => t.Turn))
+            {
+                var hero = FinalHeroOf(entry.Player);
+                <div class="turn-order-row">
+                    <div class="turn-order-num">@entry.Turn</div>
+                    <HeroToken ImageUrl="@(hero?.ImageUrl ?? "/Unknown.png")" Alt="@hero?.Name" Size="34" Radius="10"/>
+                    <span class="turn-order-player">@entry.Player.Name</span>
+                    @if (entry.Team is { } team)
+                    {
+                        <span class="turn-order-team">T@team</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private UiHeroDto? FinalHeroOf(UiPlayerDto player)
+        => State.PickedHeroesByPlayer.GetValueOrDefault(player.Id)?
+            .FirstOrDefault(h => h.Id == State.FinalHeroByPlayer.GetValueOrDefault(player.Id));
+
+    private Task Roll()
+    {
+        State.TurnOrder = DraftRandomizer.RollTurnOrder(State.Mode, State.Players, State.Teams);
+        return OnChanged.InvokeAsync();
+    }
+}

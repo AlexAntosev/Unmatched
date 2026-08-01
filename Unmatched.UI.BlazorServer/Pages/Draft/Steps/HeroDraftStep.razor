@@ -1,0 +1,152 @@
+@using Unmatched.Dtos
+@*
+    Draft step 3 (design/IMPLEMENTATION-PROMPT.md §5A.3): a pool of N×3 heroes. First one ban each
+    from every player in a random order, then a snake pick (forward through that order, then
+    back) so everyone ends with two heroes. Once the pool is exhausted, FinalPickPanel narrows
+    each player's two down to one.
+*@
+<div class="draft-step">
+    <div class="draft-step-head">
+        <span class="draft-step-caption">@(InBanPhase ? "Hero bans" : "Hero snake pick")</span>
+        <div class="ban-order-ribbon">
+            @foreach (var player in State.HeroBanOrder)
+            {
+                var done = InBanPhase ? State.HeroBans.Values.Any(p => p.Id == player.Id) : IsDonePicking(player);
+                var isCurrent = InBanPhase ? CurrentBanner?.Id == player.Id : CurrentPicker?.Id == player.Id;
+                <div class="ban-order-chip @(done ? "is-done" : null) @(isCurrent ? "is-current" : null)">
+                    <HeroToken ImageUrl="@player.ImageUrl" Alt="@player.Name" Size="20" Round="true"/>
+                    <span>@player.Name</span>
+                    @if (done)
+                    {
+                        <i class="bi bi-check-lg"></i>
+                    }
+                </div>
+            }
+        </div>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Icon="bi-shuffle" OnClick="RerollPool">Reroll pool</UmButton>
+    </div>
+
+    <div class="hero-draft-pool">
+        @foreach (var hero in State.HeroPool)
+        {
+            var bannedBy = State.HeroBans.GetValueOrDefault(hero.Id);
+            var pickedBy = PickerOf(hero);
+            var disabled = bannedBy is not null || pickedBy is not null || (!InBanPhase && !InPickPhase);
+            <button type="button" class="hero-draft-tile @(bannedBy is not null ? "is-banned" : null) @(pickedBy is not null ? "is-picked" : null)"
+                    disabled="@disabled" @onclick="@(() => ClickHeroAsync(hero))">
+                <img src="@hero.ImageUrl" alt="@hero.Name" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                @if (bannedBy is not null)
+                {
+                    <div class="hero-draft-tag is-ban">BAN</div>
+                    <div class="hero-draft-owner"><HeroToken ImageUrl="@bannedBy.ImageUrl" Alt="@bannedBy.Name" Size="20" Round="true"/></div>
+                }
+                @if (pickedBy is not null)
+                {
+                    <div class="hero-draft-owner"><HeroToken ImageUrl="@pickedBy.ImageUrl" Alt="@pickedBy.Name" Size="20" Round="true"/></div>
+                }
+                <span class="hero-draft-name">@hero.Name</span>
+            </button>
+        }
+    </div>
+
+    @if (!InBanPhase && !InPickPhase)
+    {
+        <FinalPickPanel State="State" OnChanged="OnChanged"/>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<UiHeroDto> AllHeroes { get; set; } = [];
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private List<UiPlayerDto> SnakeOrder => DraftRandomizer.SnakePickOrder(State.HeroBanOrder);
+
+    private int BansMade => State.HeroBans.Count;
+
+    private bool InBanPhase => BansMade < State.HeroBanOrder.Count;
+
+    private UiPlayerDto? CurrentBanner => InBanPhase ? State.HeroBanOrder[BansMade] : null;
+
+    private int PicksMade => State.PickedHeroesByPlayer.Values.Sum(l => l.Count);
+
+    private bool InPickPhase => !InBanPhase && PicksMade < SnakeOrder.Count;
+
+    private UiPlayerDto? CurrentPicker => InPickPhase ? SnakeOrder[PicksMade] : null;
+
+    private bool IsDonePicking(UiPlayerDto player)
+        => State.PickedHeroesByPlayer.GetValueOrDefault(player.Id)?.Count == 2;
+
+    private UiPlayerDto? PickerOf(UiHeroDto hero)
+    {
+        foreach (var (playerId, heroes) in State.PickedHeroesByPlayer)
+        {
+            if (heroes.Any(h => h.Id == hero.Id))
+            {
+                return State.Players.FirstOrDefault(p => p.Id == playerId);
+            }
+        }
+
+        return null;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (State.HeroPool.Count == 0)
+        {
+            RerollPoolInternal();
+        }
+    }
+
+    private Task ClickHeroAsync(UiHeroDto hero)
+    {
+        if (State.HeroBans.ContainsKey(hero.Id) || PickerOf(hero) is not null)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (InBanPhase)
+        {
+            var banner = CurrentBanner!;
+            State.HeroBans[hero.Id] = banner;
+            State.BanLog.Add($"{banner.Name} banned {hero.Name}");
+            return OnChanged.InvokeAsync();
+        }
+
+        if (InPickPhase)
+        {
+            var picker = CurrentPicker!;
+            if (!State.PickedHeroesByPlayer.TryGetValue(picker.Id, out var list))
+            {
+                list = new List<UiHeroDto>();
+                State.PickedHeroesByPlayer[picker.Id] = list;
+            }
+
+            list.Add(hero);
+            return OnChanged.InvokeAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task RerollPool()
+    {
+        RerollPoolInternal();
+        return OnChanged.InvokeAsync();
+    }
+
+    private void RerollPoolInternal()
+    {
+        State.HeroPool = DraftRandomizer.BuildHeroPool(AllHeroes, State.Players.Count);
+        State.HeroBanOrder = DraftRandomizer.RollBanOrder(State.Players);
+        State.HeroBans.Clear();
+        State.PickedHeroesByPlayer.Clear();
+        State.FinalHeroByPlayer.Clear();
+    }
+}

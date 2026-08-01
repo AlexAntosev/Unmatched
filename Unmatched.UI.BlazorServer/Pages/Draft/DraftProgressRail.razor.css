@@ -1,0 +1,74 @@
+.draft-rail {
+    display: flex;
+    align-items: center;
+    padding: 16px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+}
+
+.draft-rail-step {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 0;
+    background: none;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.draft-rail-step:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.draft-rail-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--um-bg-inset);
+    border: 1px solid var(--um-border);
+    color: var(--um-text-muted);
+    font: 600 11px var(--um-font-mono);
+}
+
+.draft-rail-num i {
+    font-size: 11px;
+}
+
+.draft-rail-label {
+    font: 600 11.5px var(--um-font-body);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--um-text-muted);
+    white-space: nowrap;
+}
+
+.draft-rail-step.is-current .draft-rail-num {
+    background: var(--um-accent);
+    border-color: var(--um-accent);
+    color: #fff;
+}
+
+.draft-rail-step.is-current .draft-rail-label {
+    color: var(--um-text);
+}
+
+.draft-rail-step.is-done .draft-rail-num {
+    background: var(--um-win);
+    border-color: var(--um-win);
+    color: #062a1c;
+}
+
+.draft-rail-connector {
+    width: 40px;
+    height: 1px;
+    margin: 0 10px;
+    background: var(--um-border);
+}
+
+.draft-rail-connector.is-done {
+    background: var(--um-win);
+}

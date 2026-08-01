@@ -15,7 +15,13 @@
             <i class="bi bi-arrows-fullscreen"></i>
         </button>
         <div class="map-banner-text">
-            <span class="map-banner-caption">Battlefield</span>
+            <div class="map-banner-caption-row">
+                <span class="map-banner-caption">Battlefield</span>
+                @if (ShowDraftedBadge)
+                {
+                    <span class="map-banner-drafted">DRAFTED</span>
+                }
+            </div>
             <span class="map-banner-name">@(SelectedMap?.DisplayName ?? "No map")</span>
         </div>
         <UmButton Variant="dice" Size="sm" Icon="bi-dice-5-fill" Title="Randomize" OnClick="RandomizeMapAsync"/>
@@ -24,7 +30,10 @@
                       ValueChanged="OnPickedAsync" Options="MapOptions()"/>
         </div>
         <div class="um-spacer"></div>
-        <UmButton Size="sm" Icon="bi-shuffle" OnClick="OnShuffleTurnOrder">Shuffle turn order</UmButton>
+        @if (ShowShuffle)
+        {
+            <UmButton Size="sm" Icon="bi-shuffle" OnClick="OnShuffleTurnOrder">Shuffle turn order</UmButton>
+        }
     </div>
 
     @if (_fullscreen)
@@ -82,6 +91,15 @@
 
     [Parameter]
     public EventCallback OnShuffleTurnOrder { get; set; }
+
+    /// <summary>Shows the DRAFTED pill next to "Battlefield" when this sheet was prefilled by the
+    /// draft session (design/IMPLEMENTATION-PROMPT.md §5.1).</summary>
+    [Parameter]
+    public bool ShowDraftedBadge { get; set; }
+
+    /// <summary>Hidden for Co-op, which has no turn order at all.</summary>
+    [Parameter]
+    public bool ShowShuffle { get; set; } = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
