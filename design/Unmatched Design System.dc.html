@@ -440,7 +440,82 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 
   <div style="display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">08 · Rules</div>
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">08 · Tournaments</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    </div>
+    <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+      <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Type badge — one neutral chip, icon &amp; label only</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <sc-for list="{{ tourneyTypes }}" as="t" hint-placeholder-count="4">
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:{{ t.fg }};opacity:{{ t.opacity }}"><i class="bi {{ t.icon }}" style="margin-right:2px;color:{{ t.iconColor }}"></i>{{ t.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font:400 11px/1.5 Barlow,sans-serif;color:#5c5d70">League and Group stay dimmed everywhere — not buildable yet. Swiss is shelved. Only Playoff and Bounty are live.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      <sc-for list="{{ bracketStates }}" as="b" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font:400 10px IBM Plex Mono,monospace;color:#5c5d70">{{ b.caption }}</div>
+          <div style="border-radius:12px;background:#0c0c14;border:1px solid rgba(255,255,255,.08);overflow:hidden">
+            <div style="display:flex;align-items:center;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#6b6c7e">QF 1</div>
+            <div style="display:{{ b.lockedDisplay }};align-items:center;justify-content:center;gap:6px;height:64px;color:#4a4b58;font:500 10.5px Barlow,sans-serif"><i class="bi bi-lock-fill" style="font-size:11px"></i>Waiting</div>
+            <div style="display:{{ b.spoilerDisplay }};align-items:center;justify-content:center;flex-direction:column;gap:5px;height:64px;background:repeating-linear-gradient(135deg,#14141c,#14141c 6px,#181822 6px,#181822 12px)"><i class="bi bi-eye-slash-fill" style="font-size:15px;color:#8b7dff"></i><div style="font:600 9.5px Barlow,sans-serif;color:#c4bcff;text-transform:uppercase;letter-spacing:.06em">Reveal</div></div>
+            <div style="display:{{ b.contentDisplay }};flex-direction:column">
+              <div style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-left:3px solid {{ b.edgeA }}"><img src="assets/heroes/geralt-of-rivia.png" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover"><span style="font:600 11px Barlow,sans-serif;flex:1">Geralt</span><span style="display:{{ b.hpDisplay }};font:600 10.5px IBM Plex Mono,monospace">9</span></div>
+              <div style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-left:3px solid {{ b.edgeB }};border-top:1px solid rgba(255,255,255,.05)"><img src="assets/heroes/medusa.png" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover"><span style="font:600 11px Barlow,sans-serif;flex:1">Medusa</span><span style="display:{{ b.hpDisplay }};font:600 10.5px IBM Plex Mono,monospace">0</span></div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Result plate — tap to mark the winner</div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:rgba(52,217,155,.1);border:2px solid #34d99b">
+            <div style="display:flex;align-items:center;gap:8px">
+              <img src="assets/heroes/geralt-of-rivia.png" alt="" style="width:34px;height:34px;border-radius:9px;object-fit:cover">
+              <div style="flex:1"><div style="font:600 12px Barlow,sans-serif">Geralt of Rivia</div><div style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">Vados</div></div>
+              <i class="bi bi-trophy-fill" style="font-size:13px;color:#34d99b"></i>
+            </div>
+            <div style="display:flex;gap:5px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:7px;background:#1c1c26"><div style="font:400 8px IBM Plex Mono,monospace;color:#5c5d70">HP</div><div style="font:600 11px IBM Plex Mono,monospace">9</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:7px;background:#1c1c26"><div style="font:400 8px IBM Plex Mono,monospace;color:#5c5d70">CARDS</div><div style="font:600 11px IBM Plex Mono,monospace">8</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:7px;background:#1c1c26"><div style="font:400 8px IBM Plex Mono,monospace;color:#5c5d70">SK</div><div style="font:600 11px IBM Plex Mono,monospace">0</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:#14141c;border:2px solid rgba(255,255,255,.08)">
+            <div style="display:flex;align-items:center;gap:8px">
+              <img src="assets/heroes/medusa.png" alt="" style="width:34px;height:34px;border-radius:9px;object-fit:cover">
+              <div style="flex:1"><div style="font:600 12px Barlow,sans-serif">Medusa</div><div style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">Ksuha</div></div>
+              <i class="bi bi-trophy-fill" style="font-size:13px;color:#5c5d70"></i>
+            </div>
+            <div style="display:flex;gap:5px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:7px;background:#1c1c26"><div style="font:400 8px IBM Plex Mono,monospace;color:#5c5d70">HP</div><div style="font:600 11px IBM Plex Mono,monospace">0</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:7px;background:#1c1c26"><div style="font:400 8px IBM Plex Mono,monospace;color:#5c5d70">CARDS</div><div style="font:600 11px IBM Plex Mono,monospace">3</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:7px;background:#1c1c26"><div style="font:400 8px IBM Plex Mono,monospace;color:#5c5d70">SK</div><div style="font:600 11px IBM Plex Mono,monospace">0</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="font:400 11px/1.5 Barlow,sans-serif;color:#5c5d70">No separate "confirm winner" control — the plate itself is the button. Green border + filled trophy = winner.</div>
+      </div>
+      <div style="padding:20px;border-radius:13px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
+        <div style="font:500 10.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b6c7e">Bracket flow, in order</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ flowSteps }}" as="f" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:11px">
+              <div style="width:22px;height:22px;border-radius:7px;background:rgba(139,125,255,.16);color:#c4bcff;display:flex;align-items:center;justify-content:center;font:700 10.5px Chakra Petch,sans-serif;flex:none">{{ f.n }}</div>
+              <div style="font:400 12px/1.4 Barlow,sans-serif;color:#c9cad6">{{ f.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font:600 12px IBM Plex Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:#8b8c9e">09 · Rules</div>
       <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -664,19 +739,40 @@ class Component extends DCLogic {
           onClick: () => this.setState({ [s.key]: o.value })
         }))
       })),
+      tourneyTypes: [
+        { label: 'Playoff', icon: 'bi-diagram-3-fill', fg: '#c9cad6', iconColor: '#8b7dff', opacity: 1 },
+        { label: 'Bounty', icon: 'bi-award-fill', fg: '#c9cad6', iconColor: '#8b7dff', opacity: 1 },
+        { label: 'Swiss', icon: 'bi-list-columns-reverse', fg: '#6b6c7e', iconColor: '#4a4b58', opacity: .5 },
+        { label: 'League', icon: 'bi-trophy', fg: '#6b6c7e', iconColor: '#4a4b58', opacity: .5 },
+        { label: 'Group', icon: 'bi-diagram-2', fg: '#6b6c7e', iconColor: '#4a4b58', opacity: .5 }
+      ],
+      bracketStates: [
+        { caption: 'locked — previous round unplayed', lockedDisplay: 'flex', spoilerDisplay: 'none', contentDisplay: 'none', hpDisplay: 'none', edgeA: 'rgba(255,255,255,.08)', edgeB: 'rgba(255,255,255,.08)' },
+        { caption: 'spoiler — tap to reveal, never re-hides', lockedDisplay: 'none', spoilerDisplay: 'flex', contentDisplay: 'none', hpDisplay: 'none', edgeA: 'rgba(255,255,255,.08)', edgeB: 'rgba(255,255,255,.08)' },
+        { caption: 'ready — revealed, not yet played', lockedDisplay: 'none', spoilerDisplay: 'none', contentDisplay: 'flex', hpDisplay: 'none', edgeA: 'rgba(255,255,255,.08)', edgeB: 'rgba(255,255,255,.08)' },
+        { caption: 'played — winner edge lit green', lockedDisplay: 'none', spoilerDisplay: 'none', contentDisplay: 'flex', hpDisplay: 'block', edgeA: '#34d99b', edgeB: '#f2506b' }
+      ],
+      flowSteps: [
+        { n: 1, label: 'Start match — opens the ban-map popup for that pairing' },
+        { n: 2, label: 'Two of three maps get banned, one each; Continue when one remains' },
+        { n: 3, label: 'Drops into the match sheet, fully filled — no mode picker' },
+        { n: 4, label: 'Tap a plate to mark the winner, save — back to the tournament' }
+      ],
       dos: [
         'Show hero and map art as tiles or tokens; never tint a table cell with a background colour instead of art.',
         'Keep one accent gradient action per screen; everything else is outlined or ghost.',
         'Use mono for anything numeric or temporal — dates always carry the year (12 Jul 2026).',
         'Let the game mode reshape a row or form: sides are boxes, VS joins them, FFA ranks with medals.',
-        'Villains and minions never get a player avatar; minions indent under their villain.'
+        'Villains and minions never get a player avatar; minions indent under their villain.',
+        'A bracket match is a plate you tap to mark the winner — never a separate confirm button.'
       ],
       donts: [
         'No red #e63946 from the old theme, no new hues outside this palette.',
         'Do not record items used, actions made or time spent — the app does not track them.',
         'No win/loss colouring of Match log rows; that context belongs to hero and player pages.',
         'No decorative Unmatched.otf headings — Chakra Petch is the display face.',
-        'No side column for 1v1 or FFA scoreboards; only 2v2 and co-op have sides.'
+        'No side column for 1v1 or FFA scoreboards; only 2v2 and co-op have sides.',
+        'No League, Group or Swiss creation flows yet — only Playoff and Bounty are offered.'
       ]
     };
   }
