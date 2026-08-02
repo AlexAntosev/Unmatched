@@ -5,7 +5,7 @@ namespace Unmatched.MatchService.Domain.Constants;
 public static class TitleThresholds
 {
     /// <summary>Last Breath: win with at most this much HP left.</summary>
-    public const int LastBreathMaxHp = 2;
+    public const int LastBreathMaxHp = 1;
 
     /// <summary>Giant Slayer: beat an opponent whose pre-match rating was at least this many points
     /// higher.</summary>

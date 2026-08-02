@@ -152,7 +152,15 @@ public class TournamentService(
             throw new InvalidOperationException("Cannot complete this tournament: some matches are still planned.");
         }
 
-        var completedAt = DateTime.UtcNow;
+        if (matches.Count == 0)
+        {
+            throw new InvalidOperationException("Cannot complete this tournament: it has no matches.");
+        }
+
+        // the last match's Date, not "now" - completion is often clicked well after the matches were
+        // actually played/logged, and backdating the award to when the tournament really finished keeps
+        // it in its correct chronological position for the rating replay (see RatingTimeline).
+        var completedAt = matches.Max(m => m.Date);
         var schedule = awardScheduler.Schedule(tournament, matches, completedAt);
 
         foreach (var award in schedule.Awards)

@@ -16,7 +16,7 @@ public class LastBreathTitleRule : ITitleRule
         var qualifiers = new Dictionary<Guid, double?>();
         foreach (var f in match.Fighters.Where(f => f.IsWinner && f.HpLeft is >= 0 and <= TitleThresholds.LastBreathMaxHp))
         {
-            qualifiers[f.HeroId] = f.HpLeft;
+            qualifiers[f.HeroId] = null;
         }
 
         return Task.FromResult<IReadOnlyDictionary<Guid, double?>>(qualifiers);

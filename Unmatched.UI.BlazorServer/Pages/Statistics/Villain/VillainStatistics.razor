@@ -1,9 +1,12 @@
 @page "/villains-statistics/{id}"
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IVillainStatisticsService VillainStatisticsService
+@inject IVillainService VillainService
+@inject ICollectionService CollectionService
 @inject NavigationManager NavManager
 @*
     Not in the design pack: the 2a dossier pattern applied to a villain.
@@ -59,7 +62,9 @@
             var stats = VillainStatisticsService.GetVillainStatisticsAsync(villainId);
             var matches = VillainStatisticsService.GetVillainMatchesAsync(villainId);
             var ladder = VillainStatisticsService.GetVillainsStatisticsAsync();
-            await Task.WhenAll(stats, matches, ladder);
+            var catalog = VillainService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, matches, ladder, catalog, owned);
 
             _villain = stats.Result;
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
@@ -77,12 +82,30 @@
                 .OrderByDescending(r => r.Total)
                 .ToList();
 
-            BuildNeighbours(ladder.Result.ToList(), villainId);
+            var catalogVillains = catalog.Result.ToDictionary(v => v.Id);
+            var ownedExpansionIds = owned.Result.ToHashSet();
+            BuildNeighbours(FilterByCollection(ladder.Result.ToList(), catalogVillains, ownedExpansionIds), villainId);
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    /// <summary>Villains from sets you do not own are excluded from Prev/Next, matching the ladder page.</summary>
+    private static List<VillainStatisticsDto> FilterByCollection(
+        List<VillainStatisticsDto> villains, Dictionary<Guid, VillainDto> catalogVillains, HashSet<Guid> ownedExpansionIds)
+    {
+        if (ownedExpansionIds.Count == 0)
+        {
+            return villains;
+        }
+
+        return villains
+            .Where(v => !catalogVillains.TryGetValue(v.VillainId, out var catalogVillain)
+                     || catalogVillain.ExpansionId is null
+                     || ownedExpansionIds.Contains(catalogVillain.ExpansionId.Value))
+            .ToList();
     }
 
     /// <summary>Same order as the Villains ladder (most matches played first), wrapping at the ends.</summary>

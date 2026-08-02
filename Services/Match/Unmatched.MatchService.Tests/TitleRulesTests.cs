@@ -48,15 +48,25 @@ public class TitleRulesTests
     }
 
     [Fact]
-    public async Task LastBreath_WinnerAtTwoHp_Qualifies()
+    public async Task LastBreath_WinnerAtOneHp_Qualifies()
+    {
+        var winnerId = Guid.NewGuid();
+        var match = Match(Fighter(winnerId, isWinner: true, hpLeft: 1));
+
+        var qualifiers = await new LastBreathTitleRule().EvaluateAsync(match);
+
+        Assert.Contains(winnerId, qualifiers.Keys);
+    }
+
+    [Fact]
+    public async Task LastBreath_WinnerAtTwoHp_DoesNotQualify()
     {
         var winnerId = Guid.NewGuid();
         var match = Match(Fighter(winnerId, isWinner: true, hpLeft: 2));
 
         var qualifiers = await new LastBreathTitleRule().EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers.Keys);
-        Assert.Equal(2, qualifiers[winnerId]);
+        Assert.Empty(qualifiers);
     }
 
     [Fact]

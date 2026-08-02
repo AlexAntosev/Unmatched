@@ -7,6 +7,7 @@
 @using Unmatched.UI.BlazorServer.Services
 @inject IHeroStatisticsService HeroStatisticsService
 @inject IHeroService HeroService
+@inject ICollectionService CollectionService
 @inject IPlayStyleService PlayStyleService
 @inject IImageUploadService ImageUploadService
 @inject ITitleService TitleService
@@ -287,7 +288,8 @@
             var catalogHeroes = HeroService.GetAsync();
             var titleCatalog = TitleService.GetAsync();
             var tournaments = TournamentService.GetAsync();
-            await Task.WhenAll(stats, matches, ratings, ladder, catalogHeroes, titleCatalog, tournaments);
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, matches, ratings, ladder, catalogHeroes, titleCatalog, tournaments, owned);
 
             _hero = stats.Result;
             _titlesSummary = TitlePresentation.ForHero(heroId, titleCatalog.Result, tournaments.Result);
@@ -308,7 +310,10 @@
             _ratingChanges = ratings.Result;
             BuildRatingPoints();
             BuildMonsterMatchups();
-            BuildNeighbours(ladder.Result.ToList(), heroId);
+
+            var expansionIdByHero = catalogHeroes.Result.ToDictionary(h => h.Id, h => h.ExpansionId);
+            var ownedExpansionIds = owned.Result.ToHashSet();
+            BuildNeighbours(FilterByCollection(ladder.Result.ToList(), expansionIdByHero, ownedExpansionIds), heroId);
         }
         finally
         {
@@ -363,6 +368,22 @@
                     Looses = g.Count(m => m.IsWinner)
                 })
             .OrderByDescending(r => r.Total)
+            .ToList();
+    }
+
+    /// <summary>Heroes from sets you do not own are excluded from Prev/Next, matching the ladder page.</summary>
+    private static List<UiHeroStatisticsDto> FilterByCollection(
+        List<UiHeroStatisticsDto> heroes, Dictionary<Guid, Guid?> expansionIdByHero, HashSet<Guid> ownedExpansionIds)
+    {
+        if (ownedExpansionIds.Count == 0)
+        {
+            return heroes;
+        }
+
+        return heroes
+            .Where(h => !expansionIdByHero.TryGetValue(h.HeroId, out var expansionId)
+                     || expansionId is null
+                     || ownedExpansionIds.Contains(expansionId.Value))
             .ToList();
     }
 

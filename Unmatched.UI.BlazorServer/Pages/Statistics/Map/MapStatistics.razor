@@ -5,6 +5,7 @@
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMapStatisticsService MapStatisticsService
 @inject IMapService MapService
+@inject ICollectionService CollectionService
 @inject NavigationManager NavManager
 @*
     Not in the design pack: the 2a dossier pattern applied to a map.
@@ -59,23 +60,42 @@
             var matches = MapStatisticsService.GetMapMatchesAsync(mapId);
             var catalog = MapService.GetAsync();
             var ladder = MapStatisticsService.GetMapsStatisticsAsync();
-            await Task.WhenAll(stats, matches, catalog, ladder);
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, matches, catalog, ladder, owned);
 
             _map = stats.Result;
+            var catalogMaps = catalog.Result.ToDictionary(m => m.Id);
             // The stats service stores the internal map name; the catalog knows the printed one.
-            var catalogMap = catalog.Result.FirstOrDefault(m => m.Id == mapId);
-            if (catalogMap is not null)
+            if (catalogMaps.TryGetValue(mapId, out var catalogMap))
             {
                 _map.Name = catalogMap.DisplayName;
             }
 
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
-            BuildNeighbours(ladder.Result.ToList(), mapId);
+
+            var ownedExpansionIds = owned.Result.ToHashSet();
+            BuildNeighbours(FilterByCollection(ladder.Result.ToList(), catalogMaps, ownedExpansionIds), mapId);
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    /// <summary>Maps from sets you do not own are excluded from Prev/Next, matching the ladder page.</summary>
+    private static List<UiMapStatisticsDto> FilterByCollection(
+        List<UiMapStatisticsDto> maps, Dictionary<Guid, MapDto> catalogMaps, HashSet<Guid> ownedExpansionIds)
+    {
+        if (ownedExpansionIds.Count == 0)
+        {
+            return maps;
+        }
+
+        return maps
+            .Where(m => !catalogMaps.TryGetValue(m.MapId, out var catalogMap)
+                     || catalogMap.ExpansionId is null
+                     || ownedExpansionIds.Contains(catalogMap.ExpansionId.Value))
+            .ToList();
     }
 
     /// <summary>Same order as the Maps ladder (most matches played first), wrapping at the ends.</summary>
