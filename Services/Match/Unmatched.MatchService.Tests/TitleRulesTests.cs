@@ -32,7 +32,8 @@ public class TitleRulesTests
 
         var qualifiers = await new RusherTitleRule(_catalogHeroCache.Object).EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers);
+        Assert.Contains(winnerId, qualifiers.Keys);
+        Assert.Equal(7, qualifiers[winnerId]);
     }
 
     [Fact]
@@ -43,7 +44,7 @@ public class TitleRulesTests
 
         var qualifiers = await new RusherTitleRule(_catalogHeroCache.Object).EvaluateAsync(match);
 
-        Assert.DoesNotContain(winnerId, qualifiers);
+        Assert.DoesNotContain(winnerId, qualifiers.Keys);
     }
 
     [Fact]
@@ -65,7 +66,8 @@ public class TitleRulesTests
 
         var qualifiers = await new PunisherTitleRule().EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers);
+        Assert.Contains(winnerId, qualifiers.Keys);
+        Assert.Equal(45, qualifiers[winnerId]);
     }
 
     [Fact]
@@ -87,7 +89,8 @@ public class TitleRulesTests
 
         var qualifiers = await new FlawlessTitleRule(_catalogHeroCache.Object).EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers);
+        Assert.Contains(winnerId, qualifiers.Keys);
+        Assert.Null(qualifiers[winnerId]);
     }
 
     [Fact]
@@ -109,7 +112,8 @@ public class TitleRulesTests
 
         var qualifiers = await new LastBreathTitleRule().EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers);
+        Assert.Contains(winnerId, qualifiers.Keys);
+        Assert.Equal(2, qualifiers[winnerId]);
     }
 
     [Fact]
@@ -131,7 +135,8 @@ public class TitleRulesTests
 
         var qualifiers = await new DeckMillerTitleRule().EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers);
+        Assert.Contains(winnerId, qualifiers.Keys);
+        Assert.Null(qualifiers[winnerId]);
     }
 
     [Fact]
@@ -146,7 +151,8 @@ public class TitleRulesTests
 
         var qualifiers = await new GiantSlayerTitleRule(_unitOfWork.Object).EvaluateAsync(match);
 
-        Assert.Contains(winnerId, qualifiers);
+        Assert.Contains(winnerId, qualifiers.Keys);
+        Assert.Equal(300, qualifiers[winnerId]); // 1300 - 1000
     }
 
     [Fact]
@@ -161,6 +167,25 @@ public class TitleRulesTests
         var qualifiers = await new GiantSlayerTitleRule(_unitOfWork.Object).EvaluateAsync(match);
 
         Assert.Empty(qualifiers);
+    }
+
+    [Fact]
+    public async Task GiantSlayer_MultipleQualifyingLosers_MetricIsTheLargestGap()
+    {
+        var winnerId = Guid.NewGuid();
+        var closeLoserId = Guid.NewGuid();
+        var giantLoserId = Guid.NewGuid();
+        var match = Match(
+            Fighter(winnerId, isWinner: true, matchPoints: 0),
+            Fighter(closeLoserId, isWinner: false, matchPoints: 0),
+            Fighter(giantLoserId, isWinner: false, matchPoints: 0));
+        _ratingRepository.Setup(r => r.GetByHeroIdAsync(winnerId)).ReturnsAsync(new RatingEntity { HeroId = winnerId, Points = 1000 });
+        _ratingRepository.Setup(r => r.GetByHeroIdAsync(closeLoserId)).ReturnsAsync(new RatingEntity { HeroId = closeLoserId, Points = 1310 });
+        _ratingRepository.Setup(r => r.GetByHeroIdAsync(giantLoserId)).ReturnsAsync(new RatingEntity { HeroId = giantLoserId, Points = 1450 });
+
+        var qualifiers = await new GiantSlayerTitleRule(_unitOfWork.Object).EvaluateAsync(match);
+
+        Assert.Equal(450, qualifiers[winnerId]);
     }
 
     [Fact]
@@ -180,7 +205,8 @@ public class TitleRulesTests
 
         var holders = await new StreakTitleRule(_unitOfWork.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { streakyHero }, holders);
+        Assert.Equal(new[] { streakyHero }, holders.Keys);
+        Assert.Equal(3, holders[streakyHero]); // three wins before the streak-breaking loss
     }
 
     [Fact]
@@ -198,7 +224,8 @@ public class TitleRulesTests
 
         var holders = await new SuffererTitleRule(_unitOfWork.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { unluckyHero }, holders);
+        Assert.Equal(new[] { unluckyHero }, holders.Keys);
+        Assert.Equal(2, holders[unluckyHero]); // two losses before the streak-breaking win
     }
 
     [Fact]
@@ -213,7 +240,8 @@ public class TitleRulesTests
 
         var holders = await new GrandChampionTitleRule(_unitOfWork.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { championId }, holders);
+        Assert.Equal(new[] { championId }, holders.Keys);
+        Assert.Equal(1300, holders[championId]);
     }
 
     [Fact]
@@ -232,7 +260,8 @@ public class TitleRulesTests
 
         var holders = await new KingslayerTitleRule(_unitOfWork.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { latestSlayer }, holders);
+        Assert.Equal(new[] { latestSlayer }, holders.Keys);
+        Assert.Null(holders[latestSlayer]);
     }
 
     [Fact]
@@ -263,7 +292,8 @@ public class TitleRulesTests
 
         var holders = await new WallTitleRule(_unitOfWork.Object, _catalogHeroCache.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { carefulHero }, holders);
+        Assert.Equal(new[] { carefulHero }, holders.Keys);
+        Assert.Equal(1, holders[carefulHero]); // 1 HP lost / 1 win
     }
 
     [Fact]
@@ -281,7 +311,8 @@ public class TitleRulesTests
 
         var holders = await new WorkhorseTitleRule(_unitOfWork.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { busyHero }, holders);
+        Assert.Equal(new[] { busyHero }, holders.Keys);
+        Assert.Equal(2, holders[busyHero]); // 2 ranked matches; the unranked one doesn't count
     }
 
     [Fact]
@@ -299,7 +330,8 @@ public class TitleRulesTests
 
         var holders = await new ExecutionerTitleRule(_unitOfWork.Object, _catalogHeroCache.Object).EvaluateAsync(Match());
 
-        Assert.Equal(new[] { dealerId }, holders);
+        Assert.Equal(new[] { dealerId }, holders.Keys);
+        Assert.Equal(3, holders[dealerId]); // ReferenceHero's sidekick has 3 max HP, all destroyed
     }
 
     [Fact]

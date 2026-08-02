@@ -214,6 +214,47 @@ public class TitleServiceTests : IDisposable
         Assert.Empty(await _titleService.GetByHeroAsync(Guid.NewGuid()));
     }
 
+    [Fact]
+    public async Task GetAsync_IncludesHolders()
+    {
+        // regression: TitleRepository.GetAsync() used to fall through to the base repository's
+        // implementation, which has no .Include(HeroTitles) - every title came back with Holders
+        // empty even when it had real holders.
+        var titleId = await SeedTitleAsync("Streak");
+        var heroId = Guid.NewGuid();
+        await _titleService.MergeAsync(titleId, new[] { heroId });
+
+        var titles = await _titleService.GetAsync();
+
+        var streak = titles.Single(t => t.Id == titleId);
+        Assert.Equal(new[] { heroId }, streak.Holders.Select(h => h.HeroId));
+    }
+
+    [Fact]
+    public async Task MergeAsync_NewHolder_StartsAtTimesEarnedOne()
+    {
+        var titleId = await SeedTitleAsync("Streak");
+        var heroId = Guid.NewGuid();
+
+        await _titleService.MergeAsync(titleId, new[] { heroId });
+
+        var heroTitle = await _dbContext.HeroTitles.SingleAsync(ht => ht.TitlesId == titleId && ht.HeroesId == heroId);
+        Assert.Equal(1, heroTitle.TimesEarned);
+    }
+
+    [Fact]
+    public async Task AssignAsync_NewHolder_StartsAtTimesEarnedOne()
+    {
+        var titleId = await SeedTitleAsync("Streak");
+        var heroId = Guid.NewGuid();
+        _catalogHeroCache.Setup(c => c.GetAsync(heroId)).ReturnsAsync(new CatalogHeroDto { Id = heroId });
+
+        await _titleService.AssignAsync(titleId, heroId);
+
+        var heroTitle = await _dbContext.HeroTitles.SingleAsync(ht => ht.TitlesId == titleId && ht.HeroesId == heroId);
+        Assert.Equal(1, heroTitle.TimesEarned);
+    }
+
     private async Task<Guid> SeedTitleAsync(string name, TitleExclusivity exclusivity = TitleExclusivity.Shared)
     {
         var entity = new TitleEntity

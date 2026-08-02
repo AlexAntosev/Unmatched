@@ -29,4 +29,10 @@ public class TitleEntity
     /// <summary>Set for a per-tournament title (Champion, RunnerUp, ...) - each tournament gets its own
     /// copy, so two tournaments' Champions coexist as separate rows instead of sharing one holder set.</summary>
     public Guid? TournamentId { get; set; }
+
+    /// <summary>Which kind of tournament title this row is - only set when <see cref="TournamentId"/> is
+    /// set. Stored separately rather than parsed back out of <see cref="Name"/> (which bakes the
+    /// tournament's name into the string, e.g. "Champion of Winter Cup 2026") so display code doesn't
+    /// need a fragile string match to pick an icon or sort order.</summary>
+    public TournamentTitleKind? Kind { get; set; }
 }

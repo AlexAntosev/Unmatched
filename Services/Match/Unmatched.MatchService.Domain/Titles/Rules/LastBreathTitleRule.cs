@@ -11,13 +11,14 @@ public class LastBreathTitleRule : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Shared;
 
-    public Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
-        IReadOnlySet<Guid> qualifiers = match.Fighters
-            .Where(f => f.IsWinner && f.HpLeft is >= 0 and <= TitleThresholds.LastBreathMaxHp)
-            .Select(f => f.HeroId)
-            .ToHashSet();
+        var qualifiers = new Dictionary<Guid, double?>();
+        foreach (var f in match.Fighters.Where(f => f.IsWinner && f.HpLeft is >= 0 and <= TitleThresholds.LastBreathMaxHp))
+        {
+            qualifiers[f.HeroId] = f.HpLeft;
+        }
 
-        return Task.FromResult(qualifiers);
+        return Task.FromResult<IReadOnlyDictionary<Guid, double?>>(qualifiers);
     }
 }

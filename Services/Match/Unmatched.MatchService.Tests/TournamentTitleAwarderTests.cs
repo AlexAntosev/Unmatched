@@ -149,6 +149,23 @@ public class TournamentTitleAwarderTests : IDisposable
     }
 
     [Fact]
+    public async Task AwardAsync_StampsKindOnTheCreatedTitle()
+    {
+        var championId = Guid.NewGuid();
+        var runnerUpId = Guid.NewGuid();
+        var tournament = CreateTournament(
+            titleKinds: [TournamentTitleKind.Champion, TournamentTitleKind.RunnerUp],
+            participants: [(championId, 1), (runnerUpId, 2)]);
+
+        await _awarder.AwardAsync(tournament, []);
+        await _unitOfWork.SaveChangesAsync();
+
+        var titles = await _dbContext.Titles.Where(t => t.TournamentId == tournament.Id).ToListAsync();
+        Assert.Equal(TournamentTitleKind.Champion, titles.Single(t => t.Name.Contains("Champion")).Kind);
+        Assert.Equal(TournamentTitleKind.RunnerUp, titles.Single(t => t.Name.Contains("Runner-Up")).Kind);
+    }
+
+    [Fact]
     public async Task AwardAsync_CalledTwiceForTheSameTournament_DoesNotDuplicateTheHolder()
     {
         var championId = Guid.NewGuid();

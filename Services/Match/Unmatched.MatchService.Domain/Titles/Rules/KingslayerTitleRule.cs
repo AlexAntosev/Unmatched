@@ -13,12 +13,14 @@ public class KingslayerTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
+        // No metric worth storing: the answer is a hero reference (who beat the champion last), not a
+        // quantity.
         var ratings = await unitOfWork.Ratings.GetAsync();
         if (ratings.Count == 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
         var maxPoints = ratings.Max(r => r.Points);
@@ -31,6 +33,6 @@ public class KingslayerTitleRule(IUnitOfWork unitOfWork) : ITitleRule
             .FirstOrDefault();
 
         var slayer = lastLoss?.Fighters.FirstOrDefault(f => f.HeroId != championId && f.IsWinner);
-        return slayer is null ? new HashSet<Guid>() : new HashSet<Guid> { slayer.HeroId };
+        return slayer is null ? new Dictionary<Guid, double?>() : new Dictionary<Guid, double?> { [slayer.HeroId] = null };
     }
 }

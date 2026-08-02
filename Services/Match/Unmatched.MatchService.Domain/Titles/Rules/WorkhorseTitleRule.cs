@@ -12,7 +12,7 @@ public class WorkhorseTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
         var matches = await unitOfWork.Matches.GetFinishedForRatingReplayAsync();
 
@@ -24,11 +24,11 @@ public class WorkhorseTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
         if (counts.Count == 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
         var maxMatches = counts.Values.Max();
         var holder = counts.Where(kv => kv.Value == maxMatches).OrderBy(kv => kv.Key).First().Key;
-        return new HashSet<Guid> { holder };
+        return new Dictionary<Guid, double?> { [holder] = maxMatches };
     }
 }

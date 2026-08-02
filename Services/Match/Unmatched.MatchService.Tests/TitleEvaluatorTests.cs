@@ -61,16 +61,49 @@ public class TitleEvaluatorTests : IDisposable
     }
 
     [Fact]
-    public async Task EvaluateAsync_HeroAlreadyHoldingTheTitle_IsIdempotentAndReportsNothingNew()
+    public async Task EvaluateAsync_SharedRule_HeroAlreadyHolding_IncrementsTimesEarnedButReportsNothingNew()
     {
         var heroId = Guid.NewGuid();
         var titleId = await SeedTitleAsync("shared-rule", TitleExclusivity.Shared, heroId);
+        var matchDate = new DateTime(2026, 6, 15);
         var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, heroId));
 
-        var earned = await evaluator.EvaluateAsync(CreateMatch());
+        var earned = await evaluator.EvaluateAsync(CreateMatch(matchDate));
 
         Assert.Empty(earned);
         Assert.Equal(new[] { heroId }, await HolderIdsAsync(titleId));
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Equal(2, heroTitle.TimesEarned);
+        Assert.Equal(matchDate, heroTitle.EarnedAt);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_UniqueRule_HeroAlreadyHolding_LeavesTimesEarnedUntouched()
+    {
+        var heroId = Guid.NewGuid();
+        var titleId = await SeedTitleAsync("unique-rule", TitleExclusivity.Unique, heroId);
+        var evaluator = MakeEvaluator(new StubRule("unique-rule", TitleExclusivity.Unique, heroId));
+
+        await evaluator.EvaluateAsync(CreateMatch());
+
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Equal(1, heroTitle.TimesEarned);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_SharedRule_EarnedAcrossThreeMatches_EndsAtTimesEarnedThree()
+    {
+        var heroId = Guid.NewGuid();
+        var titleId = await SeedTitleAsync("shared-rule", TitleExclusivity.Shared);
+        var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, heroId));
+
+        await evaluator.EvaluateAsync(CreateMatch(new DateTime(2026, 1, 1)));
+        await evaluator.EvaluateAsync(CreateMatch(new DateTime(2026, 2, 1)));
+        await evaluator.EvaluateAsync(CreateMatch(new DateTime(2026, 3, 1)));
+
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Equal(3, heroTitle.TimesEarned);
+        Assert.Equal(new DateTime(2026, 3, 1), heroTitle.EarnedAt);
     }
 
     [Fact]
@@ -108,6 +141,58 @@ public class TitleEvaluatorTests : IDisposable
     }
 
     [Fact]
+    public async Task EvaluateAsync_SharedRule_NewQualifier_PersistsTheMetric()
+    {
+        var heroId = Guid.NewGuid();
+        var titleId = await SeedTitleAsync("shared-rule", TitleExclusivity.Shared);
+        var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, new Dictionary<Guid, double?> { [heroId] = 214 }));
+
+        await evaluator.EvaluateAsync(CreateMatch());
+
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Equal(214, heroTitle.Metric);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_SharedRule_ReQualifying_RefreshesTheMetricToTheLatestValue()
+    {
+        var heroId = Guid.NewGuid();
+        var titleId = await SeedTitleAsync("shared-rule", TitleExclusivity.Shared, heroId);
+        var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, new Dictionary<Guid, double?> { [heroId] = 5 }));
+
+        await evaluator.EvaluateAsync(CreateMatch());
+
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Equal(5, heroTitle.Metric);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_UniqueRule_HolderUnchanged_MetricStillRefreshesToTheCurrentValue()
+    {
+        var heroId = Guid.NewGuid();
+        var titleId = await SeedTitleAsync("unique-rule", TitleExclusivity.Unique, heroId);
+        var evaluator = MakeEvaluator(new StubRule("unique-rule", TitleExclusivity.Unique, new Dictionary<Guid, double?> { [heroId] = 9 }));
+
+        await evaluator.EvaluateAsync(CreateMatch());
+
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Equal(9, heroTitle.Metric);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_RuleWithNoMetric_LeavesMetricNull()
+    {
+        var heroId = Guid.NewGuid();
+        var titleId = await SeedTitleAsync("shared-rule", TitleExclusivity.Shared);
+        var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, heroId));
+
+        await evaluator.EvaluateAsync(CreateMatch());
+
+        var heroTitle = await HeroTitleAsync(titleId, heroId);
+        Assert.Null(heroTitle.Metric);
+    }
+
+    [Fact]
     public async Task EvaluateAsync_RuleWithNoSeededTitleRow_IsSkippedWithoutThrowing()
     {
         var evaluator = MakeEvaluator(new StubRule("not-seeded", TitleExclusivity.Shared, Guid.NewGuid()));
@@ -140,16 +225,33 @@ public class TitleEvaluatorTests : IDisposable
     private async Task<List<Guid>> HolderIdsAsync(Guid titleId)
         => await _dbContext.HeroTitles.Where(ht => ht.TitlesId == titleId).Select(ht => ht.HeroesId).ToListAsync();
 
+    private async Task<HeroTitleEntity> HeroTitleAsync(Guid titleId, Guid heroId)
+        => await _dbContext.HeroTitles.AsNoTracking().SingleAsync(ht => ht.TitlesId == titleId && ht.HeroesId == heroId);
+
     private static MatchEntity CreateMatch(DateTime? date = null)
         => new() { Id = Guid.NewGuid(), Date = date ?? DateTime.UtcNow, Fighters = new List<FighterEntity>() };
 
-    private class StubRule(string ruleKey, TitleExclusivity exclusivity, params Guid[] qualifiers) : ITitleRule
+    private class StubRule : ITitleRule
     {
-        public string RuleKey => ruleKey;
+        private readonly IReadOnlyDictionary<Guid, double?> _qualifiers;
 
-        public TitleExclusivity Exclusivity => exclusivity;
+        public StubRule(string ruleKey, TitleExclusivity exclusivity, params Guid[] qualifiers)
+            : this(ruleKey, exclusivity, qualifiers.ToDictionary(id => id, _ => (double?)null))
+        {
+        }
 
-        public Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
-            => Task.FromResult<IReadOnlySet<Guid>>(qualifiers.ToHashSet());
+        public StubRule(string ruleKey, TitleExclusivity exclusivity, IReadOnlyDictionary<Guid, double?> qualifiers)
+        {
+            RuleKey = ruleKey;
+            Exclusivity = exclusivity;
+            _qualifiers = qualifiers;
+        }
+
+        public string RuleKey { get; }
+
+        public TitleExclusivity Exclusivity { get; }
+
+        public Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
+            => Task.FromResult(_qualifiers);
     }
 }

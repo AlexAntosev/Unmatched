@@ -14,10 +14,10 @@ public class StreakTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
         => await LongestStreakHolderAsync(unitOfWork, wins: true);
 
-    internal static async Task<IReadOnlySet<Guid>> LongestStreakHolderAsync(IUnitOfWork unitOfWork, bool wins)
+    internal static async Task<IReadOnlyDictionary<Guid, double?>> LongestStreakHolderAsync(IUnitOfWork unitOfWork, bool wins)
     {
         var matches = (await unitOfWork.Matches.GetFinishedForRatingReplayAsync()).OrderBy(m => m.Date);
 
@@ -37,10 +37,10 @@ public class StreakTitleRule(IUnitOfWork unitOfWork) : ITitleRule
         var longest = bestStreaks.Values.DefaultIfEmpty(0).Max();
         if (longest == 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
         var holder = bestStreaks.Where(kv => kv.Value == longest).OrderBy(kv => kv.Key).Select(kv => kv.Key).First();
-        return new HashSet<Guid> { holder };
+        return new Dictionary<Guid, double?> { [holder] = longest };
     }
 }

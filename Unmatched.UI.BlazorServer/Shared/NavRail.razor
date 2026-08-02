@@ -97,7 +97,7 @@
             new("Add match", "bi-plus-circle", Urls.AddMatch, _ => string.Empty, OpensModal: true),
             new("Match log", "bi-list-ul", Urls.MatchLog, c => c.Matches.ToString()),
             new("Collection", "bi-box-seam", Urls.Collection, c => c.Collection),
-            new("Titles", "bi-award", Urls.Titles, c => c.Titles.ToString()),
+            new("Titles", "bi-award", Urls.Titles, _ => string.Empty),
             new("Tournaments", "bi-flag", Urls.Tournaments, c => c.Tournaments.ToString())
         ])
     ];

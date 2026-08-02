@@ -13,7 +13,7 @@ public class WallTitleRule(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHero
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
         var matches = await unitOfWork.Matches.GetFinishedForRatingReplayAsync();
 
@@ -29,7 +29,7 @@ public class WallTitleRule(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHero
 
         if (winCountByHero.Count == 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
         var lowestAverage = winCountByHero.Keys
@@ -38,6 +38,6 @@ public class WallTitleRule(IUnitOfWork unitOfWork, ICatalogHeroCache catalogHero
             .ThenBy(x => x.heroId)
             .First();
 
-        return new HashSet<Guid> { lowestAverage.heroId };
+        return new Dictionary<Guid, double?> { [lowestAverage.heroId] = lowestAverage.average };
     }
 }

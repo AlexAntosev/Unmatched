@@ -12,9 +12,11 @@ public class FlawlessTitleRule(ICatalogHeroCache catalogHeroCache) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Shared;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
-        var qualifiers = new HashSet<Guid>();
+        // No metric worth storing: qualifying forces HpLeft to equal the hero's own max HP, which is
+        // fixed catalog data, not a varying figure.
+        var qualifiers = new Dictionary<Guid, double?>();
         foreach (var winner in match.Fighters.Where(f => f.IsWinner))
         {
             if (winner.HpLeft is null)
@@ -25,7 +27,7 @@ public class FlawlessTitleRule(ICatalogHeroCache catalogHeroCache) : ITitleRule
             var hero = await catalogHeroCache.GetAsync(winner.HeroId);
             if (winner.HpLeft >= hero!.Hp)
             {
-                qualifiers.Add(winner.HeroId);
+                qualifiers[winner.HeroId] = null;
             }
         }
 

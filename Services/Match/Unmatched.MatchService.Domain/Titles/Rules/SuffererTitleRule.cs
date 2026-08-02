@@ -12,6 +12,6 @@ public class SuffererTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
         => StreakTitleRule.LongestStreakHolderAsync(unitOfWork, wins: false);
 }

@@ -32,8 +32,6 @@ public class UiHeroStatisticsDto : IComparable<UiHeroStatisticsDto>
 
     public int Points { get; set; }
 
-    public IEnumerable<TitleDto>? Titles { get; set; }
-
     public int TotalLooses { get; set; }
 
     public int TotalMatches { get; set; }

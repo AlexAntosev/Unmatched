@@ -30,7 +30,8 @@ public class TitleEvaluator(IUnitOfWork unitOfWork, IMapper mapper, IEnumerable<
                 continue;
             }
 
-            var holderIds = await rule.EvaluateAsync(match);
+            var results = await rule.EvaluateAsync(match);
+            var holderIds = results.Keys.ToHashSet();
             var existingHolderIds = title.HeroTitles.Select(h => h.HeroesId).ToHashSet();
 
             if (rule.Exclusivity == TitleExclusivity.Unique)
@@ -39,12 +40,32 @@ public class TitleEvaluator(IUnitOfWork unitOfWork, IMapper mapper, IEnumerable<
                 {
                     title.HeroTitles.Remove(stale);
                 }
+
+                // A Unique rule recomputes the current record from the whole history every time, so its
+                // metric (e.g. the longest streak so far) needs refreshing even for a holder who isn't
+                // new - "holds the title" and "holds the current-best number" are the same fact here.
+                foreach (var current in title.HeroTitles.Where(h => holderIds.Contains(h.HeroesId)))
+                {
+                    current.Metric = results[current.HeroesId];
+                }
+            }
+            else
+            {
+                // A Shared title's existing holders re-qualifying from this match aren't new holders,
+                // but the match still counts toward how many times they've earned it, and the metric
+                // (e.g. HP left on this particular win) refreshes to this match's value.
+                foreach (var reQualified in title.HeroTitles.Where(h => holderIds.Contains(h.HeroesId)))
+                {
+                    reQualified.TimesEarned++;
+                    reQualified.EarnedAt = match.Date;
+                    reQualified.Metric = results[reQualified.HeroesId];
+                }
             }
 
             var newHolderIds = holderIds.Where(id => !existingHolderIds.Contains(id)).ToList();
             foreach (var heroId in newHolderIds)
             {
-                title.HeroTitles.Add(new HeroTitleEntity { HeroesId = heroId, TitlesId = title.Id, EarnedAt = match.Date });
+                title.HeroTitles.Add(new HeroTitleEntity { HeroesId = heroId, TitlesId = title.Id, EarnedAt = match.Date, Metric = results[heroId] });
             }
 
             if (newHolderIds.Count > 0)

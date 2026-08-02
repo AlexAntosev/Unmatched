@@ -16,27 +16,36 @@ public class GiantSlayerTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Shared;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
         var winners = match.Fighters.Where(f => f.IsWinner).ToList();
         var losers = match.Fighters.Where(f => !f.IsWinner).ToList();
         if (winners.Count == 0 || losers.Count == 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
-        var qualifiers = new HashSet<Guid>();
+        var qualifiers = new Dictionary<Guid, double?>();
         foreach (var winner in winners)
         {
             var winnerPreMatchRating = await PreMatchRatingAsync(winner);
+
+            // The largest gap against any qualifying loser is the metric - a winner facing several
+            // opponents (team/FFA) gets credit for the toughest one, not just the first one checked.
+            var largestGap = 0;
             foreach (var loser in losers)
             {
                 var loserPreMatchRating = await PreMatchRatingAsync(loser);
-                if (loserPreMatchRating - winnerPreMatchRating >= TitleThresholds.GiantSlayerRatingGap)
+                var gap = loserPreMatchRating - winnerPreMatchRating;
+                if (gap >= TitleThresholds.GiantSlayerRatingGap && gap > largestGap)
                 {
-                    qualifiers.Add(winner.HeroId);
-                    break;
+                    largestGap = gap;
                 }
+            }
+
+            if (largestGap > 0)
+            {
+                qualifiers[winner.HeroId] = largestGap;
             }
         }
 

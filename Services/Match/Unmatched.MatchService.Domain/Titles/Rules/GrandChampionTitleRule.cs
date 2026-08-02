@@ -12,16 +12,16 @@ public class GrandChampionTitleRule(IUnitOfWork unitOfWork) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
         var ratings = await unitOfWork.Ratings.GetAsync();
         if (ratings.Count == 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
         var maxPoints = ratings.Max(r => r.Points);
         var champion = ratings.Where(r => r.Points == maxPoints).OrderBy(r => r.HeroId).First().HeroId;
-        return new HashSet<Guid> { champion };
+        return new Dictionary<Guid, double?> { [champion] = maxPoints };
     }
 }

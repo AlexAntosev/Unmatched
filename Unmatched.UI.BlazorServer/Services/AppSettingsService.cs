@@ -19,6 +19,9 @@ public class AppSettingsService(IJSRuntime jsRuntime)
     /// <summary>Nav rail expanded/collapsed - a durable preference per §6, not just circuit-scoped.</summary>
     private const string NavExpandedKey = "unmatched.navExpanded";
 
+    /// <summary>The hero page's "Titles &amp; achievements" section, collapsed/expanded as one unit.</summary>
+    private const string HeroTitlesSectionExpandedKey = "unmatched.heroTitlesSectionExpanded";
+
     private IJSObjectReference? _module;
 
     public async Task<int> GetMatchesPerPageAsync()
@@ -58,6 +61,19 @@ public class AppSettingsService(IJSRuntime jsRuntime)
     {
         var module = await ModuleAsync();
         await module.InvokeVoidAsync("setItem", NavExpandedKey, expanded.ToString());
+    }
+
+    public async Task<bool> GetHeroTitlesSectionExpandedAsync()
+    {
+        var module = await ModuleAsync();
+        var raw = await module.InvokeAsync<string?>("getItem", HeroTitlesSectionExpandedKey);
+        return bool.TryParse(raw, out var expanded) ? expanded : true;
+    }
+
+    public async Task SetHeroTitlesSectionExpandedAsync(bool expanded)
+    {
+        var module = await ModuleAsync();
+        await module.InvokeVoidAsync("setItem", HeroTitlesSectionExpandedKey, expanded.ToString());
     }
 
     private async Task<IJSObjectReference> ModuleAsync()

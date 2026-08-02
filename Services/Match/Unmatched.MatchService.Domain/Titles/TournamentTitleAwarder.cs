@@ -161,6 +161,7 @@ public class TournamentTitleAwarder(IUnitOfWork unitOfWork, ICatalogHeroCache ca
             Comment = KindDescription(kind),
             Exclusivity = TitleExclusivity.Unique,
             TournamentId = tournament.Id,
+            Kind = kind,
             HeroTitles = new List<HeroTitleEntity>()
         };
         return await unitOfWork.Titles.AddAsync(created);

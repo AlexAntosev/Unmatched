@@ -13,13 +13,14 @@ public class PunisherTitleRule : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Shared;
 
-    public Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
-        IReadOnlySet<Guid> qualifiers = match.Fighters
-            .Where(f => f.IsWinner && (f.MatchPoints ?? 0) >= TitleThresholds.PunisherMinMatchPoints)
-            .Select(f => f.HeroId)
-            .ToHashSet();
+        var qualifiers = new Dictionary<Guid, double?>();
+        foreach (var f in match.Fighters.Where(f => f.IsWinner && (f.MatchPoints ?? 0) >= TitleThresholds.PunisherMinMatchPoints))
+        {
+            qualifiers[f.HeroId] = f.MatchPoints;
+        }
 
-        return Task.FromResult(qualifiers);
+        return Task.FromResult<IReadOnlyDictionary<Guid, double?>>(qualifiers);
     }
 }

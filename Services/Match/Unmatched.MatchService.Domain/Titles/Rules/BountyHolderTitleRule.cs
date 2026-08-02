@@ -13,6 +13,6 @@ public class BountyHolderTitleRule : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
-        => Task.FromResult<IReadOnlySet<Guid>>(new HashSet<Guid>());
+    public Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
+        => Task.FromResult<IReadOnlyDictionary<Guid, double?>>(new Dictionary<Guid, double?>());
 }

@@ -18,5 +18,7 @@ public class Title
 
     public Guid? TournamentId { get; set; }
 
+    public TournamentTitleKind? Kind { get; set; }
+
     public IEnumerable<TitleHolder> Holders { get; set; } = [];
 }

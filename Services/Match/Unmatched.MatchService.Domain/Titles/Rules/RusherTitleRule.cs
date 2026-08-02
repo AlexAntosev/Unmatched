@@ -12,9 +12,9 @@ public class RusherTitleRule(ICatalogHeroCache catalogHeroCache) : ITitleRule
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Shared;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
-        var qualifiers = new HashSet<Guid>();
+        var qualifiers = new Dictionary<Guid, double?>();
         foreach (var winner in match.Fighters.Where(f => f.IsWinner))
         {
             if (winner.CardsLeft is null)
@@ -25,7 +25,7 @@ public class RusherTitleRule(ICatalogHeroCache catalogHeroCache) : ITitleRule
             var hero = await catalogHeroCache.GetAsync(winner.HeroId);
             if (winner.CardsLeft >= TitleThresholds.RusherMinCardRatio * hero!.DeckSize)
             {
-                qualifiers.Add(winner.HeroId);
+                qualifiers[winner.HeroId] = winner.CardsLeft;
             }
         }
 

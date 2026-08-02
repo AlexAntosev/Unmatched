@@ -11,6 +11,11 @@ using Unmatched.MatchService.Domain.Enums;
 /// history including this match" (a set - at most one hero - that becomes the entire holder set,
 /// transferring the title away from anyone else). <see cref="TitleEvaluator"/> applies that distinction
 /// uniformly so individual rules only need to answer "who qualifies."
+///
+/// The dictionary's value is the rule-specific "how much/how many" backing the qualification (e.g. total
+/// sidekick HP destroyed for Executioner, HP left for Last Breath) - null where no single number is
+/// meaningful (e.g. Flawless, Kingslayer). <see cref="TitleEvaluator"/> persists it as-is; only rules
+/// where storing it makes sense need to compute anything beyond null.
 /// </summary>
 public interface ITitleRule
 {
@@ -18,5 +23,5 @@ public interface ITitleRule
 
     TitleExclusivity Exclusivity { get; }
 
-    Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match);
+    Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match);
 }

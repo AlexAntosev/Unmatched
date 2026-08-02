@@ -15,7 +15,7 @@ public class ExecutionerTitleRule(IUnitOfWork unitOfWork, ICatalogHeroCache cata
 
     public TitleExclusivity Exclusivity => TitleExclusivity.Unique;
 
-    public async Task<IReadOnlySet<Guid>> EvaluateAsync(MatchEntity match)
+    public async Task<IReadOnlyDictionary<Guid, double?>> EvaluateAsync(MatchEntity match)
     {
         var matches = await unitOfWork.Matches.GetFinishedForRatingReplayAsync();
 
@@ -31,11 +31,11 @@ public class ExecutionerTitleRule(IUnitOfWork unitOfWork, ICatalogHeroCache cata
         var maxDestroyed = totals.Values.DefaultIfEmpty(0).Max();
         if (maxDestroyed <= 0)
         {
-            return new HashSet<Guid>();
+            return new Dictionary<Guid, double?>();
         }
 
         var holder = totals.Where(kv => kv.Value == maxDestroyed).OrderBy(kv => kv.Key).First().Key;
-        return new HashSet<Guid> { holder };
+        return new Dictionary<Guid, double?> { [holder] = maxDestroyed };
     }
 
     private async Task CreditAsync(Dictionary<Guid, int> totals, Guid dealer, FighterEntity target)

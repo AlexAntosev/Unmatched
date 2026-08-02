@@ -9,11 +9,13 @@
 @inject IHeroService HeroService
 @inject IPlayStyleService PlayStyleService
 @inject IImageUploadService ImageUploadService
+@inject ITitleService TitleService
+@inject ITournamentService TournamentService
 @inject NavigationManager NavManager
 @*
-    Screen 2a - the hero dossier, top to bottom: banner, four stat cards, play style + titles +
-    win rate, the rating line, antagonist + matchups, the match log excerpt, and the villain and
-    minion records.
+    Screen 2a - the hero dossier, top to bottom: banner, four stat cards, play style + win rate,
+    titles & achievements, the rating line, antagonist + matchups, the match log excerpt, and the
+    villain and minion records.
 *@
 
 <EntityNavBar EntityNoun="hero" Breadcrumbs="Crumbs" PositionLabel="@PositionLabel"
@@ -110,18 +112,6 @@
 
                     <Panel Title="Win rate" Class="hero-winrate">
                         <DonutChart Percent="_winRate" Caption="@($"{_hero.TotalWins}W · {_hero.TotalLooses}L")"/>
-                        <div class="hero-titles">
-                            @if (_hero.Titles?.Any() != true)
-                            {
-                                <div class="hero-muted">No titles yet.</div>
-                            }
-                            @foreach (var title in _hero.Titles ?? [])
-                            {
-                                <span class="hero-title-chip" title="@title.Comment">
-                                    <i class="bi bi-award-fill"></i>@title.Name
-                                </span>
-                            }
-                        </div>
                     </Panel>
                 </div>
             </div>
@@ -129,6 +119,8 @@
     </section>
 
     <section class="hero-body">
+        <HeroTitlesSection Summary="_titlesSummary"/>
+
         <Panel Title="Rating changes">
             <HeaderActions>
                 <SegmentedControl TValue="int" Options="RatingRanges" Value="_ratingMonths" ValueChanged="OnRatingRangeChanged"/>
@@ -225,6 +217,7 @@
     private HeroMatchup? _antagonist;
     private List<MonsterMatchupRow> _villainMatchups = new();
     private List<MonsterMatchupRow> _minionMatchups = new();
+    private HeroTitlesSummary _titlesSummary = TitlePresentation.ForHero(Guid.Empty, [], []);
 
     private UiHeroStatisticsDto? _previousHero;
     private UiHeroStatisticsDto? _nextHero;
@@ -292,9 +285,12 @@
             var ratings = HeroStatisticsService.GetRatingChangesAsync(heroId);
             var ladder = HeroStatisticsService.GetHeroesStatisticsAsync();
             var catalogHeroes = HeroService.GetAsync();
-            await Task.WhenAll(stats, matches, ratings, ladder, catalogHeroes);
+            var titleCatalog = TitleService.GetAsync();
+            var tournaments = TournamentService.GetAsync();
+            await Task.WhenAll(stats, matches, ratings, ladder, catalogHeroes, titleCatalog, tournaments);
 
             _hero = stats.Result;
+            _titlesSummary = TitlePresentation.ForHero(heroId, titleCatalog.Result, tournaments.Result);
             _playStyle = _hero.PlayStyle ?? await PlayStyleService.GetAsync(heroId);
             _sidekick = _hero.Sidekicks?.FirstOrDefault();
             _expansionName = catalogHeroes.Result.FirstOrDefault(h => h.Id == heroId)?.ExpansionName.ToShortName();

@@ -16,7 +16,6 @@ public class NavCountsService(
     IMatchService matchService,
     IExpansionService expansionService,
     ICollectionService collectionService,
-    ITitleService titleService,
     ITournamentService tournamentService)
 {
     private NavCounts? _cached;
@@ -38,10 +37,9 @@ public class NavCountsService(
         var matches = matchService.GetMatchLogAsync();
         var expansions = expansionService.GetAsync();
         var owned = collectionService.GetOwnedExpansionIdsAsync();
-        var titles = titleService.GetAsync();
         var tournaments = tournamentService.GetAsync();
 
-        await Task.WhenAll(heroes, players, maps, minions, villains, matches, expansions, owned, titles, tournaments);
+        await Task.WhenAll(heroes, players, maps, minions, villains, matches, expansions, owned, tournaments);
 
         var ownedExpansionIds = owned.Result.ToHashSet();
 
@@ -54,7 +52,6 @@ public class NavCountsService(
             matches.Result.Count(),
             ownedExpansionIds.Count,
             expansions.Result.Count(),
-            titles.Result.Count(),
             tournaments.Result.Count());
 
         return _cached;
