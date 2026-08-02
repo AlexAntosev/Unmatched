@@ -9,6 +9,7 @@ using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Services;
+using Unmatched.MatchService.Domain.Titles;
 
 public class RatingServiceTests
 {
@@ -19,6 +20,7 @@ public class RatingServiceTests
     private readonly Mock<IFighterRepository> _fighterRepository = new();
     private readonly Mock<IRatingRecalculationStateRepository> _recalculationStateRepository = new();
     private readonly Mock<ITournamentAwardRepository> _tournamentAwardRepository = new();
+    private readonly Mock<IHeroTitleRepository> _heroTitleRepository = new();
     private readonly Mock<IMapper> _mapper = new();
 
     private readonly RatingService _ratingService;
@@ -30,11 +32,15 @@ public class RatingServiceTests
         _unitOfWork.Setup(u => u.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(u => u.RatingRecalculationState).Returns(_recalculationStateRepository.Object);
         _unitOfWork.Setup(u => u.TournamentAwards).Returns(_tournamentAwardRepository.Object);
+        _unitOfWork.Setup(u => u.HeroTitles).Returns(_heroTitleRepository.Object);
         _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity>());
 
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
-        _ratingService = new RatingService(_matchHandler.Object, _unitOfWork.Object, _mapper.Object, new RatingTimeline(_unitOfWork.Object));
+        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, _mapper.Object, []);
+        var titleAwarder = new TournamentTitleAwarder(_unitOfWork.Object, new Mock<Domain.Communication.Catalog.ICatalogHeroCache>().Object);
+
+        _ratingService = new RatingService(_matchHandler.Object, _unitOfWork.Object, _mapper.Object, new RatingTimeline(_unitOfWork.Object), titleEvaluator, titleAwarder);
     }
 
     [Fact]

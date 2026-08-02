@@ -3,13 +3,20 @@
 using AutoMapper;
 
 using Unmatched.MatchService.Domain.Constants;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
+using Unmatched.MatchService.Domain.Titles;
 
 public class RatingService(
-    IMatchHandler matchHandler, IUnitOfWork unitOfWork, IMapper mapper, RatingTimeline ratingTimeline) : IRatingService
+    IMatchHandler matchHandler,
+    IUnitOfWork unitOfWork,
+    IMapper mapper,
+    RatingTimeline ratingTimeline,
+    TitleEvaluator titleEvaluator,
+    TournamentTitleAwarder titleAwarder) : IRatingService
 {
     public async Task<IEnumerable<Rating>> GetAllAsync()
     {
@@ -47,11 +54,14 @@ public class RatingService(
         => unitOfWork.RatingRecalculationState.IsRecalculationRequiredAsync();
 
     /// <remarks>
-    /// Ratings and Fighters.MatchPoints are values derived from the match history, so a recalculation only
-    /// resets those and replays the history over them - the matches, fighters and awards themselves are
-    /// never deleted. Replaying matches goes straight through the match handler rather than through
-    /// IMatchService so that re-deriving old ratings doesn't re-publish a match-created event per match
-    /// (which would double-count every match in the statistics service) or re-award titles.
+    /// Ratings, Fighters.MatchPoints and HeroTitles are values derived from the match/award history, so a
+    /// recalculation only resets those and replays the history over them - the matches, fighters, awards
+    /// and tournaments themselves are never deleted. Replaying matches goes straight through the match
+    /// handler rather than through IMatchService so that re-deriving old ratings doesn't re-publish a
+    /// match-created event per match (which would double-count every match in the statistics service).
+    /// Titles ARE re-evaluated inline on the same walk, though: rules like GrandChampion/Kingslayer/
+    /// Cinderella read the live rating table, so they need to run at each event's position in the replay
+    /// (the same reason ratings themselves can't be computed out of order), not once at the end.
     /// </remarks>
     public async Task RecalculateAsync()
     {
@@ -62,22 +72,45 @@ public class RatingService(
         await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(true);
 
         unitOfWork.Ratings.DeleteAll();
+        unitOfWork.HeroTitles.DeleteAll();
         await unitOfWork.SaveChangesAsync();
+
+        var titledTournaments = new HashSet<Guid>();
 
         foreach (var ratingEvent in timeline)
         {
             if (ratingEvent.Match is not null)
             {
                 await matchHandler.HandleAsync(ratingEvent.Match);
+                if (ratingEvent.Match.GameMode != GameMode.Cooperative)
+                {
+                    await titleEvaluator.EvaluateAsync(ratingEvent.Match);
+                }
             }
-            else if (ratingEvent.Award is not null)
+            else if (ratingEvent.Award is not null && titledTournaments.Add(ratingEvent.Award.TournamentId))
             {
-                await RatingLedger.ApplyAsync(unitOfWork, new Dictionary<Guid, int> { [ratingEvent.Award.HeroId] = ratingEvent.Award.Points });
-                await unitOfWork.SaveChangesAsync();
+                await ReplayTournamentCompletionAsync(ratingEvent.Award.TournamentId);
             }
         }
 
         await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(false);
+    }
+
+    /// <summary>Applies every award of a completed tournament and re-runs its title awarder together, the
+    /// first time any one of its awards is reached in the replay - awards are grouped rather than applied
+    /// one event at a time so Cinderella (which reads every participant's live rating) sees the same
+    /// fully-applied tournament payout <see cref="TournamentService.CompleteAsync"/> produced.</summary>
+    private async Task ReplayTournamentCompletionAsync(Guid tournamentId)
+    {
+        var awards = await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId);
+        var pointsByHero = awards.GroupBy(a => a.HeroId).ToDictionary(g => g.Key, g => g.Sum(a => a.Points));
+        await RatingLedger.ApplyAsync(unitOfWork, pointsByHero);
+
+        var tournament = await unitOfWork.Tournaments.GetByIdWithParticipantsAsync(tournamentId);
+        var tournamentMatches = await unitOfWork.Matches.GetByTournamentAsync(tournamentId);
+        await titleAwarder.AwardAsync(tournament!, tournamentMatches);
+
+        await unitOfWork.SaveChangesAsync();
     }
 
     private static bool Involves(RatingEvent ratingEvent, Guid heroId)

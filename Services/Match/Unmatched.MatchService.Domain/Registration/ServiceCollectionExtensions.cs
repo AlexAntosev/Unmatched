@@ -40,8 +40,6 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<TitleEvaluator>();
         services.AddTransient<TournamentTitleAwarder>();
-        services.AddTransient<ITitleRule, RusherTitleRule>();
-        services.AddTransient<ITitleRule, PunisherTitleRule>();
         services.AddTransient<ITitleRule, FlawlessTitleRule>();
         services.AddTransient<ITitleRule, LastBreathTitleRule>();
         services.AddTransient<ITitleRule, GiantSlayerTitleRule>();

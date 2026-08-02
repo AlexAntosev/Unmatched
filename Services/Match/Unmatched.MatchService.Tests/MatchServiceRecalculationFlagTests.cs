@@ -30,6 +30,7 @@ public class MatchServiceRecalculationFlagTests
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
     private readonly Mock<IRatingRecalculationStateRepository> _recalculationStateRepository = new();
+    private readonly Mock<ITournamentAwardRepository> _tournamentAwardRepository = new();
 
     private readonly MatchService _matchService;
 
@@ -38,6 +39,8 @@ public class MatchServiceRecalculationFlagTests
         _unitOfWork.Setup(u => u.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(u => u.Ratings).Returns(_ratingRepository.Object);
         _unitOfWork.Setup(u => u.RatingRecalculationState).Returns(_recalculationStateRepository.Object);
+        _unitOfWork.Setup(u => u.TournamentAwards).Returns(_tournamentAwardRepository.Object);
+        _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(Array.Empty<TournamentAwardEntity>());
 
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
@@ -134,6 +137,27 @@ public class MatchServiceRecalculationFlagTests
         await _matchService.AddOrUpdateAsync(latestMatch);
 
         _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(It.IsAny<bool>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_MatchDateEarlierThanExistingTournamentAward_MarksRecalculationRequired()
+    {
+        var backdatedMatch = new Match { Id = Guid.NewGuid(), Date = new DateTime(2026, 8, 1), Fighters = Array.Empty<Domain.Models.Fighter>(), Comment = string.Empty };
+
+        _matchRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<MatchEntity>
+        {
+            new() { Id = Guid.NewGuid(), Date = new DateTime(2026, 7, 30) },
+            new() { Id = backdatedMatch.Id, Date = backdatedMatch.Date },
+        });
+
+        _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity>
+        {
+            new() { Id = Guid.NewGuid(), HeroId = WinnerHeroId, AwardedAt = new DateTime(2026, 8, 2), Points = 10 },
+        });
+
+        await _matchService.AddOrUpdateAsync(backdatedMatch);
+
+        _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(true), Times.Once);
     }
 
     [Fact]

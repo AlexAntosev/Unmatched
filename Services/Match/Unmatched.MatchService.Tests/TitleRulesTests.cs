@@ -25,63 +25,6 @@ public class TitleRulesTests
     }
 
     [Fact]
-    public async Task Rusher_WinnerWithTwoThirdsOfDeckLeft_Qualifies()
-    {
-        var winnerId = Guid.NewGuid();
-        var match = Match(Fighter(winnerId, isWinner: true, cardsLeft: 7)); // 7/10 = 70% >= 66%
-
-        var qualifiers = await new RusherTitleRule(_catalogHeroCache.Object).EvaluateAsync(match);
-
-        Assert.Contains(winnerId, qualifiers.Keys);
-        Assert.Equal(7, qualifiers[winnerId]);
-    }
-
-    [Fact]
-    public async Task Rusher_WinnerBelowTheCardThreshold_DoesNotQualify()
-    {
-        var winnerId = Guid.NewGuid();
-        var match = Match(Fighter(winnerId, isWinner: true, cardsLeft: 5)); // 50% < 66%
-
-        var qualifiers = await new RusherTitleRule(_catalogHeroCache.Object).EvaluateAsync(match);
-
-        Assert.DoesNotContain(winnerId, qualifiers.Keys);
-    }
-
-    [Fact]
-    public async Task Rusher_NullCardsLeft_DoesNotQualify()
-    {
-        var winnerId = Guid.NewGuid();
-        var match = Match(Fighter(winnerId, isWinner: true));
-
-        var qualifiers = await new RusherTitleRule(_catalogHeroCache.Object).EvaluateAsync(match);
-
-        Assert.Empty(qualifiers);
-    }
-
-    [Fact]
-    public async Task Punisher_WinnerAtOrAboveTheThreshold_Qualifies()
-    {
-        var winnerId = Guid.NewGuid();
-        var match = Match(Fighter(winnerId, isWinner: true, matchPoints: 45));
-
-        var qualifiers = await new PunisherTitleRule().EvaluateAsync(match);
-
-        Assert.Contains(winnerId, qualifiers.Keys);
-        Assert.Equal(45, qualifiers[winnerId]);
-    }
-
-    [Fact]
-    public async Task Punisher_WinnerBelowTheThreshold_DoesNotQualify()
-    {
-        var winnerId = Guid.NewGuid();
-        var match = Match(Fighter(winnerId, isWinner: true, matchPoints: 44));
-
-        var qualifiers = await new PunisherTitleRule().EvaluateAsync(match);
-
-        Assert.Empty(qualifiers);
-    }
-
-    [Fact]
     public async Task Flawless_WinnerAtFullHp_Qualifies()
     {
         var winnerId = Guid.NewGuid();

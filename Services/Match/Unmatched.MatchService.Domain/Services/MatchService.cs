@@ -235,7 +235,13 @@ public class MatchService(
             .Select(m => (DateTime?)m.Date)
             .Max();
 
-        if (latestOtherMatchDate is not null && match.Date < latestOtherMatchDate)
+        var latestAwardDate = (await unitOfWork.TournamentAwards.GetAsync())
+            .Select(a => (DateTime?)a.AwardedAt)
+            .Max();
+
+        var latestOtherOccurredAt = new[] { latestOtherMatchDate, latestAwardDate }.Max();
+
+        if (latestOtherOccurredAt is not null && match.Date < latestOtherOccurredAt)
         {
             await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(true);
         }

@@ -26,8 +26,6 @@ public record TitleStyle(string Icon, TitleAccent Accent)
         ["flawless"] = new("bi-patch-check-fill", TitleAccent.Achievement),
         ["last-breath"] = new("bi-heartbreak-fill", TitleAccent.Achievement),
         ["giant-slayer"] = new("bi-graph-up-arrow", TitleAccent.Achievement),
-        ["rusher"] = new("bi-stopwatch-fill", TitleAccent.Achievement),
-        ["punisher"] = new("bi-fire", TitleAccent.Achievement),
         ["deck-miller"] = new("bi-layers-fill", TitleAccent.Achievement),
         ["grand-champion"] = new("bi-trophy-fill", TitleAccent.Prestige),
         ["streak"] = new("bi-lightning-charge-fill", TitleAccent.Prestige),
@@ -102,8 +100,6 @@ internal static class TitleRuleMetricFormat
 {
     public static readonly IReadOnlyDictionary<string, Func<double, string>> ByRuleKey = new Dictionary<string, Func<double, string>>
     {
-        ["rusher"] = v => $"{(int)v} cards left",
-        ["punisher"] = v => $"+{(int)v} rating",
         ["last-breath"] = v => $"{(int)v} HP left",
         ["giant-slayer"] = v => $"{(int)v} rating gap",
         ["grand-champion"] = v => $"{(int)v} rating",

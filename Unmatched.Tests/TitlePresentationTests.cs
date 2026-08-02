@@ -130,7 +130,7 @@ public class TitlePresentationTests
         var heldTitle = Title("The Streak", TitleExclusivity.Unique, ruleKey: "streak", holders: Holder(HeroId));
         var otherTitle = Title("Grand Champion", TitleExclusivity.Unique, ruleKey: "grand-champion", holders: Holder(OtherHeroId));
         var heldAchievement = Title("Flawless", TitleExclusivity.Shared, ruleKey: "flawless", holders: Holder(HeroId, timesEarned: 3));
-        var unearnedAchievement = Title("Rusher", TitleExclusivity.Shared, ruleKey: "rusher");
+        var unearnedAchievement = Title("Deck Miller", TitleExclusivity.Shared, ruleKey: "deck-miller");
 
         var summary = TitlePresentation.ForHero(HeroId, [heldTitle, otherTitle, heldAchievement, unearnedAchievement], []);
 
@@ -194,8 +194,6 @@ public class TitlePresentationTests
     [InlineData("sufferer", 6, "6 losses in a row")]
     [InlineData("grand-champion", 1842, "1842 rating")]
     [InlineData("last-breath", 2, "2 HP left")]
-    [InlineData("rusher", 23, "23 cards left")]
-    [InlineData("punisher", 45, "+45 rating")]
     [InlineData("giant-slayer", 312, "312 rating gap")]
     public void TitleEntry_MetricLabel_FormatsWithTheRulesUnit(string ruleKey, double metric, string expected)
     {

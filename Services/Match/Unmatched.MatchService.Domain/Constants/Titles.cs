@@ -6,8 +6,6 @@ namespace Unmatched.MatchService.Domain.Constants;
 public static class Titles
 {
     // Shared
-    public const string Rusher = "rusher";
-    public const string Punisher = "punisher";
     public const string Flawless = "flawless";
     public const string LastBreath = "last-breath";
     public const string GiantSlayer = "giant-slayer";

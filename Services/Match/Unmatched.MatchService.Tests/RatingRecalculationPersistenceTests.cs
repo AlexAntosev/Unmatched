@@ -14,6 +14,8 @@ using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Services;
+using Unmatched.MatchService.Domain.Titles;
+using Unmatched.MatchService.Domain.Titles.Rules;
 using Unmatched.MatchService.Domain.Validation;
 using Unmatched.MatchService.EntityFramework.Context;
 using Unmatched.MatchService.EntityFramework.Repositories;
@@ -196,11 +198,13 @@ public class RatingRecalculationPersistenceTests
     public async Task RecalculateAsync_TournamentAwardsSurviveARecalculation()
     {
         var databaseName = Guid.NewGuid().ToString();
+        var tournamentId = Guid.NewGuid();
 
         await using (var seedContext = CreateDbContext(databaseName))
         {
+            seedContext.Tournaments.Add(new TournamentEntity { Id = tournamentId, Name = "Test Tournament" });
             seedContext.Matches.Add(CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId));
-            seedContext.TournamentAwards.Add(CreateAward(HeroAId, points: 50, awardedAt: new DateTime(2026, 2, 1)));
+            seedContext.TournamentAwards.Add(CreateAward(tournamentId, HeroAId, points: 50, awardedAt: new DateTime(2026, 2, 1)));
             await seedContext.SaveChangesAsync();
         }
 
@@ -225,14 +229,16 @@ public class RatingRecalculationPersistenceTests
     public async Task RecalculateAsync_AwardDatedMidHistory_ChangesTheLaterMatchsDelta()
     {
         var databaseName = Guid.NewGuid().ToString();
+        var tournamentId = Guid.NewGuid();
         const int awardPoints = 60;
 
         await using (var seedContext = CreateDbContext(databaseName))
         {
+            seedContext.Tournaments.Add(new TournamentEntity { Id = tournamentId, Name = "Test Tournament" });
             seedContext.Matches.AddRange(
                 CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId),
                 CreateMatch(new DateTime(2026, 3, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId));
-            seedContext.TournamentAwards.Add(CreateAward(HeroAId, points: awardPoints, awardedAt: new DateTime(2026, 2, 1)));
+            seedContext.TournamentAwards.Add(CreateAward(tournamentId, HeroAId, points: awardPoints, awardedAt: new DateTime(2026, 2, 1)));
             await seedContext.SaveChangesAsync();
         }
 
@@ -259,11 +265,69 @@ public class RatingRecalculationPersistenceTests
         Assert.Equal(aAfterAward + marchDeltaWithAward, heroARating.Points);
     }
 
-    private static TournamentAwardEntity CreateAward(Guid heroId, int points, DateTime awardedAt)
+    /// <summary>
+    /// GrandChampion reads the live Ratings table ("whoever holds #1 right now"), the same class of
+    /// dependency Elo itself has on replay order - so a recalculation must recompute it in step with the
+    /// ratings, not leave whatever stale holder was there before. This seeds Hero A as the (now wrong)
+    /// incumbent, an award that puts Hero B in the lead, and a later match to re-trigger the rule - title
+    /// rules only re-run on match events (mirroring <c>MatchService.AddOrUpdateAsync</c>, which is the
+    /// only place they run in production too), so the award alone doesn't flip the holder until the next
+    /// match sees the post-award ratings.
+    /// </summary>
+    [Fact]
+    public async Task RecalculateAsync_RecomputesRatingDependentTitles_DiscardingStaleHolders()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        var titleId = Guid.NewGuid();
+        var tournamentId = Guid.NewGuid();
+
+        await using (var seedContext = CreateDbContext(databaseName))
+        {
+            seedContext.Titles.Add(new TitleEntity
+            {
+                Id = titleId,
+                Name = "Grand Champion",
+                Comment = string.Empty,
+                Exclusivity = TitleExclusivity.Unique,
+                RuleKey = Titles.GrandChampion,
+                HeroTitles = new List<HeroTitleEntity>
+                {
+                    new() { HeroesId = HeroAId, TitlesId = titleId, EarnedAt = new DateTime(2026, 1, 1) }
+                }
+            });
+            seedContext.Tournaments.Add(new TournamentEntity { Id = tournamentId, Name = "Test Tournament" });
+            seedContext.Matches.AddRange(
+                CreateMatch(new DateTime(2026, 1, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId),
+                CreateMatch(new DateTime(2026, 3, 1), winnerHeroId: HeroAId, looserHeroId: HeroBId));
+            seedContext.TournamentAwards.Add(CreateAward(tournamentId, HeroBId, points: 500, awardedAt: new DateTime(2026, 2, 1)));
+            await seedContext.SaveChangesAsync();
+        }
+
+        await using (var dbContext = CreateDbContext(databaseName))
+        {
+            var unitOfWork = new UnitOfWork(dbContext);
+            var catalogHeroCache = new Mock<ICatalogHeroCache>();
+            catalogHeroCache.Setup(c => c.GetAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = ReferenceHero.Hp, DeckSize = ReferenceHero.DeckSize, Sidekicks = ReferenceHero.Sidekicks });
+
+            var matchHandler = new MatchHandler(unitOfWork, new GameModeValidatorFactory(), new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object));
+            var titleEvaluator = new TitleEvaluator(unitOfWork, new Mock<IMapper>().Object, new ITitleRule[] { new GrandChampionTitleRule(unitOfWork) });
+            var titleAwarder = new TournamentTitleAwarder(unitOfWork, catalogHeroCache.Object);
+            var ratingService = new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder);
+
+            await ratingService.RecalculateAsync();
+        }
+
+        await using var assertContext = CreateDbContext(databaseName);
+        var holders = await assertContext.HeroTitles.Where(ht => ht.TitlesId == titleId).Select(ht => ht.HeroesId).ToListAsync();
+        Assert.Equal(new[] { HeroBId }, holders);
+    }
+
+    private static TournamentAwardEntity CreateAward(Guid tournamentId, Guid heroId, int points, DateTime awardedAt)
         => new()
         {
             Id = Guid.NewGuid(),
-            TournamentId = Guid.NewGuid(),
+            TournamentId = tournamentId,
             HeroId = heroId,
             AwardKind = TournamentAwardKind.Winner,
             Points = points,
@@ -363,6 +427,9 @@ public class RatingRecalculationPersistenceTests
             new GameModeValidatorFactory(),
             new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object));
 
-        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork));
+        var titleEvaluator = new TitleEvaluator(unitOfWork, new Mock<IMapper>().Object, []);
+        var titleAwarder = new TournamentTitleAwarder(unitOfWork, catalogHeroCache.Object);
+
+        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder);
     }
 }
