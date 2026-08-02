@@ -1,0 +1,74 @@
+.map-ban-pool {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.map-ban-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-card);
+    background: var(--um-bg-panel);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.12s ease;
+}
+
+.map-ban-tile:disabled {
+    cursor: default;
+}
+
+.map-ban-tile:not(:disabled):hover {
+    border-color: var(--um-focus-border);
+}
+
+.map-ban-tile img {
+    width: 100%;
+    height: 96px;
+    object-fit: cover;
+    background: var(--um-bg-control);
+}
+
+.map-ban-tile.is-banned img {
+    filter: grayscale(0.7);
+    opacity: 0.45;
+}
+
+.map-ban-tile.is-chosen {
+    border-color: var(--um-win-border);
+}
+
+.map-ban-name {
+    padding: 0 10px 10px;
+    font: 500 12px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-ban-overlay {
+    position: absolute;
+    top: 34px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-ban-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: var(--um-win);
+    color: #062a1c;
+    font: 700 9px var(--um-font-mono);
+    letter-spacing: 0.06em;
+}

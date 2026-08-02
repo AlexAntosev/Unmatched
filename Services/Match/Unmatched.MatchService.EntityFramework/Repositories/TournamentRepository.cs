@@ -11,9 +11,13 @@ using Unmatched.MatchService.EntityFramework.Context;
 
 public class TournamentRepository(UnmatchedDbContext dbContext) : BaseRepository<TournamentEntity, UnmatchedDbContext>(dbContext), ITournamentRepository
 {
-    public Guid GetIdByName(string name)
+    public async Task<TournamentEntity?> GetByIdWithParticipantsAsync(Guid id)
     {
-        return DbContext.Tournaments.First(x => x.Name.Equals(name)).Id;
+        return await DbContext.Tournaments
+            .AsNoTracking()
+            .Include(t => t.Participants)
+            .Include(t => t.TournamentTitles)
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     protected override Guid GetId(TournamentEntity model)

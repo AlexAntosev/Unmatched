@@ -36,11 +36,30 @@ public class StatisticsInitializer(ILogger<StatisticsInitializer> logger,IUnitOf
         }
     }
 
+    /// <remarks>
+    /// Unlike <see cref="InitializeAsync"/>, this is a deliberate, user-triggered action (following a
+    /// rating recalculation), so a failure here is left to propagate rather than logged and swallowed -
+    /// the caller needs to know the rebuild didn't happen.
+    /// </remarks>
+    public async Task RebuildAsync()
+    {
+        var matches = await GetAllMatches();
+        foreach (var coordinator in coordinators)
+        {
+            coordinator.UnitOfWork = unitOfWork;
+            await coordinator.InitializeAsync(matches);
+        }
+
+        await unitOfWork.SaveChangesAsync();
+    }
+
     private async Task<IReadOnlyList<MatchDto>> GetAllMatches()
     {
         if (_matchCache.Any() == false)
         {
-            _matchCache = (await matchClient.GetAllMatchesAsync()).ToList();
+            // Planned matches have no result yet - counting them would inflate TotalMatches/TotalLooses
+            // for every coordinator that reads this list.
+            _matchCache = (await matchClient.GetAllMatchesAsync()).Where(m => !m.IsPlanned).ToList();
         }
 
         return _matchCache;

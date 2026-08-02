@@ -1,0 +1,63 @@
+.draft-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.draft-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px var(--um-page-padding-x);
+    border-bottom: 1px solid var(--um-border);
+}
+
+.draft-title {
+    font: 600 14px var(--um-font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.draft-mode-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: var(--um-height-chip);
+    padding: 0 12px;
+    border-radius: var(--um-radius-md);
+    background: rgba(139, 125, 255, 0.16);
+    font: 600 11.5px var(--um-font-mono);
+    letter-spacing: 0.06em;
+}
+
+.draft-step-of {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.draft-body {
+    flex: 1;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 22px var(--um-page-padding-x) 26px;
+}
+
+.draft-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px var(--um-page-padding-x);
+    border-top: 1px solid var(--um-border);
+    background: var(--um-bg-nav);
+}
+
+.draft-footer-hint {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.um-spacer {
+    flex: 1;
+}

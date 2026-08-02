@@ -34,6 +34,13 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
         return Ok(dtos);
     }
 
+    [HttpGet("{id}/standings")]
+    public async Task<ActionResult<IEnumerable<TournamentStandingDto>>> GetStandings(Guid id)
+    {
+        var standings = await tournamentService.GetStandingsAsync(id);
+        return Ok(mapper.Map<IEnumerable<TournamentStandingDto>>(standings));
+    }
+
     [HttpPost("generate/{tournamentId}")]
     public async Task<ActionResult> GenerateNextStage(Guid tournamentId)
     {
@@ -41,12 +48,40 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
         return Ok();
     }
 
+    [HttpPost("{id}/complete")]
+    public async Task<ActionResult<TournamentDto>> Complete(Guid id)
+    {
+        var tournament = await tournamentService.CompleteAsync(id);
+        return Ok(mapper.Map<TournamentDto>(tournament));
+    }
+
+    [HttpGet("{id}/awards")]
+    public async Task<ActionResult<IEnumerable<TournamentAwardDto>>> GetAwards(Guid id)
+    {
+        var awards = await tournamentService.GetAwardsAsync(id);
+        return Ok(mapper.Map<IEnumerable<TournamentAwardDto>>(awards));
+    }
+
     [HttpPost("create")]
-    public async Task<ActionResult<TournamentDto>> GenerateNextStage([FromBody] TournamentDto tournament)
+    public async Task<ActionResult<TournamentDto>> Create([FromBody] TournamentDto tournament)
     {
         var model = mapper.Map<Tournament>(tournament);
         var addedResult = await tournamentService.AddAsync(model);
         return Ok(mapper.Map<TournamentDto>(addedResult));
+    }
+
+    [HttpPut("{id}/image")]
+    public async Task<ActionResult<TournamentDto>> UpdateImage(Guid id, [FromBody] string imageFileName)
+    {
+        var tournament = await tournamentService.UpdateImageAsync(id, imageFileName);
+        return tournament is null ? NotFound() : Ok(mapper.Map<TournamentDto>(tournament));
+    }
+
+    [HttpPut("{id}/trophy-image")]
+    public async Task<ActionResult<TournamentDto>> UpdateTrophyImage(Guid id, [FromBody] string imageFileName)
+    {
+        var tournament = await tournamentService.UpdateTrophyImageAsync(id, imageFileName);
+        return tournament is null ? NotFound() : Ok(mapper.Map<TournamentDto>(tournament));
     }
 
     [HttpDelete("{id}")]

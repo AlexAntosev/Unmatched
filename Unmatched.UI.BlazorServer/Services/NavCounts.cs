@@ -10,10 +10,9 @@ public record NavCounts(
     int Matches,
     int OwnedExpansions,
     int TotalExpansions,
-    int Titles,
     int Tournaments)
 {
-    public static readonly NavCounts Empty = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    public static readonly NavCounts Empty = new(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     public string Collection => $"{OwnedExpansions}/{TotalExpansions}";
 }

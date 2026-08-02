@@ -2,7 +2,9 @@
 
 using Unmatched.MatchService.Domain.Entities;
 
-public interface IHeroTitleRepository 
+public interface IHeroTitleRepository
 {
     Task AddOrUpdateAsync(HeroTitleEntity model);
+
+    void DeleteAll();
 }

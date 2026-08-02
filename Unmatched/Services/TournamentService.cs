@@ -31,4 +31,29 @@ public class TournamentService(IMatchClient matchClient) : ITournamentService
     {
         return matchClient.GenerateTournamentNextStageAsync(tournamentId);
     }
+
+    public Task<IEnumerable<TournamentStandingDto>> GetStandingsAsync(Guid tournamentId)
+    {
+        return matchClient.GetTournamentStandingsAsync(tournamentId);
+    }
+
+    public Task<TournamentDto> UpdateImageAsync(Guid id, string imageFileName)
+    {
+        return matchClient.UpdateTournamentImageAsync(id, imageFileName);
+    }
+
+    public Task<TournamentDto> UpdateTrophyImageAsync(Guid id, string imageFileName)
+    {
+        return matchClient.UpdateTournamentTrophyImageAsync(id, imageFileName);
+    }
+
+    public Task<TournamentDto> CompleteAsync(Guid id)
+    {
+        return matchClient.CompleteTournamentAsync(id);
+    }
+
+    public Task<IEnumerable<TournamentAwardDto>> GetAwardsAsync(Guid id)
+    {
+        return matchClient.GetTournamentAwardsAsync(id);
+    }
 }

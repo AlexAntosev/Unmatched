@@ -44,7 +44,7 @@ public class MatchCreatedVillainHandlerTests
             };
 
         _villainStatsRepository.Setup(r => r.GetByVillainAsync(villainId)).ReturnsAsync((VillainStats?)null);
-        _catalogVillainCache.Setup(c => c.GetAsync(villainId)).ReturnsAsync(new CatalogVillainDto { Id = villainId, Name = "Matango", Hp = 20, DeckSize = 15, Color = "green" });
+        _catalogVillainCache.Setup(c => c.GetAsync(villainId)).ReturnsAsync(new CatalogVillainDto { Id = villainId, Name = "Matango", BaseHp = 20, HpPerExtraPlayer = 20, DeckSize = 15, Color = "green" });
 
         VillainStats? savedStats = null;
         _villainStatsRepository.Setup(r => r.AddOrUpdateAsync(It.IsAny<VillainStats>()))
@@ -55,7 +55,8 @@ public class MatchCreatedVillainHandlerTests
 
         Assert.NotNull(savedStats);
         Assert.Equal("Matango", savedStats!.Name);
-        Assert.Equal(20, savedStats.Hp);
+        Assert.Equal(20, savedStats.BaseHp);
+        Assert.Equal(20, savedStats.HpPerExtraPlayer);
         Assert.Equal(1, savedStats.TotalMatches);
         Assert.Equal(0, savedStats.TotalWins);
         Assert.Equal(1, savedStats.TotalLooses);

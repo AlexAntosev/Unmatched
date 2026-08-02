@@ -115,6 +115,43 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<TournamentDto>();
     }
 
+    public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid id)
+    {
+        var response = await httpClient.GetAsync($"/tournament/{id}/standings");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<TournamentStandingDto>>();
+    }
+
+    public async Task<TournamentDto> UpdateTournamentImageAsync(Guid id, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/tournament/{id}/image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TournamentDto>();
+    }
+
+    public async Task<TournamentDto> UpdateTournamentTrophyImageAsync(Guid id, string imageFileName)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(imageFileName), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/tournament/{id}/trophy-image", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TournamentDto>();
+    }
+
+    public async Task<TournamentDto> CompleteTournamentAsync(Guid id)
+    {
+        var response = await httpClient.PostAsync($"/tournament/{id}/complete", null);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TournamentDto>();
+    }
+
+    public async Task<IEnumerable<TournamentAwardDto>> GetTournamentAwardsAsync(Guid id)
+    {
+        var response = await httpClient.GetAsync($"/tournament/{id}/awards");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<TournamentAwardDto>>();
+    }
+
     public async Task RecalculateAsync()
     {
         var response = await httpClient.PostAsync("/rating/recalculate", null);

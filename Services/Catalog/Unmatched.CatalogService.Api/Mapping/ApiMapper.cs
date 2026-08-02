@@ -21,7 +21,11 @@ public class ApiMapper : Profile
         CreateMap<Sidekick, SidekickDto>().ReverseMap();
         CreateMap<Expansion, ExpansionDto>();
         CreateMap<Hero, ExpansionContentDto>();
-        CreateMap<Villain, ExpansionContentDto>();
+        // ExpansionContentDto is the simplified shape the collection browse grid shows for every
+        // fighter type - it carries a single "Hp" for display, which for a villain is the 1-player
+        // base case (see Villain.BaseHp / HpPerExtraPlayer for the full per-player scaling).
+        CreateMap<Villain, ExpansionContentDto>()
+            .ForMember(d => d.Hp, o => o.MapFrom(s => s.BaseHp));
         CreateMap<Minion, ExpansionContentDto>();
         CreateMap<Villain, VillainDto>()
             .ForMember(d => d.ExpansionName, o => o.MapFrom(s => s.Expansion != null ? s.Expansion.Name : null));

@@ -1,0 +1,18 @@
+.um-info-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: var(--um-height-field);
+    padding: 0 12px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-inset);
+    border: 1px solid var(--um-border);
+    color: var(--um-text-muted);
+    font: 500 12.5px var(--um-font-body);
+    white-space: nowrap;
+}
+
+.um-info-chip i {
+    font-size: 12px;
+    color: var(--um-text-dim);
+}

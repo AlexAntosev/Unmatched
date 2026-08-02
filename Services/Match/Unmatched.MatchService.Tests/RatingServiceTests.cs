@@ -4,20 +4,23 @@ using AutoMapper;
 
 using Moq;
 
+using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Services;
+using Unmatched.MatchService.Domain.Titles;
 
 public class RatingServiceTests
 {
-    private readonly Mock<IMatchHandlerFactory> _matchHandlerFactory = new();
     private readonly Mock<IMatchHandler> _matchHandler = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
     private readonly Mock<IFighterRepository> _fighterRepository = new();
     private readonly Mock<IRatingRecalculationStateRepository> _recalculationStateRepository = new();
+    private readonly Mock<ITournamentAwardRepository> _tournamentAwardRepository = new();
+    private readonly Mock<IHeroTitleRepository> _heroTitleRepository = new();
     private readonly Mock<IMapper> _mapper = new();
 
     private readonly RatingService _ratingService;
@@ -28,11 +31,16 @@ public class RatingServiceTests
         _unitOfWork.Setup(u => u.Ratings).Returns(_ratingRepository.Object);
         _unitOfWork.Setup(u => u.Fighters).Returns(_fighterRepository.Object);
         _unitOfWork.Setup(u => u.RatingRecalculationState).Returns(_recalculationStateRepository.Object);
+        _unitOfWork.Setup(u => u.TournamentAwards).Returns(_tournamentAwardRepository.Object);
+        _unitOfWork.Setup(u => u.HeroTitles).Returns(_heroTitleRepository.Object);
+        _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity>());
 
-        _matchHandlerFactory.Setup(f => f.Create(It.IsAny<MatchEntity>())).Returns(_matchHandler.Object);
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
-        _ratingService = new RatingService(_matchHandlerFactory.Object, _unitOfWork.Object, _mapper.Object);
+        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, _mapper.Object, []);
+        var titleAwarder = new TournamentTitleAwarder(_unitOfWork.Object, new Mock<Domain.Communication.Catalog.ICatalogHeroCache>().Object);
+
+        _ratingService = new RatingService(_matchHandler.Object, _unitOfWork.Object, _mapper.Object, new RatingTimeline(_unitOfWork.Object), titleEvaluator, titleAwarder);
     }
 
     [Fact]
@@ -107,6 +115,48 @@ public class RatingServiceTests
 
         _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(true), Times.Once);
         _recalculationStateRepository.Verify(r => r.SetRecalculationRequiredAsync(false), Times.Never);
+    }
+
+    [Fact]
+    public async Task GetRatingChangesAsync_WalksForwardFromInitialRating_IncludingAwards()
+    {
+        var heroId = Guid.NewGuid();
+        var matchJan = new MatchEntity
+        {
+            Id = Guid.NewGuid(),
+            Date = new DateTime(2026, 1, 1),
+            Fighters = new List<FighterEntity> { new() { HeroId = heroId, MatchPoints = 20, IsWinner = true } }
+        };
+        var award = new TournamentAwardEntity { Id = Guid.NewGuid(), HeroId = heroId, Points = 50, AwardedAt = new DateTime(2026, 2, 1) };
+
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity> { matchJan });
+        _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity> { award });
+
+        var changes = await _ratingService.GetRatingChangesAsync(heroId);
+
+        Assert.Equal(2, changes.Count);
+        Assert.Equal(RatingConstants.InitialRating + 20, changes[0].RatingDelta);
+        Assert.Equal(RatingConstants.InitialRating + 20 + 50, changes[1].RatingDelta);
+    }
+
+    [Fact]
+    public async Task GetRatingChangesAsync_ExcludesMatchesAndAwardsForOtherHeroes()
+    {
+        var heroId = Guid.NewGuid();
+        var otherHeroMatch = new MatchEntity
+        {
+            Id = Guid.NewGuid(),
+            Date = new DateTime(2026, 1, 1),
+            Fighters = new List<FighterEntity> { new() { HeroId = Guid.NewGuid(), MatchPoints = 20, IsWinner = true } }
+        };
+        var otherHeroAward = new TournamentAwardEntity { Id = Guid.NewGuid(), HeroId = Guid.NewGuid(), Points = 50, AwardedAt = new DateTime(2026, 2, 1) };
+
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity> { otherHeroMatch });
+        _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity> { otherHeroAward });
+
+        var changes = await _ratingService.GetRatingChangesAsync(heroId);
+
+        Assert.Empty(changes);
     }
 
     [Fact]

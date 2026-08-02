@@ -119,4 +119,10 @@ public class StatisticsClient(HttpClient httpClient) : IStatisticsClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<MapStatisticsDto>();
     }
+
+    public async Task RebuildAsync()
+    {
+        var response = await httpClient.PostAsync("/maintenance/rebuild", content: null);
+        response.EnsureSuccessStatusCode();
+    }
 }

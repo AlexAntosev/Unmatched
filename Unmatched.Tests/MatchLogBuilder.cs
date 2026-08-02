@@ -12,7 +12,8 @@ internal static class MatchLogBuilder
     public static UiPlayerDto Player(string name, Guid? id = null)
         => new() { Id = id ?? Guid.NewGuid(), Name = name };
 
-    public static UiFighterDto Fighter(UiHeroDto hero, bool isWinner, UiPlayerDto? player = null, int? team = null, int? placement = null)
+    public static UiFighterDto Fighter(
+        UiHeroDto hero, bool isWinner, UiPlayerDto? player = null, int? team = null, int? placement = null, int? matchPoints = null)
         => new()
             {
                 Hero = hero,
@@ -21,7 +22,8 @@ internal static class MatchLogBuilder
                 PlayerId = player?.Id ?? Guid.Empty,
                 IsWinner = isWinner,
                 Team = team,
-                Placement = placement
+                Placement = placement,
+                MatchPoints = matchPoints
             };
 
     public static UiMatchLogDto Match(

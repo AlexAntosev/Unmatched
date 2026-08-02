@@ -1,55 +1,61 @@
 @using Unmatched.Dtos
 @*
-    The co-op villain plate (design/IMPLEMENTATION-PROMPT.md §5.5): no player avatar, no sidekick,
-    no cards field - just the villain art (assets/Unknown.png when unset), the Villain picker and
-    HP. It never carries a turn-order badge (the villain always acts last, fixed) and is not
-    draggable. Minions are indented 16px beneath it.
+    The co-op villain card and its minion column (design/IMPLEMENTATION-PROMPT.md §5.2, revision 3
+    turn 14a): the villain is the same 180px vertical card as a fighter, minus a turn badge, a drag
+    handle, a sidekick row and a player - it always acts last (fixed) and is never dragged. Minions
+    are 132px cards in a column to its right, each with only an HP stepper (no Count - the DTO has
+    no such field, so today's one-row-per-minion-instance model stays, just restyled).
 *@
-<div class="villain">
-    <div class="plate @(IsLoser ? "is-loser" : null)">
-        <div class="plate-art-wrap" style="width:64px;height:64px">
-            <img class="plate-art @(IsLoser ? "is-grayscale" : null)"
+<div class="villain-row">
+    <div class="match-card" style="width:180px">
+        <div class="match-card-art-wrap" style="height:118px">
+            <img class="match-card-art @(IsWinner ? "is-winner" : null) @(IsLoser ? "is-grayscale" : null)"
                  src="@(MatchVillain.Villain?.ImageUrl ?? "/Unknown.png")" alt="@MatchVillain.Villain?.Name"
                  onerror="this.onerror=null;this.src='/Unknown.png'"/>
             @if (IsLoser)
             {
-                <div class="plate-loser-veil"><i class="bi bi-x-lg" style="font-size:30px"></i></div>
+                <div class="match-card-loser-veil"><i class="bi bi-x-lg" style="font-size:44px"></i></div>
             }
         </div>
-        <div class="plate-stacked-fields">
-            <div class="plate-line">
-                <UmSelect TValue="Guid" Variant="chip" Icon="bi-eye"
-                          Value="MatchVillain.VillainId" ValueChanged="OnVillainChanged" Options="VillainOptions()"/>
-            </div>
-            <div class="plate-line">
-                <UmField Label="HP" Class="fighter-narrow">
-                    <UmTextField Type="number" Variant="xs" Centered="true" Value="@MatchVillain.HpLeft?.ToString()"
-                                 ValueChanged="OnHpChangedAsync"/>
-                </UmField>
-            </div>
+
+        <UmSelect TValue="Guid" Variant="chip" Icon="bi-eye" Class="match-card-select"
+                  Value="MatchVillain.VillainId" ValueChanged="OnVillainChanged" Options="VillainOptions()"/>
+
+        <div class="match-card-fields">
+            <Stepper Label="@HpFieldLabel" Value="MatchVillain.HpLeft" Max="EffectiveMaxHp"
+                     IsAlert="@(IsLoser && MatchVillain.HpLeft == 0)" ValueChanged="OnHpChangedAsync"/>
+            <Stepper Label="CARDS" Value="null" Dash="true"/>
         </div>
     </div>
 
-    @foreach (var minion in MatchVillain.Minions.ToList())
-    {
-        <div class="minion">
-            <HeroToken ImageUrl="@(minion.Minion?.ImageUrl ?? "/Unknown.png")" Alt="@minion.Minion?.Name"
-                       Size="30" Radius="9" Opacity="0.85"/>
-            <div class="minion-identity">
-                <div class="minion-select-spacer"></div>
-                <UmSelect TValue="Guid" Variant="chip" Value="minion.MinionId"
-                          ValueChanged="@(id => OnMinionChanged(minion, id))" Options="MinionOptions()"/>
-                <span class="minion-count">×1 on the board</span>
-            </div>
-            <UmField Label="HP" Class="minion-hp">
-                <UmTextField Type="number" Variant="xs" Centered="true" Value="@minion.HpLeft?.ToString()"
+    <div class="villain-minion-column">
+        @foreach (var minion in MatchVillain.Minions.ToList())
+        {
+            <div class="match-card" style="width:132px">
+                <div class="match-card-art-wrap" style="height:78px">
+                    <img class="match-card-art" src="@(minion.Minion?.ImageUrl ?? "/Unknown.png")" alt="@minion.Minion?.Name"
+                         onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                    <div class="minion-badge">MINION</div>
+                    <button type="button" class="match-card-remove" title="Remove minion"
+                            @onclick="() => RemoveMinion(minion)" @onclick:stopPropagation="true">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+
+                <UmSelect TValue="Guid" Variant="chip" Class="match-card-select"
+                          Value="minion.MinionId" ValueChanged="@(id => OnMinionChanged(minion, id))" Options="MinionOptions()"/>
+
+                <div class="match-card-fields">
+                    <Stepper Label="HP" Value="minion.HpLeft" Max="@(minion.Minion?.Hp ?? 0)"
                              ValueChanged="@(v => OnMinionHpChangedAsync(minion, v))"/>
-            </UmField>
-            <button type="button" class="minion-remove" title="Remove minion" @onclick="() => RemoveMinion(minion)">
-                <i class="bi bi-trash3"></i>
-            </button>
-        </div>
-    }
+                </div>
+            </div>
+        }
+
+        <button type="button" class="villain-add-minion" @onclick="OnAddMinion">
+            <i class="bi bi-plus-lg"></i><span>Add minion</span>
+        </button>
+    </div>
 </div>
 
 @code {
@@ -62,6 +68,14 @@
     [Parameter, EditorRequired]
     public UiMatchVillainDto MatchVillain { get; set; } = new();
 
+    /// <summary>Co-op HP scales with the number of heroes facing the villain - see
+    /// <see cref="VillainDto.EffectiveHp"/> - so the caller passes how many are currently in the match.</summary>
+    [Parameter]
+    public int HeroCount { get; set; } = 2;
+
+    [Parameter]
+    public bool IsWinner { get; set; }
+
     [Parameter]
     public bool IsLoser { get; set; }
 
@@ -69,12 +83,17 @@
     public EventCallback OnChanged { get; set; }
 
     [Parameter]
+    public EventCallback OnAddMinion { get; set; }
+
+    [Parameter]
     public EventCallback<int?> HpChanged { get; set; }
 
     [Parameter]
     public EventCallback<(UiMatchMinionDto Minion, int? Value)> MinionHpChanged { get; set; }
 
-    private static int? ParseInt(string? value) => int.TryParse(value, out var parsed) ? parsed : null;
+    private int EffectiveMaxHp => MatchVillain.Villain?.EffectiveHp(HeroCount) ?? 0;
+
+    private string HpFieldLabel => MatchVillain.Villain is null ? "HP" : $"HP · max {EffectiveMaxHp} ({HeroCount}p)";
 
     private IReadOnlyList<SelectOption<Guid>> VillainOptions()
         => new SelectOption<Guid>[] { new(Guid.Empty, "Villain…") }
@@ -89,11 +108,11 @@
     private Task OnVillainChanged(Guid villainId)
     {
         MatchVillain.Villain = Villains.FirstOrDefault(v => v.Id == villainId);
-        MatchVillain.SetDefaultData();
+        MatchVillain.SetDefaultData(HeroCount);
         return OnChanged.InvokeAsync();
     }
 
-    private Task OnHpChangedAsync(string? value) => HpChanged.InvokeAsync(ParseInt(value));
+    private Task OnHpChangedAsync(int? value) => HpChanged.InvokeAsync(value);
 
     private Task OnMinionChanged(UiMatchMinionDto matchMinion, Guid minionId)
     {
@@ -102,8 +121,8 @@
         return OnChanged.InvokeAsync();
     }
 
-    private Task OnMinionHpChangedAsync(UiMatchMinionDto matchMinion, string? value)
-        => MinionHpChanged.InvokeAsync((matchMinion, ParseInt(value)));
+    private Task OnMinionHpChangedAsync(UiMatchMinionDto matchMinion, int? value)
+        => MinionHpChanged.InvokeAsync((matchMinion, value));
 
     private Task RemoveMinion(UiMatchMinionDto matchMinion)
     {

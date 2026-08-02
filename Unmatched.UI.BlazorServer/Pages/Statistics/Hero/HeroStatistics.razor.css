@@ -240,29 +240,6 @@
     color: var(--um-text-dim);
 }
 
-.hero-titles {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 12px;
-}
-
-.hero-title-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 9px;
-    border-radius: var(--um-radius-chip);
-    background: var(--um-gold-bg);
-    font: 600 11px var(--um-font-body);
-    color: var(--um-gold);
-}
-
-.hero-title-chip i {
-    font-size: 11px;
-}
-
 ::deep .hero-winrate .um-panel-body,
 ::deep .hero-radar-card .um-panel-body {
     align-items: center;

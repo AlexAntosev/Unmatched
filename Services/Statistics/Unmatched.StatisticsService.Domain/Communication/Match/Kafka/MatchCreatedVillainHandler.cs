@@ -23,7 +23,8 @@ public class MatchCreatedVillainHandler(ICatalogVillainCache catalogVillainCache
                     VillainId = villain.VillainId,
                     Name = catalogVillain?.Name ?? villain.Name ?? string.Empty,
                     Color = catalogVillain?.Color ?? string.Empty,
-                    Hp = catalogVillain?.Hp ?? 0,
+                    BaseHp = catalogVillain?.BaseHp ?? 0,
+                    HpPerExtraPlayer = catalogVillain?.HpPerExtraPlayer ?? 0,
                     DeckSize = catalogVillain?.DeckSize ?? 0,
                     IsRanged = catalogVillain?.IsRanged ?? false,
                     ImageFileName = catalogVillain?.ImageFileName

@@ -15,6 +15,10 @@ public class UnitOfWork(UnmatchedDbContext context) : IUnitOfWork
 
     public ITournamentRepository Tournaments { get; } = new TournamentRepository(context);
 
+    public ITournamentParticipantRepository TournamentParticipants { get; } = new TournamentParticipantRepository(context);
+
+    public ITournamentAwardRepository TournamentAwards { get; } = new TournamentAwardRepository(context);
+
     public ITitleRepository Titles { get; } = new TitleRepository(context);
 
     public IHeroTitleRepository HeroTitles { get; } = new HeroTitleRepository(context);

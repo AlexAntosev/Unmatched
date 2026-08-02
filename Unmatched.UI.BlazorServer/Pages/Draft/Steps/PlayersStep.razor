@@ -1,0 +1,117 @@
+@using Unmatched.Dtos
+@using Unmatched.Enums
+@using Unmatched.Extensions
+@*
+    Draft step 1 (design/IMPLEMENTATION-PROMPT.md §5A.1): mode cards + a player grid. 2v2 adds a
+    T1/T2 badge per selected card (toggles on click) and "Split teams randomly".
+*@
+<div class="draft-step">
+    <div class="draft-step-caption">Game mode</div>
+    <div class="players-modes">
+        @foreach (var mode in Modes)
+        {
+            var style = GameModeStyle.For(mode);
+            <button type="button" class="players-mode @(State.Mode == mode ? "is-selected" : null)"
+                    style="@(State.Mode == mode ? $"--um-mode-accent:{style.Color}" : null)" @onclick="@(() => SelectMode(mode))">
+                <i class="bi @style.Icon"></i>
+                <span class="players-mode-label">@ModeLabel(mode)</span>
+                <span class="players-mode-hint">@ModeHint(mode)</span>
+            </button>
+        }
+    </div>
+
+    <div class="draft-step-head">
+        <span class="draft-step-caption">Players</span>
+        <span class="players-count">@State.Players.Count selected</span>
+        <div class="um-spacer"></div>
+        @if (State.Mode == GameMode.TeamVsTeam)
+        {
+            <UmButton Size="sm" Icon="bi-shuffle" OnClick="SplitTeamsRandomly">Split teams randomly</UmButton>
+        }
+    </div>
+
+    <div class="players-grid">
+        @foreach (var player in AllPlayers)
+        {
+            var isSelected = State.Players.Any(p => p.Id == player.Id);
+            <div class="players-card @(isSelected ? "is-selected" : null)" @onclick="@(() => TogglePlayer(player))">
+                <HeroToken ImageUrl="@player.ImageUrl" Alt="@player.Name" Size="34" Round="true"/>
+                <span class="players-name">@player.Name</span>
+                @if (isSelected && State.Mode == GameMode.TeamVsTeam)
+                {
+                    <button type="button" class="players-team-badge" @onclick="@(() => ToggleTeam(player))" @onclick:stopPropagation="true">
+                        T@(State.Teams.GetValueOrDefault(player.Id, 1))
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private static readonly GameMode[] Modes = [GameMode.OneVsOne, GameMode.TeamVsTeam, GameMode.FreeForAll, GameMode.Cooperative];
+
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<UiPlayerDto> AllPlayers { get; set; } = [];
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private static string ModeLabel(GameMode mode) => GameModeStyle.For(mode).Label;
+
+    private static string ModeHint(GameMode mode) => mode switch
+    {
+        GameMode.OneVsOne => "2 players",
+        GameMode.TeamVsTeam => "4 players, 2 teams",
+        GameMode.FreeForAll => "3 or 4 players",
+        GameMode.Cooperative => "2-4 vs a villain",
+        _ => string.Empty
+    };
+
+    private Task SelectMode(GameMode mode)
+    {
+        if (State.Mode != mode)
+        {
+            State.Mode = mode;
+            State.Players.Clear();
+            State.Teams.Clear();
+        }
+
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task TogglePlayer(UiPlayerDto player)
+    {
+        var existing = State.Players.FirstOrDefault(p => p.Id == player.Id);
+        if (existing is not null)
+        {
+            State.Players.Remove(existing);
+            State.Teams.Remove(player.Id);
+        }
+        else if (State.Players.Count < State.MaxPlayers)
+        {
+            State.Players.Add(player);
+            if (State.Mode == GameMode.TeamVsTeam)
+            {
+                State.Teams[player.Id] = State.Teams.Values.Count(t => t == 1) < 2 ? 1 : 2;
+            }
+        }
+
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task ToggleTeam(UiPlayerDto player)
+    {
+        State.Teams[player.Id] = State.Teams.GetValueOrDefault(player.Id, 1) == 1 ? 2 : 1;
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task SplitTeamsRandomly()
+    {
+        DraftRandomizer.SplitTeamsRandomly(State.Players, State.Teams);
+        return OnChanged.InvokeAsync();
+    }
+}

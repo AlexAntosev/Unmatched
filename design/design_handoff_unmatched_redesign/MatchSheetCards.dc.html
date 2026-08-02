@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=Barlow:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+body{margin:0;background:#0a0a10;font-family:Barlow,system-ui,sans-serif;color:#ecedf2}
+a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
+</style></helmet>
+
+<div style="width:100%;background:#0a0a10;display:flex;flex-direction:column;min-height:720px;font-family:Barlow,system-ui,sans-serif;color:#ecedf2">
+
+  <div style="display:{{ bannerDisplay }};align-items:center;gap:9px;padding:11px 20px;background:rgba(52,217,155,.08);border-bottom:1px solid rgba(52,217,155,.18)">
+    <i class="bi bi-check-circle-fill" style="font-size:12px;color:#34d99b"></i>
+    <div style="font:600 11px Chakra Petch,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#34d99b">Prefilled from draft</div>
+    <div style="font:400 10.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ bannerSub }}</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07)">
+    <div style="font:600 14px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">{{ title }}</div>
+    <div style="flex:1"></div>
+    <div style="display:{{ modeSwitchDisplay }};gap:3px;padding:3px;background:#14141c;border:1px solid rgba(255,255,255,.08);border-radius:10px">
+      <sc-for list="{{ modes }}" as="m" hint-placeholder-count="4">
+        <div onClick="{{ m.onClick }}" style="height:32px;padding:0 13px;border-radius:8px;display:flex;align-items:center;gap:6px;background:{{ m.bg }};font:600 12.5px Barlow,sans-serif;color:{{ m.fg }};cursor:pointer" style-hover="color:#ecedf2"><i class="bi {{ m.icon }}" style="font-size:12px"></i>{{ m.label }}</div>
+      </sc-for>
+    </div>
+    <div style="display:{{ modeChipDisplay }};align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:9px;background:rgba(139,125,255,.16);font:600 12px Chakra Petch,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#c4bcff">
+      <i class="bi {{ modeChipIcon }}" style="font-size:12px"></i>{{ modeChipLabel }}
+    </div>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07);overflow:hidden">
+    <img src="{{ mapArt }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3">
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,10,16,.92),rgba(10,10,16,.6))"></div>
+    <div style="position:relative;display:flex;align-items:center;gap:13px;flex:1">
+      <div title="Open map full screen" style="position:relative;cursor:zoom-in">
+        <img src="{{ mapArt }}" alt="{{ mapName }}" style="width:58px;height:58px;border-radius:11px;object-fit:cover;border:1px solid rgba(255,255,255,.14)">
+        <div style="position:absolute;inset:0;border-radius:11px;background:rgba(8,8,12,.35);display:flex;align-items:center;justify-content:center"><i class="bi bi-arrows-fullscreen" style="font-size:14px;color:#ecedf2"></i></div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#8b8c9e">Battlefield</div>
+          <div style="display:{{ draftedBadgeDisplay }};padding:2px 6px;border-radius:5px;background:rgba(108,92,255,.9);font:600 8.5px IBM Plex Mono,monospace;letter-spacing:.06em;color:#fff">DRAFTED</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <div style="font:700 18px Chakra Petch,sans-serif;letter-spacing:.04em;text-transform:uppercase">{{ mapName }}</div>
+          <i class="bi bi-dice-5-fill" title="Randomize map" style="display:{{ mapDiceDisplay }};font-size:15px;color:#8b7dff;cursor:pointer"></i>
+          <i class="bi bi-chevron-down" title="Pick another map" style="font-size:11px;color:#8b8c9e;cursor:pointer"></i>
+        </div>
+      </div>
+      <div style="flex:1"></div>
+      <div onClick="{{ onShuffle }}" style="display:{{ shuffleDisplay }};align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font:500 12.5px Barlow,sans-serif;color:#ecedf2;cursor:pointer" style-hover="border-color:rgba(139,125,255,.6)"><i class="bi bi-shuffle" style="font-size:13px"></i>{{ shuffleLabel }}</div>
+    </div>
+  </div>
+
+  <div style="display:{{ draftLogDisplay }};align-items:center;gap:9px;padding:9px 20px;background:rgba(139,125,255,.06);border-bottom:1px solid rgba(139,125,255,.16)">
+    <div style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#8b7dff">Draft log</div>
+    <div style="font:400 10.5px IBM Plex Mono,monospace;color:#8b8c9e;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ draftLog }}</div>
+  </div>
+
+  <div style="flex:1;padding:16px 20px 18px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font:500 10px IBM Plex Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:#8b8c9e">Participants</div>
+      <div style="display:flex;align-items:center;gap:6px;font:400 10.5px IBM Plex Mono,monospace;color:#5c5d70"><i class="bi bi-grip-vertical" style="font-size:12px"></i>{{ dragHint }}</div>
+      <div style="flex:1"></div>
+      <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">{{ orderLabel }}</div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:13px">
+      <sc-for list="{{ sides }}" as="s" hint-placeholder-count="2">
+        <div style="display:flex;align-items:center;justify-content:center;width:{{ s.vsWidth }};flex:none">
+          <img src="assets/Vs.png" alt="VS" style="display:{{ s.vsDisplay }};width:28px;opacity:.75;filter:invert(1)">
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:11px;padding:13px;border-radius:14px;background:{{ s.bg }};border:1px solid {{ s.border }}">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font:600 11px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ s.titleColor }}">{{ s.title }}</div>
+            <div style="flex:1"></div>
+            <div onClick="{{ s.onAdd }}" style="display:{{ s.addDisplay }};align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:9px;border:1px dashed rgba(255,255,255,.18);font:500 11.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(139,125,255,.5)"><i class="bi bi-plus-lg" style="font-size:10px"></i>{{ s.addLabel }}</div>
+            <div onClick="{{ s.onWin }}" style="display:{{ s.winDisplay }};align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:9px;background:{{ s.winBg }};border:1px solid {{ s.winBorder }};font:700 11.5px Chakra Petch,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:{{ s.winFg }};cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi {{ s.winIcon }}" style="font-size:11px"></i>{{ s.winLabel }}</div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:11px">
+            <sc-for list="{{ s.fighters }}" as="f" hint-placeholder-count="2">
+              <div draggable="{{ f.draggable }}" onDragStart="{{ f.onDragStart }}" onDragEnd="{{ f.onDragEnd }}" onDragOver="{{ f.onDragOver }}" onDrop="{{ f.onDrop }}" style="width:180px;box-sizing:border-box;flex:none;display:flex;flex-direction:column;gap:7px;padding:10px;border-radius:14px;background:#101018;border:1px solid {{ f.plateBorder }};opacity:{{ f.dragOpacity }}">
+                <div style="position:relative">
+                  <img src="{{ f.heroArt }}" alt="{{ f.hero }}" style="width:100%;height:118px;border-radius:12px;object-fit:cover;border:1.5px solid {{ f.artBorder }};filter:{{ f.artFilter }}">
+                  <div style="display:{{ f.xDisplay }};position:absolute;inset:0;border-radius:12px;background:rgba(242,80,107,.2);align-items:center;justify-content:center"><i class="bi bi-x-lg" style="font-size:44px;color:#f2506b;text-shadow:0 2px 8px rgba(0,0,0,.8)"></i></div>
+                  <div style="display:{{ f.turnDisplay }};position:absolute;bottom:6px;left:6px;width:24px;height:24px;border-radius:8px;background:#6c5cff;border:1.5px solid rgba(10,10,16,.7);box-shadow:0 2px 8px rgba(0,0,0,.6);align-items:center;justify-content:center;font:700 12px Chakra Petch,sans-serif;color:#fff">{{ f.turnNum }}</div>
+                  <div onClick="{{ f.onPlace }}" title="Cycle place" style="display:{{ f.medalDisplay }};position:absolute;bottom:6px;right:6px;height:24px;padding:0 7px;border-radius:8px;background:rgba(10,10,16,.9);border:1.5px solid {{ f.medalColor }};align-items:center;gap:4px;cursor:pointer">
+                    <i class="bi {{ f.medalIcon }}" style="font-size:10px;color:{{ f.medalColor }}"></i>
+                    <span style="font:700 10.5px Chakra Petch,sans-serif;letter-spacing:.04em;color:{{ f.medalColor }}">{{ f.medalLabel }}</span>
+                  </div>
+                  <div onMouseDown="{{ f.onGripDown }}" title="Drag to change turn order" style="display:{{ f.gripDisplay }};position:absolute;top:0;left:0;right:0;height:22px;align-items:center;justify-content:center;gap:3px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,rgba(8,8,12,.8),rgba(8,8,12,0));cursor:grab">
+                    <i class="bi bi-grip-horizontal" style="font-size:15px;color:rgba(236,237,242,.75)"></i>
+                  </div>
+                  <i class="bi bi-trash3" title="Remove player" onClick="{{ f.onRemove }}" style="display:{{ f.removeDisplay }};position:absolute;top:5px;right:5px;font-size:13px;color:rgba(236,237,242,.7);text-shadow:0 1px 4px rgba(0,0,0,.9);cursor:pointer" style-hover="color:#f2506b"></i>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.1);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
+                  <span style="flex:1;min-width:0;font:600 13px Barlow,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.hero }}</span>
+                  <i class="bi bi-dice-5-fill" title="Randomize hero" style="display:{{ f.diceDisplay }};font-size:13px;color:#8b7dff"></i>
+                  <i class="bi bi-chevron-down" style="font-size:10px;color:#6b6c7e"></i>
+                </div>
+
+                <div style="display:{{ f.playerDisplay }};align-items:center;gap:7px;height:32px;padding:0 9px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)">
+                  <img src="{{ f.avatar }}" alt="" style="width:19px;height:19px;border-radius:50%;object-fit:cover">
+                  <span style="flex:1;min-width:0;font:500 12.5px Barlow,sans-serif;color:#c9cad6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.player }}</span>
+                  <i class="bi bi-chevron-down" style="font-size:10px;color:#6b6c7e"></i>
+                </div>
+
+                <sc-for list="{{ f.fields }}" as="st" hint-placeholder-count="3">
+                  <div style="display:{{ st.display }};align-items:center;gap:2px;height:31px;padding:0 4px 0 10px;border-radius:9px;background:{{ st.bg }};border:1px solid {{ st.border }}">
+                    <span style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.09em;color:{{ st.labelColor }}">{{ st.longLabel }}</span>
+                    <div style="flex:1"></div>
+                    <div onClick="{{ st.onMinus }}" style="display:{{ st.btnDisplay }};width:20px;height:24px;flex:none;align-items:center;justify-content:center;border-radius:6px;color:#6b6c7e;cursor:pointer" style-hover="color:#ecedf2;background:rgba(255,255,255,.07)"><i class="bi bi-dash" style="font-size:12px"></i></div>
+                    <span style="min-width:19px;flex:none;text-align:center;font:500 13.5px IBM Plex Mono,monospace;color:{{ st.color }}">{{ st.value }}</span>
+                    <div onClick="{{ st.onPlus }}" style="display:{{ st.btnDisplay }};width:20px;height:24px;flex:none;align-items:center;justify-content:center;border-radius:6px;color:#6b6c7e;cursor:pointer" style-hover="color:#ecedf2;background:rgba(255,255,255,.07)"><i class="bi bi-plus" style="font-size:12px"></i></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <div style="display:{{ s.minionColDisplay }};flex-direction:column;gap:9px;width:132px;flex:none">
+              <sc-for list="{{ s.minions }}" as="mi" hint-placeholder-count="0">
+                <div style="width:132px;box-sizing:border-box;flex:none;display:flex;flex-direction:column;gap:6px;padding:9px;border-radius:13px;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.22)">
+                  <div style="position:relative">
+                    <img src="{{ mi.art }}" alt="{{ mi.name }}" style="width:100%;height:78px;border-radius:11px;object-fit:cover;border:1px solid rgba(56,189,248,.3);opacity:.85">
+                    <div style="position:absolute;top:5px;left:5px;padding:2px 6px;border-radius:6px;background:rgba(10,10,16,.8);font:600 8.5px IBM Plex Mono,monospace;letter-spacing:.08em;color:#8fd7f7">MINION</div>
+                    <i class="bi bi-trash3" title="Remove minion" style="position:absolute;top:5px;right:5px;font-size:12px;color:rgba(236,237,242,.7);text-shadow:0 1px 4px rgba(0,0,0,.9);cursor:pointer" style-hover="color:#f2506b"></i>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:5px;height:30px;padding:0 9px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.09);cursor:pointer" style-hover="border-color:rgba(56,189,248,.5)">
+                    <span style="flex:1;min-width:0;font:600 12px Barlow,sans-serif;color:#c9e9ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mi.name }}</span>
+                    <i class="bi bi-chevron-down" style="font-size:9px;color:#5c9fc0"></i>
+                  </div>
+                  <sc-for list="{{ mi.fields }}" as="st" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:2px;height:29px;padding:0 3px 0 9px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.09)">
+                      <span style="font:400 9px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c9fc0">{{ st.label }}</span>
+                      <div style="flex:1"></div>
+                      <div onClick="{{ st.onMinus }}" style="display:flex;width:18px;height:22px;flex:none;align-items:center;justify-content:center;border-radius:6px;color:#6b6c7e;cursor:pointer" style-hover="color:#ecedf2;background:rgba(255,255,255,.07)"><i class="bi bi-dash" style="font-size:11px"></i></div>
+                      <span style="min-width:17px;flex:none;text-align:center;font:500 13px IBM Plex Mono,monospace;color:#ecedf2">{{ st.value }}</span>
+                      <div onClick="{{ st.onPlus }}" style="display:flex;width:18px;height:22px;flex:none;align-items:center;justify-content:center;border-radius:6px;color:#6b6c7e;cursor:pointer" style-hover="color:#ecedf2;background:rgba(255,255,255,.07)"><i class="bi bi-plus" style="font-size:11px"></i></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+              <div onClick="{{ s.onAddMinion }}" style="display:{{ s.addMinionDisplay }};box-sizing:border-box;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:13px 0;border-radius:13px;border:1px dashed rgba(56,189,248,.35);color:#8fd7f7;cursor:pointer" style-hover="border-color:#38bdf8">
+                <i class="bi bi-plus-lg" style="font-size:15px"></i>
+                <span style="font:500 12px Barlow,sans-serif">Add minion</span>
+                </div>
+          </div>
+          </div>
+
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr .8fr;gap:10px">
+      <div>
+        <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:5px">Match type</div>
+        <div style="display:flex;gap:3px;padding:3px;height:36px;box-sizing:border-box;background:#14141c;border:1px solid rgba(255,255,255,.09);border-radius:10px">
+          <sc-for list="{{ rankedOptions }}" as="r" hint-placeholder-count="2">
+            <div onClick="{{ r.onClick }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;background:{{ r.bg }};font:600 12px Barlow,sans-serif;color:{{ r.fg }};cursor:pointer" style-hover="color:#ecedf2"><i class="bi {{ r.icon }}" style="font-size:12px"></i>{{ r.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:5px">Date</div>
+        <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 11px;border-radius:10px;background:#14141c;border:1px solid rgba(255,255,255,.09);cursor:pointer" style-hover="border-color:rgba(139,125,255,.5)"><i class="bi bi-calendar3" style="font-size:13px;color:#6b6c7e"></i><span style="flex:1;font:500 13px IBM Plex Mono,monospace">{{ dateValue }}</span></div>
+      </div>
+      <div>
+        <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:5px">Epic</div>
+        <div style="display:flex;align-items:center;gap:9px;height:36px">
+          <sc-for list="{{ epicStars }}" as="e" hint-placeholder-count="3">
+            <i class="bi {{ e.icon }}" onClick="{{ e.onClick }}" style="font-size:20px;color:{{ e.color }};cursor:pointer"></i>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5c5d70;margin-bottom:5px">Comment</div>
+      <div style="min-height:46px;padding:11px 12px;border-radius:10px;background:#14141c;border:1px solid rgba(255,255,255,.09);font:400 13px Barlow,sans-serif;color:#c9cad6;cursor:text" style-hover="border-color:rgba(139,125,255,.5)">{{ comment }}</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:7px">
+      <i class="bi bi-info-circle" style="font-size:11px;color:#4c4d5e"></i>
+      <div style="font:400 10px IBM Plex Mono,monospace;color:#4c4d5e">Tournament and stage come from the bracket &mdash; never set on this screen.</div>
+    </div>
+  </div>
+
+  <div style="display:{{ footerDisplay }};align-items:center;gap:12px;padding:13px 20px;border-top:1px solid rgba(255,255,255,.07);background:#0c0c14">
+    <div style="display:flex;align-items:center;gap:7px;font:400 11.5px IBM Plex Mono,monospace;color:{{ resultColor }}"><i class="bi {{ resultIcon }}" style="font-size:12px"></i>{{ resultLine }}</div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:10px;border:1px solid rgba(255,255,255,.09);font:500 13px Barlow,sans-serif;color:#8b8c9e;cursor:pointer" style-hover="color:#ecedf2;border-color:rgba(255,255,255,.2)">Save &amp; add another</div>
+    <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:10px;background:#6c5cff;font:600 13.5px Barlow,sans-serif;color:#fff;cursor:pointer" style-hover="background:#7d6fff"><i class="bi bi-check-lg" style="font-size:14px"></i>Save match</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:940,&quot;height&quot;:760},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1v1&quot;,&quot;2v2&quot;,&quot;ffa&quot;,&quot;coop&quot;],&quot;default&quot;:&quot;1v1&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;fighters&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;any[]&quot;},&quot;minions&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;any[]&quot;},&quot;mapName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Kaer Morhen&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mapArt&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;assets/maps/kaer-morhen.png&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;prefilled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;embedded&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;bannerSub&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;draftLog&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;date&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;31 Jul 2026&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;comment&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const SA = f => `assets/heroes/${f}.png`;
+const SP = p => `assets/players/${p}.png`;
+const SUNK = 'assets/Unknown.png';
+const GOLD = '#f0b429', SILVER = '#c9cad6', BRONZE = '#cd7f32';
+const MEDAL = { 1: { c: GOLD, l: '1st', i: 'bi-trophy-fill' }, 2: { c: SILVER, l: '2nd', i: 'bi-award-fill' }, 3: { c: BRONZE, l: '3rd', i: 'bi-award-fill' }, 4: { c: '#8b8c9e', l: '4th', i: 'bi-award' } };
+const MODE_META = {
+  '1v1': { label: '1v1', icon: 'bi-person', color: '#8b7dff', ink: '#150f2e' },
+  '2v2': { label: '2v2', icon: 'bi-people-fill', color: '#c084fc', ink: '#1b0f26' },
+  'ffa': { label: 'FFA', icon: 'bi-diagram-3', color: '#f0b429', ink: '#2a1d02' },
+  'coop': { label: 'Co-op', icon: 'bi-shield-shaded', color: '#38bdf8', ink: '#04212e' }
+};
+const DEMO = {
+  '1v1': [
+    { hero: 'Geralt of Rivia', file: 'geralt-of-rivia', player: 'Vados', hp: 7, cards: 3, sk: 5, side: 0 },
+    { hero: 'Medusa', file: 'medusa', player: 'Ksuha', hp: 0, cards: 1, sk: null, side: 1 }
+  ],
+  '2v2': [
+    { hero: 'Geralt of Rivia', file: 'geralt-of-rivia', player: 'Andrii', hp: 7, cards: 3, sk: null, side: 0 },
+    { hero: 'Medusa', file: 'medusa', player: 'Ksuha', hp: 11, cards: 5, sk: 4, side: 0 },
+    { hero: 'King Arthur', file: 'king-arthur', player: 'Vados', hp: 0, cards: 2, sk: 0, side: 1 },
+    { hero: 'Bigfoot', file: 'bigfoot', player: 'Zheka', hp: 0, cards: 1, sk: null, side: 1 }
+  ],
+  'ffa': [
+    { hero: 'Sherlock Holmes', file: 'sherlock-holmes', player: 'Andrii', hp: 5, cards: 7, sk: null, side: 0, place: 1 },
+    { hero: 'Robin Hood', file: 'robin-hood', player: 'Oleksandr', hp: 2, cards: 4, sk: null, side: 0, place: 2 },
+    { hero: 'Bigfoot', file: 'bigfoot', player: 'Zheka', hp: 0, cards: 6, sk: null, side: 0, place: 3 },
+    { hero: 'Alice', file: 'alice', player: 'Tetyana', hp: 0, cards: 5, sk: 4, side: 0, place: 4 }
+  ],
+  'coop': [
+    { hero: 'Alice', file: 'alice', player: 'Ksuha', hp: 5, cards: 2, sk: null, side: 0 },
+    { hero: 'Robin Hood', file: 'robin-hood', player: 'Andrii', hp: 8, cards: 4, sk: 3, side: 0 },
+    { hero: 'Bloody Mary', file: null, player: 'the game', hp: 0, cards: null, sk: null, side: 1, villain: true }
+  ]
+};
+const DEMO_MINIONS = [{ name: 'Bat swarm', count: 3, hp: 0 }];
+
+class Component extends DCLogic {
+  state = { mode: null, ranked: true, win: 0, ffaN: 4, epic: 2, seq: null, armed: false, dragId: null, edits: {} };
+
+  get mode() { return this.state.mode || this.props.mode || '1v1'; }
+
+  ed(key, def) { const v = this.state.edits[this.mode + '|' + key]; return v === undefined ? def : v; }
+  setEd(key, val) { this.setState(s => ({ edits: { ...s.edits, [this.mode + '|' + key]: val } })); }
+  bump(key, def, delta, max) {
+    const next = Math.max(0, Math.min(max, this.ed(key, def) + delta));
+    this.setEd(key, next);
+  }
+
+  field(key, def, label, max, opts) {
+    const o = opts || {};
+    const value = this.ed(key, def);
+    const zero = !o.dash && value === 0 && o.lost;
+    return { label, longLabel: o.longLabel || label, display: o.display || 'flex',
+      value: o.dash ? '\u2014' : value,
+      color: o.dash ? '#5c5d70' : zero ? '#f2506b' : '#ecedf2',
+      labelColor: zero ? '#f2506b' : '#5c5d70',
+      bg: zero ? 'rgba(242,80,107,.1)' : '#14141c',
+      border: zero ? 'rgba(242,80,107,.3)' : 'rgba(255,255,255,.09)',
+      btnDisplay: o.dash ? 'none' : 'flex',
+      onMinus: () => this.bump(key, def, -1, max),
+      onPlus: () => this.bump(key, def, 1, max) };
+  }
+
+  renderVals() {
+    const mode = this.mode;
+    const given = this.props.fighters;
+    const locked = !!given;
+    const meta = MODE_META[mode];
+    const win = this.state.win;
+
+    let list = (given || DEMO[mode]).map((f, i) => ({
+      hero: f.hero || 'Pick a hero', heroArt: f.heroArt || (f.file ? SA(f.file) : SUNK),
+      player: f.player || '\u2014',
+      avatar: f.avatar || (f.player && !f.villain ? SP(String(f.player).toLowerCase()) : SUNK),
+      hp: f.hp === undefined || f.hp === null ? 0 : f.hp, cards: f.cards, sk: f.sk, side: f.side || 0, villain: !!f.villain,
+      place: f.place, idx: i
+    }));
+    if (mode === 'ffa' && !locked) list = list.slice(0, this.state.ffaN);
+
+    const playing = list.filter(f => !f.villain);
+    const showTurns = mode !== 'coop';
+    const seq = (this.state.seq && this.state.seq.length === playing.length && this.state.seq.every(i => playing.some(p => p.idx === i)))
+      ? this.state.seq : playing.map(p => p.idx);
+    const turnOf = {};
+    if (mode === '2v2') {
+      const perTeam = { 0: 0, 1: 0 };
+      seq.forEach(id => {
+        const p = playing.find(x => x.idx === id);
+        turnOf[id] = perTeam[p.side] * 2 + (p.side === 0 ? 1 : 2);
+        perTeam[p.side] += 1;
+      });
+    } else seq.forEach((id, i) => { turnOf[id] = i + 1; });
+    const orderOf = {};
+    seq.forEach((id, i) => { orderOf[id] = i; });
+    const moveCard = (fromId, toId) => {
+      if (fromId === toId) return;
+      const next = seq.filter(i => i !== fromId);
+      const at = next.indexOf(toId);
+      const before = orderOf[fromId] > orderOf[toId];
+      next.splice(before ? at : at + 1, 0, fromId);
+      this.setState({ seq: next });
+    };
+
+    const mkPlate = f => {
+      const place = mode === 'ffa' ? this.ed('place' + f.idx, f.place || f.idx + 1) : null;
+      const m = place ? MEDAL[place] : null;
+      const won = mode === 'ffa' ? place === 1 : f.side === win;
+      const lost = !won;
+      const accent = mode === 'ffa' ? (m ? m.c : 'rgba(255,255,255,.12)') : won ? '#34d99b' : 'rgba(242,80,107,.45)';
+      return {
+        hero: f.hero, heroArt: f.heroArt, player: f.player, avatar: f.avatar,
+        plateBorder: mode === 'ffa' ? 'rgba(255,255,255,.09)' : won ? 'rgba(52,217,155,.22)' : f.villain ? 'rgba(56,189,248,.2)' : 'rgba(242,80,107,.18)',
+        plateCursor: mode === 'ffa' || locked || f.villain ? 'default' : 'grab',
+        gripDisplay: (showTurns && !f.villain) ? 'flex' : 'none',
+        artBorder: accent,
+        artFilter: (lost && mode !== 'ffa') ? 'grayscale(.55)' : 'none',
+        xDisplay: (lost && mode !== 'ffa') ? 'flex' : 'none',
+        turnDisplay: (showTurns && !f.villain) ? 'flex' : 'none',
+        draggable: showTurns && !f.villain,
+        onGripDown: () => { this.armed = true; },
+        onDragStart: e => { if (!this.armed) { e.preventDefault(); return; } e.dataTransfer.effectAllowed = 'move'; this.setState({ dragId: f.idx }); },
+        onDragEnd: () => { this.armed = false; this.setState({ dragId: null }); },
+        onDragOver: e => { if (this.state.dragId !== null && this.state.dragId !== undefined) e.preventDefault(); },
+        onDrop: e => { e.preventDefault(); this.armed = false; const from = this.state.dragId; this.setState({ dragId: null }); if (from !== null && from !== undefined) moveCard(from, f.idx); },
+        dragOpacity: this.state.dragId === f.idx ? .45 : 1,
+        turnNum: turnOf[f.idx],
+        medalDisplay: mode === 'ffa' ? 'flex' : 'none',
+        medalTop: mode === 'ffa' ? 'auto' : '-7px',
+        medalBottom: mode === 'ffa' ? '6px' : 'auto',
+        medalColor: m ? m.c : '#8b8c9e', medalIcon: m ? m.i : 'bi-award', medalLabel: m ? m.l : '',
+        onPlace: () => this.setEd('place' + f.idx, place >= list.length ? 1 : place + 1),
+        playerDisplay: f.villain ? 'none' : 'flex',
+        diceDisplay: f.villain ? 'none' : 'block',
+        heroChevronDisplay: f.villain ? 'block' : 'none',
+        removeDisplay: (mode === 'ffa' && !locked && list.length > 3) ? 'block' : 'none',
+        onRemove: () => this.setState({ ffaN: 3 }),
+        fields: [
+          this.field('hp' + f.idx, f.hp, 'HP', 40, { lost, longLabel: 'HP LEFT' }),
+          this.field('cd' + f.idx, f.cards === null || f.cards === undefined ? 0 : f.cards, 'CARDS', 40, { dash: f.cards === null || f.cards === undefined }),
+          this.field('sk' + f.idx, f.sk === null || f.sk === undefined ? 0 : f.sk, 'SK', 20, { dash: f.sk === null || f.sk === undefined, display: f.villain ? 'none' : 'flex', longLabel: 'SIDEKICK' })
+        ],
+        addMinionDisplay: f.villain ? 'flex' : 'none',
+        onAddMinion: () => {}
+      };
+    };
+
+    const sideTitles = { '1v1': ['Fighter', 'Opponent'], '2v2': ['Team 1', 'Team 2'], 'ffa': ['Players'], 'coop': ['Heroes', 'Villain'] };
+    const groups = mode === 'ffa' ? [0] : [0, 1];
+    const sides = groups.map(g => {
+      const fighters = list.filter(f => f.side === g).slice().sort((a, b) => (orderOf[a.idx] ?? 99) - (orderOf[b.idx] ?? 99));
+      const villainSide = mode === 'coop' && g === 1;
+      const won = g === win;
+      return {
+        title: sideTitles[mode][g],
+        titleColor: mode === 'ffa' ? '#8b8c9e' : villainSide ? '#38bdf8' : won ? '#34d99b' : '#f2506b',
+        bg: mode === 'ffa' ? 'rgba(255,255,255,.022)' : villainSide ? 'rgba(56,189,248,.06)' : won ? 'rgba(52,217,155,.07)' : 'rgba(242,80,107,.05)',
+        border: mode === 'ffa' ? 'rgba(255,255,255,.07)' : villainSide ? 'rgba(56,189,248,.32)' : won ? 'rgba(52,217,155,.4)' : 'rgba(242,80,107,.28)',
+        vsDisplay: g === 1 ? 'block' : 'none',
+        vsWidth: g === 1 ? '32px' : '0px',
+        cols: mode === 'ffa' ? '1fr 1fr' : villainSide ? '1fr' : fighters.length > 1 ? '1fr 1fr' : '1fr',
+        winDisplay: mode === 'ffa' ? 'none' : 'flex',
+        winLabel: won ? 'Winner' : 'Mark winner',
+        winIcon: won ? 'bi-trophy-fill' : 'bi-trophy',
+        winBg: won ? '#34d99b' : 'transparent',
+        winBorder: won ? '#34d99b' : 'rgba(255,255,255,.12)',
+        winFg: won ? '#062a1c' : '#6b6c7e',
+        onWin: () => this.setState({ win: g }),
+        addMinionDisplay: villainSide ? 'flex' : 'none',
+        minionColDisplay: villainSide ? 'flex' : 'none',
+        onAddMinion: () => {},
+        addDisplay: (!locked && ((mode === 'ffa' && list.length < 4) || (mode === 'coop' && g === 0))) ? 'flex' : 'none',
+        addLabel: 'Add player',
+        onAdd: () => { if (mode === 'ffa') this.setState({ ffaN: 4 }); },
+        fighters: fighters.map(mkPlate),
+        minions: villainSide ? (this.props.minions || DEMO_MINIONS).map((mi, i) => ({
+          name: mi.name, art: mi.art || SUNK,
+          fields: [
+            this.field('mc' + i, mi.count, 'COUNT', 12, {}),
+            this.field('mh' + i, mi.hp, 'HP', 12, {})
+          ]
+        })) : []
+      };
+    });
+
+    const winnerName = mode === 'ffa'
+      ? (list.find(f => this.ed('place' + f.idx, f.place || f.idx + 1) === 1) || {}).hero || '\u2014'
+      : (() => { const w = list.filter(f => f.side === win); return w.length === 1 ? w[0].hero : sideTitles[mode][win]; })();
+    const ranked = this.state.ranked;
+    const orderText = playing.slice().sort((a, b) => turnOf[a.idx] - turnOf[b.idx]).map(p => p.player).join(' \u2192 ');
+
+    return {
+      title: locked ? 'Match sheet' : 'Add match',
+      bannerDisplay: this.props.prefilled ? 'flex' : 'none',
+      bannerSub: this.props.bannerSub || 'fighters sorted by turn order \u2014 every field is still editable',
+      modeSwitchDisplay: locked ? 'none' : 'flex',
+      modeChipDisplay: locked ? 'flex' : 'none',
+      modeChipLabel: meta.label, modeChipIcon: meta.icon,
+      modes: Object.keys(MODE_META).map(k => {
+        const on = k === mode;
+        return { label: MODE_META[k].label, icon: MODE_META[k].icon,
+          bg: on ? MODE_META[k].color : 'transparent',
+          fg: on ? MODE_META[k].ink : '#8b8c9e',
+          onClick: () => this.setState({ mode: k, win: 0, ffaN: 4, order: null }) };
+      }),
+      rankedOptions: [
+        { label: 'Ranked', icon: 'bi-graph-up-arrow', on: ranked },
+        { label: 'Casual', icon: 'bi-emoji-smile', on: !ranked }
+      ].map(o => ({ label: o.label, icon: o.icon,
+        bg: o.on ? (o.label === 'Ranked' ? '#34d99b' : 'rgba(255,255,255,.1)') : 'transparent',
+        fg: o.on ? (o.label === 'Ranked' ? '#062a1c' : '#ecedf2') : '#8b8c9e',
+        onClick: () => this.setState({ ranked: o.label === 'Ranked' }) })),
+      mapArt: this.props.mapArt || 'assets/maps/kaer-morhen.png',
+      mapName: this.props.mapName || 'Kaer Morhen',
+      mapDiceDisplay: locked ? 'none' : 'block',
+      draftedBadgeDisplay: this.props.prefilled ? 'block' : 'none',
+      shuffleDisplay: showTurns ? 'flex' : 'none',
+      shuffleLabel: locked ? 'Reshuffle turn order' : 'Shuffle turn order',
+      onShuffle: () => {
+        const a = playing.map(p => p.idx);
+        for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+        this.setState({ seq: a });
+      },
+      dragHint: showTurns ? 'grab the handle on a card to change turn order' : 'turn order does not matter in co-op',
+      orderLabel: mode === 'coop' ? 'No turn order in co-op' : 'Order: ' + orderText,
+      sides,
+      dateValue: this.props.date || '31 Jul 2026',
+      epicStars: [1, 2, 3].map(i => ({
+        icon: i <= this.state.epic ? 'bi-star-fill' : 'bi-star',
+        color: i <= this.state.epic ? GOLD : '#5c5d70',
+        onClick: () => this.setState({ epic: i === this.state.epic ? 0 : i })
+      })),
+      comment: this.props.comment || (locked ? 'Drafted' : 'Last-turn comeback, Geralt at 1 HP\u2026'),
+      draftLogDisplay: this.props.draftLog ? 'flex' : 'none',
+      draftLog: this.props.draftLog || '',
+      footerDisplay: this.props.embedded ? 'none' : 'flex',
+      resultIcon: 'bi-trophy-fill',
+      resultColor: '#34d99b',
+      resultLine: mode === 'ffa'
+        ? winnerName + ' takes 1st \u00b7 places set on the plates'
+        : winnerName + ' won \u00b7 ' + (ranked ? 'counts for the ladder' : 'casual, no rating change')
+    };
+  }
+}
+</script>
+</body>
+</html>

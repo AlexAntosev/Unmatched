@@ -29,3 +29,23 @@
     flex: 1;
     border-bottom: 2px solid var(--um-border);
 }
+
+.um-tabs-pill {
+    padding: 3px;
+    border-radius: var(--um-radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    gap: 4px;
+}
+
+.um-tab-pill {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: var(--um-radius-md);
+    border-bottom: none;
+    font: 600 11.5px var(--um-font-body);
+}
+
+.um-tab-pill.is-selected {
+    background: rgba(139, 125, 255, 0.2);
+    color: var(--um-accent-text);
+}

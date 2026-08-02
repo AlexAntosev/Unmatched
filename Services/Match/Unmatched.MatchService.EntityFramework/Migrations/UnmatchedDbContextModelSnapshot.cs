@@ -85,6 +85,15 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<Guid>("TitlesId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("EarnedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("Metric")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TimesEarned")
+                        .HasColumnType("int");
+
                     b.HasKey("HeroesId", "TitlesId");
 
                     b.HasIndex("TitlesId");
@@ -113,8 +122,14 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<bool>("IsPlanned")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsRanked")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("MapId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Round")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Stage")
                         .HasColumnType("int");
@@ -197,6 +212,9 @@ namespace Unmatched.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HeroId")
+                        .IsUnique();
+
                     b.ToTable("Ratings");
                 });
 
@@ -224,13 +242,58 @@ namespace Unmatched.EntityFramework.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Exclusivity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Kind")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RuleKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("TournamentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("RuleKey")
+                        .IsUnique()
+                        .HasFilter("[RuleKey] IS NOT NULL");
+
                     b.ToTable("Titles");
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentAwardEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AwardKind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("AwardedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("HeroId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TournamentId", "HeroId", "AwardKind")
+                        .IsUnique();
+
+                    b.ToTable("TournamentAwards");
                 });
 
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentEntity", b =>
@@ -239,25 +302,80 @@ namespace Unmatched.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CurrentStage")
                         .HasColumnType("int");
+
+                    b.Property<int>("Format")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageFileName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("InitialStage")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("TrophyImageFileName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Tournaments");
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentParticipantEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("FinalPlacement")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("HeroId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TournamentId", "HeroId")
+                        .IsUnique();
+
+                    b.ToTable("TournamentParticipants");
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentTitleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TournamentId", "Kind")
+                        .IsUnique();
+
+                    b.ToTable("TournamentTitles");
                 });
 
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.FighterEntity", b =>
@@ -307,6 +425,24 @@ namespace Unmatched.EntityFramework.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentParticipantEntity", b =>
+                {
+                    b.HasOne("Unmatched.MatchService.Domain.Entities.TournamentEntity", null)
+                        .WithMany("Participants")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentTitleEntity", b =>
+                {
+                    b.HasOne("Unmatched.MatchService.Domain.Entities.TournamentEntity", null)
+                        .WithMany("TournamentTitles")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.MatchEntity", b =>
                 {
                     b.Navigation("Fighters");
@@ -327,6 +463,10 @@ namespace Unmatched.EntityFramework.Migrations
             modelBuilder.Entity("Unmatched.MatchService.Domain.Entities.TournamentEntity", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("Participants");
+
+                    b.Navigation("TournamentTitles");
                 });
 #pragma warning restore 612, 618
         }

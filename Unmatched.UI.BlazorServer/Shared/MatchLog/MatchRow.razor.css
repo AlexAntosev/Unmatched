@@ -3,13 +3,19 @@
     border-left: 3px solid transparent;
 }
 
+/* Turn 11c's column plan (Date/Mode/Participants/Map/Tournament/Epic/chevron) is specified at
+   2560px; the app normally runs at ~1240-1440px. Each fixed column scales continuously between
+   the two with clamp() rather than jumping at a breakpoint - this same expression is duplicated
+   in MatchList.razor's Columns constant so the header lines up with the rows (that copy lives on
+   an inline style set from a child component, which scoped CSS in MatchList.razor.css can't
+   reach to override). */
 .match-row-line {
     display: grid;
-    grid-template-columns: 96px 96px 1fr 195px 26px 74px 28px;
+    grid-template-columns:
+        clamp(88px, 7.5vw, 132px) clamp(84px, 6vw, 104px) minmax(0, 1fr)
+        clamp(150px, 14vw, 260px) clamp(140px, 13vw, 240px) clamp(70px, 5.5vw, 96px) clamp(26px, 2vw, 30px);
     gap: 14px;
     align-items: center;
-    /* Vertical padding is trimmed to offset the larger fighter chips below, so the row's overall
-       height (78px) stays the same as before they grew. */
     padding: 9px 16px;
     cursor: pointer;
     transition: background-color 0.12s ease;
@@ -31,6 +37,21 @@
     color: var(--um-text-faint);
 }
 
+.match-row-unranked {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font: 500 10px var(--um-font-mono);
+    letter-spacing: 0.06em;
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.match-row-unranked i {
+    font-size: 10px;
+}
+
 .match-row-participants {
     display: flex;
     align-items: center;
@@ -45,6 +66,27 @@
 }
 
 .match-row-map {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.match-row-map-thumb {
+    flex: none;
+    width: 34px;
+    height: 24px;
+    border-radius: var(--um-radius-sm);
+    border: 1px solid var(--um-border);
+    object-fit: cover;
+    background: #16161f;
+}
+
+.match-row-map-text {
+    min-width: 0;
+}
+
+.match-row-map-name {
     font: 400 12.5px var(--um-font-mono);
     color: var(--um-text-muted);
     white-space: nowrap;
@@ -52,16 +94,59 @@
     text-overflow: ellipsis;
 }
 
-.match-row-comment {
+.match-row-map-expansion {
+    display: none;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.match-row-tournament {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 7px;
+    min-width: 0;
     font-size: 12px;
     color: var(--um-text-dim);
 }
 
+.match-row-tournament-text {
+    min-width: 0;
+}
+
+.match-row-tournament-name {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.match-row-tournament-stage {
+    display: none;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.match-row-tournament-dash {
+    color: var(--um-text-faint);
+}
+
 .match-row-epic {
-    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.match-row-comment-icon {
+    font-size: 12px;
+    color: var(--um-text-dim);
 }
 
 .match-row-chevron {
@@ -71,4 +156,18 @@
 
 .match-row-chevron i {
     font-size: 13px;
+}
+
+/* The expansion/stage sub-lines are a content reveal, not a geometry change, so they still snap
+   in at a fixed breakpoint rather than fading in continuously. */
+@media (min-width: 1600px) {
+    .match-row-map-thumb {
+        width: 62px;
+        height: 40px;
+    }
+
+    .match-row-map-expansion,
+    .match-row-tournament-stage {
+        display: block;
+    }
 }

@@ -22,8 +22,6 @@ public class HeroStatisticsService(IMapper mapper,IMatchClient matchClient, ISta
         var catalogHeroSidekicks = await catalogClient.GetSidekicksByHeroAsync(heroId);
         uiModel.Sidekicks = catalogHeroSidekicks.Select(mapper.Map<UiSidekickDto>);
 
-        uiModel.Titles = await matchClient.GetTitlesByHeroAsync(heroId);
-
         var catalogPlayStyle = await catalogClient.GetPlayStyleByHero(heroId);
         uiModel.PlayStyle = mapper.Map<UiPlayStyleDto>(catalogPlayStyle);
 

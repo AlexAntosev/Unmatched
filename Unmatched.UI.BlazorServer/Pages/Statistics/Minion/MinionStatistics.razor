@@ -1,9 +1,12 @@
 @page "/minions-statistics/{id}"
 @using Unmatched.Dtos
+@using Unmatched.Services.Contracts
 @using Unmatched.Services.Statistics
 @using Unmatched.UI.BlazorServer.Pages.Statistics
 @using Unmatched.UI.BlazorServer.Shared.MatchLog
 @inject IMinionStatisticsService MinionStatisticsService
+@inject IMinionService MinionService
+@inject ICollectionService CollectionService
 @inject NavigationManager NavManager
 @*
     Not in the design pack: the 2a dossier pattern applied to a minion.
@@ -59,7 +62,9 @@
             var stats = MinionStatisticsService.GetMinionStatisticsAsync(minionId);
             var matches = MinionStatisticsService.GetMinionMatchesAsync(minionId);
             var ladder = MinionStatisticsService.GetMinionsStatisticsAsync();
-            await Task.WhenAll(stats, matches, ladder);
+            var catalog = MinionService.GetAsync();
+            var owned = CollectionService.GetOwnedExpansionIdsAsync();
+            await Task.WhenAll(stats, matches, ladder, catalog, owned);
 
             _minion = stats.Result;
             _matchLog = matches.Result.OrderByDescending(m => m.Date).ToList();
@@ -77,12 +82,30 @@
                 .OrderByDescending(r => r.Total)
                 .ToList();
 
-            BuildNeighbours(ladder.Result.ToList(), minionId);
+            var catalogMinions = catalog.Result.ToDictionary(m => m.Id);
+            var ownedExpansionIds = owned.Result.ToHashSet();
+            BuildNeighbours(FilterByCollection(ladder.Result.ToList(), catalogMinions, ownedExpansionIds), minionId);
         }
         finally
         {
             PreloadService.Hide();
         }
+    }
+
+    /// <summary>Minions from sets you do not own are excluded from Prev/Next, matching the ladder page.</summary>
+    private static List<MinionStatisticsDto> FilterByCollection(
+        List<MinionStatisticsDto> minions, Dictionary<Guid, MinionDto> catalogMinions, HashSet<Guid> ownedExpansionIds)
+    {
+        if (ownedExpansionIds.Count == 0)
+        {
+            return minions;
+        }
+
+        return minions
+            .Where(m => !catalogMinions.TryGetValue(m.MinionId, out var catalogMinion)
+                     || catalogMinion.ExpansionId is null
+                     || ownedExpansionIds.Contains(catalogMinion.ExpansionId.Value))
+            .ToList();
     }
 
     /// <summary>Same order as the Minions ladder (most matches played first), wrapping at the ends.</summary>

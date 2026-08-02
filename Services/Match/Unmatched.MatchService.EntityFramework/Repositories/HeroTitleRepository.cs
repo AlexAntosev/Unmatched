@@ -20,4 +20,9 @@ public class HeroTitleRepository(UnmatchedDbContext dbContext) : IHeroTitleRepos
             dbContext.Entry(existing).CurrentValues.SetValues(model);
         }
     }
+
+    public void DeleteAll()
+    {
+        dbContext.Set<HeroTitleEntity>().RemoveRange(dbContext.Set<HeroTitleEntity>());
+    }
 }

@@ -8,6 +8,13 @@ using Unmatched.MatchService.EntityFramework.Context;
 
 public class TitleRepository(UnmatchedDbContext dbContext) : BaseRepository<TitleEntity, UnmatchedDbContext>(dbContext), ITitleRepository
 {
+    public override async Task<IReadOnlyList<TitleEntity>> GetAsync()
+    {
+        var entities = await DbContext.Titles.Include(t => t.HeroTitles).AsNoTracking().ToListAsync();
+
+        return entities;
+    }
+
     public async Task<IEnumerable<TitleEntity>> GetByHeroId(Guid heroId)
     {
         var entities = await DbContext.Titles.Include(t => t.HeroTitles).Where(t => t.HeroTitles.Any(h => h.HeroesId == heroId)).AsNoTracking().ToListAsync();
@@ -15,9 +22,9 @@ public class TitleRepository(UnmatchedDbContext dbContext) : BaseRepository<Titl
         return entities;
     }
 
-    public async Task<TitleEntity?> GetByNameAsync(string name)
+    public async Task<TitleEntity?> GetByRuleKeyAsync(string ruleKey)
     {
-        var entity = await DbContext.Titles.Include(t => t.HeroTitles).AsNoTracking().FirstOrDefaultAsync(t => t.Name.Equals(name));
+        var entity = await DbContext.Titles.Include(t => t.HeroTitles).FirstOrDefaultAsync(t => t.RuleKey == ruleKey);
 
         return entity;
     }

@@ -1,5 +1,6 @@
 @using Unmatched.Dtos
 @using Unmatched.Enums
+@using Unmatched.Extensions
 @using Unmatched.Services.Statistics
 @*
     Screen 3b: the one row shape used by the match log and every "recent matches" block. The left
@@ -18,6 +19,10 @@
         </div>
         <div>
             <ModeBadge Mode="Match.GameMode"/>
+            @if (ShowUnrankedBadge)
+            {
+                <span class="match-row-unranked" title="Unranked - doesn't affect hero rating"><i class="bi bi-dash-circle"></i>Unranked</span>
+            }
         </div>
         <div class="match-row-participants">
             @foreach (var side in _sides)
@@ -29,24 +34,54 @@
                 <SideBox Variant="@SideVariant(side)">
                     @foreach (var participant in side.Participants)
                     {
-                        <FighterChip ImageUrl="@participant.ImageUrl"
-                                     PlayerAvatarUrl="@participant.PlayerImageUrl"
-                                     Title="@ChipTitle(participant)"
-                                     IsWinner="participant.IsWinner"
-                                     Place="@(Match.GameMode == GameMode.FreeForAll ? participant.Place : null)"
-                                     Size="46"/>
+                        <FighterPlate Participant="@participant"
+                                      Title="@ChipTitle(participant)"
+                                      IsRanked="@Match.IsRanked"
+                                      ShowPlace="@(Match.GameMode == GameMode.FreeForAll)"/>
                     }
                 </SideBox>
             }
         </div>
-        <div class="match-row-map">@MapName</div>
-        <div class="match-row-comment">
-            @if (!string.IsNullOrWhiteSpace(Match.Comment))
+        <div class="match-row-map">
+            @if (Map is not null)
             {
-                <i class="bi bi-chat-left-text-fill" title="@Match.Comment"></i>
+                <img class="match-row-map-thumb" src="@Map.ImageUrl" alt="@Map.DisplayName"
+                     onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                <div class="match-row-map-text">
+                    <div class="match-row-map-name">@Map.DisplayName</div>
+                    @if (!string.IsNullOrEmpty(Map.ExpansionName))
+                    {
+                        <div class="match-row-map-expansion">@Map.ExpansionName</div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="match-row-map-name">@MapName</div>
+            }
+        </div>
+        <div class="match-row-tournament">
+            @if (Match.TournamentId is not null)
+            {
+                <i class="bi bi-trophy"></i>
+                <div class="match-row-tournament-text">
+                    <div class="match-row-tournament-name">@Match.TournamentName</div>
+                    @if (!string.IsNullOrEmpty(StageOrRoundText))
+                    {
+                        <div class="match-row-tournament-stage">@StageOrRoundText</div>
+                    }
+                </div>
+            }
+            else
+            {
+                <span class="match-row-tournament-dash">–</span>
             }
         </div>
         <div class="match-row-epic">
+            @if (!string.IsNullOrWhiteSpace(Match.Comment))
+            {
+                <i class="bi bi-chat-left-text-fill match-row-comment-icon" title="@Match.Comment"></i>
+            }
             <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="13"/>
         </div>
         <div class="match-row-chevron">
@@ -66,15 +101,34 @@
     [Parameter, EditorRequired]
     public UiMatchLogDto Match { get; set; } = default!;
 
-    /// <summary>Resolved display name for the map - the log DTO only carries the internal name.</summary>
+    /// <summary>Resolved display name for the map - used only when <see cref="Map"/> couldn't be
+    /// resolved (falls back to the internal name the log DTO carries).</summary>
     [Parameter]
     public string? MapName { get; set; }
+
+    /// <summary>The full map, for the thumbnail + expansion name shown in the row. Optional -
+    /// falls back to plain <see cref="MapName"/> text when the caller can't resolve it.</summary>
+    [Parameter]
+    public MapDto? Map { get; set; }
 
     [Parameter]
     public bool IsOpen { get; set; }
 
     [Parameter]
     public EventCallback OnToggle { get; set; }
+
+    /// <summary>Co-op is excluded - it never affects rating regardless of IsRanked, so the label
+    /// would only raise a question the game mode itself already answers.</summary>
+    private bool ShowUnrankedBadge => !Match.IsRanked && Match.GameMode != GameMode.Cooperative;
+
+    /// <summary>Bracket stage for elimination formats, or "Round N" for Swiss/group formats that
+    /// use <see cref="UiMatchLogDto.Round"/> instead - the two are mutually exclusive per match.</summary>
+    private string StageOrRoundText
+        => Match.Stage is not null
+            ? Match.Stage.Value.GetStageName()
+            : Match.Round is not null
+                ? $"Round {Match.Round}"
+                : string.Empty;
 
     protected override void OnParametersSet()
     {

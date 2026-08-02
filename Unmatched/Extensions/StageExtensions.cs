@@ -33,17 +33,4 @@ public static class StageExtensions
                 _ => ""
             };
     }
-    
-    public static int GetCoefficient(this Stage stage)
-    {
-        return stage switch
-            {
-                Stage.Group => 2,
-                Stage.QuarterFinals => 8,
-                Stage.SemiFinals => 8,
-                Stage.ThirdPlaceDecider => 8,
-                Stage.GrandFinals => 4,
-                _ => 1
-            };
-    }
 }

@@ -10,15 +10,15 @@ using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.Repositories;
-using Unmatched.MatchService.Domain.TitleHandlers;
+using Unmatched.MatchService.Domain.Titles;
+using Unmatched.MatchService.Domain.Validation;
 
 public class MatchService(
-    IMatchHandlerFactory matchHandlerFactory,
+    IMatchHandler matchHandler,
+    RankedMatchDataValidator rankedMatchDataValidator,
     IMapper mapper,
     IUnitOfWork unitOfWork,
-    IStreakTitleHandler streakTitleHandler,
-    IRusherTitleHandler rusherTitleHandler,
-    IPunisherTitleHandler punisherTitleHandler,
+    TitleEvaluator titleEvaluator,
     ICatalogHeroCache catalogHeroCache,
     IPlayerCache playerCache,
     IKafkaProducer kafkaProducer) : IMatchService
@@ -26,8 +26,8 @@ public class MatchService(
     public async Task<SaveMatchResult> AddOrUpdateAsync(Match matchDto)
     {
         var match = mapper.Map<MatchEntity>(matchDto);
-        var handler = matchHandlerFactory.Create(match);
-        await handler.HandleAsync(match);
+        await rankedMatchDataValidator.ValidateAsync(match);
+        await matchHandler.HandleAsync(match);
 
         await FlagRecalculationIfAddedOutOfChronologicalOrderAsync(match);
 
@@ -44,11 +44,7 @@ public class MatchService(
         if (match.GameMode != Enums.GameMode.Cooperative)
         {
             // TODO: move title logic to title microservice
-            await streakTitleHandler.HandleAsync();
-            var rusherTitlesEarned = await rusherTitleHandler.HandleAsync(match);
-            var punisherTitlesEarned = await punisherTitleHandler.HandleAsync(match);
-            titlesEarned.AddRange(rusherTitlesEarned);
-            titlesEarned.AddRange(punisherTitlesEarned);
+            titlesEarned.AddRange(await titleEvaluator.EvaluateAsync(match));
         }
 
         var heroes = await catalogHeroCache.GetAsync();
@@ -239,7 +235,13 @@ public class MatchService(
             .Select(m => (DateTime?)m.Date)
             .Max();
 
-        if (latestOtherMatchDate is not null && match.Date < latestOtherMatchDate)
+        var latestAwardDate = (await unitOfWork.TournamentAwards.GetAsync())
+            .Select(a => (DateTime?)a.AwardedAt)
+            .Max();
+
+        var latestOtherOccurredAt = new[] { latestOtherMatchDate, latestAwardDate }.Max();
+
+        if (latestOtherOccurredAt is not null && match.Date < latestOtherOccurredAt)
         {
             await unitOfWork.RatingRecalculationState.SetRecalculationRequiredAsync(true);
         }

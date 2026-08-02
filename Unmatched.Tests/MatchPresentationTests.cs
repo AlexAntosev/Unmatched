@@ -177,4 +177,29 @@ public class MatchPresentationTests
         Assert.Equal("Vados", entries[0].Participant.PlayerName);
         Assert.Equal("Ksuha", entries[1].Participant.PlayerName);
     }
+
+    [Fact]
+    public void Participants_HeroesCarryTheirRatingDelta()
+    {
+        var match = Match(
+            new DateTime(2026, 7, 12),
+            [Fighter(Hero("Medusa"), true, matchPoints: 18), Fighter(Hero("Alice"), false, matchPoints: -18)],
+            GameMode.OneVsOne);
+
+        var entries = MatchPresentation.Scoreboard(match);
+
+        Assert.Equal(18, entries[0].Participant.RatingDelta);
+        Assert.Equal(-18, entries[1].Participant.RatingDelta);
+    }
+
+    [Fact]
+    public void Participants_VillainsAndMinionsCarryNoRatingDelta()
+    {
+        var entries = MatchPresentation.Scoreboard(CoopMatch(villainWon: true, "Tarantula"));
+
+        var villainAndMinion = entries.Where(e => e.Participant.Kind != ParticipantKind.Hero).ToList();
+
+        Assert.Equal(2, villainAndMinion.Count);
+        Assert.All(villainAndMinion, e => Assert.Null(e.Participant.RatingDelta));
+    }
 }

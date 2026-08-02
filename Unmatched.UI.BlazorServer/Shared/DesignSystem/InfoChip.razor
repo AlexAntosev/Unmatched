@@ -1,0 +1,23 @@
+@*
+    A small read-only pill for context that used to be an editable field - e.g. the match sheet's
+    tournament/stage badge when a match is locked to a tournament bracket
+    (design/IMPLEMENTATION-PROMPT.md §5.5: "there is no Tournament or Stage field on this screen").
+*@
+<div class="um-info-chip @Class">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="bi @Icon"></i>
+    }
+    <span>@Text</span>
+</div>
+
+@code {
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Class { get; set; }
+}

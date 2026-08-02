@@ -1,0 +1,87 @@
+.um-stepper {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 31px;
+    padding: 0 4px 0 10px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-control);
+    border: 1px solid var(--um-border);
+}
+
+.um-stepper-label {
+    font: 400 9.5px var(--um-font-mono);
+    letter-spacing: 0.09em;
+    color: var(--um-text-faint);
+    white-space: nowrap;
+}
+
+.um-stepper-value {
+    min-width: 19px;
+    flex: none;
+    text-align: center;
+    font: 500 13.5px var(--um-font-mono);
+    color: var(--um-text);
+}
+
+input.um-stepper-value {
+    width: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    outline: none;
+    /* Native up/down arrows would duplicate the +/- buttons either side of this field. */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input.um-stepper-value::-webkit-outer-spin-button,
+input.um-stepper-value::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+input.um-stepper-value:focus {
+    background: var(--um-bg-hover);
+}
+
+.um-stepper-value-dash {
+    color: var(--um-text-faint);
+}
+
+.um-stepper-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 24px;
+    flex: none;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: var(--um-text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.12s ease, background-color 0.12s ease;
+}
+
+.um-stepper-btn:hover:not(:disabled) {
+    color: var(--um-text);
+    background: var(--um-bg-hover);
+}
+
+.um-stepper-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.um-stepper.is-alert {
+    background: var(--um-loss-wash);
+    border-color: var(--um-loss-border);
+}
+
+.um-stepper.is-alert .um-stepper-label,
+.um-stepper.is-alert .um-stepper-value {
+    color: var(--um-loss);
+}

@@ -1,66 +1,58 @@
-/* The shared .plate/.plate-art-wrap/.plate-stacked-fields/.fighter-narrow shell lives in
-   wwwroot/css/theme/base.css (shared with FighterCard.razor's fighter plates). Only the villain
-   box's own layout and the minion rows are scoped here. */
+/* The shared .match-card* shell lives in wwwroot/css/theme/base.css (shared with
+   FighterCard.razor's fighter cards) - only this component's own layout is scoped here. */
 
-.villain {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+.match-card ::deep .um-select {
+    width: 100%;
 }
 
-/* Minions are indented under their villain, matching the expanded scoreboard. The identity
-   column has no label above its select, unlike the HP field beside it, so the row top-aligns
-   and a spacer the height of a UmField label (see .um-field-label) sits above the select -
-   otherwise the select would float noticeably higher than the HP input beside it. */
-.minion {
+.villain-row {
     display: flex;
     align-items: flex-start;
-    gap: 9px;
-    margin-left: 16px;
-    padding: 7px 9px;
-    border: 1px solid var(--um-info-border);
-    border-radius: var(--um-radius-md);
-    background: var(--um-info-wash);
+    gap: 13px;
 }
 
-.minion ::deep .um-token {
-    align-self: center;
-}
-
-.minion-identity {
-    flex: 1;
-    min-width: 0;
+.villain-minion-column {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-}
-
-.minion-select-spacer {
-    height: 15px;
+    gap: 9px;
+    width: 132px;
     flex: none;
 }
 
-.minion-count {
-    font: 400 9.5px var(--um-font-mono);
-    color: var(--um-text-dim);
+.minion-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(10, 10, 16, 0.8);
+    font: 600 8.5px var(--um-font-mono);
+    letter-spacing: 0.08em;
+    color: var(--um-info);
 }
 
-.minion-hp {
-    width: 58px;
-    flex: none;
-}
-
-.minion-remove {
-    align-self: center;
-    padding: 0 2px;
-    border: 0;
+.villain-add-minion {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 132px;
+    padding: 13px 0;
+    border: 1px dashed var(--um-info-border);
+    border-radius: var(--um-radius-card);
     background: none;
     color: var(--um-info);
-    font-size: 12px;
+    font: 500 12px var(--um-font-body);
     cursor: pointer;
-    transition: color 0.12s ease;
+    transition: border-color 0.12s ease;
 }
 
-.minion-remove:hover {
-    color: var(--um-loss);
+.villain-add-minion:hover {
+    border-color: var(--um-info);
+}
+
+.villain-add-minion i {
+    font-size: 15px;
 }

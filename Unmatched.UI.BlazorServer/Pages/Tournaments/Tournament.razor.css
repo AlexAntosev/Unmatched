@@ -1,3 +1,200 @@
+.tournament-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ---- Banner ---- */
+
+.td-banner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 140px;
+    border-radius: var(--um-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--um-border);
+}
+
+.td-cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.55);
+}
+
+.td-identity {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+}
+
+.td-name {
+    font: 600 22px/1.2 var(--um-font-display);
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.td-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.td-format,
+.td-participants {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font: 500 11.5px var(--um-font-mono);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.td-status {
+    font: 600 10.5px var(--um-font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.td-status.is-draft {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.td-status.is-in-progress {
+    color: var(--um-info);
+}
+
+.td-status.is-completed {
+    color: var(--um-gold);
+}
+
+.td-trophy {
+    position: relative;
+    z-index: 1;
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    margin: 0 20px 14px auto;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+.td-error {
+    margin: 0;
+}
+
+.td-participant-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ---- Awards ---- */
+
+.award-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.award-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 4px;
+    border-bottom: 1px solid var(--um-border-soft);
+}
+
+.award-row:last-child {
+    border-bottom: none;
+}
+
+.award-hero-name {
+    flex: 1;
+    min-width: 0;
+    font: 600 12.5px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.award-kind {
+    font: 500 10.5px var(--um-font-mono);
+    letter-spacing: 0.02em;
+    color: var(--um-text-muted);
+}
+
+.award-points {
+    min-width: 44px;
+    text-align: right;
+    font: 700 12.5px var(--um-font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.award-points.is-positive {
+    color: var(--um-win);
+}
+
+.award-points.is-negative {
+    color: var(--um-loss);
+}
+
+/* ---- Standings ---- */
+
+.standings-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.standings-header,
+.standings-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 48px 48px;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 4px;
+}
+
+.standings-header {
+    font: 500 10px var(--um-font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+    border-bottom: 1px solid var(--um-border);
+}
+
+.standings-row {
+    border-bottom: 1px solid var(--um-border-soft);
+    font: 400 12.5px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.standings-row:last-child {
+    border-bottom: none;
+}
+
+.standings-rank {
+    font: 600 12px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.standings-hero {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.standings-right {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 .bracket {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

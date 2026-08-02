@@ -1,0 +1,97 @@
+/* .draft-step / .draft-step-caption / .draft-step-head are shared across every step component -
+   they live in wwwroot/css/theme/base.css since Blazor CSS isolation is per-component and each
+   step is its own component. */
+
+.players-modes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.players-mode {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 13px 14px;
+    border-radius: var(--um-radius-card);
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    color: var(--um-text-muted);
+    cursor: pointer;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.players-mode i {
+    font-size: 16px;
+    color: var(--um-mode-accent, var(--um-text-dim));
+}
+
+.players-mode-label {
+    font: 600 13px var(--um-font-display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.players-mode-hint {
+    font: 400 11px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.players-mode.is-selected {
+    border-color: var(--um-mode-accent, var(--um-selected-border));
+    background: var(--um-selected-bg);
+}
+
+.players-count {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.players-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 12px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    cursor: pointer;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.players-card.is-selected {
+    border-color: var(--um-selected-border);
+    background: var(--um-selected-bg);
+    box-shadow: var(--um-shadow-selected);
+}
+
+.players-name {
+    flex: 1;
+    min-width: 0;
+    font: 500 13px var(--um-font-body);
+    color: var(--um-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.players-team-badge {
+    flex: none;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--um-radius-chip);
+    border: 0;
+    background: var(--um-accent);
+    color: #fff;
+    font: 600 10.5px var(--um-font-mono);
+    cursor: pointer;
+}

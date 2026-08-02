@@ -1,0 +1,106 @@
+@using Unmatched.Dtos
+@*
+    Draft step 2 (design/IMPLEMENTATION-PROMPT.md §5A.2): a pool of N+1 maps, each player bans
+    exactly one in a random order shown as a ribbon - the map left standing becomes the match map.
+*@
+<div class="draft-step">
+    <div class="draft-step-head">
+        <span class="draft-step-caption">Map bans</span>
+        <div class="ban-order-ribbon">
+            @foreach (var player in State.MapBanOrder)
+            {
+                var banned = State.MapBans.Values.Any(p => p.Id == player.Id);
+                var isCurrent = !banned && CurrentBanner?.Id == player.Id;
+                <div class="ban-order-chip @(banned ? "is-done" : null) @(isCurrent ? "is-current" : null)">
+                    <HeroToken ImageUrl="@player.ImageUrl" Alt="@player.Name" Size="20" Round="true"/>
+                    <span>@player.Name</span>
+                    @if (banned)
+                    {
+                        <i class="bi bi-check-lg"></i>
+                    }
+                </div>
+            }
+        </div>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Icon="bi-shuffle" OnClick="RerollPool">Reroll pool</UmButton>
+    </div>
+
+    <div class="map-ban-pool">
+        @foreach (var map in State.MapPool)
+        {
+            var bannedBy = State.MapBans.GetValueOrDefault(map.Id);
+            var isChosen = State.ChosenMap?.Id == map.Id;
+            <button type="button" class="map-ban-tile @(bannedBy is not null ? "is-banned" : null) @(isChosen ? "is-chosen" : null)"
+                    disabled="@(bannedBy is not null || CurrentBanner is null)" @onclick="@(() => BanMapAsync(map))">
+                <img src="@map.ImageUrl" alt="@map.DisplayName" onerror="this.onerror=null;this.src='/UnknownMap.png'"/>
+                @if (bannedBy is not null)
+                {
+                    <div class="map-ban-overlay">
+                        <HeroToken ImageUrl="@bannedBy.ImageUrl" Alt="@bannedBy.Name" Size="26" Round="true"/>
+                    </div>
+                }
+                @if (isChosen)
+                {
+                    <div class="map-ban-badge">CHOSEN MAP</div>
+                }
+                <span class="map-ban-name">@map.DisplayName</span>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DraftState State { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MapDto> AllMaps { get; set; } = [];
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private UiPlayerDto? CurrentBanner
+        => State.MapBans.Count < State.MapBanOrder.Count ? State.MapBanOrder[State.MapBans.Count] : null;
+
+    protected override void OnParametersSet()
+    {
+        if (State.MapPool.Count == 0)
+        {
+            RerollPoolInternal();
+        }
+    }
+
+    private Task BanMapAsync(MapDto map)
+    {
+        var banner = CurrentBanner;
+        if (banner is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        State.MapBans[map.Id] = banner;
+        State.BanLog.Add($"{banner.Name} banned {map.DisplayName}");
+
+        var remaining = State.MapPool.Where(m => !State.MapBans.ContainsKey(m.Id)).ToList();
+        if (remaining.Count == 1)
+        {
+            State.ChosenMap = remaining[0];
+        }
+
+        return OnChanged.InvokeAsync();
+    }
+
+    private Task RerollPool()
+    {
+        RerollPoolInternal();
+        return OnChanged.InvokeAsync();
+    }
+
+    private void RerollPoolInternal()
+    {
+        State.MapPool = DraftRandomizer.BuildMapPool(AllMaps, State.Players.Count);
+        State.MapBanOrder = DraftRandomizer.RollBanOrder(State.Players);
+        State.MapBans.Clear();
+        State.ChosenMap = null;
+    }
+}

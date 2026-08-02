@@ -35,6 +35,16 @@ public interface IMatchClient
 
     Task<TournamentDto> GetTournamentAsync(Guid id);
 
+    Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid id);
+
+    Task<TournamentDto> UpdateTournamentImageAsync(Guid id, string imageFileName);
+
+    Task<TournamentDto> UpdateTournamentTrophyImageAsync(Guid id, string imageFileName);
+
+    Task<TournamentDto> CompleteTournamentAsync(Guid id);
+
+    Task<IEnumerable<TournamentAwardDto>> GetTournamentAwardsAsync(Guid id);
+
     Task RecalculateAsync();
 
     Task<bool> IsRatingRecalculationRequiredAsync();

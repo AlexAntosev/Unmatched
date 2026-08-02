@@ -1,0 +1,54 @@
+@using BlazorBootstrap
+@using Unmatched.UI.BlazorServer.Services
+@implements IDisposable
+@inject NewMatchModalService NewMatchModalService
+@inject NavigationManager NavManager
+@*
+    "New match" entry point (design/IMPLEMENTATION-PROMPT.md §5 intro, revision 3 turn 12a): Manual
+    entry goes straight to the sheet; Draft session runs the 5-step ban/pick wizard first ("quiz"
+    is never used - this is a draft, the vocabulary players already use). Mounted once in
+    MainLayout and opened from anywhere via NewMatchModalService.RequestOpen().
+*@
+<Modal @ref="_modal" Title="New match">
+    <BodyTemplate>
+        <div class="new-match-options">
+            <button type="button" class="new-match-option" @onclick="GoManualAsync">
+                <i class="bi bi-pencil-square"></i>
+                <div class="new-match-option-title">Manual entry</div>
+                <div class="new-match-option-hint">The game is already played - go straight to the sheet.</div>
+            </button>
+            <button type="button" class="new-match-option" @onclick="GoDraftAsync">
+                <i class="bi bi-shuffle"></i>
+                <div class="new-match-option-title">Draft session</div>
+                <div class="new-match-option-hint">Not played yet - ban and pick first, the sheet fills itself.</div>
+            </button>
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <span class="new-match-footnote">Draft pools come from owned sets only</span>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" OnClick="@(() => _modal.HideAsync())">Cancel</UmButton>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private Modal _modal = default!;
+
+    protected override void OnInitialized() => NewMatchModalService.OpenRequested += OnOpenRequested;
+
+    private async void OnOpenRequested() => await _modal.ShowAsync();
+
+    private async Task GoManualAsync()
+    {
+        await _modal.HideAsync();
+        NavManager.NavigateTo(Urls.AddMatch);
+    }
+
+    private async Task GoDraftAsync()
+    {
+        await _modal.HideAsync();
+        NavManager.NavigateTo(Urls.Draft);
+    }
+
+    public void Dispose() => NewMatchModalService.OpenRequested -= OnOpenRequested;
+}

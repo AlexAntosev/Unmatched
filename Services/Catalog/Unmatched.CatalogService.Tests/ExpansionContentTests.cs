@@ -36,7 +36,7 @@ namespace Unmatched.CatalogService.Tests
             context.Heroes.Add(new Hero { Name = "Dr. Sattler", Color = "#4B7F52", Sidekicks = [], Expansion = expansion });
             context.Heroes.Add(new Hero { Name = "Raptors", Color = "#7F4B4B", Sidekicks = [], Expansion = expansion });
             context.Maps.Add(new Map { Name = "Raptor Paddock", Expansion = expansion });
-            context.Villains.Add(new Villain { Name = "InGen", Color = "#333333", Hp = 20, DeckSize = 30, Expansion = expansion });
+            context.Villains.Add(new Villain { Name = "InGen", Color = "#333333", BaseHp = 20, HpPerExtraPlayer = 20, DeckSize = 30, Expansion = expansion });
             context.Minions.Add(new Minion { Name = "Raptor", Color = "#555555", Hp = 4, DeckSize = 0, Expansion = expansion });
             context.Minions.Add(new Minion { Name = "Guard", Color = "#666666", Hp = 3, DeckSize = 0, Expansion = expansion });
             await context.SaveChangesAsync();

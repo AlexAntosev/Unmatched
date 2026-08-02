@@ -17,6 +17,10 @@ public interface IUnitOfWork : IDisposable
 
     ITournamentRepository Tournaments { get; }
 
+    ITournamentParticipantRepository TournamentParticipants { get; }
+
+    ITournamentAwardRepository TournamentAwards { get; }
+
     ITitleRepository Titles { get; }
 
     IHeroTitleRepository HeroTitles { get; }

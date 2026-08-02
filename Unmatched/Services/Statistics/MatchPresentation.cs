@@ -26,7 +26,8 @@ public record MatchParticipant(
     int? HpLeft = null,
     int? CardsLeft = null,
     string? SidekickName = null,
-    int? SidekickHp = null);
+    int? SidekickHp = null,
+    int? RatingDelta = null);
 
 /// <summary>
 /// A group of participants that faced the others together. <paramref name="Separator"/> is what
@@ -146,7 +147,8 @@ public static class MatchPresentation
             fighter.HpLeft,
             fighter.CardsLeft,
             fighter.SidekickName,
-            fighter.SidekickHpLeft);
+            fighter.SidekickHpLeft,
+            fighter.MatchPoints);
 
     private static MatchParticipant ToParticipant(UiMatchVillainDto villain)
         => new(

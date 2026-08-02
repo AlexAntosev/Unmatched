@@ -1,0 +1,71 @@
+@*
+    A labelled [-] n [+] control (design/IMPLEMENTATION-PROMPT.md §5.2) replacing the plain number
+    inputs on the match sheet - HP left / Cards / Sidekick on a fighter card, HP/Cards on a villain
+    card, HP on a minion card. Dash renders "-" with no buttons for a field that does not apply to
+    this fighter (villain cards, a hero with no sidekick); IsAlert paints the whole pill red,
+    matching a loser's auto-zeroed HP. The value itself is a real number input - typing is faster
+    than clicking +/- a dozen times - styled to look like the old plain span.
+*@
+<div class="um-stepper @(IsAlert ? "is-alert" : null) @Class">
+    <span class="um-stepper-label">@Label</span>
+    <div class="um-spacer"></div>
+    @if (!Dash)
+    {
+        <button type="button" class="um-stepper-btn" disabled="@((Value ?? Min) <= Min)"
+                @onclick="Decrement" @onclick:stopPropagation="true">
+            <i class="bi bi-dash"></i>
+        </button>
+        <input type="number" class="um-stepper-value" min="@Min" max="@Max" value="@Value"
+               @onchange="OnInputChanged" @onclick:stopPropagation="true"/>
+    }
+    else
+    {
+        <span class="um-stepper-value um-stepper-value-dash">—</span>
+    }
+    @if (!Dash)
+    {
+        <button type="button" class="um-stepper-btn" disabled="@((Value ?? Min) >= Max)"
+                @onclick="Increment" @onclick:stopPropagation="true">
+            <i class="bi bi-plus"></i>
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public int? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<int?> ValueChanged { get; set; }
+
+    [Parameter]
+    public int Min { get; set; }
+
+    [Parameter]
+    public int Max { get; set; } = 40;
+
+    /// <summary>Renders "—" with no +/- buttons - a field that does not apply to this fighter
+    /// (villain cards, a hero with no sidekick).</summary>
+    [Parameter]
+    public bool Dash { get; set; }
+
+    /// <summary>Red tint for a loser's auto-zeroed HP.</summary>
+    [Parameter]
+    public bool IsAlert { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private Task Decrement() => ValueChanged.InvokeAsync(Math.Max(Min, (Value ?? Min) - 1));
+
+    private Task Increment() => ValueChanged.InvokeAsync(Math.Min(Max, (Value ?? Min) + 1));
+
+    /// <summary>An empty or unparseable field falls back to Min, same as the buttons clamp to it.</summary>
+    private Task OnInputChanged(ChangeEventArgs e)
+        => int.TryParse(e.Value?.ToString(), out var parsed)
+            ? ValueChanged.InvokeAsync(Math.Clamp(parsed, Min, Max))
+            : ValueChanged.InvokeAsync(Min);
+}

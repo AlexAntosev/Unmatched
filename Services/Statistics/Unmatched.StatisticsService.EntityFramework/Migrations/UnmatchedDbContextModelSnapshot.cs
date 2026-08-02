@@ -156,6 +156,9 @@ namespace Unmatched.StatisticsService.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("BaseHp")
+                        .HasColumnType("int");
+
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -163,7 +166,7 @@ namespace Unmatched.StatisticsService.EntityFramework.Migrations
                     b.Property<int>("DeckSize")
                         .HasColumnType("int");
 
-                    b.Property<int>("Hp")
+                    b.Property<int>("HpPerExtraPlayer")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageFileName")

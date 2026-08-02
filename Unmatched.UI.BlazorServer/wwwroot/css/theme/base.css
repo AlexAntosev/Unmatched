@@ -141,104 +141,202 @@ a:hover {
     gap: 14px;
 }
 
-/* Add match's fighter/villain "plate" shell (design/IMPLEMENTATION-PROMPT.md §5.2) - shared by
-   FighterCard.razor and VillainInfo.razor, which live in different Blazor CSS scopes. */
-.plate {
+/* Add match's fighter/villain/minion vertical "card" shell (design/IMPLEMENTATION-PROMPT.md §5.2,
+   revision 3 turn 14a) - shared by FighterCard.razor and VillainInfo.razor, which live in
+   different Blazor CSS scopes. Width and art height are set inline per instance (180px
+   fighter/villain, 132px minion; art 118px/78px tall) rather than baked into these classes. */
+.match-card {
     position: relative;
+    box-sizing: border-box;
+    flex: none;
     display: flex;
-    align-items: center;
-    gap: 11px;
+    flex-direction: column;
+    gap: 7px;
     padding: 10px;
-    border: 1px solid var(--um-border);
-    border-radius: var(--um-radius-row);
+    border-radius: var(--um-radius-card);
     background: var(--um-bg-panel);
-    transition: border-color 0.12s ease, background-color 0.12s ease;
+    border: 1px solid var(--um-border);
+    transition: border-color 0.12s ease, opacity 0.12s ease;
 }
 
-.plate.is-drag-over {
+.match-card.is-drag-over {
     border-color: #8b7dff;
     background: rgba(139, 125, 255, 0.06);
 }
 
-.plate-handle {
-    flex: none;
-    color: var(--um-text-faint);
-    font-size: 13px;
-    cursor: grab;
+.match-card.is-dragging {
+    opacity: 0.45;
 }
 
-.plate-handle:active {
-    cursor: grabbing;
-}
-
-.plate-art-wrap {
+.match-card-art-wrap {
     position: relative;
-    flex: none;
-    border-radius: 14px;
-    overflow: visible;
+    width: 100%;
 }
 
-.plate-art {
+.match-card-art {
     width: 100%;
     height: 100%;
-    border-radius: 14px;
-    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-card);
+    border: 1.5px solid var(--um-border);
     object-fit: cover;
     background: var(--um-bg-control);
     transition: filter 0.12s ease, border-color 0.12s ease;
 }
 
-.plate-art.is-grayscale {
+.match-card-art.is-winner {
+    border-color: var(--um-win-ring);
+}
+
+.match-card-art.is-grayscale {
     filter: grayscale(0.55);
     border-color: rgba(242, 80, 107, 0.45);
 }
 
-.plate-loser-veil {
+/* The only place a card can be grabbed - the rest of the card (dropdowns, steppers) stays
+   clickable. JS-free: FighterCard arms/disarms the root's draggable attribute on mousedown here. */
+.match-card-grip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--um-radius-card) var(--um-radius-card) 0 0;
+    background: linear-gradient(180deg, rgba(8, 8, 12, 0.8), transparent);
+    color: rgba(236, 237, 242, 0.75);
+    font-size: 15px;
+    cursor: grab;
+}
+
+.match-card-grip:active {
+    cursor: grabbing;
+}
+
+.match-card-turn-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--um-radius-sm);
+    background: var(--um-accent);
+    border: 1.5px solid rgba(10, 10, 16, 0.7);
+    box-shadow: var(--um-shadow-float);
+    color: #fff;
+    font: 700 12px var(--um-font-display);
+}
+
+.match-card-place-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: var(--um-radius-sm);
+    background: rgba(10, 10, 16, 0.9);
+    border: 1.5px solid var(--um-border-strong);
+    cursor: pointer;
+    font: 700 10.5px var(--um-font-display);
+    letter-spacing: 0.04em;
+}
+
+.match-card-remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border: 0;
+    background: none;
+    color: rgba(236, 237, 242, 0.7);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.12s ease;
+}
+
+.match-card-remove:hover {
+    color: var(--um-loss);
+}
+
+.match-card-loser-veil {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
-    background: rgba(242, 80, 107, 0.22);
+    border-radius: var(--um-radius-card);
+    background: rgba(242, 80, 107, 0.2);
     color: #f2506b;
 }
 
-.plate-stacked-fields {
-    flex: 1;
-    min-width: 0;
+.match-card-fields {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-}
-
-.plate-line {
-    display: flex;
-    align-items: center;
     gap: 7px;
 }
 
-.plate-line .um-select {
-    flex: 1;
-    min-width: 0;
-    height: 34px;
+/* Draft session step shell (design/IMPLEMENTATION-PROMPT.md §5A) - shared by every step under
+   Pages/Draft/Steps, which live in different Blazor CSS scopes. */
+.draft-step {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
-.fighter-narrow {
-    width: 68px;
-    flex: none;
+.draft-step-caption {
+    font: 500 9.5px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
 }
 
-.fighter-narrow .um-text-field-xs {
-    height: 32px;
+.draft-step-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* HP forced to 0 for a declared loser reads red, per the auto-zero spec. */
-.plate.is-loser .plate-line .fighter-narrow:first-of-type .um-text-field {
-    background: rgba(242, 80, 107, 0.1);
-    border-color: rgba(242, 80, 107, 0.3);
+/* Ban-order ribbon (design/IMPLEMENTATION-PROMPT.md §5A.2/5A.3) - shared by MapBanStep and
+   HeroDraftStep, which live in different Blazor CSS scopes. */
+.ban-order-ribbon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.plate.is-loser .plate-line .fighter-narrow:first-of-type input {
-    color: #f2506b;
+.ban-order-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: var(--um-radius-chip);
+    background: var(--um-bg-inset);
+    border: 1px solid var(--um-border);
+    font: 500 11.5px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.ban-order-chip.is-current {
+    border-color: var(--um-selected-border);
+    background: var(--um-selected-bg);
+    color: var(--um-text);
+}
+
+.ban-order-chip.is-done {
+    opacity: 0.55;
+}
+
+.ban-order-chip i {
+    font-size: 10px;
+    color: var(--um-win);
 }

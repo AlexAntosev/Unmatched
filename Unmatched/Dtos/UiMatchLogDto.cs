@@ -14,7 +14,15 @@ public class UiMatchLogDto
 
     public Guid MatchId { get; set; }
 
+    public Guid? TournamentId { get; set; }
+
     public string TournamentName { get; set; }
+
+    public bool IsRanked { get; set; }
+
+    public Stage? Stage { get; set; }
+
+    public int? Round { get; set; }
 
     public int? Epic { get; set; }
 

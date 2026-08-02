@@ -1,0 +1,73 @@
+.hero-draft-pool {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+}
+
+.hero-draft-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0;
+    border: 1px solid var(--um-border);
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-panel);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.12s ease;
+}
+
+.hero-draft-tile:disabled {
+    cursor: default;
+}
+
+.hero-draft-tile:not(:disabled):hover {
+    border-color: var(--um-focus-border);
+}
+
+.hero-draft-tile img {
+    width: 100%;
+    height: 72px;
+    object-fit: cover;
+    background: var(--um-bg-control);
+}
+
+.hero-draft-tile.is-banned img {
+    filter: grayscale(0.7);
+    opacity: 0.4;
+}
+
+.hero-draft-tile.is-picked {
+    border-color: var(--um-win-border);
+}
+
+.hero-draft-name {
+    padding: 0 7px 7px;
+    font: 500 11px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hero-draft-tag {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font: 700 8px var(--um-font-mono);
+    letter-spacing: 0.05em;
+}
+
+.hero-draft-tag.is-ban {
+    background: var(--um-loss);
+    color: #2a0a10;
+}
+
+.hero-draft-owner {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}

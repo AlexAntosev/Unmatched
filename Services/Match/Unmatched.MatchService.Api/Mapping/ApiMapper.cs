@@ -19,6 +19,8 @@ public class ApiMapper : Profile
         CreateMap<Fighter, FighterDto>().ReverseMap();
         CreateMap<Fighter, HeroStatsFighterDto>();
         CreateMap<Tournament, TournamentDto>().ReverseMap();
+        CreateMap<TournamentStanding, TournamentStandingDto>();
+        CreateMap<TournamentAward, TournamentAwardDto>();
         CreateMap<HeroTitleAssign, HeroTitleAssignDto>().ReverseMap();
         CreateMap<SaveMatchResult, SaveMatchResultDto>().ReverseMap();
         CreateMap<FighterResult, FighterResultDto>().ReverseMap();
@@ -27,6 +29,7 @@ public class ApiMapper : Profile
         CreateMap<Rating, RatingDto>();
         CreateMap<RatingChange, RatingChangeDto>();
         CreateMap<Title, TitleDto>().ReverseMap();
+        CreateMap<TitleHolder, TitleHolderDto>().ReverseMap();
     }
 }
 

@@ -1,0 +1,319 @@
+::deep .hero-titles-panel .um-panel-header {
+    flex-wrap: wrap;
+    gap: var(--um-space-3);
+}
+
+.hero-titles-badge {
+    padding: 3px 8px;
+    border-radius: var(--um-radius-chip);
+    font: 600 10px var(--um-font-mono);
+    letter-spacing: 0.08em;
+}
+
+.hero-titles-badge-gold {
+    background: var(--um-gold-bg);
+    color: var(--um-gold);
+}
+
+.hero-titles-badge-accent {
+    background: rgba(139, 125, 255, 0.14);
+    color: var(--um-accent-text);
+}
+
+.hero-titles-all-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font: 400 11.5px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.hero-titles-all-link:hover {
+    color: var(--um-accent-text);
+}
+
+.hero-titles-all-link i {
+    font-size: 9px;
+}
+
+.hero-titles-collapse-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border: none;
+    border-radius: var(--um-radius-sm);
+    background: none;
+    color: var(--um-text-muted);
+    cursor: pointer;
+}
+
+.hero-titles-collapse-toggle:hover {
+    background: var(--um-bg-hover);
+    color: var(--um-text);
+}
+
+.hero-titles-collapse-toggle i {
+    font-size: 12px;
+}
+
+.hero-titles-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: var(--um-space-6);
+}
+
+.hero-titles-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--um-space-2);
+}
+
+.hero-titles-col:first-child {
+    padding-right: var(--um-space-6);
+    border-right: 1px solid var(--um-border);
+}
+
+.hero-titles-col-caption {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    padding-bottom: 2px;
+}
+
+.hero-titles-col-title {
+    font: 500 9.5px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
+}
+
+.hero-titles-col-note {
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+.hero-titles-empty {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-text-dim);
+}
+
+.hero-titles-divider {
+    height: 1px;
+    background: var(--um-border-soft);
+    margin: 5px 0 1px;
+}
+
+.hero-titles-subcaption {
+    font: 500 9.5px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}
+
+/* ---- Titles column ---- */
+
+.hero-title-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px 14px;
+    border-radius: var(--um-radius-card);
+    border: 1px solid var(--um-border-soft);
+}
+
+.hero-title-card.is-prestige {
+    border-left: 3px solid var(--um-gold);
+    background: linear-gradient(90deg, rgba(240, 180, 41, 0.1), rgba(240, 180, 41, 0) 70%);
+}
+
+.hero-title-card.is-neutral {
+    border-left: 3px solid var(--um-border-strong);
+}
+
+.hero-title-card.is-negative {
+    border-left: 3px solid var(--um-loss);
+    background: linear-gradient(90deg, var(--um-loss-wash), rgba(242, 80, 107, 0) 70%);
+}
+
+.hero-title-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: var(--um-radius-row);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--um-border-strong);
+    font-size: 18px;
+    color: var(--um-text-dim);
+}
+
+.hero-title-card.is-prestige .hero-title-card-icon {
+    background: var(--um-gold-bg);
+    border-color: rgba(240, 180, 41, 0.35);
+    color: var(--um-gold);
+}
+
+.hero-title-card.is-negative .hero-title-card-icon {
+    background: var(--um-loss-bg);
+    border-color: var(--um-loss-border);
+    color: var(--um-loss);
+}
+
+.hero-title-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.hero-title-card-name {
+    font: 700 14.5px var(--um-font-display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--um-text-bright);
+}
+
+.hero-title-card.is-prestige .hero-title-card-name {
+    color: var(--um-gold);
+}
+
+.hero-title-card.is-negative .hero-title-card-name {
+    color: var(--um-loss);
+}
+
+.hero-title-card-desc {
+    margin-top: 2px;
+    font: 400 11.5px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.hero-title-card-metric {
+    margin-top: 4px;
+    font: 500 11px var(--um-font-mono);
+    color: var(--um-text-bright);
+}
+
+.hero-title-card-date {
+    text-align: right;
+    flex: none;
+}
+
+.hero-title-card-date-label {
+    font: 400 10px var(--um-font-mono);
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}
+
+.hero-title-card-date-value {
+    margin-top: 2px;
+    font: 500 11.5px var(--um-font-mono);
+    color: var(--um-text-bright);
+}
+
+/* ---- Achievements column ---- */
+
+.hero-achievements-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.hero-achievement-card {
+    padding: 13px;
+    border-radius: var(--um-radius-card);
+    background: rgba(139, 125, 255, 0.08);
+    border: 1px solid rgba(139, 125, 255, 0.25);
+}
+
+.hero-achievement-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 16px;
+    color: var(--um-accent-text);
+}
+
+.hero-achievement-name {
+    flex: 1;
+    font: 700 13px var(--um-font-display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.hero-achievement-count {
+    font: 700 13px var(--um-font-display);
+    color: var(--um-accent-text);
+}
+
+.hero-achievement-desc {
+    margin-top: 7px;
+    font: 400 11px var(--um-font-body);
+    color: var(--um-text-muted);
+}
+
+.hero-achievement-metric {
+    margin-top: 5px;
+    font: 500 10.5px var(--um-font-mono);
+    color: var(--um-accent-text);
+}
+
+.hero-achievement-last {
+    margin-top: 6px;
+    font: 400 10px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+/* ---- Tournament titles ---- */
+
+.hero-tournament-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hero-tournament-title-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: var(--um-radius-row);
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--um-gold);
+    font-size: 14px;
+    color: var(--um-gold);
+}
+
+.hero-tournament-title-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.hero-tournament-title-name {
+    font: 700 12.5px var(--um-font-display);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--um-text);
+}
+
+.hero-tournament-title-meta {
+    margin-top: 2px;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+@media (max-width: 900px) {
+    .hero-titles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-titles-col:first-child {
+        padding-right: 0;
+        padding-bottom: var(--um-space-6);
+        border-right: none;
+        border-bottom: 1px solid var(--um-border);
+    }
+}

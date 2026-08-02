@@ -2,78 +2,126 @@
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
 @using Unmatched.Services.Contracts
+@using Unmatched.Services.Statistics
 @inject ITitleService TitleService
+@inject IHeroService HeroService
+@inject ITournamentService TournamentService
 @*
-    Not in the design pack: a panel of rows plus an assign dialog, built from design-system parts.
-    A first pass - the layout is deliberately plain until this screen gets designed.
+    Turn 10b - a read-only catalogue: Achievements (Shared, many holders) / Titles (Unique, one
+    holder) / Tournament titles (per tournament), each a pill tab. No admin controls here - adding,
+    assigning and deleting titles isn't part of this screen anymore, matching the mockup.
 *@
 
-<PageHeader Breadcrumbs="Crumbs">
-    <Controls>
-        <UmTextField Placeholder="New title" Variant="control" Value="@_newTitleName"
-                     ValueChanged="@(v => _newTitleName = v)" Class="titles-new"/>
-        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" Disabled="@(!IsNewTitleValid)"
-                  OnClick="AddTitleAsync">Add title</UmButton>
-    </Controls>
-</PageHeader>
+<PageHeader Breadcrumbs="Crumbs"/>
 
 <div class="um-page">
-    <Panel Title="Titles" Meta="@($"{_titles.Count} titles")">
-        @if (_titles.Count == 0)
-        {
-            <div class="titles-empty">No titles yet.</div>
-        }
-        @foreach (var title in _titles)
-        {
-            <div class="titles-row">
-                <i class="bi bi-award-fill"></i>
-                <div class="titles-names">
-                    <div class="titles-name">@title.Name</div>
-                    @if (!string.IsNullOrWhiteSpace(title.Comment))
+    <div class="titles-kpis">
+        <KpiCard Icon="bi-patch-check-fill" Label="Achievements" Value="@_catalog.AchievementsCount.ToString()"
+                 Sub="@($"{_catalog.AchievementAwardsTotal} awards total")" Class="titles-kpi-achievements"/>
+        <KpiCard Icon="bi-award-fill" Label="Titles" Value="@_catalog.Titles.Count.ToString()"
+                 Sub="@($"{_catalog.TitlesHeldCount} held · {_catalog.TitlesVacantCount} vacant")" Class="titles-kpi-titles"/>
+        <KpiCard Icon="bi-trophy-fill" Label="Tournament titles" Value="@_catalog.TournamentTitlesCount.ToString()"
+                 Sub="@($"across {_catalog.TournamentsCount} tournaments")" Class="titles-kpi-tournament"/>
+    </div>
+
+    <Tabs TValue="TitlesTab" Variant="pill" Options="TabOptions" Value="_activeTab" ValueChanged="OnTabChanged" Class="titles-tabs"/>
+
+    @if (_activeTab == TitlesTab.Achievements)
+    {
+        <div class="titles-section">
+            <div class="titles-section-header">
+                <span class="titles-section-title">Achievements</span>
+                <span class="titles-section-note">Shared — every hero that has ever qualified keeps it.</span>
+            </div>
+            @if (_catalog.Achievements.Count == 0)
+            {
+                <div class="titles-empty">No achievements exist yet.</div>
+            }
+            else
+            {
+                <div class="titles-achievements-grid">
+                    @foreach (var card in _catalog.Achievements)
                     {
-                        <div class="titles-comment">@title.Comment</div>
+                        @RenderAchievementCard(card)
                     }
                 </div>
-                <UmButton Size="sm" Icon="bi-people" OnClick="@(() => OpenAssignAsync(title))">Assign heroes</UmButton>
-                <UmButton Size="sm" Variant="danger" Icon="bi-trash" OnClick="@(() => DeleteTitleAsync(title.Id))">Delete</UmButton>
-            </div>
-        }
-    </Panel>
-</div>
-
-<BlazorBootstrap.Modal @ref="_assignDialog" Title="Assign heroes">
-    <BodyTemplate>
-        <div class="titles-assign">
-            @foreach (var hero in _assignableHeroes)
-            {
-                <label class="titles-assign-row">
-                    <UmCheckbox Checked="hero.IsAssigned" CheckedChanged="@(v => hero.IsAssigned = v)"/>
-                    <span>@hero.Name</span>
-                </label>
             }
         </div>
-    </BodyTemplate>
-    <FooterTemplate>
-        <UmButton Size="sm" OnClick="@(() => _assignDialog.HideAsync())">Cancel</UmButton>
-        <UmButton Size="sm" Variant="primary" Icon="bi-check-lg" OnClick="SaveAssignmentsAsync">Save</UmButton>
-    </FooterTemplate>
-</BlazorBootstrap.Modal>
+    }
+    else if (_activeTab == TitlesTab.Titles)
+    {
+        <div class="titles-section">
+            <div class="titles-section-header">
+                <span class="titles-section-title">Titles</span>
+                <span class="titles-section-note">Unique — one holder at a time; earning it transfers it away from the previous hero.</span>
+            </div>
+            @if (_catalog.Titles.Count == 0)
+            {
+                <div class="titles-empty">No titles exist yet.</div>
+            }
+            else
+            {
+                <Panel Flush="true">
+                    <ColumnHeader Columns="@TitleColumns">
+                        <div>Title</div>
+                        <div>Holder</div>
+                        <div>Held since</div>
+                    </ColumnHeader>
+                    @foreach (var row in _catalog.Titles)
+                    {
+                        @RenderTitleRow(row)
+                    }
+                </Panel>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="titles-section">
+            <div class="titles-section-header">
+                <span class="titles-section-title">Tournament titles</span>
+                <span class="titles-section-note">Awarded on completion and scoped to that tournament — two Champions coexist.</span>
+            </div>
+            @if (_catalog.TournamentGroups.Count == 0)
+            {
+                <div class="titles-empty">No tournament has awarded a title yet.</div>
+            }
+            else
+            {
+                @foreach (var group in _catalog.TournamentGroups)
+                {
+                    @RenderTournamentGroup(group)
+                }
+            }
+        </div>
+    }
+</div>
 
 @code {
+    private const string TitleColumns = "clamp(220px, 40vw, 340px) 1fr 120px";
+
+    private enum TitlesTab
+    {
+        Achievements,
+        Titles,
+        Tournament
+    }
+
     private static readonly IReadOnlyList<Breadcrumb.Crumb> Crumbs = [new("Play"), new("Titles")];
 
-    private List<TitleDto> _titles = new();
-    private List<HeroTitleAssignDto> _assignableHeroes = new();
-    private BlazorBootstrap.Modal _assignDialog = default!;
-    private Guid _assigningTitleId;
-    private string? _newTitleName;
+    private static readonly IReadOnlyList<SelectOption<TitlesTab>> TabOptions =
+    [
+        new(TitlesTab.Achievements, "Achievements"),
+        new(TitlesTab.Titles, "Titles"),
+        new(TitlesTab.Tournament, "Tournament")
+    ];
+
+    private TitlesCatalog _catalog = TitlePresentation.Catalog([], []);
+    private List<UiHeroDto> _heroes = new();
+    private TitlesTab _activeTab = TitlesTab.Achievements;
 
     [Inject]
     protected BlazorBootstrap.PreloadService PreloadService { get; set; } = default!;
-
-    private bool IsNewTitleValid
-        => !string.IsNullOrWhiteSpace(_newTitleName)
-        && _titles.All(t => !string.Equals(t.Name, _newTitleName, StringComparison.OrdinalIgnoreCase));
 
     protected override async Task OnInitializedAsync() => await RefreshAsync();
 
@@ -82,7 +130,13 @@
         try
         {
             PreloadService.Show();
-            _titles = (await TitleService.GetAsync()).OrderBy(t => t.Name).ToList();
+            var titles = TitleService.GetAsync();
+            var heroes = HeroService.GetAsync();
+            var tournaments = TournamentService.GetAsync();
+            await Task.WhenAll(titles, heroes, tournaments);
+
+            _heroes = heroes.Result.ToList();
+            _catalog = TitlePresentation.Catalog(titles.Result, tournaments.Result);
         }
         finally
         {
@@ -90,38 +144,124 @@
         }
     }
 
-    private async Task AddTitleAsync()
-    {
-        if (!IsNewTitleValid)
+    private void OnTabChanged(TitlesTab tab) => _activeTab = tab;
+
+    private UiHeroDto? HeroFor(Guid heroId) => _heroes.FirstOrDefault(h => h.Id == heroId);
+
+    private RenderFragment RenderAchievementCard(AchievementCard card) => @<div class="titles-achievement-card @AccentClass(card.Entry.Style.Accent)">
+        <div class="titles-achievement-head">
+            <i class="bi @card.Entry.Style.Icon"></i>
+            <div class="titles-achievement-heading">
+                <div class="titles-achievement-name">@card.Entry.DisplayName</div>
+                <div class="titles-achievement-desc">@card.Entry.Title.Comment</div>
+            </div>
+            <div class="titles-achievement-count">
+                <div class="titles-achievement-count-value">@card.TotalHolderCount</div>
+                <div class="titles-achievement-count-label">Heroes</div>
+            </div>
+        </div>
+        @if (card.TopHolders.Count == 0)
         {
-            return;
+            <div class="titles-achievement-vacant">No hero has qualified yet.</div>
         }
+        else
+        {
+            <div class="titles-achievement-holders">
+                @foreach (var holder in card.TopHolders)
+                {
+                    var hero = HeroFor(holder.HeroId);
+                    var metricLabel = card.Entry.MetricLabel(holder.Metric);
+                    <div class="titles-achievement-holder">
+                        <HeroToken ImageUrl="@(hero?.ImageUrl ?? "/Unknown.png")" Size="26" Radius="8"/>
+                        <span class="titles-achievement-holder-name">@(hero?.Name ?? "Unknown")</span>
+                        @if (metricLabel is not null)
+                        {
+                            <span class="titles-achievement-holder-metric">@metricLabel</span>
+                        }
+                        <span class="titles-achievement-holder-times">×@holder.TimesEarned</span>
+                        <span class="titles-achievement-holder-date">@FormatDate(holder.EarnedAt)</span>
+                    </div>
+                }
+            </div>
+            @if (card.TotalHolderCount > card.TopHolders.Count)
+            {
+                <div class="titles-achievement-more">+@(card.TotalHolderCount - card.TopHolders.Count) more holders</div>
+            }
+        }
+    </div>;
 
-        await TitleService.AddAsync(new TitleDto { Name = _newTitleName, Comment = string.Empty });
-        _newTitleName = null;
-        await RefreshAsync();
-    }
+    private RenderFragment RenderTitleRow(TitleTableRow row) => @<div class="titles-row @(row.Holder is null ? "is-vacant" : AccentClass(row.Entry.Style.Accent))" style="@($"grid-template-columns:{TitleColumns}")">
+        <div class="titles-row-title">
+            <i class="bi @row.Entry.Style.Icon"></i>
+            <div>
+                <div class="titles-row-name">@row.Entry.DisplayName</div>
+                <div class="titles-row-desc">@row.Entry.Title.Comment</div>
+            </div>
+        </div>
+        @if (row.Holder is null)
+        {
+            <div class="titles-row-vacant">
+                <div class="titles-row-vacant-icon"><i class="bi bi-dash"></i></div>
+                <span>Vacant</span>
+            </div>
+            <div></div>
+        }
+        else
+        {
+            var hero = HeroFor(row.Holder.HeroId);
+            var metricLabel = row.Entry.MetricLabel(row.Holder.Metric);
+            <div class="titles-row-holder">
+                <HeroToken ImageUrl="@(hero?.ImageUrl ?? "/Unknown.png")" Size="30" Radius="9"/>
+                <div class="titles-row-holder-text">
+                    <div class="titles-row-holder-name">@(hero?.Name ?? "Unknown")</div>
+                    @if (metricLabel is not null)
+                    {
+                        <div class="titles-row-holder-metric">@metricLabel</div>
+                    }
+                </div>
+            </div>
+            <div class="titles-row-date">@FormatDate(row.Holder.EarnedAt)</div>
+        }
+    </div>;
 
-    private async Task DeleteTitleAsync(Guid id)
+    private RenderFragment RenderTournamentGroup(TournamentTitleGroup group) => @<div class="titles-tournament-group">
+        <div class="titles-tournament-head">
+            <i class="bi bi-trophy"></i>
+            <span class="titles-tournament-name">@group.Tournament.Name</span>
+            <span class="titles-tournament-format">@TournamentFormatStyle.For(group.Tournament.Format).Label</span>
+            <div class="um-spacer"></div>
+            <span class="titles-tournament-date">completed @FormatDate(group.Tournament.CompletedAt)</span>
+        </div>
+        <div class="titles-tournament-rows">
+            @foreach (var row in group.Rows)
+            {
+                var hero = row.Holder is null ? null : HeroFor(row.Holder.HeroId);
+                <div class="titles-tournament-row">
+                    <i class="bi @row.Entry.Style.Icon"></i>
+                    <div class="titles-tournament-row-heading">
+                        <div class="titles-tournament-row-name">@row.Entry.DisplayName</div>
+                        <div class="titles-tournament-row-desc">@row.Entry.Title.Comment</div>
+                    </div>
+                    @if (hero is not null)
+                    {
+                        <HeroToken ImageUrl="@hero.ImageUrl" Size="26" Radius="8"/>
+                        <span class="titles-tournament-row-holder">@hero.Name</span>
+                    }
+                    else
+                    {
+                        <span class="titles-tournament-row-vacant">Vacant</span>
+                    }
+                </div>
+            }
+        </div>
+    </div>;
+
+    private static string AccentClass(TitleAccent accent) => accent switch
     {
-        await TitleService.DeleteAsync(id);
-        await RefreshAsync();
-    }
+        TitleAccent.Prestige => "is-prestige",
+        TitleAccent.Negative => "is-negative",
+        _ => "is-neutral"
+    };
 
-    private async Task OpenAssignAsync(TitleDto title)
-    {
-        _assigningTitleId = title.Id;
-        _assignableHeroes = (await TitleService.GetHeroesForTitleAssign(title.Id))
-            .OrderBy(h => h.Name)
-            .ToList();
-        await _assignDialog.ShowAsync();
-    }
-
-    private async Task SaveAssignmentsAsync()
-    {
-        var assignedHeroIds = _assignableHeroes.Where(h => h.IsAssigned).Select(h => h.Id);
-        await TitleService.MergeAsync(_assigningTitleId, assignedHeroIds);
-        await _assignDialog.HideAsync();
-        await RefreshAsync();
-    }
+    private static string FormatDate(DateTime? date) => date?.ToString("dd MMM yyyy") ?? "—";
 }

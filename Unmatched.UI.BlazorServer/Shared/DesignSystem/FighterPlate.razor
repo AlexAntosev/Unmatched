@@ -1,0 +1,79 @@
+@using Unmatched.Services.Statistics
+@*
+    Turn 11c's "named plate" - the richer participant unit the match-log row uses in place of the
+    old icon-only FighterChip (which stays as-is; it is still used by the tournament bracket card
+    and the design-system showcase). Art + name/player on one line, HP/Cards mini-stats on the
+    next, rating delta pinned to the plate's own right edge - never the row's.
+*@
+<div class="fighter-plate" title="@Title">
+    <div class="fighter-plate-art">
+        <img class="fighter-plate-token"
+             src="@(string.IsNullOrEmpty(Participant.ImageUrl) ? "/Unknown.png" : Participant.ImageUrl)"
+             alt="@Participant.Name"
+             style="@ArtStyle"
+             onerror="this.onerror=null;this.src='/Unknown.png'"/>
+        @if (ShowPlace && Participant.Place is not null)
+        {
+            <span class="fighter-plate-place" style="color:@PlaceColor.For(Participant.Place)">@Participant.Place</span>
+        }
+    </div>
+    <div class="fighter-plate-body">
+        <div class="fighter-plate-line">
+            <span class="fighter-plate-name">@Participant.Name</span>
+        </div>
+        <div class="fighter-plate-line fighter-plate-sub">
+            @if (Participant.PlayerName is not null)
+            {
+                <img class="fighter-plate-avatar" src="@(Participant.PlayerImageUrl ?? "/Unknown.png")"
+                     alt="@Participant.PlayerName" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+                <span>@Participant.PlayerName</span>
+                <span class="fighter-plate-dot">&middot;</span>
+            }
+            @if (Participant.HpLeft is not null)
+            {
+                <span>@(Participant.HpLeft)hp</span>
+                <span class="fighter-plate-dot">&middot;</span>
+            }
+            @if (Participant.CardsLeft is not null)
+            {
+                <span>@(Participant.CardsLeft) cards</span>
+            }
+        </div>
+    </div>
+    @if (ShowRatingDelta)
+    {
+        <span class="fighter-plate-delta @(Participant.RatingDelta >= 0 ? "is-positive" : "is-negative")">
+            @(Participant.RatingDelta >= 0 ? "+" : null)@Participant.RatingDelta
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public MatchParticipant Participant { get; set; } = default!;
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Rating deltas never show on an unranked match, even if a fighter happens to carry
+    /// a stale nonzero value from before it was marked unranked.</summary>
+    [Parameter]
+    public bool IsRanked { get; set; }
+
+    /// <summary>The place badge only makes sense in free-for-all - elsewhere Placement may carry
+    /// stale data from a mode switch, same guard the old FighterChip usage relied on.</summary>
+    [Parameter]
+    public bool ShowPlace { get; set; }
+
+    private bool ShowRatingDelta => IsRanked && Participant.RatingDelta is not null;
+
+    private string ArtStyle
+    {
+        get
+        {
+            var border = Participant.IsWinner ? "var(--um-win-ring)" : "rgba(255,255,255,.09)";
+            var opacity = Participant.IsWinner ? "1" : ".6";
+            return $"border-color:{border};opacity:{opacity}";
+        }
+    }
+}
