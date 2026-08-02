@@ -96,7 +96,7 @@
             State.Players.Add(player);
             if (State.Mode == GameMode.TeamVsTeam)
             {
-                State.Teams[player.Id] = State.Players.Count(p => State.Teams.GetValueOrDefault(p.Id, 1) == 1) < 2 ? 1 : 2;
+                State.Teams[player.Id] = State.Teams.Values.Count(t => t == 1) < 2 ? 1 : 2;
             }
         }
 
