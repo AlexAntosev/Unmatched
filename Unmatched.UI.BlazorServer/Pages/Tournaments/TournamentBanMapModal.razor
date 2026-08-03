@@ -1,0 +1,84 @@
+@using BlazorBootstrap
+@using Unmatched.Dtos
+@*
+    Ban-map step before a Playoff match (design/CLAUDE.md "Турніри (turn 15)", id 15b) - a pool of 3
+    maps, one ban each side, whichever survives is the match's map. Bounty skips this entirely (the
+    map is already chosen on the Bounty page itself). Opened by PlayoffBracket via ShowAsync; the
+    chosen map is reported through OnMapChosen and applied by the caller - this modal never touches
+    the match itself.
+*@
+<Modal @ref="_modal" Title="Ban map" Size="ModalSize.ExtraLarge">
+    <BodyTemplate>
+        <div class="tbm-versus">
+            <img src="@(_fighterA?.HeroImageUrl)" alt=""/>
+            <span>@(_fighterA?.Hero?.Name)</span>
+            <span class="tbm-vs">VS</span>
+            <span>@(_fighterB?.Hero?.Name)</span>
+            <img src="@(_fighterB?.HeroImageUrl)" alt=""/>
+        </div>
+
+        <div class="tbm-label">@(ChosenMap is null ? "Ban one map at a time - one pick survives" : "Map set")</div>
+        <div class="tbm-pool">
+            @foreach (var map in _pool)
+            {
+                var isBanned = _banned.Contains(map.Id);
+                <div class="tbm-map @(isBanned ? "is-banned" : null)" @onclick="@(() => BanAsync(map))">
+                    <img src="@map.ImageUrl" alt=""/>
+                    <div class="tbm-map-name">@map.DisplayName</div>
+                </div>
+            }
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <UmButton Size="sm" OnClick="@(() => _modal.HideAsync())">Cancel</UmButton>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Variant="primary" Icon="bi-arrow-right" Disabled="@(ChosenMap is null)" OnClick="ContinueAsync">
+            @(ChosenMap is null ? "Ban to continue" : $"Map: {ChosenMap.DisplayName} · Continue")
+        </UmButton>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private Modal _modal = default!;
+    private List<MapDto> _pool = new();
+    private readonly HashSet<Guid> _banned = new();
+    private UiFighterDto? _fighterA;
+    private UiFighterDto? _fighterB;
+
+    [Parameter]
+    public EventCallback<MapDto> OnMapChosen { get; set; }
+
+    private MapDto? ChosenMap => _banned.Count == 2 ? _pool.FirstOrDefault(m => !_banned.Contains(m.Id)) : null;
+
+    public Task ShowAsync(UiFighterDto fighterA, UiFighterDto fighterB, IReadOnlyList<MapDto> pool)
+    {
+        _fighterA = fighterA;
+        _fighterB = fighterB;
+        _pool = pool.ToList();
+        _banned.Clear();
+        return _modal.ShowAsync();
+    }
+
+    /// <summary>A HashSet de-duplicates a repeated click on the same map, so it never costs a second
+    /// ban slot - only a genuinely new ban advances the count.</summary>
+    private Task BanAsync(MapDto map)
+    {
+        if (_banned.Count < 2)
+        {
+            _banned.Add(map.Id);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task ContinueAsync()
+    {
+        if (ChosenMap is null)
+        {
+            return;
+        }
+
+        await _modal.HideAsync();
+        await OnMapChosen.InvokeAsync(ChosenMap);
+    }
+}

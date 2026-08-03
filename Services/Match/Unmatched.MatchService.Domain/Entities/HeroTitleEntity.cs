@@ -21,7 +21,7 @@ public class HeroTitleEntity
     /// <summary>The rule-specific "how much/how many" behind this title, e.g. total sidekick HP
     /// destroyed for Executioner or HP left for Last Breath - only set for the rules where a single
     /// number is meaningful (see <see cref="Titles.ITitleRule"/>). Null for rules with no such number
-    /// (Flawless, Deck Miller, Kingslayer, Bounty Holder) and for manually assigned titles. What the
+    /// (Flawless, Deck Miller, Kingslayer) and for manually assigned titles. What the
     /// number means is entirely rule-specific; formatting it for display is the presentation layer's
     /// job, keyed by the title's RuleKey.</summary>
     public double? Metric { get; set; }

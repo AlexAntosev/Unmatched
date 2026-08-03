@@ -9,6 +9,7 @@ using Unmatched.MatchService.Domain.Models;
 using Unmatched.MatchService.Domain.RatingCalculators;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Titles;
+using Unmatched.MatchService.Domain.Tournaments;
 
 public class RatingService(
     IMatchHandler matchHandler,
@@ -16,7 +17,8 @@ public class RatingService(
     IMapper mapper,
     RatingTimeline ratingTimeline,
     TitleEvaluator titleEvaluator,
-    TournamentTitleAwarder titleAwarder) : IRatingService
+    TournamentTitleAwarder titleAwarder,
+    BountyChallengeResolver bountyChallengeResolver) : IRatingService
 {
     public async Task<IEnumerable<Rating>> GetAllAsync()
     {
@@ -87,9 +89,19 @@ public class RatingService(
                     await titleEvaluator.EvaluateAsync(ratingEvent.Match);
                 }
             }
-            else if (ratingEvent.Award is not null && titledTournaments.Add(ratingEvent.Award.TournamentId))
+            else if (ratingEvent.Award is not null)
             {
-                await ReplayTournamentCompletionAsync(ratingEvent.Award.TournamentId);
+                if (ratingEvent.Award.AwardKind == TournamentAwardKind.BountyChallengeWin)
+                {
+                    // Bounty awards land one per challenge, each with its own date - unlike every other
+                    // kind, which arrive in one same-dated batch at completion, so each replays on its
+                    // own rather than being grouped per tournament like ReplayTournamentCompletionAsync.
+                    await bountyChallengeResolver.ReplayAsync(ratingEvent.Award);
+                }
+                else if (titledTournaments.Add(ratingEvent.Award.TournamentId))
+                {
+                    await ReplayTournamentCompletionAsync(ratingEvent.Award.TournamentId);
+                }
             }
         }
 

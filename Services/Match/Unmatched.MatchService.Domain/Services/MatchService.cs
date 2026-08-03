@@ -19,6 +19,7 @@ public class MatchService(
     IMapper mapper,
     IUnitOfWork unitOfWork,
     TitleEvaluator titleEvaluator,
+    Tournaments.BountyChallengeResolver bountyChallengeResolver,
     ICatalogHeroCache catalogHeroCache,
     IPlayerCache playerCache,
     IKafkaProducer kafkaProducer) : IMatchService
@@ -28,6 +29,7 @@ public class MatchService(
         var match = mapper.Map<MatchEntity>(matchDto);
         await rankedMatchDataValidator.ValidateAsync(match);
         await matchHandler.HandleAsync(match);
+        await bountyChallengeResolver.ResolveAsync(match);
 
         await FlagRecalculationIfAddedOutOfChronologicalOrderAsync(match);
 

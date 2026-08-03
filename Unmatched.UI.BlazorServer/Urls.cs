@@ -13,7 +13,6 @@ public static class Urls
     public const string Draft = "/draft";
     public const string Titles = "/titles";
     public const string Tournaments = "/tournaments";
-    public const string TournamentCreate = "/tournaments/new";
     public const string Collection = "/collection";
     public const string Settings = "/settings";
     public const string DesignSystem = "/design-system";

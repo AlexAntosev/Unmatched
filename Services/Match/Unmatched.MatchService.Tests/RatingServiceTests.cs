@@ -40,7 +40,14 @@ public class RatingServiceTests
         var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, _mapper.Object, []);
         var titleAwarder = new TournamentTitleAwarder(_unitOfWork.Object, new Mock<Domain.Communication.Catalog.ICatalogHeroCache>().Object);
 
-        _ratingService = new RatingService(_matchHandler.Object, _unitOfWork.Object, _mapper.Object, new RatingTimeline(_unitOfWork.Object), titleEvaluator, titleAwarder);
+        _ratingService = new RatingService(
+            _matchHandler.Object,
+            _unitOfWork.Object,
+            _mapper.Object,
+            new RatingTimeline(_unitOfWork.Object),
+            titleEvaluator,
+            titleAwarder,
+            new Domain.Tournaments.BountyChallengeResolver(_unitOfWork.Object));
     }
 
     [Fact]

@@ -24,6 +24,10 @@ public class TournamentDto
 
     public Stage CurrentStage { get; set; }
 
+    public TournamentFinalFormat FinalFormat { get; set; }
+
+    public Guid? StartingChampionId { get; set; }
+
     public IEnumerable<Guid> ParticipantHeroIds { get; set; } = [];
 
     public IEnumerable<TournamentTitleKind> TitleKinds { get; set; } = [];

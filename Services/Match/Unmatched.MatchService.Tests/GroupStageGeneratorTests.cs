@@ -81,13 +81,14 @@ public class GroupStageGeneratorTests
     {
         var participants = CreateParticipants(4);
         var groupMatches = RoundRobinResults(participants);
+        var tournament = new TournamentEntity { FinalFormat = TournamentFinalFormat.Bo3 };
 
-        var (pairings, stage, _) = _generator.GenerateNext(new TournamentEntity(), participants, groupMatches);
+        var (pairings, stage, _) = _generator.GenerateNext(tournament, participants, groupMatches);
 
         // top 2 of a single group of 4 advance to a 2-player bracket, which single-elimination seeds
-        // directly as the grand final (and, per its BO3 stand-in, as three identical pairings).
+        // directly as the grand final (and, per Bo3, as two identical pairings up front).
         Assert.Equal(Stage.GrandFinals, stage);
-        Assert.Equal(3, pairings.Count);
+        Assert.Equal(2, pairings.Count);
         var winner = participants[0].HeroId; // the participant that beat everyone in RoundRobinResults
         var advancing = pairings.SelectMany(p => new[] { p.HeroId, p.OpponentHeroId }).ToList();
         Assert.Contains(winner, advancing);

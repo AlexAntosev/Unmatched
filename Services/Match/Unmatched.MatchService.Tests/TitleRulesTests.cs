@@ -287,14 +287,6 @@ public class TitleRulesTests
         Assert.Equal(3, holders[dealerId]); // ReferenceHero's sidekick has 3 max HP, all destroyed
     }
 
-    [Fact]
-    public async Task BountyHolder_AlwaysVacant()
-    {
-        var holders = await new BountyHolderTitleRule().EvaluateAsync(Match());
-
-        Assert.Empty(holders);
-    }
-
     private static FighterEntity Fighter(
         Guid heroId, bool isWinner, int? cardsLeft = null, int? matchPoints = null, int? hpLeft = null, int? sidekickHpLeft = null)
         => new()

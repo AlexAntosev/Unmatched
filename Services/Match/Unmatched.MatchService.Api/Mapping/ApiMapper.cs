@@ -21,6 +21,7 @@ public class ApiMapper : Profile
         CreateMap<Tournament, TournamentDto>().ReverseMap();
         CreateMap<TournamentStanding, TournamentStandingDto>();
         CreateMap<TournamentAward, TournamentAwardDto>();
+        CreateMap<BountyState, BountyStateDto>();
         CreateMap<HeroTitleAssign, HeroTitleAssignDto>().ReverseMap();
         CreateMap<SaveMatchResult, SaveMatchResultDto>().ReverseMap();
         CreateMap<FighterResult, FighterResultDto>().ReverseMap();

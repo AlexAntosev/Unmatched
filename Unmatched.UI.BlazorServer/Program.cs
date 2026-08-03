@@ -29,6 +29,7 @@ builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<NavState>();
 builder.Services.AddScoped<NavCountsService>();
 builder.Services.AddScoped<NewMatchModalService>();
+builder.Services.AddScoped<TournamentCreateModalService>();
 builder.Services.AddScoped<AppSettingsService>();
 builder.Services.AddScoped<DropdownPositionService>();
 

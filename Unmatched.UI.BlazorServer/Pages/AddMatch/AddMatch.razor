@@ -5,6 +5,7 @@
 @using Unmatched.Dtos.Match
 @using Unmatched.Services.Contracts
 @using Unmatched.UI.BlazorServer.Services
+@inject NavigationManager NavManager
 @inject IMatchService MatchService
 @inject IHeroService HeroService
 @inject ITournamentService TournamentService
@@ -22,7 +23,7 @@
 
 <MatchSheet @ref="_sheet" Match="_match" Players="_players" Heroes="_heroes" Villains="_villains"
             Minions="_minions" Maps="_maps" Tournaments="_tournaments" TournamentId="TournamentId"
-            OnSavedAddAnother="HandleSavedAddAnother"/>
+            OnCancel="HandleCancel" OnSaved="HandleSavedAsync"/>
 
 @code {
     private MatchSheet _sheet = default!;
@@ -49,6 +50,15 @@
     [SupplyParameterFromQuery]
     [Parameter]
     public Guid? TournamentId { get; set; }
+
+    /// <summary>Set when this page was opened from a tournament bracket's ban-map step - overrides
+    /// the map the round's generator picked at random with the one the players actually banned down
+    /// to. Applied client-side after loading rather than persisted by the ban-map step itself, since
+    /// saving a still-planned match through the normal match-save pipeline would prematurely finalise
+    /// it (see MatchHandler.CreateMatchAsync, which always flips IsPlanned to false).</summary>
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public Guid? MapId { get; set; }
 
     [Inject]
     protected PreloadService PreloadService { get; set; } = default!;
@@ -77,6 +87,11 @@
             _tournaments = tournaments.Result.OrderBy(t => t.Name).ToList();
 
             _match = IsEditing ? await LoadExistingAsync() : await BuildDefaultMatchAsync();
+            if (MapId is { } mapId)
+            {
+                _match.Map = _maps.FirstOrDefault(m => m.Id == mapId) ?? _match.Map;
+            }
+
             await FilterByCollectionAsync();
         }
         finally
@@ -168,8 +183,25 @@
             .ToList();
     }
 
-    private async Task HandleSavedAddAnother()
+    /// <summary>A tournament match always returns to its bracket after saving - there is no reason to
+    /// stay on this screen once the result is logged. Standalone matches keep the current behaviour
+    /// (stay put, "Match saved" popup already shown by MatchSheet).</summary>
+    private Task HandleSavedAsync(SaveMatchResultDto result)
     {
-        _match = await BuildDefaultMatchAsync();
+        if (_match.TournamentId is { } tournamentId)
+        {
+            NavManager.NavigateTo($"{Urls.Tournaments}/{tournamentId}");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Discards the sheet without saving - back to the tournament for a tournament match,
+    /// back to the match log otherwise.</summary>
+    private void HandleCancel()
+    {
+        NavManager.NavigateTo(_match.TournamentId is { } tournamentId
+            ? $"{Urls.Tournaments}/{tournamentId}"
+            : Urls.MatchLog);
     }
 }

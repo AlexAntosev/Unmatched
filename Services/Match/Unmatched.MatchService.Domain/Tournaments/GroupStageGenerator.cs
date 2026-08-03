@@ -28,7 +28,11 @@ public class GroupStageGenerator(SingleEliminationGenerator singleEliminationGen
         }
 
         var playoffMatches = existingMatches.Where(m => m.Stage != Stage.Group).ToList();
-        var syntheticTournament = new TournamentEntity { CurrentStage = playoffMatches.Select(m => m.Stage!.Value).DefaultIfEmpty(Stage.Group).Max() };
+        var syntheticTournament = new TournamentEntity
+        {
+            CurrentStage = playoffMatches.Select(m => m.Stage!.Value).DefaultIfEmpty(Stage.Group).Max(),
+            FinalFormat = tournament.FinalFormat
+        };
         return singleEliminationGenerator.CanGenerateNext(syntheticTournament, playoffMatches);
     }
 
@@ -57,14 +61,18 @@ public class GroupStageGenerator(SingleEliminationGenerator singleEliminationGen
             var groups = DeriveGroups(groupMatches);
             var advancing = groups.SelectMany(group => TopN(group, groupMatches, AdvanceCount)).ToList();
             var playoffParticipants = advancing.Select(heroId => new TournamentParticipantEntity { HeroId = heroId }).ToList();
-            var seedingTournament = new TournamentEntity { CurrentStage = FirstEliminationStageFor(advancing.Count) };
+            var seedingTournament = new TournamentEntity
+            {
+                CurrentStage = FirstEliminationStageFor(advancing.Count),
+                FinalFormat = tournament.FinalFormat
+            };
 
             return singleEliminationGenerator.GenerateNext(seedingTournament, playoffParticipants, []);
         }
 
         // playoffs are under way - defer entirely to single-elimination progression.
         var currentPlayoffStage = playoffMatches.Max(m => m.Stage!.Value);
-        var playoffTournament = new TournamentEntity { CurrentStage = currentPlayoffStage };
+        var playoffTournament = new TournamentEntity { CurrentStage = currentPlayoffStage, FinalFormat = tournament.FinalFormat };
         return singleEliminationGenerator.GenerateNext(playoffTournament, [], playoffMatches);
     }
 

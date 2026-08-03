@@ -26,5 +26,11 @@ public enum TournamentAwardKind
     SeasonThird,
 
     /// <summary>No tier bonus earned - the entry fee still applies, so this row's points are negative.</summary>
-    Eliminated
+    Eliminated,
+
+    /// <summary>Bounty only - a flat, non-zero-sum bonus paid the instant a challenge is won (see
+    /// <see cref="Tournaments.BountyChallengeResolver"/>), not at completion like every other kind here:
+    /// Bounty tournaments never complete. Appended last so its int value never collides with an
+    /// existing persisted row.</summary>
+    BountyChallengeWin
 }

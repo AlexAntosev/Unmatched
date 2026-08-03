@@ -313,7 +313,8 @@ public class RatingRecalculationPersistenceTests
             var matchHandler = new MatchHandler(unitOfWork, new GameModeValidatorFactory(), new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object));
             var titleEvaluator = new TitleEvaluator(unitOfWork, new Mock<IMapper>().Object, new ITitleRule[] { new GrandChampionTitleRule(unitOfWork) });
             var titleAwarder = new TournamentTitleAwarder(unitOfWork, catalogHeroCache.Object);
-            var ratingService = new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder);
+            var bountyChallengeResolver = new Domain.Tournaments.BountyChallengeResolver(unitOfWork);
+            var ratingService = new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder, bountyChallengeResolver);
 
             await ratingService.RecalculateAsync();
         }
@@ -430,6 +431,7 @@ public class RatingRecalculationPersistenceTests
         var titleEvaluator = new TitleEvaluator(unitOfWork, new Mock<IMapper>().Object, []);
         var titleAwarder = new TournamentTitleAwarder(unitOfWork, catalogHeroCache.Object);
 
-        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder);
+        var bountyChallengeResolver = new Domain.Tournaments.BountyChallengeResolver(unitOfWork);
+        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder, bountyChallengeResolver);
     }
 }

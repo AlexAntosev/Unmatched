@@ -97,12 +97,12 @@ public class SingleEliminationGeneratorTests
     }
 
     [Fact]
-    public void GenerateNext_GrandFinals_ProducesThreeIdenticalPairings_TheBestOfThreeStandIn()
+    public void GenerateNext_GrandFinals_Bo1_ProducesOneGame()
     {
         var finalistA = Guid.NewGuid();
         var finalistB = Guid.NewGuid();
 
-        var tournament = new TournamentEntity { CurrentStage = Stage.ThirdPlaceDecider };
+        var tournament = new TournamentEntity { CurrentStage = Stage.ThirdPlaceDecider, FinalFormat = TournamentFinalFormat.Bo1 };
         var existingMatches = new List<MatchEntity>
         {
             CreateMatch(Stage.SemiFinals, finalistA, Guid.NewGuid()),
@@ -113,8 +113,48 @@ public class SingleEliminationGeneratorTests
         var (pairings, stage, _) = _generator.GenerateNext(tournament, [], existingMatches);
 
         Assert.Equal(Stage.GrandFinals, stage);
-        Assert.Equal(3, pairings.Count);
-        Assert.All(pairings, p => Assert.Equal(pairings[0], p));
+        Assert.Single(pairings);
+    }
+
+    [Fact]
+    public void GenerateNext_GrandFinals_Bo3_ProducesTwoIdenticalGamesUpFront()
+    {
+        var finalistA = Guid.NewGuid();
+        var finalistB = Guid.NewGuid();
+
+        var tournament = new TournamentEntity { CurrentStage = Stage.ThirdPlaceDecider, FinalFormat = TournamentFinalFormat.Bo3 };
+        var existingMatches = new List<MatchEntity>
+        {
+            CreateMatch(Stage.SemiFinals, finalistA, Guid.NewGuid()),
+            CreateMatch(Stage.SemiFinals, finalistB, Guid.NewGuid()),
+            CreateMatch(Stage.ThirdPlaceDecider, Guid.NewGuid(), Guid.NewGuid()),
+        };
+
+        var (pairings, stage, _) = _generator.GenerateNext(tournament, [], existingMatches);
+
+        Assert.Equal(Stage.GrandFinals, stage);
+        Assert.Equal(2, pairings.Count);
+        Assert.Equal(pairings[0], pairings[1]);
+    }
+
+    [Fact]
+    public void GenerateNext_Bo3TiedOneGameEach_SchedulesDeciderBetweenTheSameTwoFinalists()
+    {
+        var finalistA = Guid.NewGuid();
+        var finalistB = Guid.NewGuid();
+
+        var tournament = new TournamentEntity { CurrentStage = Stage.GrandFinals, FinalFormat = TournamentFinalFormat.Bo3 };
+        var existingMatches = new List<MatchEntity>
+        {
+            CreateMatch(Stage.GrandFinals, finalistA, finalistB),
+            CreateMatch(Stage.GrandFinals, finalistB, finalistA),
+        };
+
+        var (pairings, stage, _) = _generator.GenerateNext(tournament, [], existingMatches);
+
+        Assert.Equal(Stage.GrandFinals, stage);
+        var decider = Assert.Single(pairings);
+        Assert.Equal(new HashSet<Guid> { finalistA, finalistB }, new HashSet<Guid> { decider.HeroId, decider.OpponentHeroId });
     }
 
     [Fact]
@@ -122,11 +162,59 @@ public class SingleEliminationGeneratorTests
         => Assert.True(_generator.CanGenerateNext(new TournamentEntity(), []));
 
     [Fact]
-    public void CanGenerateNext_GrandFinalsAlreadyGenerated_ReturnsFalse()
+    public void CanGenerateNext_Bo1GrandFinalPlayed_ReturnsFalse()
     {
+        var tournament = new TournamentEntity { FinalFormat = TournamentFinalFormat.Bo1 };
         var existingMatches = new List<MatchEntity> { CreateMatch(Stage.GrandFinals, Guid.NewGuid(), Guid.NewGuid()) };
 
-        Assert.False(_generator.CanGenerateNext(new TournamentEntity(), existingMatches));
+        Assert.False(_generator.CanGenerateNext(tournament, existingMatches));
+    }
+
+    [Fact]
+    public void CanGenerateNext_Bo3SweptTwoNil_ReturnsFalse()
+    {
+        var finalistA = Guid.NewGuid();
+        var finalistB = Guid.NewGuid();
+        var tournament = new TournamentEntity { FinalFormat = TournamentFinalFormat.Bo3 };
+        var existingMatches = new List<MatchEntity>
+        {
+            CreateMatch(Stage.GrandFinals, finalistA, finalistB),
+            CreateMatch(Stage.GrandFinals, finalistA, finalistB),
+        };
+
+        Assert.False(_generator.CanGenerateNext(tournament, existingMatches));
+    }
+
+    [Fact]
+    public void CanGenerateNext_Bo3TiedOneGameEach_ReturnsTrue()
+    {
+        var finalistA = Guid.NewGuid();
+        var finalistB = Guid.NewGuid();
+        var tournament = new TournamentEntity { FinalFormat = TournamentFinalFormat.Bo3 };
+        var existingMatches = new List<MatchEntity>
+        {
+            CreateMatch(Stage.GrandFinals, finalistA, finalistB),
+            CreateMatch(Stage.GrandFinals, finalistB, finalistA),
+        };
+
+        Assert.True(_generator.CanGenerateNext(tournament, existingMatches));
+    }
+
+    [Fact]
+    public void CanGenerateNext_Bo3TiedButSecondGameStillPlanned_ReturnsFalse()
+    {
+        var finalistA = Guid.NewGuid();
+        var finalistB = Guid.NewGuid();
+        var tournament = new TournamentEntity { FinalFormat = TournamentFinalFormat.Bo3 };
+        var plannedGame = CreateMatch(Stage.GrandFinals, finalistB, finalistA);
+        plannedGame.IsPlanned = true;
+        var existingMatches = new List<MatchEntity>
+        {
+            CreateMatch(Stage.GrandFinals, finalistA, finalistB),
+            plannedGame,
+        };
+
+        Assert.False(_generator.CanGenerateNext(tournament, existingMatches));
     }
 
     private static List<TournamentParticipantEntity> CreateParticipants(int count)

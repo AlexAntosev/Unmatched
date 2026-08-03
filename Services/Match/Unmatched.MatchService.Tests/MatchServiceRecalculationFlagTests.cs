@@ -102,6 +102,7 @@ public class MatchServiceRecalculationFlagTests
             _mapper.Object,
             _unitOfWork.Object,
             titleEvaluator,
+            new Domain.Tournaments.BountyChallengeResolver(_unitOfWork.Object),
             catalogHeroCache.Object,
             playerCache.Object,
             kafkaProducer.Object);

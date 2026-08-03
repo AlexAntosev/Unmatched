@@ -19,5 +19,4 @@ public static class Titles
     public const string Executioner = "executioner";
     public const string Wall = "wall";
     public const string Workhorse = "workhorse";
-    public const string BountyHolder = "bounty-holder";
 }

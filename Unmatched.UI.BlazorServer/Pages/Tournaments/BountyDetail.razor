@@ -1,0 +1,187 @@
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Shared.DesignSystem
+@inject ITournamentService TournamentService
+@inject ICollectionService CollectionService
+@inject NavigationManager NavManager
+@*
+    Bounty's live pool (design/CLAUDE.md "Турніри (turn 15)", id 15d): champion spotlight, then a
+    challenge builder (challenger grid, cyclic player/map pickers), then title history. "Start
+    battle" skips the ban-map step entirely - the map is already chosen right here - and creates the
+    challenge match via ITournamentService.CreateBountyChallengeAsync before navigating straight to
+    its result sheet.
+*@
+
+<div class="bo-page">
+    @if (_error is not null)
+    {
+        <div class="bo-error alert alert-danger" role="alert">@_error</div>
+    }
+
+    <div class="bo-narrow">
+        <div class="bo-champion">
+            <img class="bo-champion-art" src="@(ChampionHero?.ImageUrl ?? "/Unknown.png")" alt=""/>
+            <div class="bo-champion-name">@(ChampionHero?.Name ?? "No champion yet")</div>
+            <div class="bo-reward">
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>+@ChallengeWinElo ELO for dethroning the champion</span>
+            </div>
+            <div class="bo-defense">@(_state?.DefenseCount ?? 0) successful defense(s)</div>
+        </div>
+
+        <Panel Title="Challenge the champion" Class="bo-challenge" HeaderActions="ChallengeHeaderActions">
+            <div class="bo-hero-grid">
+                @foreach (var hero in ChallengerOptions)
+                {
+                    var selected = _challengerHeroId == hero.Id;
+                    <div class="bo-hero-chip @(selected ? "is-selected" : null)" @onclick="@(() => _challengerHeroId = hero.Id)">
+                        <img src="@hero.ImageUrl" alt=""/>
+                        <span>@hero.Name</span>
+                    </div>
+                }
+            </div>
+            <div class="bo-pickers">
+                <UmField Label="Champion's player">
+                    <UmSelect TValue="Guid" Variant="control" Value="@(_championPlayerId ?? Guid.Empty)"
+                              ValueChanged="@(id => _championPlayerId = id)" Options="PlayerOptions"/>
+                </UmField>
+                <UmField Label="Challenger's player">
+                    <UmSelect TValue="Guid" Variant="control" Value="@(_challengerPlayerId ?? Guid.Empty)"
+                              ValueChanged="@(id => _challengerPlayerId = id)" Options="PlayerOptions"/>
+                </UmField>
+            </div>
+            @if (SamePlayerSelected)
+            {
+                <div class="bo-warning">Champion and challenger need different players.</div>
+            }
+            <div class="bo-picker bo-map-picker" @onclick="@(() => _mapIndex++)">
+                <img src="@(CurrentMap?.ImageUrl ?? "/UnknownMap.png")" alt=""/>
+                <div class="bo-map-info">
+                    <div class="bo-picker-label">Map</div>
+                    <div class="bo-picker-value">@(CurrentMap?.DisplayName ?? "-")</div>
+                </div>
+                <i class="bi bi-shuffle"></i>
+            </div>
+            <UmButton Variant="primary" Icon="bi-lightning-fill" Class="bo-start"
+                      Disabled="@(!CanStartBattle || _isStarting)" OnClick="StartBattleAsync">
+                Start battle
+            </UmButton>
+        </Panel>
+    </div>
+
+    <MatchList Matches="MatchLog" Title="Title history" PageSize="10" Meta="@($"{MatchLog.Count()} challenges")"/>
+</div>
+
+@code {
+    /// <summary>Mirrors RatingConstants.BountyChallengeWinAwardMultiplier * RatingConstants.KFactor on
+    /// the server - shown as a display hint only, never used to compute a real rating change.</summary>
+    private const int ChallengeWinElo = 8;
+
+    [Parameter, EditorRequired]
+    public TournamentDto Tournament { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<UiHeroDto> Heroes { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public List<UiPlayerDto> Players { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public List<MapDto> Maps { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public IEnumerable<UiMatchLogDto> MatchLog { get; set; } = [];
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private BountyStateDto? _state;
+    private HashSet<Guid> _ownedExpansionIds = new();
+    private Guid? _challengerHeroId;
+    private Guid? _championPlayerId;
+    private Guid? _challengerPlayerId;
+    private int _mapIndex;
+    private bool _isStarting;
+    private string? _error;
+
+    private RenderFragment? ChallengeHeaderActions =>
+        @<UmButton Size="xs" Icon="bi-dice-5-fill" OnClick="RandomizeChallenger">Random opponent</UmButton>;
+
+    private UiHeroDto? ChampionHero => Heroes.FirstOrDefault(h => h.Id == _state?.ChampionHeroId);
+
+    /// <summary>Only heroes from owned sets can be challenged with - same rule Add match applies
+    /// (see AddMatch.FilterByCollectionAsync). The champion itself is excluded regardless of
+    /// ownership, since challenging yourself makes no sense.</summary>
+    private List<UiHeroDto> ChallengerOptions => Heroes
+        .Where(h => h.Id != _state?.ChampionHeroId)
+        .Where(h => _ownedExpansionIds.Count == 0 || h.ExpansionId is null || _ownedExpansionIds.Contains(h.ExpansionId.Value))
+        .ToList();
+
+    private List<SelectOption<Guid>> PlayerOptions
+        => Players.Select(p => new SelectOption<Guid>(p.Id, p.Name, AvatarUrl: p.ImageUrl)).ToList();
+
+    private UiPlayerDto? ChampionPlayer => Players.FirstOrDefault(p => p.Id == _championPlayerId);
+
+    private UiPlayerDto? ChallengerPlayer => Players.FirstOrDefault(p => p.Id == _challengerPlayerId);
+
+    private MapDto? CurrentMap => Maps.Count == 0 ? null : Maps[_mapIndex % Maps.Count];
+
+    private bool SamePlayerSelected => _championPlayerId is not null && _championPlayerId == _challengerPlayerId;
+
+    private bool CanStartBattle => _challengerHeroId is not null && ChampionPlayer is not null
+        && ChallengerPlayer is not null && CurrentMap is not null && ChampionHero is not null && !SamePlayerSelected;
+
+    protected override async Task OnInitializedAsync()
+        => _ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _state = await TournamentService.GetBountyStateAsync(Tournament.Id);
+
+        // Default to two different players (when there are at least two) rather than both landing on
+        // the same one - the whole point of picking is telling two people's results apart.
+        _championPlayerId ??= Players.FirstOrDefault()?.Id;
+        _challengerPlayerId ??= Players.Skip(1).FirstOrDefault()?.Id ?? Players.FirstOrDefault()?.Id;
+    }
+
+    private void RandomizeChallenger()
+    {
+        if (ChallengerOptions.Count == 0)
+        {
+            return;
+        }
+
+        _challengerHeroId = ChallengerOptions[Random.Shared.Next(ChallengerOptions.Count)].Id;
+    }
+
+    private async Task StartBattleAsync()
+    {
+        if (!CanStartBattle)
+        {
+            return;
+        }
+
+        _isStarting = true;
+        _error = null;
+        try
+        {
+            var match = await TournamentService.CreateBountyChallengeAsync(Tournament.Id, new CreateBountyChallengeRequestDto
+            {
+                ChallengerHeroId = _challengerHeroId!.Value,
+                ChampionPlayerId = ChampionPlayer!.Id,
+                ChallengerPlayerId = ChallengerPlayer!.Id,
+                MapId = CurrentMap!.Id
+            });
+            NavManager.NavigateTo($"{Urls.Match}/{match.Id}");
+        }
+        catch (Exception exception)
+        {
+            _error = $"Couldn't start the battle: {exception.Message}";
+        }
+        finally
+        {
+            _isStarting = false;
+        }
+    }
+}

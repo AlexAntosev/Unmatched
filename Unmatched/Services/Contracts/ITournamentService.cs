@@ -24,4 +24,8 @@ public interface ITournamentService
     Task<TournamentDto> CompleteAsync(Guid id);
 
     Task<IEnumerable<TournamentAwardDto>> GetAwardsAsync(Guid id);
+
+    Task<BountyStateDto> GetBountyStateAsync(Guid tournamentId);
+
+    Task<MatchDto> CreateBountyChallengeAsync(Guid tournamentId, CreateBountyChallengeRequestDto request);
 }

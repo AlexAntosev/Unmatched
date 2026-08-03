@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITournamentService, TournamentService>();
         services.AddTransient<ITournamentFormatGeneratorFactory, TournamentFormatGeneratorFactory>();
         services.AddTransient<Tournaments.TournamentAwardScheduler>();
+        services.AddTransient<Tournaments.BountyChallengeResolver>();
         services.AddTransient<ITitleService, TitleService>();
 
         services.AddTransient<IRatingCalculatorFactory, RatingCalculatorFactory>();
@@ -51,7 +52,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITitleRule, ExecutionerTitleRule>();
         services.AddTransient<ITitleRule, WallTitleRule>();
         services.AddTransient<ITitleRule, WorkhorseTitleRule>();
-        services.AddTransient<ITitleRule, BountyHolderTitleRule>();
         services.AddTransient<IMatchHandler, MatchHandler>();
 
         services.AddHttpClient<ICatalogClient, CatalogClient>(client =>

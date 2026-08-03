@@ -152,6 +152,21 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<IEnumerable<TournamentAwardDto>>();
     }
 
+    public async Task<BountyStateDto> GetBountyStateAsync(Guid tournamentId)
+    {
+        var response = await httpClient.GetAsync($"/tournament/{tournamentId}/bounty/state");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<BountyStateDto>();
+    }
+
+    public async Task<MatchDto> CreateBountyChallengeAsync(Guid tournamentId, CreateBountyChallengeRequestDto request)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"/tournament/{tournamentId}/bounty/challenge", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<MatchDto>();
+    }
+
     public async Task RecalculateAsync()
     {
         var response = await httpClient.PostAsync("/rating/recalculate", null);

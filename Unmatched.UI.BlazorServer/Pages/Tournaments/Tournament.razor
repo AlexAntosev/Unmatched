@@ -1,6 +1,7 @@
 @page "/tournaments/{id}"
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
+@using Unmatched.Dtos.Player
 @using Unmatched.Enums
 @using Unmatched.Extensions
 @using Unmatched.Services.Contracts
@@ -8,13 +9,17 @@
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
 @inject IHeroService HeroService
+@inject IPlayerService PlayerService
+@inject IMapService MapService
 @inject NavigationManager NavManager
 @*
-    Not in the design pack (see Tournaments.razor). SingleElimination and GroupStage share one view -
-    a panel per bracket Stage - because GroupStage's group phase is just Stage.Group, so the same
-    per-stage rendering already covers it once the playoff stages follow. Swiss shows one panel per
-    Round instead of Stage. League/Bounty have neither, so they get a standings table plus the shared
-    3b match list. Matches are filtered by TournamentId, not by name.
+    SingleElimination gets the live bracket (PlayoffBracket.razor, design/CLAUDE.md turn 15b) and
+    Bounty gets the champion pool (BountyDetail.razor, turn 15d) - both deliberate, per-format
+    designs. GroupStage keeps the older generic per-Stage panel rendering below (its group phase is
+    just Stage.Group, so the same rendering already covers it once the playoff stages follow) and
+    Swiss keeps one panel per Round - neither has a dedicated design yet. League has neither, so it
+    gets a standings table plus the shared match list. Matches are filtered by TournamentId, not by
+    name.
 *@
 
 <PageHeader Breadcrumbs="Crumbs">
@@ -78,18 +83,30 @@
         </Panel>
     }
 
-    <Panel Title="Participants" Meta="@($"{_tournament.ParticipantHeroIds.Count()}")">
-        <div class="td-participant-list">
-            @foreach (var heroId in _tournament.ParticipantHeroIds)
-            {
-                var hero = HeroFor(heroId);
-                <HeroToken ImageUrl="@(hero?.ImageUrl ?? "/Unknown.png")" Alt="@(hero?.Name ?? "Unknown")"
-                           Size="40" Title="@(hero?.Name ?? "Unknown")"/>
-            }
-        </div>
-    </Panel>
+    @if (_tournament.Format != TournamentFormat.Bounty)
+    {
+        <Panel Title="Participants" Meta="@($"{_tournament.ParticipantHeroIds.Count()}")">
+            <div class="td-participant-list">
+                @foreach (var heroId in _tournament.ParticipantHeroIds)
+                {
+                    var hero = HeroFor(heroId);
+                    <HeroToken ImageUrl="@(hero?.ImageUrl ?? "/Unknown.png")" Alt="@(hero?.Name ?? "Unknown")"
+                               Size="40" Title="@(hero?.Name ?? "Unknown")"/>
+                }
+            </div>
+        </Panel>
+    }
 
-    @if (IsBracketFormat)
+    @if (_tournament.Format == TournamentFormat.SingleElimination)
+    {
+        <PlayoffBracket Tournament="_tournament" Matches="_matches" Maps="_maps" OnChanged="RefreshAsync"/>
+    }
+    else if (_tournament.Format == TournamentFormat.Bounty)
+    {
+        <BountyDetail Tournament="_tournament" Heroes="_heroes" Players="_players" Maps="_maps"
+                      MatchLog="_tournamentMatchLog" OnChanged="RefreshAsync"/>
+    }
+    else if (IsBracketFormat)
     {
         <div class="bracket">
             @foreach (var stage in Stages())
@@ -157,7 +174,7 @@
             }
         </Panel>
 
-        <MatchList Matches="_leagueMatches" Title="Matches" PageSize="10" Meta="@($"{_leagueMatches.Count} matches")"/>
+        <MatchList Matches="_tournamentMatchLog" Title="Matches" PageSize="10" Meta="@($"{_tournamentMatchLog.Count} matches")"/>
     }
 </div>
 
@@ -169,8 +186,10 @@
     private List<UiMatchDto> _matches = new();
     private List<TournamentStandingDto> _standings = new();
     private List<TournamentAwardDto> _awards = new();
-    private List<UiMatchLogDto> _leagueMatches = new();
+    private List<UiMatchLogDto> _tournamentMatchLog = new();
     private List<UiHeroDto> _heroes = new();
+    private List<UiPlayerDto> _players = new();
+    private List<MapDto> _maps = new();
     private string? _error;
 
     [Inject]
@@ -183,16 +202,23 @@
 
     private TournamentFormatStyle Style => TournamentFormatStyle.For(_tournament.Format);
 
-    private bool IsBracketFormat => _tournament.Format is TournamentFormat.SingleElimination or TournamentFormat.GroupStage;
+    /// <summary>GroupStage's group phase is just Stage.Group, so the generic per-Stage panel below
+    /// already covers it once the playoff stages follow - SingleElimination has its own dedicated
+    /// PlayoffBracket instead (see the header comment).</summary>
+    private bool IsBracketFormat => _tournament.Format == TournamentFormat.GroupStage;
 
     private bool IsSwiss => _tournament.Format == TournamentFormat.Swiss;
 
-    private bool CanGenerate => TournamentFormatStyle.SupportsGeneration(_tournament.Format) && !_matches.Any(m => m.IsPlanned);
+    /// <summary>Playoff generates its own next round automatically (see TryAutoGenerateNextStageAsync)
+    /// and has no manual button for it; Bounty has no generator at all.</summary>
+    private bool CanGenerate => TournamentFormatStyle.SupportsGeneration(_tournament.Format)
+        && _tournament.Format != TournamentFormat.SingleElimination
+        && !_matches.Any(m => m.IsPlanned);
 
-    /// <summary>Bounty's completion payout is an ongoing per-challenge pool rather than a one-shot
-    /// placement schedule (see the plan's bounty schedule) - it isn't built yet, so Bounty tournaments
-    /// don't offer a "Complete" action at all, mirroring how they don't offer "Generate matches" either.</summary>
-    private bool SupportsCompletion => _tournament.Format != TournamentFormat.Bounty;
+    /// <summary>Bounty's payout is an ongoing per-challenge pool, not a one-shot placement schedule -
+    /// it never completes. Playoff completes through its own popup (PlayoffBracket.razor) instead of
+    /// this header button, mirroring how it also hides the generic "Generate matches" button above.</summary>
+    private bool SupportsCompletion => _tournament.Format is not TournamentFormat.Bounty and not TournamentFormat.SingleElimination;
 
     private bool CanComplete => _tournament.Status != TournamentStatus.Completed
         && _matches.Count > 0 && !_matches.Any(m => m.IsPlanned);
@@ -235,30 +261,58 @@
         try
         {
             PreloadService.Show();
+            await LoadAsync(tournamentId);
 
-            var tournament = TournamentService.GetAsync(tournamentId);
-            var matches = MatchService.GetByTournamentIdAsync(tournamentId);
-            var standings = TournamentService.GetStandingsAsync(tournamentId);
-            var awards = TournamentService.GetAwardsAsync(tournamentId);
-            var heroes = HeroService.GetAsync();
-            var matchLog = MatchService.GetMatchLogAsync();
-            await Task.WhenAll(tournament, matches, standings, awards, heroes, matchLog);
-
-            _tournament = tournament.Result;
-            _matches = matches.Result.ToList();
-            _standings = standings.Result.ToList();
-            _awards = awards.Result.ToList();
-            _heroes = heroes.Result.ToList();
-            _leagueMatches = matchLog.Result
-                .Where(m => m.TournamentId == tournamentId)
-                .OrderByDescending(m => m.Date)
-                .ToList();
+            // The round that just finished needs its next round generated - Playoff has no manual
+            // "Generate matches" button (see CanGenerate), so this is the only place it happens.
+            // Swallowing the failure is deliberate: once the bracket is fully decided,
+            // CreateNextStagePlannedMatchesAsync always throws "nothing further to generate", which
+            // just means PlayoffBracket's "Tournament complete" popup takes over from here.
+            if (_tournament.Format == TournamentFormat.SingleElimination && _matches.Count > 0 && !_matches.Any(m => m.IsPlanned))
+            {
+                try
+                {
+                    await TournamentService.GenerateMatchesAsync(tournamentId);
+                    await LoadAsync(tournamentId);
+                }
+                catch (Exception)
+                {
+                    // no further stage to generate - the bracket is complete.
+                }
+            }
         }
         finally
         {
             PreloadService.Hide();
         }
     }
+
+    private async Task LoadAsync(Guid tournamentId)
+    {
+        var tournament = TournamentService.GetAsync(tournamentId);
+        var matches = MatchService.GetByTournamentIdAsync(tournamentId);
+        var standings = TournamentService.GetStandingsAsync(tournamentId);
+        var awards = TournamentService.GetAwardsAsync(tournamentId);
+        var heroes = HeroService.GetAsync();
+        var players = PlayerService.GetAsync();
+        var maps = MapService.GetAsync();
+        var matchLog = MatchService.GetMatchLogAsync();
+        await Task.WhenAll(tournament, matches, standings, awards, heroes, players, maps, matchLog);
+
+        _tournament = tournament.Result;
+        _matches = matches.Result.ToList();
+        _standings = standings.Result.ToList();
+        _awards = awards.Result.ToList();
+        _heroes = heroes.Result.ToList();
+        _players = players.Result.ToList();
+        _maps = maps.Result.ToList();
+        _tournamentMatchLog = matchLog.Result
+            .Where(m => m.TournamentId == tournamentId)
+            .OrderByDescending(m => m.Date)
+            .ToList();
+    }
+
+    private async Task RefreshAsync() => await OnParametersSetAsync();
 
     private async Task GenerateMatchesAsync()
     {

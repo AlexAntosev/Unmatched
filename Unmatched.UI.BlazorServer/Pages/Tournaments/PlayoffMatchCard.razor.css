@@ -1,0 +1,105 @@
+.pb-card {
+    border-radius: var(--um-radius-card);
+    background: var(--um-bg-panel-raised);
+    border: 1px solid var(--um-border);
+    overflow: hidden;
+}
+
+.pb-card-tag {
+    padding: 6px 10px;
+    font: 600 9.5px var(--um-font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--um-accent-soft);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pb-card.is-locked {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 64px;
+    color: var(--um-text-faint);
+    font: 500 10.5px var(--um-font-body);
+}
+
+.pb-card-spoiler {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    height: 64px;
+    cursor: pointer;
+    background: repeating-linear-gradient(135deg, var(--um-bg-panel), var(--um-bg-panel) 6px, var(--um-bg-panel-raised) 6px, var(--um-bg-panel-raised) 12px);
+}
+
+.pb-card-spoiler i {
+    font-size: 15px;
+    color: var(--um-accent-soft);
+}
+
+.pb-card-spoiler span {
+    font: 600 9.5px var(--um-font-body);
+    color: var(--um-accent-text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.pb-fighter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-left: 3px solid transparent;
+}
+
+.pb-fighter + .pb-fighter {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pb-fighter.is-winner {
+    border-left-color: var(--um-win);
+}
+
+.pb-fighter.is-loser {
+    border-left-color: var(--um-loss);
+    opacity: 0.7;
+}
+
+.pb-fighter img {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+.pb-fighter-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.pb-fighter-name {
+    font: 600 11.5px var(--um-font-body);
+    color: var(--um-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pb-fighter-player {
+    font: 400 9.5px var(--um-font-mono);
+    color: var(--um-text-faint);
+}
+
+.pb-fighter-hp {
+    font: 600 11px var(--um-font-mono);
+    color: var(--um-text);
+}
+
+.pb-card-start {
+    width: calc(100% - 16px);
+    margin: 6px 8px 8px;
+    justify-content: center;
+}

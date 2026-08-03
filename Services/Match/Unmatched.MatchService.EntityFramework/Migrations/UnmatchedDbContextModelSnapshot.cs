@@ -291,7 +291,8 @@ namespace Unmatched.EntityFramework.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TournamentId", "HeroId", "AwardKind")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("([AwardKind] <> 11)");
 
                     b.ToTable("TournamentAwards");
                 });
@@ -306,6 +307,9 @@ namespace Unmatched.EntityFramework.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CurrentStage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FinalFormat")
                         .HasColumnType("int");
 
                     b.Property<int>("Format")
@@ -323,6 +327,9 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("StartingChampionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

@@ -1,5 +1,6 @@
 using Unmatched.MatchService.Api.Registration;
 using Unmatched.MatchService.Domain.Registration;
+using Unmatched.MatchService.Domain.Services;
 using Unmatched.MatchService.EntityFramework.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,5 +43,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Services.Migrate();
+
+// Self-heals a completed tournament's awards whenever its participants no longer match them - e.g. right
+// after FixTournamentParticipantsMismatchDetection corrects a tournament's roster, or after restoring a
+// database backup that reverted an earlier recomputation.
+using (var scope = app.Services.CreateScope())
+{
+    var tournamentService = scope.ServiceProvider.GetRequiredService<ITournamentService>();
+    await tournamentService.ReconcileCompletionAwardsAsync();
+}
 
 app.Run();

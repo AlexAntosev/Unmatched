@@ -1,0 +1,190 @@
+.tcm-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.tcm-types {
+    display: flex;
+    gap: 8px;
+}
+
+.tcm-type {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border-radius: var(--um-radius-card);
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-border);
+    cursor: pointer;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.tcm-type:hover:not(.is-disabled) {
+    border-color: var(--um-focus-border);
+}
+
+.tcm-type.is-selected {
+    background: var(--um-selected-bg);
+    border-color: var(--um-selected-border);
+}
+
+.tcm-type.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tcm-type i {
+    font-size: 16px;
+    color: var(--um-accent-soft);
+}
+
+.tcm-type-label {
+    font: 600 12.5px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.tcm-identity {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+}
+
+.tcm-cover {
+    width: 72px;
+    height: 72px;
+    flex: none;
+    border-radius: var(--um-radius-md);
+    overflow: hidden;
+    background: var(--um-bg-control);
+    border: 1px dashed var(--um-border);
+}
+
+.tcm-name-field {
+    flex: 1;
+}
+
+.tcm-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tcm-chip-row {
+    display: flex;
+    gap: 6px;
+}
+
+.tcm-chip {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--um-radius-sm);
+    background: var(--um-bg-control);
+    border: 1px solid var(--um-border);
+    color: var(--um-text-muted);
+    font: 600 11.5px var(--um-font-body);
+    cursor: pointer;
+}
+
+.tcm-chip.is-selected {
+    background: var(--um-accent);
+    border-color: var(--um-accent);
+    color: #fff;
+}
+
+.tcm-hero-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    max-height: 160px;
+    overflow: auto;
+}
+
+.tcm-hero-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px 5px 5px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-control);
+    border: 1px solid var(--um-border);
+    cursor: pointer;
+}
+
+.tcm-hero-chip.is-selected {
+    background: var(--um-selected-bg);
+    border-color: var(--um-selected-border);
+}
+
+.tcm-hero-chip img {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.tcm-hero-chip span {
+    font: 500 10.5px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.tcm-bounty-champion {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.tcm-bounty-champion-art {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--um-radius-card);
+    object-fit: cover;
+    border: 2px solid rgba(240, 180, 41, 0.5);
+    flex: none;
+}
+
+.tcm-bounty-champion-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tcm-bounty-champion-name {
+    font: 700 15px var(--um-font-display);
+}
+
+.tcm-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tcm-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 4px;
+    cursor: pointer;
+}
+
+.tcm-title-row.is-locked {
+    cursor: default;
+    opacity: 0.65;
+}
+
+.tcm-title-label {
+    font: 500 12.5px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.tcm-error {
+    font: 400 12px var(--um-font-body);
+    color: var(--um-loss);
+}

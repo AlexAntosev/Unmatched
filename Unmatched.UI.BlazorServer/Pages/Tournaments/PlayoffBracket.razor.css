@@ -1,0 +1,89 @@
+.pb-start {
+    margin-bottom: 18px;
+}
+
+.pb-error {
+    margin-bottom: 14px;
+}
+
+.pb-tree {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.pb-stage {
+    min-width: 220px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pb-final {
+    border-color: rgba(240, 180, 41, 0.35);
+    background: linear-gradient(160deg, rgba(240, 180, 41, 0.1), var(--um-bg-panel) 55%);
+}
+
+.pb-complete-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 6, 10, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.pb-complete-popup {
+    width: 320px;
+    border-radius: var(--um-radius-lg);
+    background: var(--um-bg-panel);
+    border: 1px solid rgba(240, 180, 41, 0.4);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.pb-complete-popup > i {
+    font-size: 28px;
+    color: var(--um-gold);
+}
+
+.pb-complete-title {
+    font: 600 14px var(--um-font-display);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.pb-complete-champion-art {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--um-radius-card);
+    object-fit: cover;
+    border: 2px solid rgba(240, 180, 41, 0.5);
+}
+
+.pb-complete-champion-name {
+    font: 700 16px var(--um-font-display);
+}
+
+.pb-complete-champion-sub {
+    font: 400 11.5px var(--um-font-body);
+    color: var(--um-text-muted);
+    margin-top: -8px;
+}
+
+.pb-complete-dismiss {
+    background: none;
+    border: none;
+    font: 400 11px var(--um-font-body);
+    color: var(--um-text-faint);
+    cursor: pointer;
+    padding: 0;
+}

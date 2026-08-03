@@ -1,0 +1,161 @@
+.bo-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.bo-error {
+    margin-bottom: 0;
+}
+
+/* Champion banner and challenge builder read best narrow and centred; the match log below wants
+   the full page width so its columns (date/mode/participants/map/tournament) stop cramping. */
+.bo-narrow {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 560px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.bo-champion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 0 4px;
+}
+
+.bo-champion-art {
+    width: 112px;
+    height: 112px;
+    border-radius: var(--um-radius-lg);
+    object-fit: cover;
+    border: 2px solid rgba(240, 180, 41, 0.55);
+    box-shadow: 0 0 0 6px rgba(240, 180, 41, 0.08);
+}
+
+.bo-champion-name {
+    font: 700 22px var(--um-font-display);
+    letter-spacing: 0.02em;
+}
+
+.bo-reward {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-gold-bg);
+    border: 1px solid rgba(240, 180, 41, 0.3);
+    color: var(--um-gold);
+    font: 600 12.5px var(--um-font-body);
+}
+
+.bo-defense {
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.bo-hero-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 118px;
+    overflow: auto;
+}
+
+.bo-hero-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px 6px 6px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-control);
+    border: 1px solid var(--um-border);
+    cursor: pointer;
+}
+
+.bo-hero-chip.is-selected {
+    background: var(--um-selected-bg);
+    border-color: var(--um-selected-border);
+}
+
+.bo-hero-chip img {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.bo-hero-chip span {
+    font: 500 11px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.bo-pickers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.bo-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-bg-control);
+    border: 1px solid var(--um-border);
+    cursor: pointer;
+}
+
+.bo-picker img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.bo-picker-label {
+    font: 400 9px var(--um-font-mono);
+    color: var(--um-text-faint);
+    text-transform: uppercase;
+}
+
+.bo-picker-value {
+    font: 600 11.5px var(--um-font-body);
+    color: var(--um-text);
+}
+
+.bo-map-picker {
+    margin-top: 10px;
+}
+
+.bo-map-picker img {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+}
+
+.bo-map-info {
+    flex: 1;
+}
+
+.bo-map-picker i {
+    color: var(--um-accent-soft);
+}
+
+.bo-warning {
+    margin-top: 8px;
+    font: 400 11.5px var(--um-font-body);
+    color: var(--um-loss);
+}
+
+.bo-start {
+    margin-top: 14px;
+    width: 100%;
+    justify-content: center;
+}

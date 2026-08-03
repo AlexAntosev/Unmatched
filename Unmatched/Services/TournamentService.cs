@@ -56,4 +56,14 @@ public class TournamentService(IMatchClient matchClient) : ITournamentService
     {
         return matchClient.GetTournamentAwardsAsync(id);
     }
+
+    public Task<BountyStateDto> GetBountyStateAsync(Guid tournamentId)
+    {
+        return matchClient.GetBountyStateAsync(tournamentId);
+    }
+
+    public Task<MatchDto> CreateBountyChallengeAsync(Guid tournamentId, CreateBountyChallengeRequestDto request)
+    {
+        return matchClient.CreateBountyChallengeAsync(tournamentId, request);
+    }
 }
