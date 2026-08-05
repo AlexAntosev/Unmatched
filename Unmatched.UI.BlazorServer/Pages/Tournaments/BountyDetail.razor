@@ -1,5 +1,6 @@
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
+@using Unmatched.Extensions
 @using Unmatched.Services.Contracts
 @using Unmatched.UI.BlazorServer.Shared.DesignSystem
 @inject ITournamentService TournamentService
@@ -58,14 +59,10 @@
             {
                 <div class="bo-warning">Champion and challenger need different players.</div>
             }
-            <div class="bo-picker bo-map-picker" @onclick="@(() => _mapIndex++)">
-                <img src="@(CurrentMap?.ImageUrl ?? "/UnknownMap.png")" alt=""/>
-                <div class="bo-map-info">
-                    <div class="bo-picker-label">Map</div>
-                    <div class="bo-picker-value">@(CurrentMap?.DisplayName ?? "-")</div>
-                </div>
-                <i class="bi bi-shuffle"></i>
-            </div>
+            <UmField Label="Map" Class="bo-map-field">
+                <UmSelect TValue="Guid" Variant="control" Icon="bi-map" Value="@(CurrentMap?.Id ?? Guid.Empty)"
+                          ValueChanged="@(id => _selectedMapId = id)" Options="MapOptions" OnRandomize="RandomizeMap"/>
+            </UmField>
             <UmButton Variant="primary" Icon="bi-lightning-fill" Class="bo-start"
                       Disabled="@(!CanStartBattle || _isStarting)" OnClick="StartBattleAsync">
                 Start battle
@@ -101,7 +98,7 @@
     private Guid? _challengerHeroId;
     private Guid? _championPlayerId;
     private Guid? _challengerPlayerId;
-    private int _mapIndex;
+    private Guid? _selectedMapId;
     private bool _isStarting;
     private string? _error;
 
@@ -125,7 +122,17 @@
 
     private UiPlayerDto? ChallengerPlayer => Players.FirstOrDefault(p => p.Id == _challengerPlayerId);
 
-    private MapDto? CurrentMap => Maps.Count == 0 ? null : Maps[_mapIndex % Maps.Count];
+    /// <summary>Only maps from owned sets can be picked - same rule Add match applies (see
+    /// AddMatch.FilterByCollectionAsync). The currently selected map stays available even if its set
+    /// isn't owned, so picking a map never silently swaps out from under the user later.</summary>
+    private List<MapDto> OwnedMaps => Maps
+        .Where(m => _ownedExpansionIds.Count == 0 || m.ExpansionId is null || _ownedExpansionIds.Contains(m.ExpansionId.Value) || m.Id == _selectedMapId)
+        .ToList();
+
+    private MapDto? CurrentMap => OwnedMaps.FirstOrDefault(m => m.Id == _selectedMapId) ?? OwnedMaps.FirstOrDefault();
+
+    private List<SelectOption<Guid>> MapOptions
+        => OwnedMaps.Select(m => new SelectOption<Guid>(m.Id, m.DisplayName, ArtUrl: m.ImageUrl)).ToList();
 
     private bool SamePlayerSelected => _championPlayerId is not null && _championPlayerId == _challengerPlayerId;
 
@@ -183,6 +190,16 @@
         }
 
         _challengerHeroId = ChallengerOptions[Random.Shared.Next(ChallengerOptions.Count)].Id;
+    }
+
+    private void RandomizeMap()
+    {
+        if (OwnedMaps.Count == 0)
+        {
+            return;
+        }
+
+        _selectedMapId = OwnedMaps.GetRandomItem().Id;
     }
 
     private async Task StartBattleAsync()
