@@ -20,6 +20,8 @@ public interface ITournamentService
 
     Task<Tournament?> UpdateTrophyImageAsync(Guid id, string imageFileName);
 
+    Task<Tournament?> UpdateNameAsync(Guid id, string name);
+
     Task<IEnumerable<TournamentStanding>> GetStandingsAsync(Guid tournamentId);
 
     Task<Tournament> CompleteAsync(Guid tournamentId);

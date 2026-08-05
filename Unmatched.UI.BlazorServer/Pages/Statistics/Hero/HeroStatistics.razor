@@ -214,6 +214,8 @@
     private List<HeroMatchEntry> _heroMatches = new();
     private List<RatingChangeDto> _ratingChanges = new();
     private List<ChartPoint> _ratingPoints = new();
+    private Dictionary<Guid, string> _heroNamesById = new();
+    private Dictionary<Guid, string> _tournamentNamesById = new();
     private IReadOnlyList<HeroMatchup> _matchups = [];
     private HeroMatchup? _antagonist;
     private List<MonsterMatchupRow> _villainMatchups = new();
@@ -224,7 +226,10 @@
     private UiHeroStatisticsDto? _nextHero;
     private int _rank;
     private int _ladderSize;
-    private int _ratingMonths = 6;
+    // Defaults to the full history rather than a fixed recent window - board game sessions are
+    // sporadic enough that a hero can easily have zero rated matches in the last 6 months without
+    // that meaning anything is wrong. 6M/1Y stay available for anyone who wants the recent trend.
+    private int _ratingMonths;
     private int _winRate;
     private int _cacheBust;
     private int _matchupPage = 1;
@@ -296,6 +301,8 @@
             _playStyle = _hero.PlayStyle ?? await PlayStyleService.GetAsync(heroId);
             _sidekick = _hero.Sidekicks?.FirstOrDefault();
             _expansionName = catalogHeroes.Result.FirstOrDefault(h => h.Id == heroId)?.ExpansionName.ToShortName();
+            _heroNamesById = catalogHeroes.Result.ToDictionary(h => h.Id, h => h.Name);
+            _tournamentNamesById = tournaments.Result.ToDictionary(t => t.Id, t => t.Name);
             _winRate = _hero.TotalMatches == 0
                 ? 0
                 : (int)Math.Round((double)_hero.TotalWins / _hero.TotalMatches * 100);
@@ -323,23 +330,39 @@
 
     /// <summary>
     /// Despite the name, RatingChangeDto.RatingDelta already carries the running rating, so the
-    /// series is plotted as-is rather than accumulated here.
+    /// series is plotted as-is rather than accumulated here. Filtered by real elapsed time from now,
+    /// not by a fixed count of events - a hero's rating cadence varies too much for an event count to
+    /// stand in for a time range.
     /// </summary>
     private void BuildRatingPoints()
     {
-        var points = _ratingChanges.Select(c => new ChartPoint(AxisLabel(c.Date), c.RatingDelta)).ToList();
-
-        // The range switch trims from the end because the series is ordered oldest to newest.
-        var take = _ratingMonths == 0 ? points.Count : Math.Max(2, _ratingMonths * 4);
-        _ratingPoints = points.TakeLast(take).ToList();
+        var cutoff = _ratingMonths == 0 ? DateTime.MinValue : DateTime.Now.AddMonths(-_ratingMonths);
+        _ratingPoints = _ratingChanges
+            .Where(c => c.Date >= cutoff)
+            .Select(c => new ChartPoint(AxisLabel(c.Date), c.RatingDelta, ReasonFor(c), c.IsAward))
+            .ToList();
     }
 
-    /// <summary>
-    /// The match service formats these as short dates and caps the series with a literal "Current",
-    /// so anything that parses becomes a month and everything else is passed through.
-    /// </summary>
-    private static string AxisLabel(string date)
-        => DateTime.TryParse(date, out var parsed) ? parsed.ToString("MMM yy") : date;
+    private static string AxisLabel(DateTime date) => date.ToString("MMM yyyy");
+
+    /// <summary>Hover text for a rating chart point - which match (and against whom) or which
+    /// tournament award moved the rating, and by how much.</summary>
+    private string ReasonFor(RatingChangeDto change)
+    {
+        var sign = change.PointsChange >= 0 ? "+" : string.Empty;
+        if (change.IsAward)
+        {
+            var tournamentName = change.TournamentId is { } tournamentId
+                ? _tournamentNamesById.GetValueOrDefault(tournamentId, "Unknown tournament")
+                : "Unknown tournament";
+            return $"{change.AwardKind?.GetLabel() ?? "Award"} — {tournamentName} ({sign}{change.PointsChange})";
+        }
+
+        var opponentName = change.OpponentHeroId is { } opponentId
+            ? _heroNamesById.GetValueOrDefault(opponentId, "Unknown opponent")
+            : "Unknown opponent";
+        return $"{(change.IsWin == true ? "Won" : "Lost")} vs {opponentName} ({sign}{change.PointsChange})";
+    }
 
     private void BuildMonsterMatchups()
     {

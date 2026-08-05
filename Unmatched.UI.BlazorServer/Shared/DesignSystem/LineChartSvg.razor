@@ -1,7 +1,9 @@
 @using System.Globalization
 @*
-    The rating line on the hero page. Plain SVG rather than a charting library: the design shows no
-    tooltips or zoom, just the shape of the curve between three gridlines.
+    The rating line on the hero page. Plain SVG rather than a charting library - no zoom, just the
+    shape of the curve between three gridlines. Each point carries a native browser tooltip (an SVG
+    &lt;title&gt;) explaining what moved the rating; award-derived points additionally get a small
+    permanent gold marker instead of blending into the line.
 
     The plot area uses a fixed 720x190 viewBox stretched to the container, so x is the sample index
     and y is the value mapped onto the min/max of the series.
@@ -22,6 +24,17 @@
             <path d="@AreaPath" fill="rgba(108,92,255,.16)"></path>
             <polyline points="@LinePoints" fill="none" stroke="@StrokeColor" stroke-width="2.5" stroke-linejoin="round"
                       vector-effect="non-scaling-stroke"></polyline>
+            @for (var i = 0; i < _plotted.Count; i++)
+            {
+                var point = _plotted[i];
+                <circle class="um-line-point @(point.IsAward ? "is-award" : null)" cx="@F(X(i))" cy="@F(Y(point.Value))"
+                        r="@(point.IsAward ? 4 : 8)">
+                    @if (!string.IsNullOrEmpty(point.Reason))
+                    {
+                        <title>@point.Reason</title>
+                    }
+                </circle>
+            }
         }
     </svg>
 </div>

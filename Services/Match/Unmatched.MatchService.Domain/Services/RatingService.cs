@@ -43,11 +43,40 @@ public class RatingService(
         var points = RatingConstants.InitialRating;
         foreach (var ratingEvent in heroEvents)
         {
-            points += DeltaFor(ratingEvent, heroId);
-            ratingChanges.Add(new RatingChange { Date = ratingEvent.OccurredAt.ToShortDateString(), RatingDelta = points });
+            var delta = DeltaFor(ratingEvent, heroId);
+            points += delta;
+            ratingChanges.Add(BuildRatingChange(ratingEvent, heroId, delta, points));
         }
 
         return ratingChanges;
+    }
+
+    private static RatingChange BuildRatingChange(RatingEvent ratingEvent, Guid heroId, int pointsChange, int runningTotal)
+    {
+        if (ratingEvent.Match is not null)
+        {
+            var self = ratingEvent.Match.Fighters.First(f => f.HeroId == heroId);
+            var opponent = ratingEvent.Match.Fighters.FirstOrDefault(f => f.HeroId != heroId);
+            return new RatingChange
+            {
+                Date = ratingEvent.OccurredAt,
+                RatingDelta = runningTotal,
+                PointsChange = pointsChange,
+                IsWin = self.IsWinner,
+                OpponentHeroId = opponent?.HeroId,
+                TournamentId = ratingEvent.Match.TournamentId
+            };
+        }
+
+        return new RatingChange
+        {
+            Date = ratingEvent.OccurredAt,
+            RatingDelta = runningTotal,
+            PointsChange = pointsChange,
+            IsAward = true,
+            TournamentId = ratingEvent.Award!.TournamentId,
+            AwardKind = ratingEvent.Award!.AwardKind
+        };
     }
 
     public Task<bool> IsRecalculationRequiredAsync()

@@ -41,6 +41,8 @@ public interface IMatchClient
 
     Task<TournamentDto> UpdateTournamentTrophyImageAsync(Guid id, string imageFileName);
 
+    Task<TournamentDto> UpdateTournamentNameAsync(Guid id, string name);
+
     Task<TournamentDto> CompleteTournamentAsync(Guid id);
 
     Task<IEnumerable<TournamentAwardDto>> GetTournamentAwardsAsync(Guid id);

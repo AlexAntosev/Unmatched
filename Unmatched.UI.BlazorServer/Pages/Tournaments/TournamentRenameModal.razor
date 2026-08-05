@@ -1,0 +1,44 @@
+@using BlazorBootstrap
+@using Unmatched.UI.BlazorServer.Shared.DesignSystem
+@*
+    Small "Rename" popup opened from Tournament.razor's header - a single name field with
+    Done/Cancel. Opened by ShowAsync; the new name is reported through OnRenamed and applied by the
+    caller, this modal never touches the tournament itself.
+*@
+<Modal @ref="_modal" Title="Rename tournament" Size="ModalSize.Small">
+    <BodyTemplate>
+        <UmField Label="Tournament name">
+            <UmTextField Value="@_name" ValueChanged="@(v => _name = v ?? string.Empty)"/>
+        </UmField>
+    </BodyTemplate>
+    <FooterTemplate>
+        <UmButton Size="sm" OnClick="@(() => _modal.HideAsync())">Cancel</UmButton>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Variant="primary" Disabled="@string.IsNullOrWhiteSpace(_name)" OnClick="DoneAsync">Done</UmButton>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private Modal _modal = default!;
+    private string _name = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> OnRenamed { get; set; }
+
+    public Task ShowAsync(string currentName)
+    {
+        _name = currentName;
+        return _modal.ShowAsync();
+    }
+
+    private async Task DoneAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_name))
+        {
+            return;
+        }
+
+        await _modal.HideAsync();
+        await OnRenamed.InvokeAsync(_name.Trim());
+    }
+}

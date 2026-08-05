@@ -47,6 +47,11 @@ public class TournamentService(IMatchClient matchClient) : ITournamentService
         return matchClient.UpdateTournamentTrophyImageAsync(id, imageFileName);
     }
 
+    public Task<TournamentDto> UpdateNameAsync(Guid id, string name)
+    {
+        return matchClient.UpdateTournamentNameAsync(id, name);
+    }
+
     public Task<TournamentDto> CompleteAsync(Guid id)
     {
         return matchClient.CompleteTournamentAsync(id);

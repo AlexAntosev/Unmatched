@@ -29,7 +29,8 @@
                       MapName="@match.MapName"
                       IsOpen="@(_openMatchId == match.MatchId)"
                       OnToggle="@(() => Toggle(match.MatchId))"
-                      IsHighlighted="@(HighlightRow?.Invoke(match) ?? false)"/>
+                      IsHighlighted="@(HighlightRow?.Invoke(match) ?? false)"
+                      ResultVariant="@(ResultVariant?.Invoke(match))"/>
         }
     </ChildContent>
     <Footer>
@@ -93,6 +94,12 @@
     /// other caller of this shared component is unaffected.</summary>
     [Parameter]
     public Func<UiMatchLogDto, bool>? HighlightRow { get; set; }
+
+    /// <summary>Optional per-row win/loss colouring relative to whichever hero/player the caller's
+    /// page is scoped to, e.g. Hero/Player match logs. `true` = win, `false` = loss, `null` (or an
+    /// unset callback) = no colouring - independent of <see cref="HighlightRow"/>'s gold gilding.</summary>
+    [Parameter]
+    public Func<UiMatchLogDto, bool?>? ResultVariant { get; set; }
 
     private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
         [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
