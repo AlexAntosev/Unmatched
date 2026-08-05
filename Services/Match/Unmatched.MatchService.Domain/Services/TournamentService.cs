@@ -263,9 +263,16 @@ public class TournamentService(
         var tournament = await unitOfWork.Tournaments.GetByIdAsync(tournamentId)
             ?? throw new KeyNotFoundException($"No tournament with key {tournamentId}");
         var matches = await unitOfWork.Matches.GetByTournamentAsync(tournamentId);
+        var poolRow = (await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId))
+            .FirstOrDefault(a => a.AwardKind == TournamentAwardKind.BountyPool);
 
-        var state = BountyChampionship.Compute(tournament.StartingChampionId, matches);
-        return new BountyState { ChampionHeroId = state.ChampionHeroId, DefenseCount = state.DefenseCount };
+        var defenseCount = BountyChampionship.Compute(tournament.StartingChampionId, matches).DefenseCount;
+        return new BountyState
+        {
+            ChampionHeroId = poolRow?.HeroId ?? tournament.StartingChampionId,
+            DefenseCount = defenseCount,
+            BankPoints = poolRow?.Points ?? 0
+        };
     }
 
     public async Task<Match> CreateBountyChallengeAsync(
@@ -278,8 +285,9 @@ public class TournamentService(
             throw new InvalidOperationException("Only Bounty tournaments support challenges.");
         }
 
-        var matches = await unitOfWork.Matches.GetByTournamentAsync(tournamentId);
-        var championId = BountyChampionship.Compute(tournament.StartingChampionId, matches).ChampionHeroId
+        var poolRow = (await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId))
+            .FirstOrDefault(a => a.AwardKind == TournamentAwardKind.BountyPool);
+        var championId = poolRow?.HeroId ?? tournament.StartingChampionId
             ?? throw new InvalidOperationException("This Bounty pool has no starting champion set.");
 
         if (championId == challengerHeroId)

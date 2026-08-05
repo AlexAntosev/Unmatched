@@ -5,8 +5,9 @@ using Unmatched.MatchService.Domain.Entities;
 /// <summary>
 /// A Bounty tournament never stores "the current champion" - it's always derived by replaying the
 /// pool's finished challenges in order, starting from <see cref="TournamentEntity.StartingChampionId"/>.
-/// Shared by <see cref="Services.TournamentService"/> (who a new challenge is against) and
-/// <see cref="BountyChallengeResolver"/> (who the dynamic holder title belongs to).
+/// Used by <see cref="Services.TournamentService"/> for <see cref="Models.BountyState.DefenseCount"/> -
+/// the champion/bank themselves are read directly off the tournament's <see cref="RatingCalculators.BountyRatingCalculator"/>
+/// pool row, since there's no persisted counter for defenses.
 /// </summary>
 public static class BountyChampionship
 {

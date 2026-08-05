@@ -2,6 +2,8 @@ namespace Unmatched.MatchService.Tests;
 
 using Moq;
 
+using Unmatched.MatchService.Domain.Communication.Catalog;
+using Unmatched.MatchService.Domain.Communication.Catalog.Dto;
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Enums;
@@ -15,6 +17,10 @@ public class MatchHandlerTests
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
     private readonly Mock<IMatchRepository> _matchRepository = new();
     private readonly Mock<IRatingRepository> _ratingRepository = new();
+    private readonly Mock<ITournamentRepository> _tournamentRepository = new();
+    private readonly Mock<ITournamentAwardRepository> _tournamentAwardRepository = new();
+    private readonly Mock<ITitleRepository> _titleRepository = new();
+    private readonly Mock<ICatalogHeroCache> _catalogHeroCache = new();
     private readonly Mock<IGameModeValidatorFactory> _validatorFactory = new();
     private readonly Mock<IGameModeValidator> _validator = new();
     private readonly Mock<IRatingCalculatorFactory> _ratingCalculatorFactory = new();
@@ -26,10 +32,18 @@ public class MatchHandlerTests
     {
         _unitOfWork.Setup(u => u.Matches).Returns(_matchRepository.Object);
         _unitOfWork.Setup(u => u.Ratings).Returns(_ratingRepository.Object);
+        _unitOfWork.Setup(u => u.Tournaments).Returns(_tournamentRepository.Object);
+        _unitOfWork.Setup(u => u.TournamentAwards).Returns(_tournamentAwardRepository.Object);
+        _unitOfWork.Setup(u => u.Titles).Returns(_titleRepository.Object);
+        _tournamentAwardRepository.Setup(r => r.GetByTournamentAsync(It.IsAny<Guid>())).ReturnsAsync(new List<TournamentAwardEntity>());
+        _titleRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TitleEntity>());
+        _titleRepository.Setup(r => r.AddAsync(It.IsAny<TitleEntity>())).ReturnsAsync((TitleEntity t) => t);
         _validatorFactory.Setup(f => f.Create(It.IsAny<GameMode>())).Returns(_validator.Object);
         _ratingCalculatorFactory.Setup(f => f.Create(It.IsAny<GameMode>())).Returns(_ratingCalculator.Object);
 
-        _handler = new MatchHandler(_unitOfWork.Object, _validatorFactory.Object, _ratingCalculatorFactory.Object);
+        var bountyRatingCalculator = new BountyRatingCalculator(_unitOfWork.Object, _catalogHeroCache.Object);
+        var bountyHolderTitleUpdater = new Domain.Tournaments.BountyHolderTitleUpdater(_unitOfWork.Object);
+        _handler = new MatchHandler(_unitOfWork.Object, _validatorFactory.Object, _ratingCalculatorFactory.Object, bountyRatingCalculator, bountyHolderTitleUpdater);
     }
 
     [Fact]
@@ -75,6 +89,49 @@ public class MatchHandlerTests
         var winnerId = Guid.NewGuid();
         var looserId = Guid.NewGuid();
         var match = CreateMatch(GameMode.OneVsOne, isRanked: true, winnerId, looserId);
+        _ratingCalculator.Setup(c => c.CalculateAsync(match)).ReturnsAsync(new Dictionary<Guid, int> { [winnerId] = 16, [looserId] = -16 });
+        _ratingRepository.Setup(r => r.GetByHeroIdAsync(It.IsAny<Guid>())).ReturnsAsync((RatingEntity?)null);
+
+        await _handler.HandleAsync(match);
+
+        Assert.Equal(16, match.Fighters.Single(f => f.HeroId == winnerId).MatchPoints);
+        Assert.Equal(-16, match.Fighters.Single(f => f.HeroId == looserId).MatchPoints);
+    }
+
+    [Fact]
+    public async Task HandleAsync_RankedBountyTournamentMatch_UsesBountyRatingCalculatorInsteadOfTheFactory()
+    {
+        // BountyRatingCalculator computes its own N-based payout for these instead of the factory's
+        // game-mode dispatch, so Fighter.MatchPoints is non-zero (unlike every other award kind, this
+        // flows through the normal MatchPoints path - see BountyRatingCalculator's doc comment).
+        var tournamentId = Guid.NewGuid();
+        var winnerId = Guid.NewGuid();
+        var looserId = Guid.NewGuid();
+        var match = CreateMatch(GameMode.OneVsOne, isRanked: true, winnerId, looserId);
+        match.TournamentId = tournamentId;
+        _tournamentRepository.Setup(r => r.GetByIdAsync(tournamentId))
+            .ReturnsAsync(new TournamentEntity { Id = tournamentId, Name = "Bounty Pool", Format = TournamentFormat.Bounty });
+        _ratingRepository.Setup(r => r.GetByHeroIdAsync(It.IsAny<Guid>())).ReturnsAsync((RatingEntity?)null);
+        _catalogHeroCache.Setup(c => c.GetAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = 16, DeckSize = 10, Sidekicks = Array.Empty<CatalogSidekickDto>() });
+
+        await _handler.HandleAsync(match);
+
+        _ratingCalculatorFactory.Verify(f => f.Create(It.IsAny<GameMode>()), Times.Never);
+        Assert.NotEqual(0, match.Fighters.Single(f => f.HeroId == winnerId).MatchPoints);
+        Assert.NotEqual(0, match.Fighters.Single(f => f.HeroId == looserId).MatchPoints);
+    }
+
+    [Fact]
+    public async Task HandleAsync_RankedNonBountyTournamentMatch_StillAppliesStandardElo()
+    {
+        var tournamentId = Guid.NewGuid();
+        var winnerId = Guid.NewGuid();
+        var looserId = Guid.NewGuid();
+        var match = CreateMatch(GameMode.OneVsOne, isRanked: true, winnerId, looserId);
+        match.TournamentId = tournamentId;
+        _tournamentRepository.Setup(r => r.GetByIdAsync(tournamentId))
+            .ReturnsAsync(new TournamentEntity { Id = tournamentId, Name = "Bracket Cup", Format = TournamentFormat.SingleElimination });
         _ratingCalculator.Setup(c => c.CalculateAsync(match)).ReturnsAsync(new Dictionary<Guid, int> { [winnerId] = 16, [looserId] = -16 });
         _ratingRepository.Setup(r => r.GetByHeroIdAsync(It.IsAny<Guid>())).ReturnsAsync((RatingEntity?)null);
 

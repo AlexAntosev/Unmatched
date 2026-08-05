@@ -23,10 +23,13 @@
         <div class="bo-champion">
             <img class="bo-champion-art" src="@(ChampionHero?.ImageUrl ?? "/Unknown.png")" alt=""/>
             <div class="bo-champion-name">@(ChampionHero?.Name ?? "No champion yet")</div>
-            <div class="bo-reward">
-                <i class="bi bi-lightning-charge-fill"></i>
-                <span>+@ChallengeWinElo ELO for dethroning the champion</span>
-            </div>
+            @if ((_state?.BankPoints ?? 0) > 0)
+            {
+                <div class="bo-reward">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <span>+@(_state!.BankPoints) pts riding on this reign</span>
+                </div>
+            }
             <div class="bo-defense">@(_state?.DefenseCount ?? 0) successful defense(s)</div>
         </div>
 
@@ -70,14 +73,11 @@
         </Panel>
     </div>
 
-    <MatchList Matches="MatchLog" Title="Title history" PageSize="10" Meta="@($"{MatchLog.Count()} challenges")"/>
+    <MatchList Matches="MatchLog" Title="Title history" PageSize="10" Meta="@($"{MatchLog.Count()} challenges")"
+               HighlightRow="@(m => DethroneMatchIds.Contains(m.MatchId))"/>
 </div>
 
 @code {
-    /// <summary>Mirrors RatingConstants.BountyChallengeWinAwardMultiplier * RatingConstants.KFactor on
-    /// the server - shown as a display hint only, never used to compute a real rating change.</summary>
-    private const int ChallengeWinElo = 8;
-
     [Parameter, EditorRequired]
     public TournamentDto Tournament { get; set; } = default!;
 
@@ -131,6 +131,36 @@
 
     private bool CanStartBattle => _challengerHeroId is not null && ChampionPlayer is not null
         && ChallengerPlayer is not null && CurrentMap is not null && ChampionHero is not null && !SamePlayerSelected;
+
+    /// <summary>Which challenges changed the pool's holder, gilded in Title History. Walks MatchLog
+    /// chronologically (it arrives newest-first) tracking the reigning champion from
+    /// Tournament.StartingChampionId, the same replay BountyChampionship.Compute does server-side -
+    /// a winner different from the reigning champion is a dethrone (including the very first
+    /// challenge, which claims a vacant title the same way the reward formula treats it).</summary>
+    private HashSet<Guid> DethroneMatchIds
+    {
+        get
+        {
+            var dethrones = new HashSet<Guid>();
+            var championId = Tournament.StartingChampionId;
+            foreach (var match in MatchLog.OrderBy(m => m.Date))
+            {
+                var winner = match.Fighters.FirstOrDefault(f => f.IsWinner);
+                if (winner is null)
+                {
+                    continue;
+                }
+
+                if (winner.HeroId != championId)
+                {
+                    dethrones.Add(match.MatchId);
+                    championId = winner.HeroId;
+                }
+            }
+
+            return dethrones;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
         => _ownedExpansionIds = (await CollectionService.GetOwnedExpansionIdsAsync()).ToHashSet();

@@ -6,6 +6,7 @@ using Moq;
 
 using Unmatched.MatchService.Domain.Constants;
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.MatchHandlers;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.Domain.Services;
@@ -34,6 +35,7 @@ public class RatingServiceTests
         _unitOfWork.Setup(u => u.TournamentAwards).Returns(_tournamentAwardRepository.Object);
         _unitOfWork.Setup(u => u.HeroTitles).Returns(_heroTitleRepository.Object);
         _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity>());
+        _tournamentAwardRepository.Setup(r => r.DeleteByAwardKindAsync(It.IsAny<TournamentAwardKind>())).Returns(Task.CompletedTask);
 
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
@@ -46,8 +48,7 @@ public class RatingServiceTests
             _mapper.Object,
             new RatingTimeline(_unitOfWork.Object),
             titleEvaluator,
-            titleAwarder,
-            new Domain.Tournaments.BountyChallengeResolver(_unitOfWork.Object));
+            titleAwarder);
     }
 
     [Fact]

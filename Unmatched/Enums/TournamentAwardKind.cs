@@ -13,5 +13,5 @@ public enum TournamentAwardKind
     SeasonSecond,
     SeasonThird,
     Eliminated,
-    BountyChallengeWin
+    BountyPool
 }

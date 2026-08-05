@@ -32,10 +32,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITournamentService, TournamentService>();
         services.AddTransient<ITournamentFormatGeneratorFactory, TournamentFormatGeneratorFactory>();
         services.AddTransient<Tournaments.TournamentAwardScheduler>();
-        services.AddTransient<Tournaments.BountyChallengeResolver>();
+        services.AddTransient<Tournaments.BountyHolderTitleUpdater>();
         services.AddTransient<ITitleService, TitleService>();
 
         services.AddTransient<IRatingCalculatorFactory, RatingCalculatorFactory>();
+        services.AddTransient<BountyRatingCalculator>();
         services.AddTransient<IGameModeValidatorFactory, GameModeValidatorFactory>();
         services.AddTransient<RankedMatchDataValidator>();
 

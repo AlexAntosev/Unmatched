@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 using Unmatched.MatchService.Domain.Entities;
-using Unmatched.MatchService.Domain.Enums;
 
 public class UnmatchedDbContextFactory : IDesignTimeDbContextFactory<UnmatchedDbContext>
 {
@@ -103,13 +102,11 @@ public class UnmatchedDbContext : DbContext
             .HasIndex(t => new { t.TournamentId, t.Kind })
             .IsUnique();
 
-        // BountyChallengeWin is excluded: a hero can defend a Bounty pool many times, producing many
-        // award rows with the same (TournamentId, HeroId, AwardKind) - every other kind is a one-time
-        // completion bonus, so it stays unique.
+        // Bounty's single BountyPool row per tournament is upserted, never inserted a second time, so
+        // plain uniqueness on (TournamentId, HeroId, AwardKind) holds for it same as every other kind.
         modelBuilder.Entity<TournamentAwardEntity>()
             .HasIndex(a => new { a.TournamentId, a.HeroId, a.AwardKind })
-            .IsUnique()
-            .HasFilter($"([AwardKind] <> {(int)TournamentAwardKind.BountyChallengeWin})");
+            .IsUnique();
 
         modelBuilder.Entity<TitleEntity>()
             .HasIndex(t => t.RuleKey)

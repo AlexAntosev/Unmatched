@@ -95,6 +95,7 @@ public class BountyChampionshipTests
     private static MatchEntity CreateMatch(DateTime date, Guid winnerId, Guid loserId)
         => new()
         {
+            Id = Guid.NewGuid(),
             Date = date,
             IsPlanned = false,
             Fighters = new List<FighterEntity>

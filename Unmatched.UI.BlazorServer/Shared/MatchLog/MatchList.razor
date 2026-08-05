@@ -28,7 +28,8 @@
                       Map="@ResolvedMap(match.MapName)"
                       MapName="@match.MapName"
                       IsOpen="@(_openMatchId == match.MatchId)"
-                      OnToggle="@(() => Toggle(match.MatchId))"/>
+                      OnToggle="@(() => Toggle(match.MatchId))"
+                      IsHighlighted="@(HighlightRow?.Invoke(match) ?? false)"/>
         }
     </ChildContent>
     <Footer>
@@ -86,6 +87,12 @@
     /// <summary>Shows the "Per page" segmented override in the footer - the match log page opts in.</summary>
     [Parameter]
     public bool AllowPageSizeControl { get; set; }
+
+    /// <summary>Optional per-row emphasis, e.g. Bounty's Title History gilding the challenge that
+    /// changed the pool's holder. Unset (the default) means no row is ever highlighted, so every
+    /// other caller of this shared component is unaffected.</summary>
+    [Parameter]
+    public Func<UiMatchLogDto, bool>? HighlightRow { get; set; }
 
     private static readonly IReadOnlyList<SelectOption<int>> PageSizeOptions =
         [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];

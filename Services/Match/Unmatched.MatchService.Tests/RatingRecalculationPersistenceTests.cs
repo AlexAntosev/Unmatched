@@ -310,11 +310,13 @@ public class RatingRecalculationPersistenceTests
             catalogHeroCache.Setup(c => c.GetAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = ReferenceHero.Hp, DeckSize = ReferenceHero.DeckSize, Sidekicks = ReferenceHero.Sidekicks });
 
-            var matchHandler = new MatchHandler(unitOfWork, new GameModeValidatorFactory(), new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object));
+            var ratingCalculatorFactory = new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object);
+            var bountyRatingCalculator = new BountyRatingCalculator(unitOfWork, catalogHeroCache.Object);
+            var bountyHolderTitleUpdater = new Domain.Tournaments.BountyHolderTitleUpdater(unitOfWork);
+            var matchHandler = new MatchHandler(unitOfWork, new GameModeValidatorFactory(), ratingCalculatorFactory, bountyRatingCalculator, bountyHolderTitleUpdater);
             var titleEvaluator = new TitleEvaluator(unitOfWork, new Mock<IMapper>().Object, new ITitleRule[] { new GrandChampionTitleRule(unitOfWork) });
             var titleAwarder = new TournamentTitleAwarder(unitOfWork, catalogHeroCache.Object);
-            var bountyChallengeResolver = new Domain.Tournaments.BountyChallengeResolver(unitOfWork);
-            var ratingService = new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder, bountyChallengeResolver);
+            var ratingService = new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder);
 
             await ratingService.RecalculateAsync();
         }
@@ -322,6 +324,74 @@ public class RatingRecalculationPersistenceTests
         await using var assertContext = CreateDbContext(databaseName);
         var holders = await assertContext.HeroTitles.Where(ht => ht.TitlesId == titleId).Select(ht => ht.HeroesId).ToListAsync();
         Assert.Equal(new[] { HeroBId }, holders);
+    }
+
+    [Fact]
+    public async Task RecalculateAsync_BountyChallengeSequence_ReproducesTheLiveRatingsExactly()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        var championId = Guid.NewGuid();
+        var firstChallengerId = Guid.NewGuid();
+        var secondChallengerId = Guid.NewGuid();
+        var dethronerId = Guid.NewGuid();
+        var tournamentId = Guid.NewGuid();
+
+        await using (var seedContext = CreateDbContext(databaseName))
+        {
+            seedContext.Tournaments.Add(new TournamentEntity
+            {
+                Id = tournamentId, Name = "Bounty Pool", Format = TournamentFormat.Bounty, StartingChampionId = championId
+            });
+            await seedContext.SaveChangesAsync();
+        }
+
+        // live path: resolve a mix of defenses and a dethrone in order, exactly as
+        // MatchService.AddOrUpdateAsync would (one MatchHandler.HandleAsync call per match now does
+        // both the rating math and the holder-title update).
+        await using (var liveContext = CreateDbContext(databaseName))
+        {
+            var unitOfWork = new UnitOfWork(liveContext);
+            var catalogHeroCache = new Mock<ICatalogHeroCache>();
+            catalogHeroCache.Setup(c => c.GetAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = ReferenceHero.Hp, DeckSize = ReferenceHero.DeckSize, Sidekicks = ReferenceHero.Sidekicks });
+            var ratingCalculatorFactory = new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object);
+            var bountyRatingCalculator = new BountyRatingCalculator(unitOfWork, catalogHeroCache.Object);
+            var bountyHolderTitleUpdater = new Domain.Tournaments.BountyHolderTitleUpdater(unitOfWork);
+            var matchHandler = new MatchHandler(unitOfWork, new GameModeValidatorFactory(), ratingCalculatorFactory, bountyRatingCalculator, bountyHolderTitleUpdater);
+
+            await ResolveBountyChallengeAsync(matchHandler, tournamentId, championId, firstChallengerId, new DateTime(2026, 1, 1));
+            await ResolveBountyChallengeAsync(matchHandler, tournamentId, championId, secondChallengerId, new DateTime(2026, 1, 8));
+            await ResolveBountyChallengeAsync(matchHandler, tournamentId, dethronerId, championId, new DateTime(2026, 1, 15));
+        }
+
+        Dictionary<Guid, int> ratingsBeforeRecalculation;
+        await using (var beforeContext = CreateDbContext(databaseName))
+        {
+            ratingsBeforeRecalculation = await beforeContext.Ratings.ToDictionaryAsync(r => r.HeroId, r => r.Points);
+        }
+
+        await using (var dbContext = CreateDbContext(databaseName))
+        {
+            await CreateRatingService(dbContext).RecalculateAsync();
+        }
+
+        await using var assertContext = CreateDbContext(databaseName);
+        var ratingsAfterRecalculation = await assertContext.Ratings.ToDictionaryAsync(r => r.HeroId, r => r.Points);
+
+        Assert.Equal(4, ratingsBeforeRecalculation.Count);
+        Assert.Equal(ratingsBeforeRecalculation, ratingsAfterRecalculation);
+    }
+
+    /// <summary>Mirrors MatchService.AddOrUpdateAsync's live pipeline for one Bounty challenge: build a
+    /// fresh (Id-less) planned-then-finished match and run it through the match handler, which now
+    /// does both the rating math and the holder-title update in one call.</summary>
+    private static async Task ResolveBountyChallengeAsync(
+        MatchHandler matchHandler, Guid tournamentId, Guid winnerId, Guid loserId, DateTime date)
+    {
+        var match = CreateMatch(date, winnerHeroId: winnerId, looserHeroId: loserId, tournamentId: tournamentId);
+        match.Id = Guid.Empty;
+
+        await matchHandler.HandleAsync(match);
     }
 
     private static TournamentAwardEntity CreateAward(Guid tournamentId, Guid heroId, int points, DateTime awardedAt)
@@ -423,15 +493,14 @@ public class RatingRecalculationPersistenceTests
         catalogHeroCache.Setup(c => c.GetAsync(It.IsAny<Guid>()))
             .ReturnsAsync((Guid heroId) => new CatalogHeroDto { Id = heroId, Hp = ReferenceHero.Hp, DeckSize = ReferenceHero.DeckSize, Sidekicks = ReferenceHero.Sidekicks });
 
-        var matchHandler = new MatchHandler(
-            unitOfWork,
-            new GameModeValidatorFactory(),
-            new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object));
+        var ratingCalculatorFactory = new RatingCalculatorFactory(unitOfWork, catalogHeroCache.Object);
+        var bountyRatingCalculator = new BountyRatingCalculator(unitOfWork, catalogHeroCache.Object);
+        var bountyHolderTitleUpdater = new Domain.Tournaments.BountyHolderTitleUpdater(unitOfWork);
+        var matchHandler = new MatchHandler(unitOfWork, new GameModeValidatorFactory(), ratingCalculatorFactory, bountyRatingCalculator, bountyHolderTitleUpdater);
 
         var titleEvaluator = new TitleEvaluator(unitOfWork, new Mock<IMapper>().Object, []);
         var titleAwarder = new TournamentTitleAwarder(unitOfWork, catalogHeroCache.Object);
 
-        var bountyChallengeResolver = new Domain.Tournaments.BountyChallengeResolver(unitOfWork);
-        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder, bountyChallengeResolver);
+        return new RatingService(matchHandler, unitOfWork, new Mock<IMapper>().Object, new RatingTimeline(unitOfWork), titleEvaluator, titleAwarder);
     }
 }

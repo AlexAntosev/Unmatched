@@ -79,9 +79,4 @@ public static class RatingConstants
     public const double TournamentAwardScaleMin = 0.5;
 
     public const double TournamentAwardScaleMax = 1.5;
-
-    /// <summary>Flat bonus for winning a Bounty challenge, paid straight to the winner with no entry
-    /// fee or pool - unlike the completion bonuses above, a Bounty pool is played indefinitely and
-    /// never nets to zero.</summary>
-    public const double BountyChallengeWinAwardMultiplier = 0.25;
 }

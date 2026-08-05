@@ -542,6 +542,45 @@ public class TournamentServiceTests : IDisposable
 
         Assert.Equal(startingChampionId, state.ChampionHeroId);
         Assert.Equal(0, state.DefenseCount);
+        Assert.Equal(0, state.BankPoints);
+    }
+
+    [Fact]
+    public async Task GetBountyStateAsync_AfterADefense_ExposesTheAccumulatedBank()
+    {
+        var championId = Guid.NewGuid();
+        var tournament = await _tournamentService.AddAsync(new Tournament
+        {
+            Name = "Bounty Pool",
+            Format = TournamentFormat.Bounty,
+            StartingChampionId = championId
+        });
+
+        var challengerId = Guid.NewGuid();
+        var match = new MatchEntity
+        {
+            Id = Guid.NewGuid(),
+            TournamentId = tournament.Id,
+            Date = new DateTime(2026, 1, 1),
+            Fighters = new List<FighterEntity>
+            {
+                new() { HeroId = championId, IsWinner = true },
+                new() { HeroId = challengerId, IsWinner = false },
+            },
+        };
+        _dbContext.Matches.Add(match);
+        _dbContext.TournamentAwards.Add(new TournamentAwardEntity
+        {
+            Id = Guid.NewGuid(), TournamentId = tournament.Id, HeroId = championId,
+            AwardKind = TournamentAwardKind.BountyPool, Points = 5, AwardedAt = match.Date
+        });
+        await _dbContext.SaveChangesAsync();
+
+        var state = await _tournamentService.GetBountyStateAsync(tournament.Id);
+
+        Assert.Equal(1, state.DefenseCount);
+        Assert.Equal(championId, state.ChampionHeroId);
+        Assert.Equal(5, state.BankPoints);
     }
 
     [Fact]
@@ -565,6 +604,7 @@ public class TournamentServiceTests : IDisposable
             tournament.Id, challengerId, championPlayerId, challengerPlayerId, MapId);
 
         Assert.True(match.IsPlanned);
+        Assert.True(match.IsRanked);
         Assert.Null(match.Stage);
         Assert.Equal(tournament.Id, match.TournamentId);
         var fighterHeroIds = match.Fighters.Select(f => f.HeroId).ToList();
