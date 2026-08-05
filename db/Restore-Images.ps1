@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Restores the MinIO "images" bucket from a snapshot created by Backup-Database.ps1
+    Restores the MinIO "images" bucket from a snapshot created by Backup-Images.ps1
     (db/images-{stamp}/), mirroring it back onto the running MinIO server.
 
 .DESCRIPTION
@@ -53,7 +53,7 @@ if (-not $BackupFolder) {
         Select-Object -First 1
 
     if (-not $latest) {
-        throw "No db/images-* backup folder found. Run Backup-Database.ps1 first, or pass -BackupFolder explicitly."
+        throw "No db/images-* backup folder found. Run Backup-Images.ps1 first, or pass -BackupFolder explicitly."
     }
 
     $BackupFolder = $latest.FullName

@@ -1,0 +1,319 @@
+@using BlazorBootstrap
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Enums
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
+@using Unmatched.UI.BlazorServer.Shared.DesignSystem
+@implements IDisposable
+@inject TournamentCreateModalService TournamentCreateModalService
+@inject ITournamentService TournamentService
+@inject IHeroService HeroService
+@inject ICollectionService CollectionService
+@inject IImageUploadService ImageUploadService
+@inject NavigationManager NavManager
+@*
+    "New tournament" modal (design/CLAUDE.md "Турніри (turn 15)", id 15a). League, Group and Swiss
+    are shown but dimmed - only Playoff (SingleElimination) and Bounty are buildable today. Mounted
+    once in MainLayout, opened from anywhere via TournamentCreateModalService.RequestOpen().
+*@
+<Modal @ref="_modal" Title="New tournament" Size="ModalSize.Large">
+    <BodyTemplate>
+        <div class="tcm-body">
+            <div class="tcm-types">
+                @foreach (var type in TypeOptions)
+                {
+                    <div class="tcm-type @(type.Format == _form.Format ? "is-selected" : null) @(type.Enabled ? null : "is-disabled")"
+                         @onclick="@(() => SelectFormat(type))">
+                        <i class="bi @type.Icon"></i>
+                        <div class="tcm-type-label">@type.Label</div>
+                    </div>
+                }
+            </div>
+
+            <div class="tcm-identity">
+                <div class="tcm-cover">
+                    <EditableImage ImageUrl="@(_coverPreviewUrl ?? "/Unmatched-logo.png")" AltText="Cover" Label=""
+                                   FallbackImageUrl="/Unmatched-logo.png" OnFileSelected="OnCoverSelectedAsync"/>
+                </div>
+                <UmField Label="Tournament name" Class="tcm-name-field">
+                    <UmTextField Placeholder="Golden Halat Playoff" Value="@_form.Name"
+                                 ValueChanged="@(v => _form.Name = v ?? string.Empty)"/>
+                </UmField>
+            </div>
+
+            @if (_form.Format == TournamentFormat.SingleElimination)
+            {
+                <div class="tcm-section">
+                    <span class="um-section-caption">Participants</span>
+                    <div class="tcm-chip-row">
+                        @foreach (var size in PlayoffSizes)
+                        {
+                            <div class="tcm-chip @(_playoffSize == size ? "is-selected" : null)" @onclick="@(() => SetPlayoffSize(size))">@size</div>
+                        }
+                    </div>
+                </div>
+                <div class="tcm-section">
+                    <span class="um-section-caption">Heroes &middot; @PlayoffHeroesLeft left to pick</span>
+                    <div class="tcm-hero-grid">
+                        @foreach (var hero in _heroes)
+                        {
+                            var selected = _selectedPlayoffHeroes.Contains(hero.Id);
+                            <div class="tcm-hero-chip @(selected ? "is-selected" : null)" @onclick="@(() => TogglePlayoffHero(hero.Id))">
+                                <img src="@hero.ImageUrl" alt=""/>
+                                <span>@hero.Name</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tcm-section">
+                    <span class="um-section-caption">Final</span>
+                    <div class="tcm-chip-row">
+                        @foreach (var final in FinalFormatOptions)
+                        {
+                            <div class="tcm-chip @(_form.FinalFormat == final ? "is-selected" : null)" @onclick="@(() => _form.FinalFormat = final)">@final</div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (_form.Format == TournamentFormat.Bounty)
+            {
+                <div class="tcm-section">
+                    <div class="tcm-bounty-champion">
+                        <img class="tcm-bounty-champion-art" src="@(StartingChampionHero?.ImageUrl ?? "/Unknown.png")" alt=""/>
+                        <div class="tcm-bounty-champion-info">
+                            <span class="um-section-caption">Starting champion</span>
+                            <div class="tcm-bounty-champion-name">@(StartingChampionHero?.Name ?? "Pick a hero")</div>
+                        </div>
+                        <UmButton Variant="primary" Size="sm" Icon="bi-dice-5-fill" OnClick="RandomizeChampion">Randomize</UmButton>
+                    </div>
+                    <span class="um-section-caption">Or pick by hand</span>
+                    <div class="tcm-hero-grid">
+                        @foreach (var hero in _heroes)
+                        {
+                            var selected = _form.StartingChampionId == hero.Id;
+                            <div class="tcm-hero-chip @(selected ? "is-selected" : null)" @onclick="@(() => _form.StartingChampionId = hero.Id)">
+                                <img src="@hero.ImageUrl" alt=""/>
+                                <span>@hero.Name</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="tcm-section">
+                <span class="um-section-caption">Titles this tournament awards</span>
+                <div class="tcm-titles">
+                    @foreach (var kind in TitleKindOptions)
+                    {
+                        var isChampion = kind == TournamentTitleKind.Champion;
+                        <label class="tcm-title-row @(isChampion ? "is-locked" : null)">
+                            <UmCheckbox Checked="@(isChampion || _selectedTitles.Contains(kind))"
+                                        Title="@(isChampion ? "Champion is always awarded" : null)"
+                                        CheckedChanged="@(_ => ToggleTitle(kind))"/>
+                            <span class="tcm-title-label">@kind@(isChampion ? " (required)" : null)</span>
+                        </label>
+                    }
+                </div>
+            </div>
+
+            @if (_error is not null)
+            {
+                <div class="tcm-error">@_error</div>
+            }
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <UmButton Size="sm" OnClick="CloseAsync">Cancel</UmButton>
+        <div class="um-spacer"></div>
+        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" Disabled="@(!IsValid || _isSaving)" OnClick="CreateAsync">
+            Create tournament
+        </UmButton>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private static readonly int[] PlayoffSizes = [8, 16, 32];
+
+    private static readonly TournamentFinalFormat[] FinalFormatOptions = Enum.GetValues<TournamentFinalFormat>();
+
+    private static readonly TournamentTitleKind[] TitleKindOptions = Enum.GetValues<TournamentTitleKind>();
+
+    private static readonly IReadOnlyList<TypeOption> TypeOptions = Enum.GetValues<TournamentFormat>()
+        .Select(format => new TypeOption(
+            format,
+            TournamentFormatStyle.For(format).Label,
+            TournamentFormatStyle.For(format).Icon,
+            format is TournamentFormat.SingleElimination or TournamentFormat.Bounty))
+        .ToList();
+
+    private Modal _modal = default!;
+    private List<UiHeroDto> _heroes = new();
+    private TournamentDto _form = NewForm();
+    private readonly HashSet<Guid> _selectedPlayoffHeroes = new();
+    private readonly HashSet<TournamentTitleKind> _selectedTitles = new() { TournamentTitleKind.Champion };
+    private int _playoffSize = 8;
+    private string? _coverPreviewUrl;
+    private string? _error;
+    private bool _isSaving;
+
+    private int PlayoffHeroesLeft => Math.Max(0, _playoffSize - _selectedPlayoffHeroes.Count);
+
+    private UiHeroDto? StartingChampionHero => _heroes.FirstOrDefault(h => h.Id == _form.StartingChampionId);
+
+    private bool IsValid => _form.Format switch
+    {
+        TournamentFormat.SingleElimination => !string.IsNullOrWhiteSpace(_form.Name) && _selectedPlayoffHeroes.Count == _playoffSize,
+        TournamentFormat.Bounty => !string.IsNullOrWhiteSpace(_form.Name) && _form.StartingChampionId is not null,
+        _ => false
+    };
+
+    private static TournamentDto NewForm() => new()
+    {
+        Format = TournamentFormat.SingleElimination,
+        FinalFormat = TournamentFinalFormat.Bo3,
+        InitialStage = StageFor(8)
+    };
+
+    private static Stage StageFor(int size) => size switch
+    {
+        8 => Stage.QuarterFinals,
+        16 => Stage.EighthFinals,
+        _ => Stage.SixteenthFinals
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        TournamentCreateModalService.OpenRequested += OnOpenRequested;
+
+        var heroes = HeroService.GetAsync();
+        var ownedExpansionIds = CollectionService.GetOwnedExpansionIdsAsync();
+        await Task.WhenAll(heroes, ownedExpansionIds);
+
+        // Only heroes from owned sets are eligible - same rule Add match applies (see
+        // AddMatch.FilterByCollectionAsync). An empty collection means "not tracked yet", so it
+        // falls back to showing everything rather than an empty picker.
+        var owned = ownedExpansionIds.Result.ToHashSet();
+        _heroes = heroes.Result
+            .Where(h => owned.Count == 0 || h.ExpansionId is null || owned.Contains(h.ExpansionId.Value))
+            .OrderBy(h => h.Name)
+            .ToList();
+    }
+
+    private async void OnOpenRequested()
+    {
+        ResetForm();
+        await _modal.ShowAsync();
+    }
+
+    private void ResetForm()
+    {
+        _form = NewForm();
+        _playoffSize = 8;
+        _selectedPlayoffHeroes.Clear();
+        _selectedTitles.Clear();
+        _selectedTitles.Add(TournamentTitleKind.Champion);
+        _coverPreviewUrl = null;
+        _error = null;
+        _isSaving = false;
+    }
+
+    private void SelectFormat(TypeOption type)
+    {
+        if (!type.Enabled)
+        {
+            return;
+        }
+
+        _form.Format = type.Format;
+    }
+
+    private void SetPlayoffSize(int size)
+    {
+        _playoffSize = size;
+        _form.InitialStage = StageFor(size);
+        // shrinking the field drops the excess so "left to pick" never goes negative.
+        if (_selectedPlayoffHeroes.Count > size)
+        {
+            _selectedPlayoffHeroes.RemoveWhere(_ => _selectedPlayoffHeroes.Count > size);
+        }
+    }
+
+    private void TogglePlayoffHero(Guid heroId)
+    {
+        if (!_selectedPlayoffHeroes.Remove(heroId) && _selectedPlayoffHeroes.Count < _playoffSize)
+        {
+            _selectedPlayoffHeroes.Add(heroId);
+        }
+    }
+
+    private void RandomizeChampion()
+    {
+        if (_heroes.Count == 0)
+        {
+            return;
+        }
+
+        _form.StartingChampionId = _heroes[Random.Shared.Next(_heroes.Count)].Id;
+    }
+
+    private void ToggleTitle(TournamentTitleKind kind)
+    {
+        if (kind == TournamentTitleKind.Champion)
+        {
+            return; // always on, not user-toggleable
+        }
+
+        if (!_selectedTitles.Add(kind))
+        {
+            _selectedTitles.Remove(kind);
+        }
+    }
+
+    private async Task OnCoverSelectedAsync(IBrowserFile file)
+    {
+        if (string.IsNullOrWhiteSpace(_form.Name))
+        {
+            return;
+        }
+
+        await using var stream = file.OpenReadStream(15_000_000);
+        _form.ImageFileName = await ImageUploadService.SaveAsync("tournaments", _form.Name, _form.ImageFileName, stream, file.Name);
+        _coverPreviewUrl = $"/images/tournaments/{_form.ImageFileName}";
+    }
+
+    private async Task CloseAsync() => await _modal.HideAsync();
+
+    private async Task CreateAsync()
+    {
+        if (!IsValid)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        _error = null;
+        try
+        {
+            _form.TitleKinds = _selectedTitles.ToList();
+            _form.ParticipantHeroIds = _form.Format == TournamentFormat.SingleElimination ? _selectedPlayoffHeroes.ToList() : [];
+            _form.MaxParticipants = _form.Format == TournamentFormat.SingleElimination ? _playoffSize : 0;
+
+            var created = await TournamentService.AddAsync(_form);
+            await _modal.HideAsync();
+            NavManager.NavigateTo($"{Urls.Tournaments}/{created.Id}");
+        }
+        catch (Exception exception)
+        {
+            _error = $"Failed to create the tournament: {exception.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    public void Dispose() => TournamentCreateModalService.OpenRequested -= OnOpenRequested;
+
+    private record TypeOption(TournamentFormat Format, string Label, string Icon, bool Enabled);
+}

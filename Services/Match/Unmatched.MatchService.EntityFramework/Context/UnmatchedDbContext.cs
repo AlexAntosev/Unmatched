@@ -102,6 +102,8 @@ public class UnmatchedDbContext : DbContext
             .HasIndex(t => new { t.TournamentId, t.Kind })
             .IsUnique();
 
+        // Bounty's single BountyPool row per tournament is upserted, never inserted a second time, so
+        // plain uniqueness on (TournamentId, HeroId, AwardKind) holds for it same as every other kind.
         modelBuilder.Entity<TournamentAwardEntity>()
             .HasIndex(a => new { a.TournamentId, a.HeroId, a.AwardKind })
             .IsUnique();

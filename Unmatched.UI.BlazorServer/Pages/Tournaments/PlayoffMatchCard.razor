@@ -1,0 +1,74 @@
+@using Unmatched.Dtos
+@*
+    One bracket card in PlayoffBracket, in one of four states: locked (Match is null - the feeding
+    round hasn't finished yet), spoiler (planned but not yet revealed - a purely client-side veil),
+    revealed (planned and ready to play) or played (finished, edged win/loss, HP shown).
+*@
+@if (Match is null)
+{
+    <div class="pb-card is-locked">
+        <i class="bi bi-lock-fill"></i>
+        <span>@LockedLabel</span>
+    </div>
+}
+else
+{
+    <div class="pb-card @(Match.IsPlanned ? (IsRevealed ? "is-revealed" : "is-spoiler") : "is-played")">
+        @if (Tag is not null)
+        {
+            <div class="pb-card-tag">@Tag</div>
+        }
+        @if (Match.IsPlanned && !IsRevealed)
+        {
+            <div class="pb-card-spoiler" @onclick="@(() => OnReveal.InvokeAsync())">
+                <i class="bi bi-eye-slash-fill"></i>
+                <span>Reveal match</span>
+            </div>
+        }
+        else
+        {
+            @foreach (var fighter in Match.Fighters)
+            {
+                <div class="pb-fighter @(!Match.IsPlanned && fighter.IsWinner ? "is-winner" : null) @(!Match.IsPlanned && !fighter.IsWinner ? "is-loser" : null)">
+                    <img src="@fighter.HeroImageUrl" alt=""/>
+                    <div class="pb-fighter-info">
+                        <div class="pb-fighter-name">@fighter.Hero?.Name</div>
+                        <div class="pb-fighter-player">@fighter.Player?.Name</div>
+                    </div>
+                    @if (!Match.IsPlanned)
+                    {
+                        <div class="pb-fighter-hp">@(fighter.HpLeft?.ToString() ?? "–")</div>
+                    }
+                </div>
+            }
+            @if (Match.IsPlanned)
+            {
+                <UmButton Variant="primary" Size="sm" Icon="bi-play-fill" Class="pb-card-start" OnClick="@(() => OnStart.InvokeAsync(Match))">
+                    Start match
+                </UmButton>
+            }
+        }
+    </div>
+}
+
+@code {
+    /// <summary>Null renders a locked placeholder - the future match's participants aren't decided yet.</summary>
+    [Parameter]
+    public UiMatchDto? Match { get; set; }
+
+    [Parameter]
+    public string LockedLabel { get; set; } = "Locked";
+
+    /// <summary>Optional header label, e.g. "Game 1" / "Decider" on the Final panel's cards.</summary>
+    [Parameter]
+    public string? Tag { get; set; }
+
+    [Parameter]
+    public bool IsRevealed { get; set; }
+
+    [Parameter]
+    public EventCallback OnReveal { get; set; }
+
+    [Parameter]
+    public EventCallback<UiMatchDto> OnStart { get; set; }
+}

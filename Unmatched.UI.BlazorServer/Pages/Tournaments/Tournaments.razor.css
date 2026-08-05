@@ -91,12 +91,6 @@
     color: var(--um-text);
 }
 
-.tournament-delete {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-}
-
 .tournament-meta {
     display: flex;
     flex-direction: column;

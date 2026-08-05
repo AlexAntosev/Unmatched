@@ -193,10 +193,152 @@ public class TournamentService(
         return mapper.Map<Tournament>(tournament);
     }
 
+    /// <summary>Regenerates a completed tournament's award points and placements from its current
+    /// participants/matches - for correcting a completion that ran against a wrong participant set
+    /// (e.g. one backfilled from every match ever tied to the tournament instead of just its bracket).
+    /// Awards replay at the tournament's original <see cref="TournamentEntity.CompletedAt"/> so they keep
+    /// their original position in the rating timeline; titles aren't re-awarded here.</summary>
+    public async Task RecomputeCompletionAwardsAsync(Guid tournamentId)
+    {
+        var tournament = await unitOfWork.Tournaments.GetByIdWithParticipantsAsync(tournamentId)
+            ?? throw new KeyNotFoundException($"No tournament with key {tournamentId}");
+
+        if (tournament.Status != TournamentStatus.Completed)
+        {
+            throw new InvalidOperationException("Only a completed tournament's awards can be recomputed.");
+        }
+
+        var matches = await unitOfWork.Matches.GetByTournamentAsync(tournamentId);
+        var existingAwards = await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId);
+        foreach (var award in existingAwards)
+        {
+            await unitOfWork.TournamentAwards.Delete(award.Id);
+        }
+
+        var schedule = awardScheduler.Schedule(tournament, matches, tournament.CompletedAt!.Value);
+
+        foreach (var award in schedule.Awards)
+        {
+            await unitOfWork.TournamentAwards.AddAsync(award);
+        }
+
+        foreach (var participant in tournament.Participants)
+        {
+            participant.FinalPlacement = schedule.FinalPlacements.GetValueOrDefault(participant.HeroId);
+            await unitOfWork.TournamentParticipants.AddOrUpdateAsync(participant);
+        }
+
+        await unitOfWork.SaveChangesAsync();
+    }
+
+    /// <summary>Run at startup (after migrations): finds every completed tournament whose stored awards
+    /// no longer match its current participants - e.g. a participant-correcting migration ran, or a
+    /// database restore reverted an earlier <see cref="RecomputeCompletionAwardsAsync"/> - and recomputes
+    /// just those, so a stale award set never lingers silently.</summary>
+    public async Task ReconcileCompletionAwardsAsync()
+    {
+        var completedTournaments = await unitOfWork.Tournaments.GetCompletedWithParticipantsAsync();
+        foreach (var tournament in completedTournaments)
+        {
+            var participantHeroIds = tournament.Participants.Select(p => p.HeroId).ToHashSet();
+            var awardHeroIds = (await unitOfWork.TournamentAwards.GetByTournamentAsync(tournament.Id))
+                .Select(a => a.HeroId)
+                .ToHashSet();
+
+            if (!participantHeroIds.SetEquals(awardHeroIds))
+            {
+                await RecomputeCompletionAwardsAsync(tournament.Id);
+            }
+        }
+    }
+
     public async Task<IEnumerable<TournamentAward>> GetAwardsAsync(Guid tournamentId)
     {
         var awards = await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId);
         return mapper.Map<IEnumerable<TournamentAward>>(awards);
+    }
+
+    public async Task<BountyState> GetBountyStateAsync(Guid tournamentId)
+    {
+        var tournament = await unitOfWork.Tournaments.GetByIdAsync(tournamentId)
+            ?? throw new KeyNotFoundException($"No tournament with key {tournamentId}");
+        var matches = await unitOfWork.Matches.GetByTournamentAsync(tournamentId);
+        var poolRow = (await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId))
+            .FirstOrDefault(a => a.AwardKind == TournamentAwardKind.BountyPool);
+
+        var defenseCount = BountyChampionship.Compute(tournament.StartingChampionId, matches).DefenseCount;
+        return new BountyState
+        {
+            ChampionHeroId = poolRow?.HeroId ?? tournament.StartingChampionId,
+            DefenseCount = defenseCount,
+            BankPoints = poolRow?.Points ?? 0
+        };
+    }
+
+    public async Task<Match> CreateBountyChallengeAsync(
+        Guid tournamentId, Guid challengerHeroId, Guid championPlayerId, Guid challengerPlayerId, Guid mapId)
+    {
+        var tournament = await unitOfWork.Tournaments.GetByIdAsync(tournamentId)
+            ?? throw new KeyNotFoundException($"No tournament with key {tournamentId}");
+        if (tournament.Format != TournamentFormat.Bounty)
+        {
+            throw new InvalidOperationException("Only Bounty tournaments support challenges.");
+        }
+
+        var poolRow = (await unitOfWork.TournamentAwards.GetByTournamentAsync(tournamentId))
+            .FirstOrDefault(a => a.AwardKind == TournamentAwardKind.BountyPool);
+        var championId = poolRow?.HeroId ?? tournament.StartingChampionId
+            ?? throw new InvalidOperationException("This Bounty pool has no starting champion set.");
+
+        if (championId == challengerHeroId)
+        {
+            throw new InvalidOperationException("The challenger cannot be the current champion.");
+        }
+
+        var heroesById = new Dictionary<Guid, FighterHero>
+        {
+            [championId] = mapper.Map<FighterHero>(await catalogHeroCache.GetAsync(championId)),
+            [challengerHeroId] = mapper.Map<FighterHero>(await catalogHeroCache.GetAsync(challengerHeroId))
+        };
+        var map = (await catalogMapCache.GetAsync()).First(m => m.Id == mapId);
+
+        var champion = new Fighter
+        {
+            Hero = heroesById[championId],
+            HeroId = championId,
+            Player = mapper.Map<FighterPlayer>(await playerCache.GetAsync(championPlayerId)),
+            Turn = 1
+        };
+        var challenger = new Fighter
+        {
+            Hero = heroesById[challengerHeroId],
+            HeroId = challengerHeroId,
+            Player = mapper.Map<FighterPlayer>(await playerCache.GetAsync(challengerPlayerId)),
+            Turn = 2
+        };
+        SetDefaultStats(champion);
+        SetDefaultStats(challenger);
+
+        var match = new Match
+        {
+            Id = Guid.Empty,
+            Date = DateTime.Now,
+            Fighters = new List<Fighter> { champion, challenger },
+            TournamentId = tournamentId,
+            Map = map,
+            IsPlanned = true,
+            IsRanked = true
+        };
+
+        var matchEntity = mapper.Map<MatchEntity>(match);
+        var added = await unitOfWork.Matches.AddAsync(matchEntity);
+        await unitOfWork.SaveChangesAsync();
+
+        // Returned as the already-populated model built above, not re-mapped from the persisted entity:
+        // Fighter.Hero there comes from FighterHeroResolver, which round-trips through the catalog cache
+        // for no reason when this method already built it by hand.
+        match.Id = added.Id;
+        return match;
     }
 
     public async Task CreateNextStagePlannedMatchesAsync(Guid tournamentId)
@@ -283,10 +425,13 @@ public class TournamentService(
             Player = players.GetAndRemoveRandomItem(),
             Turn = turns.GetAndRemoveRandomItem()
         };
+        SetDefaultStats(fighter);
+        SetDefaultStats(opponent);
 
         return new Match
         {
             Id = Guid.Empty,
+            Date = DateTime.Now,
             Stage = stage,
             Round = round,
             Fighters = new List<Fighter> { fighter, opponent },
@@ -295,8 +440,20 @@ public class TournamentService(
             // produces (including the 3 identical BO3 grand-final pairings), so depleting it would
             // crash once there are more matches in the batch than catalog maps.
             Map = maps.GetRandomItem(),
-            IsPlanned = true
+            IsPlanned = true,
+            IsRanked = true
         };
+    }
+
+    /// <summary>A freshly generated tournament match starts fully healthy - full HP, full deck, full
+    /// sidekick HP - the same defaults a manually-added match's fighters get (see
+    /// UiFighterDto.SetDefaultData on the client), so the match sheet opens ready to edit down from a
+    /// real starting point instead of blank fields.</summary>
+    private static void SetDefaultStats(Fighter fighter)
+    {
+        fighter.HpLeft = fighter.Hero!.Hp;
+        fighter.CardsLeft = fighter.Hero.DeckSize;
+        fighter.SidekickHpLeft = fighter.Hero.Sidekicks.Sum(s => s.Hp * s.Count);
     }
 
     private async Task PersistGeneratedMatchesAsync(Guid tournamentId, List<Match> matches, Stage? stage)

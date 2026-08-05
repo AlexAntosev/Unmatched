@@ -7,7 +7,7 @@
     edge carries the game mode, not the result - this app is a hub for everybody's games, so the
     outcome only appears inside the expanded scoreboard.
 *@
-<div class="match-row @(IsOpen ? "is-open" : null)" style="border-left-color:@_mode.Color">
+<div class="match-row @(IsOpen ? "is-open" : null) @(IsHighlighted ? "is-highlighted" : null)" style="border-left-color:@_mode.Color">
     <div class="match-row-line" @onclick="OnToggle">
         <div>
             <div class="match-row-date">@Match.Date.ToString("dd MMM yyyy")</div>
@@ -116,6 +116,11 @@
 
     [Parameter]
     public EventCallback OnToggle { get; set; }
+
+    /// <summary>Gilds the row - currently only Bounty's Title History uses this, to call out the
+    /// challenge that changed the pool's holder (see MatchList.HighlightRow).</summary>
+    [Parameter]
+    public bool IsHighlighted { get; set; }
 
     /// <summary>Co-op is excluded - it never affects rating regardless of IsRanked, so the label
     /// would only raise a question the game mode itself already answers.</summary>

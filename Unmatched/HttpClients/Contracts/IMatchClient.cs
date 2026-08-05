@@ -45,6 +45,10 @@ public interface IMatchClient
 
     Task<IEnumerable<TournamentAwardDto>> GetTournamentAwardsAsync(Guid id);
 
+    Task<BountyStateDto> GetBountyStateAsync(Guid tournamentId);
+
+    Task<MatchDto> CreateBountyChallengeAsync(Guid tournamentId, CreateBountyChallengeRequestDto request);
+
     Task RecalculateAsync();
 
     Task<bool> IsRatingRecalculationRequiredAsync();

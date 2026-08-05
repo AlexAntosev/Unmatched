@@ -3,8 +3,10 @@
 @using Unmatched.Enums
 @using Unmatched.Extensions
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
 @using Unmatched.UI.BlazorServer.Shared.DesignSystem
 @inject ITournamentService TournamentService
+@inject TournamentCreateModalService TournamentCreateModalService
 @inject NavigationManager NavManager
 @*
     Not in the design pack: a shelf of tournament covers, built to the Collection.razor standard
@@ -17,7 +19,7 @@
         <UmSearchBox Value="@_search" ValueChanged="OnSearchChanged" Placeholder="Search tournaments…"/>
         <UmMultiSelect TValue="TournamentFormat" Icon="bi-funnel" Label="Format"
                        Value="_formatFilter" ValueChanged="OnFormatFilterChanged" Options="FormatOptions"/>
-        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" OnClick="@(() => NavManager.NavigateTo(Urls.TournamentCreate))">
+        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" OnClick="@(() => TournamentCreateModalService.RequestOpen())">
             New tournament
         </UmButton>
     </Controls>
@@ -56,8 +58,6 @@
                             <img class="tournament-cover-logo" src="/Unmatched-logo.png" alt=""/>
                         }
                         <div class="tournament-format-badge"><i class="bi @style.Icon"></i>@style.Label</div>
-                        <UmButton Size="xs" Variant="danger" Icon="bi-trash" StopPropagation="true"
-                                  Class="tournament-delete" OnClick="@(() => DeleteAsync(tournament.Id))"/>
                     </div>
                     <div class="tournament-meta">
                         <div class="tournament-name">@tournament.Name</div>
@@ -180,12 +180,6 @@
         TournamentStatus.Completed => "is-completed",
         _ => "is-draft"
     };
-
-    private async Task DeleteAsync(Guid id)
-    {
-        await TournamentService.DeleteAsync(id);
-        await RefreshAsync();
-    }
 
     private void Open(TournamentDto tournament)
         => NavManager.NavigateTo($"{Urls.Tournaments}/{tournament.Id}");

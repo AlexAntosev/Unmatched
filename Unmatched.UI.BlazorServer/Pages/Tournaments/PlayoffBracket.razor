@@ -1,0 +1,225 @@
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Enums
+@using Unmatched.Extensions
+@using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Shared.DesignSystem
+@inject ITournamentService TournamentService
+@inject NavigationManager NavManager
+@*
+    SingleElimination's live bracket (design/CLAUDE.md "Турніри (turn 15)", id 15b): a panel per
+    stage, each match card in one of four states - locked (the feeding round hasn't finished),
+    spoiler (generated but not yet revealed - a purely client-side veil, never persisted), revealed
+    (ready to play) or played. "Start bracket" generates and spoilers round one; every later round
+    is generated automatically by Tournament.razor once the round before it finishes - there is no
+    manual "Generate" button here. The decider game of a Bo3 final only ever appears once the first
+    two split 1-1 (see SingleEliminationGenerator), so the Final panel can show 1-3 games.
+*@
+
+@if (_error is not null)
+{
+    <div class="pb-error alert alert-danger" role="alert">@_error</div>
+}
+
+@if (Matches.Count == 0)
+{
+    <UmButton Variant="primary" Icon="bi-shuffle" Disabled="_isStarting" OnClick="StartBracketAsync" Class="pb-start">
+        Start bracket
+    </UmButton>
+}
+
+<div class="pb-tree">
+    @foreach (var stage in ProgressionStages())
+    {
+        var stageMatches = Matches.Where(m => m.Stage == stage).ToList();
+        var expected = ExpectedMatchCount(stage);
+        <Panel Title="@stage.GetStageName()" Meta="@($"{stageMatches.Count(m => !m.IsPlanned)}/{expected}")" Class="pb-stage">
+            @if (stageMatches.Count > 0)
+            {
+                @foreach (var match in stageMatches)
+                {
+                    <PlayoffMatchCard Match="match" IsRevealed="IsRevealed(match)"
+                                      OnReveal="@(() => Reveal(match))" OnStart="StartMatchAsync"/>
+                }
+            }
+            else
+            {
+                @for (var i = 0; i < expected; i++)
+                {
+                    <PlayoffMatchCard/>
+                }
+            }
+        </Panel>
+    }
+
+    <Panel Title="@($"Final · {Tournament.FinalFormat}")" Class="pb-stage pb-final">
+        @{
+            var finalGames = Matches.Where(m => m.Stage == Stage.GrandFinals).ToList();
+        }
+        @if (finalGames.Count == 0)
+        {
+            var priorStage = Tournament.InitialStage == Stage.GrandFinals ? (Stage?)null : Stage.GrandFinals - 1;
+            <PlayoffMatchCard LockedLabel="@(priorStage is null ? "Start the bracket first" : $"Waiting for {priorStage.Value.GetStageName()}")"/>
+        }
+        else
+        {
+            @foreach (var game in finalGames)
+            {
+                <PlayoffMatchCard Match="game" Tag="@FinalGameLabel(finalGames, game)" IsRevealed="IsRevealed(game)"
+                                  OnReveal="@(() => Reveal(game))" OnStart="StartMatchAsync"/>
+            }
+        }
+    </Panel>
+</div>
+
+<TournamentBanMapModal @ref="_banMapModal" OnMapChosen="OnMapChosenAsync"/>
+
+@if (ShowCompletePopup)
+{
+    <div class="pb-complete-scrim">
+        <div class="pb-complete-popup">
+            <i class="bi bi-trophy-fill"></i>
+            <div class="pb-complete-title">Tournament complete</div>
+            @{
+                var champion = Champion();
+            }
+            @if (champion is not null)
+            {
+                <img class="pb-complete-champion-art" src="@champion.HeroImageUrl" alt=""/>
+                <div class="pb-complete-champion-name">@champion.Hero?.Name</div>
+                <div class="pb-complete-champion-sub">is the new champion</div>
+            }
+            <UmButton Variant="primary" Icon="bi-trophy" OnClick="CompleteAsync">Complete tournament</UmButton>
+            <button type="button" class="pb-complete-dismiss" @onclick="@(() => _completePopupDismissed = true)">Review bracket first</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public TournamentDto Tournament { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<UiMatchDto> Matches { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public List<MapDto> Maps { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private readonly HashSet<Guid> _revealedMatchIds = new();
+    private TournamentBanMapModal _banMapModal = default!;
+    private UiMatchDto? _pendingBanMatch;
+    private bool _isStarting;
+    private bool _completePopupDismissed;
+    private string? _error;
+
+    private bool CanComplete => Tournament.Status != TournamentStatus.Completed
+        && Matches.Count > 0 && !Matches.Any(m => m.IsPlanned);
+
+    private bool ShowCompletePopup => CanComplete && !_completePopupDismissed;
+
+    private List<Stage> ProgressionStages()
+    {
+        var stages = new List<Stage>();
+        for (var stage = Tournament.InitialStage; stage < Stage.GrandFinals; stage++)
+        {
+            stages.Add(stage);
+        }
+
+        return stages;
+    }
+
+    private int ExpectedMatchCount(Stage stage)
+    {
+        if (stage == Stage.ThirdPlaceDecider)
+        {
+            return 1;
+        }
+
+        var roundsIn = stage - Tournament.InitialStage;
+        return Math.Max(1, Tournament.MaxParticipants / (int)Math.Pow(2, roundsIn + 1));
+    }
+
+    private static string FinalGameLabel(List<UiMatchDto> finalGames, UiMatchDto game)
+    {
+        if (finalGames.Count == 1)
+        {
+            return "Final";
+        }
+
+        var isSoleDecider = game.IsPlanned && finalGames.Count(g => g.IsPlanned) == 1 && finalGames.Count == 3;
+        return isSoleDecider ? "Decider" : $"Game {finalGames.IndexOf(game) + 1}";
+    }
+
+    private UiFighterDto? Champion()
+        => Matches
+            .Where(m => m.Stage == Stage.GrandFinals && !m.IsPlanned)
+            .SelectMany(m => m.Fighters)
+            .Where(f => f.IsWinner)
+            .GroupBy(f => f.HeroId)
+            .OrderByDescending(g => g.Count())
+            .FirstOrDefault()
+            ?.First();
+
+    private bool IsRevealed(UiMatchDto match) => _revealedMatchIds.Contains(match.Id);
+
+    private void Reveal(UiMatchDto match) => _revealedMatchIds.Add(match.Id);
+
+    private async Task StartBracketAsync()
+    {
+        _isStarting = true;
+        _error = null;
+        try
+        {
+            await TournamentService.GenerateMatchesAsync(Tournament.Id);
+            await OnChanged.InvokeAsync();
+        }
+        catch (Exception exception)
+        {
+            _error = $"Couldn't start the bracket: {exception.Message}";
+        }
+        finally
+        {
+            _isStarting = false;
+        }
+    }
+
+    private async Task CompleteAsync()
+    {
+        _error = null;
+        try
+        {
+            await TournamentService.CompleteAsync(Tournament.Id);
+            await OnChanged.InvokeAsync();
+        }
+        catch (Exception exception)
+        {
+            _error = $"Couldn't complete the tournament: {exception.Message}";
+        }
+    }
+
+    private async Task StartMatchAsync(UiMatchDto match)
+    {
+        var fighters = match.Fighters.ToList();
+        if (fighters.Count != 2)
+        {
+            return;
+        }
+
+        _pendingBanMatch = match;
+        var pool = Maps.OrderBy(_ => Guid.NewGuid()).Take(3).ToList();
+        await _banMapModal.ShowAsync(fighters[0], fighters[1], pool);
+    }
+
+    private void OnMapChosenAsync(MapDto map)
+    {
+        if (_pendingBanMatch is null)
+        {
+            return;
+        }
+
+        NavManager.NavigateTo($"{Urls.Match}/{_pendingBanMatch.Id}?mapId={map.Id}");
+    }
+}

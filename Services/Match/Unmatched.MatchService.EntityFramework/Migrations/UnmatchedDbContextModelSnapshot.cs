@@ -308,6 +308,9 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<int>("CurrentStage")
                         .HasColumnType("int");
 
+                    b.Property<int>("FinalFormat")
+                        .HasColumnType("int");
+
                     b.Property<int>("Format")
                         .HasColumnType("int");
 
@@ -323,6 +326,9 @@ namespace Unmatched.EntityFramework.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("StartingChampionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

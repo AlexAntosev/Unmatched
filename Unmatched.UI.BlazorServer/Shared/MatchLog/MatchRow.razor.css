@@ -3,6 +3,15 @@
     border-left: 3px solid transparent;
 }
 
+.match-row.is-highlighted .match-row-line {
+    background: var(--um-gold-bg);
+}
+
+.match-row.is-highlighted .match-row-line:hover {
+    background: var(--um-gold-bg);
+    filter: brightness(1.15);
+}
+
 /* Turn 11c's column plan (Date/Mode/Participants/Map/Tournament/Epic/chevron) is specified at
    2560px; the app normally runs at ~1240-1440px. Each fixed column scales continuously between
    the two with clamp() rather than jumping at a breakpoint - this same expression is duplicated

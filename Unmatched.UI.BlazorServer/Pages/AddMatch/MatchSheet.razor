@@ -39,7 +39,7 @@
     <header class="add-head">
         <div class="add-title">@(IsEditing ? "Edit match" : "Add match")</div>
         <div class="um-spacer"></div>
-        @if (Embedded)
+        @if (Embedded || IsTournamentLockedByContext)
         {
             <div class="add-mode-chip"><i class="bi @CurrentMode.Icon"></i>@CurrentMode.Label</div>
         }
@@ -193,9 +193,9 @@
                 <span class="add-state-summary is-muted">@StateSummary()</span>
             }
             <div class="um-spacer"></div>
-            <UmButton Size="sm" Disabled="_isSaving" OnClick="@(() => SaveAsync(addAnother: true))">Save &amp; add another</UmButton>
+            <UmButton Size="sm" Disabled="_isSaving" OnClick="@(() => OnCancel.InvokeAsync())">Cancel</UmButton>
             <UmButton Size="sm" Variant="primary" Icon="bi-check-lg" Disabled="_isSaving"
-                      OnClick="@(() => SaveAsync(addAnother: false))">Save match</UmButton>
+                      OnClick="SaveAsync">Save match</UmButton>
         </footer>
     }
 </div>
@@ -287,16 +287,16 @@
     [Parameter]
     public bool Embedded { get; set; }
 
-    /// <summary>Fires after a non-"add another" save succeeds. Regular Add/Edit match doesn't need
-    /// to react (the sheet already shows its own "Match saved" popup) - the draft session uses this
-    /// to navigate away once <see cref="Embedded"/> suppresses that popup.</summary>
+    /// <summary>Fires after a save succeeds. Regular Add/Edit match doesn't need to react (the sheet
+    /// already shows its own "Match saved" popup) - the draft session uses this to navigate away once
+    /// <see cref="Embedded"/> suppresses that popup.</summary>
     [Parameter]
     public EventCallback<SaveMatchResultDto> OnSaved { get; set; }
 
-    /// <summary>Fires after a "Save &amp; add another" succeeds - only the host knows how to build
-    /// the next default match (favourite heroes, random turn), so it owns the reset.</summary>
+    /// <summary>Fires when the footer's Cancel button is clicked - only the host knows where "away"
+    /// means (back to the tournament, back to the match log, ...).</summary>
     [Parameter]
-    public EventCallback OnSavedAddAnother { get; set; }
+    public EventCallback OnCancel { get; set; }
 
     private bool IsEditing => Match.Id != Guid.Empty;
 
@@ -857,7 +857,7 @@
     /// <summary>Validates and saves, exposed for the draft session's own footer (step 5 hides this
     /// sheet's footer via <see cref="Embedded"/> and calls this directly through a component ref).
     /// Returns whether the save succeeded.</summary>
-    public async Task<bool> SaveAsync(bool addAnother)
+    public async Task<bool> SaveAsync()
     {
         _error = Validate();
         if (_error is not null)
@@ -884,13 +884,9 @@
 
             NavCountsService.Invalidate();
 
-            if (addAnother)
-            {
-                await OnSavedAddAnother.InvokeAsync();
-                return true;
-            }
-
-            if (!Embedded)
+            // A tournament match navigates straight back to its bracket below (see AddMatch.OnSaved) -
+            // showing the popup first would just flash it mid-navigation.
+            if (!Embedded && !IsTournamentLockedByContext)
             {
                 await _savedPopup.ShowAsync<MatchSavedPopup>(
                     title: "Match saved",

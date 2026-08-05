@@ -32,27 +32,574 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
 @keyframes umpulse{0%,100%{opacity:.55}50%{opacity:1}}
 </style></helmet>
 
+<section class="dv-turn" id="t15">
+<div class="dv-thd"><a class="dv-tid" href="#t15">15</a><span class="dv-tname">Tournaments — creation per type, and the tournament-type pages</span></div>
+<p class="dv-note">League, Group and Swiss all stay hidden for now (not buildable yet). <b>Playoff</b> needs a size (2–64), that many heroes, and a final format; <b>Bounty</b> only needs a starting champion — picked by hand, from a hero grid, or by a fast card-flip randomizer (a conveyor-reel alternative sits alongside for comparison) — and a reward line. Type badges are one neutral chip everywhere, icon and label only. <a class="dv-oid" href="#15b">15b</a>’s bracket is <b>live</b>: Start deals the first round behind a spoiler (revealed match by match, never re-hidden), each unlocked match opens a <b>ban map</b> popup, winners feed the next round automatically, a 3rd-place match always runs, and a best-of-3 final drops its unneeded game the moment someone reaches two wins — which pops <b>Complete tournament</b>. Continue on the ban-map popup drops straight into the match sheet — fully filled, no mode picker — for HP / cards / sidekick and marking the winner. <a class="dv-oid" href="#15d">15d</a> uses the same sheet, entered directly since the champion, challenger, players and map are already set on the page. Every page ends with its own played-matches log.</p>
+<div class="dv-opts">
+
+  <div class="dv-opt" id="15a">
+    <div class="dv-olabel"><a class="dv-oid" href="#15a">15a</a>Create tournament — type picker, settings per type</div>
+    <div class="dv-card" style="width:640px">
+      <div style="background:#0a0a10;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07)">
+          <i class="bi bi-flag-fill" style="color:#8b7dff"></i>
+          <div style="font:600 14px Chakra Petch,sans-serif;letter-spacing:.1em;text-transform:uppercase">New tournament</div>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;gap:8px">
+            <sc-for list="{{ tTypes }}" as="t" hint-placeholder-count="3">
+              <div onClick="{{ t.onClick }}" style="flex:1;display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:12px;background:{{ t.bg }};border:1px solid {{ t.border }};cursor:pointer">
+                <i class="{{ t.icon }}" style="font-size:16px;color:{{ t.iconColor }}"></i>
+                <div style="font:600 12.5px Barlow,sans-serif;color:{{ t.fg }}">{{ t.label }}</div>
+                <div style="font:400 9.5px Barlow,sans-serif;color:#6b6c7e">{{ t.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;gap:14px;align-items:center">
+            <div style="width:56px;height:56px;border-radius:12px;background:#101018;border:1px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex:none">
+              <i class="bi bi-image" style="color:#4a4b58;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:5px">Tournament name</div>
+              <input value="{{ tName }}" onChange="{{ tSetNameEvt }}" style="width:100%;height:36px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.09);color:#ecedf2;font:500 12.5px Barlow,sans-serif;padding:0 11px;box-sizing:border-box">
+            </div>
+          </div>
+
+          <div style="display:{{ tShowPo }};flex-direction:column;gap:14px">
+            <div>
+              <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:8px">Participants</div>
+              <div style="display:flex;gap:6px">
+                <sc-for list="{{ tPoSizes }}" as="sz" hint-placeholder-count="6">
+                  <div onClick="{{ sz.onClick }}" style="flex:1;height:32px;border-radius:8px;background:{{ sz.bg }};color:{{ sz.fg }};display:flex;align-items:center;justify-content:center;font:600 12px IBM Plex Mono,monospace;cursor:pointer">{{ sz.n }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:8px">Heroes · {{ tPoNeed }} left to pick</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px;max-height:150px;overflow:auto">
+                <sc-for list="{{ tPoHeroGrid }}" as="h" hint-placeholder-count="8">
+                  <div onClick="{{ h.onClick }}" style="display:flex;align-items:center;gap:6px;padding:5px 9px 5px 5px;border-radius:9px;background:{{ h.bg }};border:1px solid {{ h.border }};cursor:pointer">
+                    <img src="{{ h.art }}" alt="" style="width:20px;height:20px;border-radius:5px;object-fit:cover">
+                    <span style="font:500 10.5px Barlow,sans-serif;color:{{ h.fg }}">{{ h.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:8px">Final</div>
+              <div style="display:flex;gap:6px">
+                <sc-for list="{{ tPoFinalOpts }}" as="o" hint-placeholder-count="2">
+                  <div onClick="{{ o.onClick }}" style="flex:1;height:32px;border-radius:8px;background:{{ o.bg }};color:{{ o.fg }};display:flex;align-items:center;justify-content:center;font:600 11.5px Barlow,sans-serif;cursor:pointer;border:1px solid rgba(255,255,255,.08)">{{ o.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:{{ tShowBo }};flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <img src="{{ tBoChampArt }}" alt="" style="width:72px;height:72px;border-radius:14px;object-fit:cover;border:2px solid rgba(240,180,41,.5);flex:none">
+              <div style="flex:1">
+                <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:4px">Starting champion</div>
+                <div style="font:700 16px Chakra Petch,sans-serif">{{ tBoChamp }}</div>
+              </div>
+              <div onClick="{{ tBoSpin }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:9px;background:#6c5cff;color:#fff;font:600 11.5px Barlow,sans-serif;cursor:pointer"><i class="bi bi-dice-5-fill"></i>Randomize</div>
+            </div>
+            <div>
+              <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:8px">Or pick by hand</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px;max-height:150px;overflow:auto">
+                <sc-for list="{{ tBoHeroGrid }}" as="h" hint-placeholder-count="8">
+                  <div onClick="{{ h.onClick }}" style="display:flex;align-items:center;gap:6px;padding:5px 9px 5px 5px;border-radius:9px;background:{{ h.bg }};border:1px solid {{ h.border }};cursor:pointer">
+                    <img src="{{ h.art }}" alt="" style="width:20px;height:20px;border-radius:5px;object-fit:cover">
+                    <span style="font:500 10.5px Barlow,sans-serif;color:{{ h.fg }}">{{ h.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding-top:6px;border-top:1px dashed rgba(255,255,255,.08)">
+              <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5c5d70;margin-bottom:8px">Alternative randomizer &middot; conveyor reel</div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="flex:1;display:flex;gap:6px;padding:8px;border-radius:10px;background:#0c0c14;border:1px solid rgba(255,255,255,.07);overflow:hidden">
+                  <sc-for list="{{ tBoDemoReel }}" as="r" hint-placeholder-count="5">
+                    <div style="flex:1;text-align:center;font:600 10.5px Barlow,sans-serif;color:#8b8c9e;padding:6px 2px;border-radius:7px;background:#14141c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r }}</div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ tBoSpinConveyor }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:9px;background:rgba(255,255,255,.08);color:#ecedf2;font:600 11.5px Barlow,sans-serif;cursor:pointer;flex:none"><i class="bi bi-arrow-left-right"></i>Spin reel</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);background:#0c0c14">
+          <div style="font:500 11.5px Barlow,sans-serif;color:#8b8c9e;cursor:pointer">Cancel</div>
+          <div style="flex:1"></div>
+          <div style="height:36px;padding:0 20px;border-radius:9px;background:{{ tCreateBg }};color:{{ tCreateFg }};display:flex;align-items:center;justify-content:center;font:600 12px Barlow,sans-serif">Create tournament</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dv-opt" id="15b">
+    <div class="dv-olabel"><a class="dv-oid" href="#15b">15b</a>Playoff — live bracket, spoilers, ban map · result flow</div>
+    <div class="dv-card" style="width:1240px">
+      <div style="background:#0a0a10;display:flex;min-height:1100px;position:relative">
+        <div style="width:{{ tNavW }}px;flex:none;background:#0c0c11;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;padding:16px 10px;gap:18px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 6px">
+            <img src="assets/Unmatched-logo.png" alt="" style="width:22px;height:22px;object-fit:contain">
+            <div style="display:{{ tNavLabelDisplay }};font:700 13px Chakra Petch,sans-serif;letter-spacing:.06em">UNMATCHED</div>
+          </div>
+          <sc-for list="{{ tNavGroups }}" as="g" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="display:{{ tNavLabelDisplay }};font:500 9.5px IBM Plex Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#4a4b58;padding:0 8px;margin-bottom:2px">{{ g.title }}</div>
+              <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;justify-content:{{ i.justify }};gap:9px;height:32px;padding:0 8px;border-radius:8px;background:{{ i.bg }};color:{{ i.fg }};cursor:pointer">
+                  <i class="{{ i.icon }}" style="font-size:13px"></i>
+                  <div style="display:{{ tNavLabelDisplay }};font:500 12px Barlow,sans-serif;flex:1">{{ i.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="flex:1;overflow:auto">
+          <div style="height:150px;position:relative;background:#14141c">
+            <img src="assets/maps/kaer-morhen.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,12,.15),#0a0a10)"></div>
+            <div style="position:absolute;left:26px;bottom:16px;display:flex;align-items:center;gap:12px">
+              <div style="width:56px;height:56px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center"><i class="bi bi-diagram-3-fill" style="font-size:22px;color:#8b7dff"></i></div>
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <div style="padding:3px 9px;border-radius:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:#c9cad6"><i class="bi bi-diagram-3-fill" style="margin-right:5px;color:#8b7dff"></i>Playoff</div>
+                  <div style="font:400 10.5px IBM Plex Mono,monospace;color:#6b6c7e">8 heroes · {{ poFormatLabel }} final</div>
+                </div>
+                <div style="font:700 22px Chakra Petch,sans-serif;letter-spacing:.03em">Golden Halat Playoff</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:26px 30px 40px;position:relative">
+            <div onClick="{{ poStart }}" style="display:{{ poStartDisplay }};align-items:center;justify-content:center;gap:8px;width:220px;height:40px;border-radius:10px;background:#6c5cff;color:#fff;font:600 12.5px Barlow,sans-serif;cursor:pointer;margin-bottom:22px"><i class="bi bi-shuffle"></i>Start bracket</div>
+
+            <div style="position:relative;width:800px;height:960px">
+              <div style="position:absolute;left:210px;top:220px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:210px;top:410px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:245px;top:220px;width:1.5px;height:190px;background:#3a3b48"></div>
+              <div style="position:absolute;left:245px;top:315px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:210px;top:600px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:210px;top:790px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:245px;top:600px;width:1.5px;height:190px;background:#3a3b48"></div>
+              <div style="position:absolute;left:245px;top:695px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:490px;top:315px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:490px;top:695px;width:35px;height:1.5px;background:#3a3b48"></div>
+              <div style="position:absolute;left:525px;top:315px;width:1.5px;height:380px;background:#3a3b48"></div>
+              <div style="position:absolute;left:525px;top:505px;width:35px;height:1.5px;background:#3a3b48"></div>
+
+              <sc-for list="{{ poQfCards }}" as="c" hint-placeholder-count="7">
+                <div style="position:absolute;left:{{ c.x }}px;top:{{ c.top }}px;width:{{ c.width }}px;min-height:{{ c.height }}px;border-radius:12px;background:#101018;border:1px solid rgba(255,255,255,.08);overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)">
+                    <div style="font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#6b6c7e">{{ c.tag }}</div>
+                    <div style="flex:1"></div>
+                    <div style="display:{{ c.mapDisplay }};font:500 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ c.map }}</div>
+                  </div>
+                  <div style="display:{{ c.lockedDisplay }};align-items:center;justify-content:center;gap:6px;height:64px;color:#4a4b58;font:500 10.5px Barlow,sans-serif">
+                    <i class="bi bi-lock-fill" style="font-size:11px"></i>{{ c.lockedLabel }}
+                  </div>
+                  <div onClick="{{ c.onReveal }}" style="display:{{ c.spoilerDisplay }};align-items:center;justify-content:center;flex-direction:column;gap:5px;height:64px;cursor:pointer;background:repeating-linear-gradient(135deg,#14141c,#14141c 6px,#181822 6px,#181822 12px)">
+                    <i class="bi bi-eye-slash-fill" style="font-size:15px;color:#8b7dff"></i>
+                    <div style="font:600 9.5px Barlow,sans-serif;color:#c4bcff;text-transform:uppercase;letter-spacing:.06em">Reveal match</div>
+                  </div>
+                  <div style="display:{{ c.contentDisplay }};flex-direction:column">
+                    <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-left:3px solid {{ c.edgeA }}">
+                      <img src="{{ c.artA }}" alt="" style="width:26px;height:26px;border-radius:7px;object-fit:cover">
+                      <div style="flex:1;min-width:0">
+                        <div style="font:600 11.5px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.heroA }}</div>
+                        <div style="font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ c.playerA }}</div>
+                      </div>
+                      <div style="display:{{ c.hpADisplay }};font:600 11px IBM Plex Mono,monospace;color:#ecedf2">{{ c.hpA }}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-left:3px solid {{ c.edgeB }};border-top:1px solid rgba(255,255,255,.05)">
+                      <img src="{{ c.artB }}" alt="" style="width:26px;height:26px;border-radius:7px;object-fit:cover">
+                      <div style="flex:1;min-width:0">
+                        <div style="font:600 11.5px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.heroB }}</div>
+                        <div style="font:400 9.5px IBM Plex Mono,monospace;color:#6b6c7e">{{ c.playerB }}</div>
+                      </div>
+                      <div style="display:{{ c.hpBDisplay }};font:600 11px IBM Plex Mono,monospace;color:#ecedf2">{{ c.hpB }}</div>
+                    </div>
+                    <div onClick="{{ c.onStart }}" style="display:{{ c.startDisplay }};align-items:center;justify-content:center;gap:6px;height:28px;margin:6px 8px 8px;border-radius:8px;background:#6c5cff;font:600 10.5px Barlow,sans-serif;color:#fff;cursor:pointer">
+                      <i class="bi bi-play-fill" style="font-size:11px"></i>Start match
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+
+              <div style="position:absolute;left:560px;top:425px;width:210px;border-radius:12px;background:linear-gradient(160deg,rgba(240,180,41,.12),#101018 55%);border:1px solid rgba(240,180,41,.35);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid rgba(240,180,41,.2)">
+                  <i class="bi bi-trophy-fill" style="font-size:11px;color:#f0b429"></i>
+                  <div style="font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#f0b429">FINAL · {{ poFormatLabel }}</div>
+                </div>
+                <div style="display:{{ poFinalLockedDisplay }};align-items:center;justify-content:center;gap:6px;height:64px;color:#4a4b58;font:500 10.5px Barlow,sans-serif">
+                  <i class="bi bi-lock-fill" style="font-size:11px"></i>Waiting for Semifinals
+                </div>
+                <div style="display:{{ poFinalReadyDisplay }};flex-direction:column">
+                  <sc-for list="{{ poFinalRows }}" as="g" hint-placeholder-count="1">
+                    <div style="padding:8px 10px;border-top:1px solid rgba(255,255,255,.05)">
+                      <div style="font:500 9px IBM Plex Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:#8b7dff;margin-bottom:4px">{{ g.label }}</div>
+                      <div style="display:flex;align-items:center;gap:7px;border-left:3px solid {{ g.edgeA }};padding-left:6px">
+                        <img src="{{ g.artA }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover">
+                        <div style="flex:1;font:600 11px Barlow,sans-serif;color:#ecedf2">{{ g.heroA }}</div>
+                        <div style="font:600 10.5px IBM Plex Mono,monospace;color:#ecedf2">{{ g.hpA }}</div>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:7px;border-left:3px solid {{ g.edgeB }};padding-left:6px;margin-top:3px">
+                        <img src="{{ g.artB }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover">
+                        <div style="flex:1;font:600 11px Barlow,sans-serif;color:#ecedf2">{{ g.heroB }}</div>
+                        <div style="font:600 10.5px IBM Plex Mono,monospace;color:#ecedf2">{{ g.hpB }}</div>
+                      </div>
+                      <div onClick="{{ g.onStart }}" style="display:{{ g.startDisplay }};align-items:center;justify-content:center;gap:6px;height:26px;margin-top:6px;border-radius:7px;background:#6c5cff;font:600 10px Barlow,sans-serif;color:#fff;cursor:pointer">
+                        <i class="bi bi-play-fill" style="font-size:10px"></i>Start {{ g.label }}
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="display:{{ poPopupDisplay }};position:absolute;inset:0;background:rgba(6,6,10,.78);align-items:center;justify-content:center;z-index:20;border-radius:14px">
+                <div style="width:320px;border-radius:16px;background:#101018;border:1px solid rgba(240,180,41,.4);box-shadow:0 30px 80px rgba(0,0,0,.6);padding:26px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+                  <i class="bi bi-trophy-fill" style="font-size:28px;color:#f0b429"></i>
+                  <div style="font:600 14px Chakra Petch,sans-serif;letter-spacing:.08em;text-transform:uppercase">Tournament complete</div>
+                  <img src="{{ poChampionArt }}" alt="" style="width:60px;height:60px;border-radius:14px;object-fit:cover;border:2px solid rgba(240,180,41,.5)">
+                  <div style="font:700 16px Chakra Petch,sans-serif">{{ poChampion }}</div>
+                  <div style="font:400 11.5px Barlow,sans-serif;color:#8b8c9e">is the new champion</div>
+                  <div onClick="{{ poClosePopup }}" style="margin-top:6px;height:34px;padding:0 20px;border-radius:9px;background:#f0b429;display:flex;align-items:center;justify-content:center;font:600 12px Barlow,sans-serif;color:#1a1408;cursor:pointer">Complete tournament</div>
+                </div>
+              </div>
+
+              <div style="display:{{ flowShowInPo }};position:absolute;inset:0;background:rgba(6,6,10,.78);align-items:center;justify-content:center;z-index:30;border-radius:14px;padding:20px">
+                <div style="width:400px;max-height:100%;overflow:auto;border-radius:16px;background:#101018;border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.6)">
+                  <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07)">
+                    <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.08em;text-transform:uppercase">{{ flowStage }}</div>
+                    <div style="flex:1"></div>
+                    <i onClick="{{ flowClose }}" class="bi bi-x-lg" style="font-size:12px;color:#6b6c7e;cursor:pointer"></i>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.05)">
+                    <img src="{{ flowArtA }}" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:cover">
+                    <div style="font:600 12px Barlow,sans-serif">{{ flowHeroA }}</div>
+                    <div style="font:500 10px IBM Plex Mono,monospace;color:#5c5d70">VS</div>
+                    <div style="font:600 12px Barlow,sans-serif">{{ flowHeroB }}</div>
+                    <img src="{{ flowArtB }}" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:cover">
+                  </div>
+                  <div style="display:{{ flowStep1Display }};flex-direction:column;gap:10px;padding:16px 18px">
+                    <div style="font:400 10.5px IBM Plex Mono,monospace;color:#8b8c9e;text-transform:uppercase;letter-spacing:.08em">{{ flowBanLabel }}</div>
+                    <div style="display:flex;gap:10px">
+                      <sc-for list="{{ flowMapPool }}" as="m" hint-placeholder-count="3">
+                        <div onClick="{{ m.onClick }}" style="flex:1;border-radius:11px;overflow:hidden;border:1px solid rgba(255,255,255,.08);cursor:pointer;opacity:{{ m.banned }}">
+                          <img src="{{ m.art }}" alt="" style="width:100%;height:70px;object-fit:cover;display:block">
+                          <div style="padding:6px 8px;font:600 10.5px Barlow,sans-serif;background:#14141c">{{ m.name }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div onClick="{{ flowNext }}" style="display:{{ flowNextDisplay }};align-items:center;justify-content:center;gap:6px;height:34px;border-radius:9px;background:#6c5cff;color:#fff;font:600 11.5px Barlow,sans-serif;cursor:pointer">Map set: {{ flowChosenMap }} · Continue</div>
+                  </div>
+                  <div style="display:{{ flowStep3Display }};flex-direction:column;gap:10px;padding:16px 18px">
+                    <div style="display:flex;gap:10px">
+                      <div onClick="{{ flowWinnerA }}" style="flex:1;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:{{ flowWinA_bg }};border:2px solid {{ flowWinA_border }};cursor:pointer">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <img src="{{ flowArtA }}" alt="" style="width:34px;height:34px;border-radius:9px;object-fit:cover">
+                          <div style="flex:1;min-width:0">
+                            <div style="font:600 12px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ flowHeroA }}</div>
+                            <div onClick="{{ flowCycleA }}" style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ flowPlayerA }}</div>
+                          </div>
+                          <i class="bi bi-trophy-fill" style="font-size:13px;color:{{ flowWinA_fg }}"></i>
+                        </div>
+                        <div style="display:flex;gap:5px">
+                          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                            <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">HP</div>
+                            <div style="display:flex;align-items:center;gap:5px">
+                              <div onClick="{{ flowHpADec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                              <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowHpA }}</div>
+                              <div onClick="{{ flowHpAInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                            </div>
+                          </div>
+                          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                            <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">CARDS</div>
+                            <div style="display:flex;align-items:center;gap:5px">
+                              <div onClick="{{ flowCardsADec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                              <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowCardsA }}</div>
+                              <div onClick="{{ flowCardsAInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                            </div>
+                          </div>
+                          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                            <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">SK</div>
+                            <div style="display:flex;align-items:center;gap:5px">
+                              <div onClick="{{ flowSkADec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                              <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowSkA }}</div>
+                              <div onClick="{{ flowSkAInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div onClick="{{ flowWinnerB }}" style="flex:1;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:{{ flowWinB_bg }};border:2px solid {{ flowWinB_border }};cursor:pointer">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <img src="{{ flowArtB }}" alt="" style="width:34px;height:34px;border-radius:9px;object-fit:cover">
+                          <div style="flex:1;min-width:0">
+                            <div style="font:600 12px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ flowHeroB }}</div>
+                            <div onClick="{{ flowCycleB }}" style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ flowPlayerB }}</div>
+                          </div>
+                          <i class="bi bi-trophy-fill" style="font-size:13px;color:{{ flowWinB_fg }}"></i>
+                        </div>
+                        <div style="display:flex;gap:5px">
+                          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                            <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">HP</div>
+                            <div style="display:flex;align-items:center;gap:5px">
+                              <div onClick="{{ flowHpBDec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                              <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowHpB }}</div>
+                              <div onClick="{{ flowHpBInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                            </div>
+                          </div>
+                          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                            <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">CARDS</div>
+                            <div style="display:flex;align-items:center;gap:5px">
+                              <div onClick="{{ flowCardsBDec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                              <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowCardsB }}</div>
+                              <div onClick="{{ flowCardsBInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                            </div>
+                          </div>
+                          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                            <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">SK</div>
+                            <div style="display:flex;align-items:center;gap:5px">
+                              <div onClick="{{ flowSkBDec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                              <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowSkB }}</div>
+                              <div onClick="{{ flowSkBInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;text-align:center">Map: {{ flowMapFinal }} · tap a plate to mark the winner</div>
+                    <div onClick="{{ flowSave }}" style="display:flex;align-items:center;justify-content:center;height:36px;border-radius:9px;background:{{ flowSaveBg }};color:#06110c;font:600 12px Barlow,sans-serif;cursor:pointer">Save match · to tournament</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px">
+              <div style="font:700 13px Chakra Petch,sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Played matches</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <sc-for list="{{ poPlayedMatches }}" as="m" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:74px 90px 1fr auto;gap:12px;align-items:center;padding:10px 14px;border-radius:10px;background:#101018;border-left:3px solid #8b7dff">
+                    <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">{{ m.date }}</div>
+                    <div style="font:400 9.5px IBM Plex Mono,monospace;color:#5c5d70">{{ m.stage }}</div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <div style="position:relative"><img src="{{ m.artA }}" alt="" style="width:28px;height:28px;border-radius:8px;object-fit:cover;border:1.5px solid {{ m.borderA }}"><img src="{{ m.avatarA }}" alt="" style="position:absolute;bottom:-3px;right:-4px;width:14px;height:14px;border-radius:50%;object-fit:cover;border:1.5px solid #101018"></div>
+                      <span style="font:600 11.5px Barlow,sans-serif;color:{{ m.fgA }}">{{ m.heroA }}</span>
+                      <span style="font:400 10px IBM Plex Mono,monospace;color:#4a4b58">vs</span>
+                      <span style="font:600 11.5px Barlow,sans-serif;color:{{ m.fgB }}">{{ m.heroB }}</span>
+                      <div style="position:relative"><img src="{{ m.artB }}" alt="" style="width:28px;height:28px;border-radius:8px;object-fit:cover;border:1.5px solid {{ m.borderB }}"><img src="{{ m.avatarB }}" alt="" style="position:absolute;bottom:-3px;right:-4px;width:14px;height:14px;border-radius:50%;object-fit:cover;border:1.5px solid #101018"></div>
+                    </div>
+                    <div style="font:400 10.5px IBM Plex Mono,monospace;color:#8b8c9e;text-align:right">{{ m.map }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:{{ poPlayedEmptyDisplay }};padding:14px;text-align:center;font:400 11px Barlow,sans-serif;color:#5c5d70">No matches played yet — start the bracket above</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dv-opt" id="15d">
+    <div class="dv-olabel"><a class="dv-oid" href="#15d">15d</a>Bounty — champion spotlight, challenge setup, straight-to-result flow</div>
+    <div class="dv-card" style="width:900px">
+      <div style="background:#0a0a10;display:flex;flex-direction:column;position:relative;min-height:900px">
+        <div style="display:flex;align-items:center;gap:10px;padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.07)">
+          <div style="padding:3px 9px;border-radius:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font:600 9.5px IBM Plex Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:#c9cad6"><i class="bi bi-award-fill" style="margin-right:5px;color:#8b7dff"></i>Bounty</div>
+          <div style="font:700 15px Chakra Petch,sans-serif;letter-spacing:.04em">Blade of the North</div>
+        </div>
+
+        <div style="max-width:560px;margin:0 auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;padding:36px 0">
+          <img src="{{ boChampionArt }}" alt="" style="width:128px;height:128px;border-radius:20px;object-fit:cover;border:2px solid rgba(240,180,41,.55);box-shadow:0 0 0 6px rgba(240,180,41,.08)">
+          <div style="font:700 24px Chakra Petch,sans-serif;letter-spacing:.02em">{{ boChampion }}</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:10px;background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.3)">
+            <i class="bi bi-gem" style="color:#f0b429"></i><span style="font:600 12.5px Barlow,sans-serif;color:#f0b429">{{ boReward }}</span>
+            <div style="width:1px;height:14px;background:rgba(240,180,41,.3)"></div>
+            <span style="font:600 11.5px IBM Plex Mono,monospace;color:#f0b429">+{{ boRewardElo }} ELO</span>
+          </div>
+          <div style="font:400 11px IBM Plex Mono,monospace;color:#6b6c7e">{{ boDefenseCount }} successful defense(s)</div>
+
+          <div style="width:100%;margin-top:6px;padding:20px;border-radius:14px;background:#101018;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font:600 12px Chakra Petch,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#8b8c9e;flex:1">Challenge the champion</div>
+              <div onClick="{{ boRandomChallenger }}" style="display:flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:7px;background:rgba(255,255,255,.07);color:#c9cad6;font:500 10.5px Barlow,sans-serif;cursor:pointer"><i class="bi bi-dice-5-fill" style="color:#8b7dff"></i>Random opponent</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;max-height:118px;overflow:auto">
+              <sc-for list="{{ boChallengeOpts }}" as="h" hint-placeholder-count="6">
+                <div onClick="{{ h.onClick }}" style="display:flex;align-items:center;gap:6px;padding:6px 10px 6px 6px;border-radius:9px;background:{{ h.bg }};border:1px solid {{ h.border }};cursor:pointer">
+                  <img src="{{ h.art }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover">
+                  <span style="font:500 11px Barlow,sans-serif;color:#ecedf2">{{ h.name }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div onClick="{{ boCycleChampPlayer }}" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer">
+                <img src="{{ boChampPlayerArt }}" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover">
+                <div><div style="font:400 9px IBM Plex Mono,monospace;color:#6b6c7e;text-transform:uppercase">Champion's player</div><div style="font:600 11.5px Barlow,sans-serif">{{ boChampPlayerName }}</div></div>
+              </div>
+              <div onClick="{{ boCycleChallPlayer }}" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer">
+                <img src="{{ boChallPlayerArt }}" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover">
+                <div><div style="font:400 9px IBM Plex Mono,monospace;color:#6b6c7e;text-transform:uppercase">Challenger's player</div><div style="font:600 11.5px Barlow,sans-serif">{{ boChallPlayerName }}</div></div>
+              </div>
+            </div>
+            <div onClick="{{ boCycleMap }}" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:#14141c;border:1px solid rgba(255,255,255,.08);cursor:pointer">
+              <img src="{{ boMapArt }}" alt="" style="width:26px;height:26px;border-radius:7px;object-fit:cover">
+              <div style="flex:1"><div style="font:400 9px IBM Plex Mono,monospace;color:#6b6c7e;text-transform:uppercase">Map</div><div style="font:600 11.5px Barlow,sans-serif">{{ boMap }}</div></div>
+              <i class="bi bi-shuffle" style="color:#8b7dff"></i>
+            </div>
+            <div onClick="{{ boStartBattle }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:40px;border-radius:10px;background:#6c5cff;color:#fff;font:600 12.5px Barlow,sans-serif;cursor:pointer"><i class="bi bi-lightning-fill"></i>Start battle</div>
+          </div>
+
+          <div style="width:100%;margin-top:6px">
+            <div style="font:700 13px Chakra Petch,sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Title history</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ boPlayedMatches }}" as="m" hint-placeholder-count="2">
+                <div style="display:grid;grid-template-columns:74px 1fr auto;gap:12px;align-items:center;padding:10px 14px;border-radius:10px;background:#14141c;border-left:3px solid #f0b429">
+                  <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e">{{ m.date }}</div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="position:relative"><img src="{{ m.artA }}" alt="" style="width:28px;height:28px;border-radius:8px;object-fit:cover;border:1.5px solid {{ m.borderA }}"><img src="{{ m.avatarA }}" alt="" style="position:absolute;bottom:-3px;right:-4px;width:14px;height:14px;border-radius:50%;object-fit:cover;border:1.5px solid #14141c"></div>
+                    <span style="font:600 11.5px Barlow,sans-serif;color:{{ m.fgA }}">{{ m.heroA }}</span>
+                    <span style="font:400 10px IBM Plex Mono,monospace;color:#4a4b58">defended vs</span>
+                    <span style="font:600 11.5px Barlow,sans-serif;color:{{ m.fgB }}">{{ m.heroB }}</span>
+                    <div style="position:relative"><img src="{{ m.artB }}" alt="" style="width:28px;height:28px;border-radius:8px;object-fit:cover;border:1.5px solid {{ m.borderB }}"><img src="{{ m.avatarB }}" alt="" style="position:absolute;bottom:-3px;right:-4px;width:14px;height:14px;border-radius:50%;object-fit:cover;border:1.5px solid #14141c"></div>
+                  </div>
+                  <div style="font:400 10.5px IBM Plex Mono,monospace;color:#8b8c9e;text-align:right">{{ m.map }}</div>
+                </div>
+              </sc-for>
+              <div style="display:{{ boPlayedEmptyDisplay }};padding:14px;text-align:center;font:400 11px Barlow,sans-serif;color:#5c5d70">No challenges fought yet</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:{{ flowShowInBo }};position:absolute;inset:0;background:rgba(6,6,10,.78);align-items:center;justify-content:center;z-index:30;padding:20px">
+          <div style="width:380px;max-height:90%;overflow:auto;border-radius:16px;background:#101018;border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.6)">
+            <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07)">
+              <div style="font:600 12.5px Chakra Petch,sans-serif;letter-spacing:.08em;text-transform:uppercase">{{ flowStage }}</div>
+              <div style="flex:1"></div>
+              <i onClick="{{ flowClose }}" class="bi bi-x-lg" style="font-size:12px;color:#6b6c7e;cursor:pointer"></i>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.05)">
+              <img src="{{ flowArtA }}" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:cover">
+              <div style="font:600 12px Barlow,sans-serif">{{ flowHeroA }}</div>
+              <div style="font:500 10px IBM Plex Mono,monospace;color:#5c5d70">VS</div>
+              <div style="font:600 12px Barlow,sans-serif">{{ flowHeroB }}</div>
+              <img src="{{ flowArtB }}" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:cover">
+            </div>
+            <div style="display:{{ flowStep3Display }};flex-direction:column;gap:10px;padding:16px 18px">
+              <div style="display:flex;gap:10px">
+                <div onClick="{{ flowWinnerA }}" style="flex:1;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:{{ flowWinA_bg }};border:2px solid {{ flowWinA_border }};cursor:pointer">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <img src="{{ flowArtA }}" alt="" style="width:34px;height:34px;border-radius:9px;object-fit:cover">
+                    <div style="flex:1;min-width:0">
+                      <div style="font:600 12px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ flowHeroA }}</div>
+                      <div style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ flowPlayerA }}</div>
+                    </div>
+                    <i class="bi bi-trophy-fill" style="font-size:13px;color:{{ flowWinA_fg }}"></i>
+                  </div>
+                  <div style="display:flex;gap:5px">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                      <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">HP</div>
+                      <div style="display:flex;align-items:center;gap:5px">
+                        <div onClick="{{ flowHpADec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                        <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowHpA }}</div>
+                        <div onClick="{{ flowHpAInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                      </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                      <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">CARDS</div>
+                      <div style="display:flex;align-items:center;gap:5px">
+                        <div onClick="{{ flowCardsADec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                        <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowCardsA }}</div>
+                        <div onClick="{{ flowCardsAInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                      </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                      <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">SK</div>
+                      <div style="display:flex;align-items:center;gap:5px">
+                        <div onClick="{{ flowSkADec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                        <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowSkA }}</div>
+                        <div onClick="{{ flowSkAInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div onClick="{{ flowWinnerB }}" style="flex:1;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:{{ flowWinB_bg }};border:2px solid {{ flowWinB_border }};cursor:pointer">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <img src="{{ flowArtB }}" alt="" style="width:34px;height:34px;border-radius:9px;object-fit:cover">
+                    <div style="flex:1;min-width:0">
+                      <div style="font:600 12px Barlow,sans-serif;color:#ecedf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ flowHeroB }}</div>
+                      <div style="font:400 9.5px IBM Plex Mono,monospace;color:#8b8c9e">{{ flowPlayerB }}</div>
+                    </div>
+                    <i class="bi bi-trophy-fill" style="font-size:13px;color:{{ flowWinB_fg }}"></i>
+                  </div>
+                  <div style="display:flex;gap:5px">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                      <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">HP</div>
+                      <div style="display:flex;align-items:center;gap:5px">
+                        <div onClick="{{ flowHpBDec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                        <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowHpB }}</div>
+                        <div onClick="{{ flowHpBInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                      </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                      <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">CARDS</div>
+                      <div style="display:flex;align-items:center;gap:5px">
+                        <div onClick="{{ flowCardsBDec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                        <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowCardsB }}</div>
+                        <div onClick="{{ flowCardsBInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                      </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:7px;background:#1c1c26">
+                      <div style="font:400 8px IBM Plex Mono,monospace;letter-spacing:.08em;color:#5c5d70">SK</div>
+                      <div style="display:flex;align-items:center;gap:5px">
+                        <div onClick="{{ flowSkBDec }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">−</div>
+                        <div style="font:600 11px IBM Plex Mono,monospace;min-width:14px;text-align:center">{{ flowSkB }}</div>
+                        <div onClick="{{ flowSkBInc }}" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b8c9e;font-size:11px">+</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="font:400 10px IBM Plex Mono,monospace;color:#6b6c7e;text-align:center">Map: {{ flowMapFinal }} · turn order randomized · tap a plate to mark the winner</div>
+              <div onClick="{{ flowSave }}" style="display:flex;align-items:center;justify-content:center;height:36px;border-radius:9px;background:{{ flowSaveBg }};color:#06110c;font:600 12px Barlow,sans-serif;cursor:pointer">Save match · to tournament</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="dv-next">Swiss is shelved for now, alongside League and Group. Confirm the shortened ban-map → match-sheet flow reads right before wiring up more bracket sizes.</p>
+</section>
+
 <section class="dv-turn" id="t14">
-<div class="dv-thd"><a class="dv-tid" href="#t14">14</a><span class="dv-tname">Match sheet &mdash; vertical participant cards, Ranked instead of Tournament, drag-to-reorder turn</span></div>
-<p class="dv-note">The match sheet &mdash; one component (<b>MatchSheetCards</b>) that both <b>Add match</b> and the last step of the draft mount. No Tournament or Stage (they come from the bracket) &mdash; that slot holds <b>Ranked / Casual</b> instead. The participant plate is a <b>186px vertical card</b>: hero key art on top (118px, the turn badge or the FFA medal riding its corner, grip in the other corner), the <b>hero dropdown right under the art</b>, then the player dropdown, then HP&nbsp;left / Cards / Sidekick stacked as full-width steppers. Every control is now the same width, so labels never truncate to &ldquo;A.&rdquo; the way they did when the plate was horizontal and squeezed two-per-side. Cards wrap centred inside their side box, which is what lets four of them sit in a row in FFA and two per team in 2v2 without the sheet growing wider. All four modes are live &mdash; switch them in the header.</p>
+<div class="dv-thd"><a class="dv-tid" href="#t14">14</a><span class="dv-tname">Match sheet — vertical participant cards, Ranked instead of Tournament, drag-to-reorder turn</span></div>
+<p class="dv-note">The match sheet — one component (<b>MatchSheetCards</b>) that both <b>Add match</b> and the last step of the draft mount. No Tournament or Stage (they come from the bracket) — that slot holds <b>Ranked / Casual</b> instead. The participant plate is a <b>186px vertical card</b>: hero key art on top (118px, the turn badge or the FFA medal riding its corner, grip in the other corner), the <b>hero dropdown right under the art</b>, then the player dropdown, then HP&nbsp;left / Cards / Sidekick stacked as full-width steppers. Every control is now the same width, so labels never truncate to “A.” the way they did when the plate was horizontal and squeezed two-per-side. Cards wrap centred inside their side box, which is what lets four of them sit in a row in FFA and two per team in 2v2 without the sheet growing wider. All four modes are live — switch them in the header.</p>
 <div class="dv-opts">
   <div class="dv-opt" id="14a">
-    <div class="dv-olabel"><a class="dv-oid" href="#14a">14a</a>Match sheet &mdash; 1v1 / 2v2 / FFA / Co-op, switchable</div>
+    <div class="dv-olabel"><a class="dv-oid" href="#14a">14a</a>Match sheet — 1v1 / 2v2 / FFA / Co-op, switchable</div>
     <div class="dv-card" style="width:940px">
       <dc-import name="MatchSheetCards" mode="2v2" map-name="London" map-art="assets/maps/london.png" hint-size="940px,760px"></dc-import>
     </div>
   </div>
 </div>
-<p class="dv-next">Step 5 of <a class="dv-oid" href="#12b">12b</a> is this same component with <b>prefilled</b> on. Turn order: drag a card by the handle at the top of its art &mdash; 1v1 and FFA renumber 1-2-3 left to right, 2v2 alternates teams (1-3 / 2-4), co-op has no turn order at all.</p>
+<p class="dv-next">Step 5 of <a class="dv-oid" href="#12b">12b</a> is this same component with <b>prefilled</b> on. Turn order: drag a card by the handle at the top of its art — 1v1 and FFA renumber 1-2-3 left to right, 2v2 alternates teams (1-3 / 2-4), co-op has no turn order at all.</p>
 </section>
 
 <section class="dv-turn" id="t12">
-<div class="dv-thd"><a class="dv-tid" href="#t12">12</a><span class="dv-tname">Add match, two ways &mdash; the entry modal and a working draft session</span></div>
-<p class="dv-note"><b>Add match</b> now asks one question first: are you logging a finished game or setting one up? <a class="dv-oid" href="#12a">12a</a> is that modal &mdash; <b>Manual entry</b> goes straight to <a class="dv-oid" href="#4b">4b</a>, <b>Draft session</b> opens <a class="dv-oid" href="#12b">12b</a>. &ldquo;Quiz&rdquo; reads like a questionnaire, so the flow is called a <b>draft</b> &mdash; that is what it is: ban and pick, the vocabulary players already use. <a class="dv-oid" href="#12b">12b</a> is <b>live, click through the whole thing</b>: pick a mode and players (2v2 can split teams by hand or roll them), ban maps one player each from a pool of N+1, ban and pick from N&times;3 heroes in a random order (snake: forward, then back), cross one of your two in the final phase, roll turn order (alternating teams in 2v2, a villain step instead in co-op), and land on the prefilled sheet with fighters already sorted by turn. Every random pool has a <b>Reroll</b> next to it. Heroes and maps without art in the repo fall back to <b>Unknown.png</b>.</p>
+<div class="dv-thd"><a class="dv-tid" href="#t12">12</a><span class="dv-tname">Add match, two ways — the entry modal and a working draft session</span></div>
+<p class="dv-note"><b>Add match</b> now asks one question first: are you logging a finished game or setting one up? <a class="dv-oid" href="#12a">12a</a> is that modal — <b>Manual entry</b> goes straight to <a class="dv-oid" href="#4b">4b</a>, <b>Draft session</b> opens <a class="dv-oid" href="#12b">12b</a>. “Quiz” reads like a questionnaire, so the flow is called a <b>draft</b> — that is what it is: ban and pick, the vocabulary players already use. <a class="dv-oid" href="#12b">12b</a> is <b>live, click through the whole thing</b>: pick a mode and players (2v2 can split teams by hand or roll them), ban maps one player each from a pool of N+1, ban and pick from N×3 heroes in a random order (snake: forward, then back), cross one of your two in the final phase, roll turn order (alternating teams in 2v2, a villain step instead in co-op), and land on the prefilled sheet with fighters already sorted by turn. Every random pool has a <b>Reroll</b> next to it. Heroes and maps without art in the repo fall back to <b>Unknown.png</b>.</p>
 <div class="dv-opts">
 
   <div class="dv-opt" id="12a">
-    <div class="dv-olabel"><a class="dv-oid" href="#12a">12a</a>Entry modal &mdash; Manual entry or Draft session, over the dimmed sheet</div>
+    <div class="dv-olabel"><a class="dv-oid" href="#12a">12a</a>Entry modal — Manual entry or Draft session, over the dimmed sheet</div>
     <div class="dv-card" style="width:900px">
       <div style="position:relative;background:#0a0a10;min-height:520px">
         <div style="filter:blur(2px);opacity:.4;pointer-events:none">
@@ -101,9 +648,9 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
               <div style="position:relative;display:flex;flex-direction:column;gap:9px;padding:15px;border-radius:13px;background:linear-gradient(160deg,rgba(108,92,255,.18),rgba(168,85,247,.09));border:1.5px solid rgba(139,125,255,.5);cursor:pointer;box-shadow:0 0 0 3px rgba(108,92,255,.12)">
                 <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(108,92,255,.25)"><i class="bi bi-shuffle" style="font-size:15px;color:#c4bcff"></i></div>
                 <div style="font:600 13px Barlow,sans-serif;color:#ecedf2">Draft session</div>
-                <div style="font:400 11px/1.5 Barlow,sans-serif;color:#b9b6d6">Not played yet. Ban maps, draft heroes, roll turn order &mdash; then the sheet fills itself.</div>
+                <div style="font:400 11px/1.5 Barlow,sans-serif;color:#b9b6d6">Not played yet. Ban maps, draft heroes, roll turn order — then the sheet fills itself.</div>
                 <div style="flex:1"></div>
-                <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#8b7dff">5 steps &middot; uses your collection</div>
+                <div style="font:400 9.5px IBM Plex Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#8b7dff">5 steps · uses your collection</div>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);background:#0c0c14">
@@ -119,7 +666,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
   </div>
 
   <div class="dv-opt" id="12b">
-    <div class="dv-olabel"><a class="dv-oid" href="#12b">12b</a>Draft session &mdash; live: mode &amp; players, map bans, hero snake draft, final pick, turn order or villain, prefilled sheet</div>
+    <div class="dv-olabel"><a class="dv-oid" href="#12b">12b</a>Draft session — live: mode &amp; players, map bans, hero snake draft, final pick, turn order or villain, prefilled sheet</div>
     <div class="dv-card" style="width:900px">
       <div style="background:#0a0a10;display:flex;flex-direction:column;min-height:800px">
         <div style="display:flex;align-items:center;gap:11px;padding:15px 20px;border-bottom:1px solid rgba(255,255,255,.07)">
@@ -174,7 +721,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                 </div>
               </sc-for>
             </div>
-            <div style="font:400 10.5px/1.5 IBM Plex Mono,monospace;color:#5c5d70;display:{{ dTeamHintDisplay }}">Tap the badge on a card to move that player between Team 1 and Team 2 &mdash; or roll the split.</div>
+            <div style="font:400 10.5px/1.5 IBM Plex Mono,monospace;color:#5c5d70;display:{{ dTeamHintDisplay }}">Tap the badge on a card to move that player between Team 1 and Team 2 — or roll the split.</div>
           </div>
         </div>
 
@@ -321,7 +868,7 @@ a{color:#8b7dff;text-decoration:none}a:hover{color:#a99fff}
                 <div onClick="{{ mi.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:11px;background:{{ mi.bg }};border:{{ mi.border }};cursor:pointer">
                   <img src="{{ mi.art }}" alt="{{ mi.name }}" style="width:28px;height:28px;flex:none;border-radius:8px;object-fit:cover;opacity:.8">
                   <div style="flex:1;min-width:0;font:500 12px Barlow,sans-serif;color:{{ mi.fg }}">{{ mi.name }}</div>
-                  <div style="font:400 10px IBM Plex Mono,monospace;color:#5c9fc0">&times;{{ mi.count }} &middot; {{ mi.hp }} HP</div>
+                  <div style="font:400 10px IBM Plex Mono,monospace;color:#5c9fc0">×{{ mi.count }} · {{ mi.hp }} HP</div>
                   <i class="bi {{ mi.checkIcon }}" style="font-size:12px;color:{{ mi.checkColor }}"></i>
                 </div>
               </sc-for>
@@ -5484,6 +6031,8 @@ const DVILLAINS = [['Jack the Ripper', 30], ['The Kraken', 34], ['Baba Yaga', 28
   .map(([name, hp]) => ({ name, hp, art: DUNK }));
 const DMINIONS = [['Thugs', 4, 2], ['Rats', 6, 1], ['Hounds', 3, 3], ['Cultists', 4, 2]]
   .map(([name, count, hp]) => ({ name, count, hp, art: DUNK }));
+const POROSTER = DHEROES.slice(0, 8);
+const SWROSTER = [8, 9, 0, 1, 2, 3, 4, 5].map(i => DHEROES[i]);
 
 class Component extends DCLogic {
   state = { navOpen: true, openMatch: 'm4', addMode: '1v1', addStep: 2, addWinner: 0, colSet: 1, colOwnedOnly: false,
@@ -5492,7 +6041,14 @@ class Component extends DCLogic {
       teams: { andrii: 'A', ksuha: 'B', oleksandr: 'A', tetyana: 'B' },
       mapPool: [], mapBans: [], mapSeq: [], mapIdx: 0, map: null,
       heroPool: [], heroBans: [], heroSeq: [], picks: {}, drops: {},
-      order: [], villain: null, minions: [] } };
+      order: [], villain: null, minions: [] },
+    activeFlow: null, swView: null,
+    create: { type: 'playoff', name: 'Golden Halat Playoff', poSize: 8, poHeroes: POROSTER.map(h => h.name), poFinal: 'bo3',
+      swSize: 8, swHeroes: SWROSTER.map(h => h.name), swFinal: 'bo1',
+      boChamp: 'Geralt of Rivia', boReward: 'Golden Halat Blade', boSpin: false, boSpinDisplay: '', boDemoSpin: false, boDemoReel: [] },
+    po: { started: false, revealed: {}, results: {}, finalGames: [null, null, null], pairs: null, popup: false, completed: false, flow: null },
+    sw: { results: {}, flow: null },
+    bo: { champion: 'Geralt of Rivia', reward: 'Golden Halat Blade', rewardElo: 45, challenger: 'Medusa', champPlayerIdx: 0, challPlayerIdx: 1, map: 'Kaer Morhen', history: [], flow: null } };
 
   dShuffle(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
 
@@ -6847,6 +7403,481 @@ class Component extends DCLogic {
     };
   }
 
+  tCreatePatch(patch) {
+    this.setState(s => ({ create: { ...s.create, ...(typeof patch === 'function' ? patch(s.create) : patch) } }));
+  }
+
+  tCreateVals() {
+    const c = this.state.create;
+    const types = [
+      { key: 'playoff', label: 'Playoff', icon: 'bi-diagram-3-fill', sub: 'Single elimination bracket' },
+      { key: 'bounty', label: 'Bounty', icon: 'bi-award-fill', sub: 'Defend the title, one challenger at a time' }
+    ].map(t => ({ ...t, active: t.key === c.type,
+      bg: t.key === c.type ? 'rgba(108,92,255,.16)' : '#101018',
+      border: t.key === c.type ? 'rgba(139,125,255,.5)' : 'rgba(255,255,255,.08)',
+      fg: t.key === c.type ? '#ecedf2' : '#8b8c9e',
+      iconColor: t.key === c.type ? '#c4bcff' : '#6b6c7e',
+      onClick: () => this.tCreatePatch({ type: t.key })
+    }));
+
+    const sizes = [2, 4, 8, 16, 32, 64].map(n => ({
+      n, bg: n === c.poSize ? '#6c5cff' : '#14141c', fg: n === c.poSize ? '#fff' : '#8b8c9e',
+      onClick: () => this.tCreatePatch(() => ({ poSize: n, poHeroes: this.dShuffle(DHEROES).slice(0, n).map(h => h.name) }))
+    }));
+    const swSizes = [4, 8, 16, 32].map(n => ({
+      n, bg: n === c.swSize ? '#6c5cff' : '#14141c', fg: n === c.swSize ? '#fff' : '#8b8c9e',
+      onClick: () => this.tCreatePatch(() => ({ swSize: n, swHeroes: this.dShuffle(DHEROES).slice(0, n).map(h => h.name) }))
+    }));
+    const swRounds = Math.ceil(Math.log2(c.swSize || 8));
+
+    const heroChip = (list, size, name, art) => {
+      const on = list.includes(name);
+      return { name, art, on,
+        bg: on ? 'rgba(139,125,255,.14)' : '#101018', border: on ? 'rgba(139,125,255,.45)' : 'rgba(255,255,255,.07)',
+        fg: on ? '#ecedf2' : '#6b6c7e' };
+    };
+    const poHeroGrid = DHEROES.map(h => ({ ...heroChip(c.poHeroes, c.poSize, h.name, h.art),
+      onClick: () => this.tCreatePatch(s => {
+        const has = s.poHeroes.includes(h.name);
+        if (has) return { poHeroes: s.poHeroes.filter(n => n !== h.name) };
+        if (s.poHeroes.length >= s.poSize) return {};
+        return { poHeroes: [...s.poHeroes, h.name] };
+      }) }));
+    const swHeroGrid = DHEROES.map(h => ({ ...heroChip(c.swHeroes, c.swSize, h.name, h.art),
+      onClick: () => this.tCreatePatch(s => {
+        const has = s.swHeroes.includes(h.name);
+        if (has) return { swHeroes: s.swHeroes.filter(n => n !== h.name) };
+        if (s.swHeroes.length >= s.swSize) return {};
+        return { swHeroes: [...s.swHeroes, h.name] };
+      }) }));
+
+    const finalOpts = [{ k: 'bo1', label: 'Best of 1' }, { k: 'bo3', label: 'Best of 3' }].map(o => ({
+      ...o, bg: o.k === c.poFinal ? 'rgba(139,125,255,.18)' : 'transparent', fg: o.k === c.poFinal ? '#c4bcff' : '#8b8c9e',
+      onClick: () => this.tCreatePatch({ poFinal: o.k })
+    }));
+    const swFinalOpts = [{ k: 'bo1', label: 'Best of 1' }, { k: 'bo3', label: 'Best of 3' }].map(o => ({
+      ...o, bg: o.k === c.swFinal ? 'rgba(139,125,255,.18)' : 'transparent', fg: o.k === c.swFinal ? '#c4bcff' : '#8b8c9e',
+      onClick: () => this.tCreatePatch({ swFinal: o.k })
+    }));
+
+    const spinName = c.boSpin ? c.boSpinDisplay : c.boChamp;
+    const boHeroGrid = DHEROES.map(h => ({ name: h.name, art: h.art, on: h.name === c.boChamp,
+      bg: h.name === c.boChamp ? 'rgba(139,125,255,.14)' : '#101018', border: h.name === c.boChamp ? 'rgba(139,125,255,.45)' : 'rgba(255,255,255,.07)',
+      fg: h.name === c.boChamp ? '#ecedf2' : '#6b6c7e',
+      onClick: () => this.tCreatePatch({ boChamp: h.name, boSpin: false })
+    }));
+    const demoReel = c.boDemoReel.length ? c.boDemoReel : ['—', '—', '—', '—', '—'];
+    const disabled = c.type === 'playoff' ? c.poHeroes.length !== c.poSize : c.type === 'swiss' ? c.swHeroes.length !== c.swSize : !c.boChamp;
+
+    return {
+      tTypes: types, tName: c.name,
+      tSetNameEvt: e => this.tCreatePatch({ name: e.target.value }),
+      tPoSizes: sizes, tPoHeroGrid: poHeroGrid, tPoNeed: Math.max(0, c.poSize - c.poHeroes.length),
+      tPoFinalOpts: finalOpts,
+      tSwSizes: swSizes, tSwHeroGrid: swHeroGrid, tSwRounds: swRounds, tSwNeed: Math.max(0, c.swSize - c.swHeroes.length),
+      tBoChamp: spinName, tBoChampArt: (DHEROES.find(h => h.name === spinName) || {}).art || DUNK,
+      tBoReward: c.boReward, tSetRewardEvt: e => this.tCreatePatch({ boReward: e.target.value }),
+      tBoSpin: () => {
+        let n = 0;
+        const tick = () => {
+          n++;
+          const pick = DHEROES[Math.floor(Math.random() * DHEROES.length)];
+          this.tCreatePatch({ boSpin: true, boSpinDisplay: pick.name });
+          if (n < 14) setTimeout(tick, 60 + n * 12);
+          else this.tCreatePatch(s => ({ boSpin: false, boChamp: s.boSpinDisplay }));
+        };
+        tick();
+      },
+      tSwFinalOpts: swFinalOpts,
+      tBoHeroGrid: boHeroGrid,
+      tBoDemoReel: demoReel, tBoDemoSpinning: c.boDemoSpin,
+      tBoSpinConveyor: () => {
+        let n = 0;
+        const tick = () => {
+          n++;
+          const reel = Array.from({ length: 5 }, () => DHEROES[Math.floor(Math.random() * DHEROES.length)].name);
+          this.tCreatePatch({ boDemoSpin: true, boDemoReel: reel });
+          if (n < 18) setTimeout(tick, 45 + n * 8);
+          else this.tCreatePatch({ boDemoSpin: false });
+        };
+        tick();
+      },
+      tShowPo: c.type === 'playoff' ? 'flex' : 'none',
+      tShowSw: c.type === 'swiss' ? 'flex' : 'none',
+      tShowBo: c.type === 'bounty' ? 'flex' : 'none',
+      tCreateDisabled: disabled,
+      tCreateBg: disabled ? '#2a2b36' : '#34d99b', tCreateFg: disabled ? '#5c5d70' : '#06110c'
+    };
+  }
+
+  tNavGroups() {
+    const navOpen = this.state.navOpen;
+    const groups = [
+      { title: 'Statistics', items: [
+        { icon: 'bi-shield-fill', label: 'Heroes', count: 48 }, { icon: 'bi-people', label: 'Players', count: 6 },
+        { icon: 'bi-map', label: 'Maps', count: 20 }, { icon: 'bi-bug', label: 'Minions', count: 6 }, { icon: 'bi-eye', label: 'Villains', count: 2 }
+      ] },
+      { title: 'Play', items: [
+        { icon: 'bi-plus-circle', label: 'Add match', count: '' }, { icon: 'bi-list-ul', label: 'Match log', count: 1284 },
+        { icon: 'bi-box-seam', label: 'Collection', count: '6/11' }, { icon: 'bi-award', label: 'Titles', count: 9 },
+        { icon: 'bi-flag-fill', label: 'Tournaments', count: 3, active: true }
+      ] }
+    ].map(g => ({ ...g, items: g.items.map(i => ({ ...i,
+      fg: i.active ? '#ffffff' : '#8b8c9e', bg: i.active ? 'rgba(108,92,255,.18)' : 'transparent',
+      justify: navOpen ? 'flex-start' : 'center' })) }));
+    return { tNavGroups: groups, tNavW: navOpen ? 216 : 76, tNavLabelDisplay: navOpen ? 'block' : 'none' };
+  }
+
+  openFlow(sys, matchId, stageLabel, heroA, heroB, opts) {
+    opts = opts || {};
+    const pool = this.dShuffle(DMAPS).slice(0, 3);
+    const flow = {
+      sys, matchId, stageLabel, heroA, heroB,
+      playerAIdx: opts.playerAIdx ?? 0, playerBIdx: opts.playerBIdx ?? 1,
+      step: opts.step || 1, mapPool: pool, bans: [],
+      chosenMap: opts.map ? (DMAPS.find(m => m.name === opts.map) || { name: opts.map, art: DUNK }) : null,
+      order: [0, 1], hpA: 10, hpB: 10, cardsA: 8, cardsB: 8, skA: 0, skB: 0, winner: null
+    };
+    this.setState(s => ({ activeFlow: sys, [sys]: { ...s[sys], flow } }));
+  }
+  patchFlow(patch) {
+    const sys = this.state.activeFlow;
+    if (!sys) return;
+    this.setState(s => ({ [sys]: { ...s[sys], flow: { ...s[sys].flow, ...(typeof patch === 'function' ? patch(s[sys].flow) : patch) } } }));
+  }
+  flowBan(idx) {
+    this.patchFlow(f => {
+      if (f.bans.includes(idx) || f.chosenMap) return {};
+      const bans = [...f.bans, idx];
+      if (bans.length === 2) {
+        const left = f.mapPool.findIndex((_, i) => !bans.includes(i));
+        return { bans, chosenMap: f.mapPool[left] };
+      }
+      return { bans };
+    });
+  }
+  flowNext() {
+    this.patchFlow(f => f.step === 1 ? { step: 3, order: this.dShuffle([0, 1]) } : { step: Math.min(3, f.step + 1) });
+  }
+  flowReroll() { this.patchFlow(() => ({ order: this.dShuffle([0, 1]) })); }
+  flowHp(side, d) { this.patchFlow(f => ({ [side]: Math.max(0, Math.min(20, f[side] + d)) })); }
+  flowStat(side, d, max) { this.patchFlow(f => ({ [side]: Math.max(0, Math.min(max, f[side] + d)) })); }
+  flowCyclePlayer(side) {
+    this.patchFlow(f => {
+      const key = side === 'hpA' ? 'playerAIdx' : 'playerBIdx';
+      return { [key]: (f[key] + 1) % DPLAYERS.length };
+    });
+  }
+  flowWinner(w) { this.patchFlow({ winner: w }); }
+  flowClose() { this.setState({ activeFlow: null }); }
+  flowSave() {
+    const sys = this.state.activeFlow;
+    if (!sys) return;
+    const f = this.state[sys].flow;
+    if (!f.winner) return;
+    const record = { heroA: f.heroA, heroB: f.heroB, winner: f.winner, stage: f.stageLabel,
+      playerA: DPLAYERS[f.playerAIdx].name, playerB: DPLAYERS[f.playerBIdx].name,
+      hpA: f.hpA, hpB: f.hpB, map: (f.chosenMap || f.mapPool[0]).name, date: '02 Aug 2026' };
+    if (sys === 'po') this.poSave(f.matchId, record);
+    else if (sys === 'sw') this.swSave(f.matchId, record);
+    else this.boSave(record);
+    this.setState({ activeFlow: null });
+  }
+
+  poSave(matchId, record) {
+    this.setState(s => {
+      const results = { ...s.po.results, [matchId]: record };
+      let finalGames = s.po.finalGames, popup = s.po.popup;
+      if (matchId.startsWith('final-')) {
+        const idx = parseInt(matchId.split('-')[1], 10) - 1;
+        finalGames = finalGames.slice();
+        finalGames[idx] = record.winner;
+        const winsA = finalGames.filter(w => w === 'A').length, winsB = finalGames.filter(w => w === 'B').length;
+        if (s.create.poFinal === 'bo1' || winsA === 2 || winsB === 2 || finalGames.every(Boolean)) popup = true;
+      }
+      return { po: { ...s.po, results, finalGames, popup } };
+    });
+  }
+  poReveal(id) { this.setState(s => ({ po: { ...s.po, revealed: { ...s.po.revealed, [id]: true } } })); }
+  poStart() {
+    this.setState(s => ({ po: { ...s.po, started: true, pairs: this.dShuffle(POROSTER.map(h => h.name)) } }));
+  }
+  poClosePopup() { this.setState(s => ({ po: { ...s.po, popup: false, completed: true } })); }
+
+  buildMatchCard(id, tag, x, top, heroA, heroB, rec, state_, onStart, onReveal) {
+    const heroArt = n => (DHEROES.find(h => h.name === n) || {}).art || DUNK;
+    return {
+      id, tag, x, top, width: 210, height: 100,
+      spoilerDisplay: state_ === 'spoiler' ? 'flex' : 'none',
+      lockedDisplay: state_ === 'locked' ? 'flex' : 'none',
+      contentDisplay: (state_ === 'ready' || state_ === 'played') ? 'flex' : 'none',
+      lockedLabel: 'Waiting for previous round',
+      onReveal: onReveal || (() => {}),
+      heroA, heroB, artA: heroArt(heroA), artB: heroArt(heroB),
+      playerA: rec ? rec.playerA : '—', playerB: rec ? rec.playerB : '—',
+      hpA: rec ? rec.hpA : null, hpB: rec ? rec.hpB : null,
+      hpADisplay: rec ? 'block' : 'none', hpBDisplay: rec ? 'block' : 'none',
+      map: rec ? rec.map : '', mapDisplay: rec ? 'flex' : 'none',
+      edgeA: rec ? (rec.winner === 'A' ? '#34d99b' : '#f2506b') : 'rgba(255,255,255,.08)',
+      edgeB: rec ? (rec.winner === 'B' ? '#34d99b' : '#f2506b') : 'rgba(255,255,255,.08)',
+      startDisplay: state_ === 'ready' ? 'flex' : 'none',
+      onStart
+    };
+  }
+
+  poVals() {
+    const s = this.state.po;
+    const heroArt = n => (DHEROES.find(h => h.name === n) || {}).art || DUNK;
+    const roster = (s.pairs && s.pairs.length === 8) ? s.pairs : POROSTER.map(h => h.name);
+
+    const qfDefs = [
+      { id: 'qf1', tag: 'QF 1', x: 0, top: 140, a: 0, b: 1 }, { id: 'qf2', tag: 'QF 2', x: 0, top: 330, a: 2, b: 3 },
+      { id: 'qf3', tag: 'QF 3', x: 0, top: 520, a: 4, b: 5 }, { id: 'qf4', tag: 'QF 4', x: 0, top: 710, a: 6, b: 7 }
+    ];
+    const qfCards = qfDefs.map(d => {
+      const heroA = roster[d.a], heroB = roster[d.b];
+      const rec = s.results[d.id], revealed = !!s.revealed[d.id];
+      const state_ = !s.started ? 'locked' : !revealed ? 'spoiler' : rec ? 'played' : 'ready';
+      return this.buildMatchCard(d.id, d.tag, d.x, d.top, heroA, heroB, rec, state_,
+        () => this.openFlow('po', d.id, d.tag, heroA, heroB), () => this.poReveal(d.id));
+    });
+    const winnerOf = id => { const r = s.results[id]; return r ? (r.winner === 'A' ? r.heroA : r.heroB) : null; };
+    const loserOf = id => { const r = s.results[id]; return r ? (r.winner === 'A' ? r.heroB : r.heroA) : null; };
+
+    const sfDefs = [{ id: 'sf1', tag: 'SF 1', x: 280, top: 235, fa: 'qf1', fb: 'qf2' }, { id: 'sf2', tag: 'SF 2', x: 280, top: 615, fa: 'qf3', fb: 'qf4' }];
+    const sfCards = sfDefs.map(d => {
+      const heroA = winnerOf(d.fa), heroB = winnerOf(d.fb), ready = !!(heroA && heroB);
+      const rec = s.results[d.id];
+      const state_ = !ready ? 'locked' : rec ? 'played' : 'ready';
+      return this.buildMatchCard(d.id, d.tag, d.x, d.top, heroA || 'TBD', heroB || 'TBD', rec, state_,
+        () => this.openFlow('po', d.id, d.tag, heroA, heroB));
+    });
+
+    const thirdHeroA = loserOf('sf1'), thirdHeroB = loserOf('sf2'), thirdReady = !!(thirdHeroA && thirdHeroB);
+    const thirdRec = s.results['third'];
+    const thirdCard = this.buildMatchCard('third', '3RD PLACE', 560, 0, thirdHeroA || 'TBD', thirdHeroB || 'TBD', thirdRec,
+      !thirdReady ? 'locked' : thirdRec ? 'played' : 'ready',
+      () => this.openFlow('po', 'third', '3rd place match', thirdHeroA, thirdHeroB));
+
+    const finHeroA = winnerOf('sf1'), finHeroB = winnerOf('sf2'), finReady = !!(finHeroA && finHeroB);
+    const bo3 = this.state.create.poFinal === 'bo3';
+    const gameIds = bo3 ? ['final-1', 'final-2', 'final-3'] : ['final-1'];
+    const shown = [];
+    let champion = null;
+    for (const gid of gameIds) {
+      shown.push(gid);
+      const rec = s.results[gid];
+      if (rec) {
+        const winsA = s.finalGames.filter(w => w === 'A').length, winsB = s.finalGames.filter(w => w === 'B').length;
+        if (!bo3 || winsA === 2 || winsB === 2) { champion = winsA > winsB ? finHeroA : finHeroB; break; }
+      } else break;
+    }
+    const finalRows = shown.map((gid, i) => {
+      const rec = s.results[gid];
+      return {
+        label: bo3 ? 'Game ' + (i + 1) : 'Final',
+        heroA: finHeroA, heroB: finHeroB, artA: heroArt(finHeroA), artB: heroArt(finHeroB),
+        hpA: rec ? rec.hpA : null, hpB: rec ? rec.hpB : null,
+        edgeA: rec ? (rec.winner === 'A' ? '#34d99b' : '#f2506b') : 'rgba(255,255,255,.08)',
+        edgeB: rec ? (rec.winner === 'B' ? '#34d99b' : '#f2506b') : 'rgba(255,255,255,.08)',
+        startDisplay: (finReady && !rec) ? 'flex' : 'none',
+        onStart: () => this.openFlow('po', gid, bo3 ? ('Final · Game ' + (i + 1)) : 'Final', finHeroA, finHeroB)
+      };
+    });
+
+    const playedList = Object.entries(s.results).map(([id, r]) => ({ id, ...r }));
+    return {
+      poStarted: s.started, poStartDisplay: s.started ? 'none' : 'flex', poStart: () => this.poStart(),
+      poQfCards: [...qfCards, ...sfCards, thirdCard],
+      poFinalReady: finReady, poFinalReadyDisplay: finReady ? 'flex' : 'none', poFinalLockedDisplay: finReady ? 'none' : 'flex',
+      poFinalRows: finalRows, poFormatLabel: bo3 ? 'Best of 3' : 'Best of 1',
+      poPopupDisplay: s.popup ? 'flex' : 'none', poChampion: champion, poChampionArt: champion ? heroArt(champion) : DUNK,
+      poClosePopup: () => this.poClosePopup(),
+      poPlayedMatches: this.playedRowsFor(playedList), poPlayedEmptyDisplay: playedList.length ? 'none' : 'block'
+    };
+  }
+
+  swVals() {
+    const s = this.state.sw, roster = SWROSTER.map(h => h.name);
+    const bo3 = this.state.create.swFinal === 'bo3';
+    const totalRounds = Math.ceil(Math.log2(roster.length));
+    const heroArt = n => (DHEROES.find(h => h.name === n) || {}).art || DUNK;
+
+    const wins = {}, losses = {}, opps = {};
+    roster.forEach(h => { wins[h] = 0; losses[h] = 0; opps[h] = []; });
+    const playedPairs = new Set();
+    const roundsInfo = [];
+    let active = totalRounds, foundActive = false, priorReady = true;
+
+    for (let r = 0; r < totalRounds; r++) {
+      if (r > 0 && !priorReady) { roundsInfo.push({ idx: r + 1, ready: false, pairs: [] }); if (!foundActive) { active = r + 1; foundActive = true; } continue; }
+      let pairs;
+      if (r === 0) { pairs = []; for (let i = 0; i < roster.length; i += 2) pairs.push([roster[i], roster[i + 1]]); }
+      else {
+        const sorted = roster.slice().sort((a, b) => wins[b] - wins[a]);
+        pairs = []; const used = new Set();
+        for (let i = 0; i < sorted.length; i++) {
+          const h = sorted[i]; if (used.has(h)) continue;
+          let opp = null;
+          for (let j = i + 1; j < sorted.length; j++) { const cand = sorted[j]; if (used.has(cand)) continue; if (!playedPairs.has([h, cand].sort().join('|'))) { opp = cand; break; } }
+          if (!opp) for (let j = i + 1; j < sorted.length; j++) { if (!used.has(sorted[j])) { opp = sorted[j]; break; } }
+          used.add(h); used.add(opp); pairs.push([h, opp]);
+        }
+      }
+      let roundDecidedCount = 0;
+      const pairInfos = pairs.map((pair, pi) => {
+        const baseId = 'r' + (r + 1) + '-m' + (pi + 1);
+        const heroA = pair[0], heroB = pair[1];
+        const gameIds = bo3 ? [baseId + '-g1', baseId + '-g2', baseId + '-g3'] : [baseId + '-g1'];
+        const shown = []; let decided = false, winnerSide = null;
+        for (const gid of gameIds) {
+          shown.push(gid);
+          const rec = s.results[gid];
+          if (rec) {
+            const wa = shown.filter(id => s.results[id] && s.results[id].winner === 'A').length;
+            const wb = shown.filter(id => s.results[id] && s.results[id].winner === 'B').length;
+            if (!bo3 || wa === 2 || wb === 2) { decided = true; winnerSide = wa > wb ? 'A' : 'B'; break; }
+          } else break;
+        }
+        if (decided) roundDecidedCount++;
+        return { baseId, heroA, heroB, shown, decided, winnerSide };
+      });
+      if (!foundActive && roundDecidedCount < pairs.length) { active = r + 1; foundActive = true; }
+      pairInfos.forEach(pi => {
+        if (!pi.decided) return;
+        const w = pi.winnerSide === 'A' ? pi.heroA : pi.heroB, l = pi.winnerSide === 'A' ? pi.heroB : pi.heroA;
+        wins[w]++; losses[l]++; opps[pi.heroA].push(pi.heroB); opps[pi.heroB].push(pi.heroA);
+        playedPairs.add([pi.heroA, pi.heroB].sort().join('|'));
+      });
+      priorReady = roundDecidedCount === pairs.length;
+      roundsInfo.push({ idx: r + 1, ready: true, pairInfos });
+    }
+    if (!foundActive) active = totalRounds;
+
+    const viewRound = Math.min(this.state.swView || active, totalRounds);
+    const curRound = roundsInfo[viewRound - 1];
+    const matches = (curRound && curRound.ready ? curRound.pairInfos : []).map(pi => {
+      const games = pi.shown.map((gid, gi) => {
+        const rec = s.results[gid];
+        const canStart = viewRound === active && !pi.decided && !rec && (gi === 0 || s.results[pi.shown[gi - 1]]);
+        return {
+          id: gid, label: bo3 ? 'Game ' + (gi + 1) : 'Match', played: !!rec,
+          playerA: rec ? rec.playerA : '—', playerB: rec ? rec.playerB : '—', map: rec ? rec.map : '—',
+          edgeA: rec ? (rec.winner === 'A' ? '#34d99b' : '#f2506b') : 'rgba(255,255,255,.08)',
+          edgeB: rec ? (rec.winner === 'B' ? '#34d99b' : '#f2506b') : 'rgba(255,255,255,.08)',
+          startDisplay: canStart ? 'flex' : 'none',
+          onStart: () => this.openFlow('sw', gid, 'Swiss R' + viewRound + (bo3 ? ' · Game ' + (gi + 1) : ''), pi.heroA, pi.heroB)
+        };
+      });
+      return { id: pi.baseId, heroA: pi.heroA, heroB: pi.heroB, artA: heroArt(pi.heroA), artB: heroArt(pi.heroB), games, bo3: bo3 ? 'block' : 'none' };
+    });
+    const tabs = roundsInfo.map(r => ({
+      n: r.idx, bg: r.idx === viewRound ? '#6c5cff' : '#14141c', fg: r.idx === viewRound ? '#fff' : r.idx > active ? '#4a4b58' : '#8b8c9e',
+      onClick: () => { if (r.idx <= active) this.setState({ swView: r.idx }); }
+    }));
+    const standings = roster.map(h => ({ name: h, art: heroArt(h), w: wins[h], l: losses[h],
+      buch: opps[h].reduce((sum, o) => sum + wins[o], 0), opps: opps[h].join(', ') || '—' }))
+      .sort((a, b) => b.w - a.w || b.buch - a.buch).map((r, i) => ({ ...r, rank: i + 1 }));
+    const playedList = Object.entries(s.results).map(([id, r]) => ({ id, ...r }));
+    return {
+      swTotalRounds: totalRounds, swActiveRound: active, swViewRound: viewRound, swTabs: tabs, swMatches: matches, swStandings: standings,
+      swPlayedMatches: this.playedRowsFor(playedList), swPlayedEmptyDisplay: playedList.length ? 'none' : 'block'
+    };
+  }
+
+  boSave(record) {
+    this.setState(s => {
+      const history = [{ ...record }, ...s.bo.history];
+      const championChanged = record.winner === 'B';
+      return { bo: { ...s.bo, history, champion: championChanged ? record.heroB : record.heroA } };
+    });
+  }
+  boVals() {
+    const s = this.state.bo;
+    const heroArt = n => (DHEROES.find(h => h.name === n) || {}).art || DUNK;
+    const challOpts = DHEROES.filter(h => h.name !== s.champion).map(h => ({
+      name: h.name, art: h.art, bg: h.name === s.challenger ? 'rgba(139,125,255,.16)' : '#101018',
+      border: h.name === s.challenger ? 'rgba(139,125,255,.5)' : 'rgba(255,255,255,.07)',
+      onClick: () => this.setState(st => ({ bo: { ...st.bo, challenger: h.name } }))
+    }));
+    const playedList = s.history.map((r, i) => ({ id: 'bounty-' + i, ...r }));
+    return {
+      boChampion: s.champion, boChampionArt: heroArt(s.champion), boReward: s.reward, boRewardElo: s.rewardElo,
+      boChallenger: s.challenger, boChallengeOpts: challOpts,
+      boRandomChallenger: () => this.setState(st => {
+        const pool = DHEROES.filter(h => h.name !== st.bo.champion);
+        return { bo: { ...st.bo, challenger: pool[Math.floor(Math.random() * pool.length)].name } };
+      }),
+      boChampPlayerName: DPLAYERS[s.champPlayerIdx].name, boChampPlayerArt: DPLAYERS[s.champPlayerIdx].art,
+      boChallPlayerName: DPLAYERS[s.challPlayerIdx].name, boChallPlayerArt: DPLAYERS[s.challPlayerIdx].art,
+      boCycleChampPlayer: () => this.setState(s2 => ({ bo: { ...s2.bo, champPlayerIdx: (s2.bo.champPlayerIdx + 1) % DPLAYERS.length } })),
+      boCycleChallPlayer: () => this.setState(s2 => ({ bo: { ...s2.bo, challPlayerIdx: (s2.bo.challPlayerIdx + 1) % DPLAYERS.length } })),
+      boMap: s.map, boMapArt: (DMAPS.find(m => m.name === s.map) || {}).art || DUNK,
+      boCycleMap: () => this.setState(s2 => { const i = (DMAPS.findIndex(m => m.name === s2.bo.map) + 1) % DMAPS.length; return { bo: { ...s2.bo, map: DMAPS[i].name } }; }),
+      boStartBattle: () => this.openFlow('bo', 'bounty-' + s.history.length, 'Bounty challenge', s.champion, s.challenger,
+        { step: 3, map: s.map, playerAIdx: s.champPlayerIdx, playerBIdx: s.challPlayerIdx }),
+      boDefenseCount: s.history.filter(h => h.winner === 'A').length,
+      boPlayedMatches: this.playedRowsFor(playedList), boPlayedEmptyDisplay: playedList.length ? 'none' : 'block'
+    };
+  }
+
+  playedRowsFor(list) {
+    return list.slice().reverse().map(m => {
+      const fgA = m.winner === 'A' ? '#34d99b' : '#f2506b', fgB = m.winner === 'B' ? '#34d99b' : '#f2506b';
+      const pA = DPLAYERS.find(p => p.name === m.playerA), pB = DPLAYERS.find(p => p.name === m.playerB);
+      return { ...m,
+        artA: (DHEROES.find(h => h.name === m.heroA) || {}).art || DUNK,
+        artB: (DHEROES.find(h => h.name === m.heroB) || {}).art || DUNK,
+        avatarA: pA ? pA.art : DUNK, avatarB: pB ? pB.art : DUNK,
+        fgA, fgB, borderA: m.winner === 'A' ? 'rgba(52,217,155,.5)' : 'rgba(242,80,107,.4)', borderB: m.winner === 'B' ? 'rgba(52,217,155,.5)' : 'rgba(242,80,107,.4)'
+      };
+    });
+  }
+
+  flowVals() {
+    const sys = this.state.activeFlow;
+    const base = { flowShowInPo: sys === 'po' ? 'flex' : 'none', flowShowInSw: sys === 'sw' ? 'flex' : 'none', flowShowInBo: sys === 'bo' ? 'flex' : 'none' };
+    if (!sys) return { ...base, flowStage: '', flowHeroA: '', flowHeroB: '', flowArtA: DUNK, flowArtB: DUNK,
+      flowStep1Display: 'none', flowStep2Display: 'none', flowStep3Display: 'none', flowMapPool: [], flowBanLabel: '',
+      flowNextDisplay: 'none', flowChosenMap: '', flowOrderFirst: '', flowOrderSecond: '', flowPlayerA: '', flowPlayerB: '',
+      flowHpA: 0, flowHpB: 0, flowCardsA: 0, flowCardsB: 0, flowSkA: 0, flowSkB: 0,
+      flowMapFinal: '', flowWinA_bg: '#14141c', flowWinA_fg: '#5c5d70', flowWinB_bg: '#14141c', flowWinB_fg: '#5c5d70',
+      flowWinA_border: 'rgba(255,255,255,.08)', flowWinB_border: 'rgba(255,255,255,.08)',
+      flowSaveBg: '#2a2b36', flowClose: () => {}, flowNext: () => {}, flowReroll: () => {}, flowConfirmOrder: () => {},
+      flowCycleA: () => {}, flowCycleB: () => {}, flowHpAInc: () => {}, flowHpADec: () => {}, flowHpBInc: () => {}, flowHpBDec: () => {},
+      flowCardsAInc: () => {}, flowCardsADec: () => {}, flowCardsBInc: () => {}, flowCardsBDec: () => {},
+      flowSkAInc: () => {}, flowSkADec: () => {}, flowSkBInc: () => {}, flowSkBDec: () => {},
+      flowWinnerA: () => {}, flowWinnerB: () => {}, flowSave: () => {} };
+    const f = this.state[sys].flow;
+    const heroArt = n => (DHEROES.find(h => h.name === n) || {}).art || DUNK;
+    const mapPool = f.mapPool.map((m, i) => ({ name: m.name, art: m.art, banned: f.bans.includes(i) ? 0.35 : 1, onClick: () => this.flowBan(i) }));
+    const banLabel = f.chosenMap ? 'Map set' : (f.bans.length === 0 ? DPLAYERS[f.playerAIdx].name + ' bans first' : DPLAYERS[f.playerBIdx].name + ' bans');
+    const orderNames = f.order.map(i => i === 0 ? f.heroA : f.heroB);
+    return { ...base,
+      flowStage: f.stageLabel, flowHeroA: f.heroA, flowHeroB: f.heroB, flowArtA: heroArt(f.heroA), flowArtB: heroArt(f.heroB),
+      flowStep1Display: f.step === 1 ? 'flex' : 'none', flowStep2Display: f.step === 2 ? 'flex' : 'none', flowStep3Display: f.step === 3 ? 'flex' : 'none',
+      flowMapPool: mapPool, flowBanLabel: banLabel, flowChosenMap: f.chosenMap ? f.chosenMap.name : '', flowNextDisplay: f.chosenMap ? 'flex' : 'none',
+      flowNext: () => this.flowNext(), flowOrderFirst: orderNames[0], flowOrderSecond: orderNames[1], flowReroll: () => this.flowReroll(),
+      flowConfirmOrder: () => this.flowNext(), flowPlayerA: DPLAYERS[f.playerAIdx].name, flowPlayerB: DPLAYERS[f.playerBIdx].name,
+      flowCycleA: e => { e.stopPropagation(); this.flowCyclePlayer('hpA'); }, flowCycleB: e => { e.stopPropagation(); this.flowCyclePlayer('hpB'); },
+      flowHpA: f.hpA, flowHpB: f.hpB,
+      flowHpAInc: e => { e.stopPropagation(); this.flowHp('hpA', 1); }, flowHpADec: e => { e.stopPropagation(); this.flowHp('hpA', -1); },
+      flowHpBInc: e => { e.stopPropagation(); this.flowHp('hpB', 1); }, flowHpBDec: e => { e.stopPropagation(); this.flowHp('hpB', -1); },
+      flowCardsA: f.cardsA, flowCardsB: f.cardsB,
+      flowCardsAInc: e => { e.stopPropagation(); this.flowStat('cardsA', 1, 20); }, flowCardsADec: e => { e.stopPropagation(); this.flowStat('cardsA', -1, 20); },
+      flowCardsBInc: e => { e.stopPropagation(); this.flowStat('cardsB', 1, 20); }, flowCardsBDec: e => { e.stopPropagation(); this.flowStat('cardsB', -1, 20); },
+      flowSkA: f.skA, flowSkB: f.skB,
+      flowSkAInc: e => { e.stopPropagation(); this.flowStat('skA', 1, 10); }, flowSkADec: e => { e.stopPropagation(); this.flowStat('skA', -1, 10); },
+      flowSkBInc: e => { e.stopPropagation(); this.flowStat('skB', 1, 10); }, flowSkBDec: e => { e.stopPropagation(); this.flowStat('skB', -1, 10); },
+      flowMapFinal: f.chosenMap ? f.chosenMap.name : (f.mapPool[0] || {}).name,
+      flowWinnerA: () => this.flowWinner('A'), flowWinnerB: () => this.flowWinner('B'),
+      flowWinA_bg: f.winner === 'A' ? 'rgba(52,217,155,.1)' : '#14141c', flowWinA_fg: f.winner === 'A' ? '#34d99b' : '#5c5d70',
+      flowWinB_bg: f.winner === 'B' ? 'rgba(52,217,155,.1)' : '#14141c', flowWinB_fg: f.winner === 'B' ? '#34d99b' : '#5c5d70',
+      flowWinA_border: f.winner === 'A' ? '#34d99b' : 'rgba(255,255,255,.08)', flowWinB_border: f.winner === 'B' ? '#34d99b' : 'rgba(255,255,255,.08)',
+      flowSaveBg: f.winner ? '#34d99b' : '#2a2b36', flowSave: () => this.flowSave(), flowClose: () => this.flowClose()
+    };
+  }
+
   renderVals() {
     const epicA = this.epicStars('epicA'), epicB = this.epicStars('epicB');
     const epicWord = v => v === 0 ? 'not epic' : v === 1 ? 'epic' : v === 2 ? 'very epic' : 'legendary';
@@ -6960,6 +7991,7 @@ class Component extends DCLogic {
     }));
 
     return {
+      ...this.tCreateVals(), ...this.poVals(), ...this.boVals(), ...this.tNavGroups(), ...this.flowVals(),
       ...this.draftVals(),
       ...this.detailVals(),
       ...this.collectionVals(),

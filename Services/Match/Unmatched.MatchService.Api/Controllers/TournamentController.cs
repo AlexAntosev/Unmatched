@@ -55,11 +55,36 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
         return Ok(mapper.Map<TournamentDto>(tournament));
     }
 
+    // Corrective tool for a completed tournament whose award points were computed against a wrong
+    // participant set (see FixBackfilledTournamentParticipants migration) - regenerates its
+    // TournamentAwards/FinalPlacement from the current participants without touching Status/CompletedAt.
+    [HttpPost("{id}/recompute-awards")]
+    public async Task<ActionResult> RecomputeAwards(Guid id)
+    {
+        await tournamentService.RecomputeCompletionAwardsAsync(id);
+        return Ok();
+    }
+
     [HttpGet("{id}/awards")]
     public async Task<ActionResult<IEnumerable<TournamentAwardDto>>> GetAwards(Guid id)
     {
         var awards = await tournamentService.GetAwardsAsync(id);
         return Ok(mapper.Map<IEnumerable<TournamentAwardDto>>(awards));
+    }
+
+    [HttpGet("{id}/bounty/state")]
+    public async Task<ActionResult<BountyStateDto>> GetBountyState(Guid id)
+    {
+        var state = await tournamentService.GetBountyStateAsync(id);
+        return Ok(mapper.Map<BountyStateDto>(state));
+    }
+
+    [HttpPost("{id}/bounty/challenge")]
+    public async Task<ActionResult<MatchDto>> CreateBountyChallenge(Guid id, [FromBody] CreateBountyChallengeRequestDto request)
+    {
+        var match = await tournamentService.CreateBountyChallengeAsync(
+            id, request.ChallengerHeroId, request.ChampionPlayerId, request.ChallengerPlayerId, request.MapId);
+        return Ok(mapper.Map<MatchDto>(match));
     }
 
     [HttpPost("create")]

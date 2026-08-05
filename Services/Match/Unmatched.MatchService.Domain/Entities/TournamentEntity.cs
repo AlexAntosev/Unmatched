@@ -32,6 +32,16 @@ public class TournamentEntity
 
     public Stage CurrentStage { get; set; }
 
+    /// <summary>SingleElimination only - Bo1 or Bo3 grand final. See
+    /// <see cref="Tournaments.SingleEliminationGenerator"/>.</summary>
+    public TournamentFinalFormat FinalFormat { get; set; }
+
+    /// <summary>Bounty only - the hero who holds the pool before any challenge has been played. The
+    /// live champion is never stored: it's always derived from the winner of the most recent finished
+    /// match in this tournament, falling back to this field - see
+    /// <see cref="Tournaments.BountyChampionship"/>.</summary>
+    public Guid? StartingChampionId { get; set; }
+
     public virtual ICollection<MatchEntity> Matches { get; set; }
 
     public virtual ICollection<TournamentParticipantEntity> Participants { get; set; } = new List<TournamentParticipantEntity>();

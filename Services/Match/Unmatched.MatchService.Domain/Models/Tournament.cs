@@ -24,6 +24,10 @@ public class Tournament
 
     public Stage CurrentStage { get; set; }
 
+    public TournamentFinalFormat FinalFormat { get; set; }
+
+    public Guid? StartingChampionId { get; set; }
+
     public IEnumerable<Guid> ParticipantHeroIds { get; set; } = [];
 
     /// <summary>Which titles this tournament awards on completion. Set at creation; Champion is

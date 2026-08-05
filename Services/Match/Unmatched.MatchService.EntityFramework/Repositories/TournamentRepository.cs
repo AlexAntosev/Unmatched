@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 using Unmatched.MatchService.Domain.Entities;
+using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Repositories;
 using Unmatched.MatchService.EntityFramework.Context;
 
@@ -18,6 +19,15 @@ public class TournamentRepository(UnmatchedDbContext dbContext) : BaseRepository
             .Include(t => t.Participants)
             .Include(t => t.TournamentTitles)
             .FirstOrDefaultAsync(t => t.Id == id);
+    }
+
+    public async Task<IReadOnlyList<TournamentEntity>> GetCompletedWithParticipantsAsync()
+    {
+        return await DbContext.Tournaments
+            .AsNoTracking()
+            .Include(t => t.Participants)
+            .Where(t => t.Status == TournamentStatus.Completed)
+            .ToListAsync();
     }
 
     protected override Guid GetId(TournamentEntity model)

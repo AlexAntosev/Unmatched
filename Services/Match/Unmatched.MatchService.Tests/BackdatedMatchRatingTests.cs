@@ -92,7 +92,12 @@ public class BackdatedMatchRatingTests
         unitOfWork.Setup(u => u.Matches).Returns(matchRepository.Object);
         unitOfWork.Setup(u => u.Ratings).Returns(ratingRepository);
 
-        var handler = new MatchHandler(unitOfWork.Object, new GameModeValidatorFactory(), new RatingCalculatorFactory(unitOfWork.Object, catalogHeroCache.Object));
+        var handler = new MatchHandler(
+            unitOfWork.Object,
+            new GameModeValidatorFactory(),
+            new RatingCalculatorFactory(unitOfWork.Object, catalogHeroCache.Object),
+            new BountyRatingCalculator(unitOfWork.Object, catalogHeroCache.Object),
+            new Domain.Tournaments.BountyHolderTitleUpdater(unitOfWork.Object));
 
         foreach (var match in matches)
         {

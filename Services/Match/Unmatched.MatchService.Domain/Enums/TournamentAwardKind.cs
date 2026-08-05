@@ -26,5 +26,13 @@ public enum TournamentAwardKind
     SeasonThird,
 
     /// <summary>No tier bonus earned - the entry fee still applies, so this row's points are negative.</summary>
-    Eliminated
+    Eliminated,
+
+    /// <summary>Bounty only - exactly one row per Bounty tournament, upserted (never appended) by
+    /// <see cref="RatingCalculators.BountyRatingCalculator"/> as challenges resolve. HeroId is the current
+    /// title holder, Points is the bank accumulated during this holder's reign. Unlike every other kind
+    /// here, this row's Points is a running balance, not a rating delta - it is deliberately excluded from
+    /// <see cref="Services.RatingTimeline.BuildAsync"/> so it never gets summed and applied as one.
+    /// Appended last so its int value never collides with an existing persisted row.</summary>
+    BountyPool
 }

@@ -55,13 +55,14 @@ public class RatingService(
 
     /// <remarks>
     /// Ratings, Fighters.MatchPoints and HeroTitles are values derived from the match/award history, so a
-    /// recalculation only resets those and replays the history over them - the matches, fighters, awards
-    /// and tournaments themselves are never deleted. Replaying matches goes straight through the match
-    /// handler rather than through IMatchService so that re-deriving old ratings doesn't re-publish a
-    /// match-created event per match (which would double-count every match in the statistics service).
-    /// Titles ARE re-evaluated inline on the same walk, though: rules like GrandChampion/Kingslayer/
-    /// Cinderella read the live rating table, so they need to run at each event's position in the replay
-    /// (the same reason ratings themselves can't be computed out of order), not once at the end.
+    /// recalculation only resets those (plus Bounty's mutable pool rows, see below) and replays the
+    /// history over them - the matches, completion awards, and tournaments themselves are never deleted.
+    /// Replaying matches goes straight through the match handler rather than through IMatchService so
+    /// that re-deriving old ratings doesn't re-publish a match-created event per match (which would
+    /// double-count every match in the statistics service). Titles ARE re-evaluated inline on the same
+    /// walk, though: rules like GrandChampion/Kingslayer/Cinderella read the live rating table, so they
+    /// need to run at each event's position in the replay (the same reason ratings themselves can't be
+    /// computed out of order), not once at the end.
     /// </remarks>
     public async Task RecalculateAsync()
     {
@@ -73,6 +74,10 @@ public class RatingService(
 
         unitOfWork.Ratings.DeleteAll();
         unitOfWork.HeroTitles.DeleteAll();
+        // Bounty's pool row is mutable "current state" like Ratings/HeroTitles, not an append-only
+        // ledger - a stale pre-recalculation balance would corrupt the first replayed challenge.
+        // BountyRatingCalculator re-seeds it from StartingChampionId the same way it does live.
+        await unitOfWork.TournamentAwards.DeleteByAwardKindAsync(TournamentAwardKind.BountyPool);
         await unitOfWork.SaveChangesAsync();
 
         var titledTournaments = new HashSet<Guid>();
