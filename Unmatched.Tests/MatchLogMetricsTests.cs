@@ -104,7 +104,7 @@ public class MatchLogMetricsTests
         var bigfoot = Hero("Bigfoot");
         var matches = new[] { Duel(new DateTime(2026, 6, 2), medusa, bigfoot, heroWon: true) };
 
-        Assert.Equal("Medusa · June", MatchLogMetrics.Calculate(matches, Today).LongestStreak!.Caption);
+        Assert.Equal("Medusa · 2 June 2026", MatchLogMetrics.Calculate(matches, Today).LongestStreak!.Caption);
     }
 
     [Fact]

@@ -76,8 +76,8 @@ public record MatchLogMetrics(
     }
 }
 
-/// <summary>A hero's best winning run and the date it ended, shown as "Medusa · June".</summary>
+/// <summary>A hero's best winning run and the date it ended, shown as "Medusa · 12 June 2026".</summary>
 public record HeroStreak(string HeroName, int Length, DateTime EndedOn)
 {
-    public string Caption => $"{HeroName} · {EndedOn.ToString("MMMM", CultureInfo.InvariantCulture)}";
+    public string Caption => $"{HeroName} · {EndedOn.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)}";
 }

@@ -21,6 +21,8 @@ public interface ITournamentService
 
     Task<TournamentDto> UpdateTrophyImageAsync(Guid id, string imageFileName);
 
+    Task<TournamentDto> UpdateNameAsync(Guid id, string name);
+
     Task<TournamentDto> CompleteAsync(Guid id);
 
     Task<IEnumerable<TournamentAwardDto>> GetAwardsAsync(Guid id);

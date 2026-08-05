@@ -238,6 +238,32 @@ public class TournamentServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task UpdateNameAsync_PersistsTheName()
+    {
+        var tournament = await _tournamentService.AddAsync(new Tournament
+        {
+            Name = "Art Cup",
+            Format = TournamentFormat.League,
+            MaxParticipants = 2,
+            ParticipantHeroIds = [Guid.NewGuid(), Guid.NewGuid()]
+        });
+
+        var updated = await _tournamentService.UpdateNameAsync(tournament.Id, "Art Cup: Redux");
+
+        Assert.Equal("Art Cup: Redux", updated!.Name);
+        var reloaded = await _tournamentService.GetAsync(tournament.Id);
+        Assert.Equal("Art Cup: Redux", reloaded.Name);
+    }
+
+    [Fact]
+    public async Task UpdateNameAsync_ReturnsNullForUnknownTournament()
+    {
+        var updated = await _tournamentService.UpdateNameAsync(Guid.NewGuid(), "Doesn't matter");
+
+        Assert.Null(updated);
+    }
+
+    [Fact]
     public async Task GetStandingsAsync_CountsWinsAndLosses()
     {
         var winnerId = Guid.NewGuid();

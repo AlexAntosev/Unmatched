@@ -148,6 +148,53 @@ public class RatingServiceTests
     }
 
     [Fact]
+    public async Task GetRatingChangesAsync_PopulatesReasonDataForMatchAndAwardEvents()
+    {
+        var heroId = Guid.NewGuid();
+        var opponentHeroId = Guid.NewGuid();
+        var tournamentId = Guid.NewGuid();
+        var matchJan = new MatchEntity
+        {
+            Id = Guid.NewGuid(),
+            Date = new DateTime(2026, 1, 1),
+            TournamentId = tournamentId,
+            Fighters = new List<FighterEntity>
+            {
+                new() { HeroId = heroId, MatchPoints = 20, IsWinner = true },
+                new() { HeroId = opponentHeroId, MatchPoints = -20, IsWinner = false }
+            }
+        };
+        var award = new TournamentAwardEntity
+        {
+            Id = Guid.NewGuid(),
+            HeroId = heroId,
+            Points = 50,
+            AwardedAt = new DateTime(2026, 2, 1),
+            TournamentId = tournamentId,
+            AwardKind = TournamentAwardKind.Winner
+        };
+
+        _matchRepository.Setup(r => r.GetFinishedForRatingReplayAsync()).ReturnsAsync(new List<MatchEntity> { matchJan });
+        _tournamentAwardRepository.Setup(r => r.GetAsync()).ReturnsAsync(new List<TournamentAwardEntity> { award });
+
+        var changes = await _ratingService.GetRatingChangesAsync(heroId);
+
+        var matchChange = changes[0];
+        Assert.False(matchChange.IsAward);
+        Assert.True(matchChange.IsWin);
+        Assert.Equal(opponentHeroId, matchChange.OpponentHeroId);
+        Assert.Equal(tournamentId, matchChange.TournamentId);
+        Assert.Equal(20, matchChange.PointsChange);
+
+        var awardChange = changes[1];
+        Assert.True(awardChange.IsAward);
+        Assert.Null(awardChange.IsWin);
+        Assert.Equal(TournamentAwardKind.Winner, awardChange.AwardKind);
+        Assert.Equal(tournamentId, awardChange.TournamentId);
+        Assert.Equal(50, awardChange.PointsChange);
+    }
+
+    [Fact]
     public async Task GetRatingChangesAsync_ExcludesMatchesAndAwardsForOtherHeroes()
     {
         var heroId = Guid.NewGuid();

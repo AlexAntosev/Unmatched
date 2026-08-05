@@ -26,3 +26,18 @@
     font: 400 10px var(--um-font-mono);
     color: var(--um-text-dim);
 }
+
+/* Invisible by default - just a wider hit area so every point can show its hover tooltip without
+   needing pixel-precise aim on the thin line itself. */
+.um-line-point {
+    fill: transparent;
+    pointer-events: all;
+}
+
+/* Tournament awards stay visible without hovering, instead of blending into the line like every
+   other point. */
+.um-line-point.is-award {
+    fill: var(--um-gold);
+    stroke: var(--um-bg-panel);
+    stroke-width: 1.5;
+}

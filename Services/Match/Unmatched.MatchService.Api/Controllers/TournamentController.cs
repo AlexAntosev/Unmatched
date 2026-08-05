@@ -109,6 +109,13 @@ public class TournamentController(ILogger<TournamentController> logger, IMapper 
         return tournament is null ? NotFound() : Ok(mapper.Map<TournamentDto>(tournament));
     }
 
+    [HttpPut("{id}/name")]
+    public async Task<ActionResult<TournamentDto>> UpdateName(Guid id, [FromBody] string name)
+    {
+        var tournament = await tournamentService.UpdateNameAsync(id, name);
+        return tournament is null ? NotFound() : Ok(mapper.Map<TournamentDto>(tournament));
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {

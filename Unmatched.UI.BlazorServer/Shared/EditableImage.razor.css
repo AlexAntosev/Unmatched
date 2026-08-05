@@ -14,14 +14,17 @@
 
 .edit-image-button {
     position: absolute;
-    left: 12px;
-    right: 12px;
+    left: 50%;
     bottom: 12px;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: calc(100% - 24px);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
     height: 32px;
+    padding: 0 14px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--um-radius-md);
     background: rgba(8, 8, 12, 0.72);

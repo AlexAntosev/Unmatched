@@ -272,11 +272,6 @@
 
     private async Task OnCoverSelectedAsync(IBrowserFile file)
     {
-        if (string.IsNullOrWhiteSpace(_form.Name))
-        {
-            return;
-        }
-
         await using var stream = file.OpenReadStream(15_000_000);
         _form.ImageFileName = await ImageUploadService.SaveAsync("tournaments", _form.Name, _form.ImageFileName, stream, file.Name);
         _coverPreviewUrl = $"/images/tournaments/{_form.ImageFileName}";

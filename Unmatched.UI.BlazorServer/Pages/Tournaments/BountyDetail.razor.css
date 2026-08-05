@@ -101,51 +101,8 @@
     margin-top: 14px;
 }
 
-.bo-picker {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: var(--um-radius-md);
-    background: var(--um-bg-control);
-    border: 1px solid var(--um-border);
-    cursor: pointer;
-}
-
-.bo-picker img {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.bo-picker-label {
-    font: 400 9px var(--um-font-mono);
-    color: var(--um-text-faint);
-    text-transform: uppercase;
-}
-
-.bo-picker-value {
-    font: 600 11.5px var(--um-font-body);
-    color: var(--um-text);
-}
-
-.bo-map-picker {
+.bo-map-field {
     margin-top: 10px;
-}
-
-.bo-map-picker img {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-}
-
-.bo-map-info {
-    flex: 1;
-}
-
-.bo-map-picker i {
-    color: var(--um-accent-soft);
 }
 
 .bo-warning {

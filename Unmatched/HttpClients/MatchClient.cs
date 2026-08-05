@@ -138,6 +138,14 @@ public class MatchClient(HttpClient httpClient) : IMatchClient
         return await response.Content.ReadFromJsonAsync<TournamentDto>();
     }
 
+    public async Task<TournamentDto> UpdateTournamentNameAsync(Guid id, string name)
+    {
+        var content = new StringContent(JsonSerializer.Serialize(name), Encoding.UTF8, "application/json");
+        var response = await httpClient.PutAsync($"/tournament/{id}/name", content);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TournamentDto>();
+    }
+
     public async Task<TournamentDto> CompleteTournamentAsync(Guid id)
     {
         var response = await httpClient.PostAsync($"/tournament/{id}/complete", null);

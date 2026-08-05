@@ -4,7 +4,8 @@
     scoped to one hero's matches, with a win/loss tally and a link back to the full log.
 *@
 <MatchList Matches="@Entries.Select(e => e.Match)" Title="@($"{HeroName}'s matches")"
-           PageSize="10" AllowPageSizeControl="true">
+           PageSize="_pageSize" PageSizeChanged="OnPageSizeChanged" AllowPageSizeControl="true"
+           ResultVariant="@(m => _selfWinByMatchId.TryGetValue(m.MatchId, out var isWin) ? isWin : (bool?)null)">
     <HeaderActions>
         <span class="pm-tally pm-tally-win">W @Wins</span>
         <span class="pm-tally pm-tally-loss">L @Losses</span>
@@ -19,7 +20,15 @@
     [Parameter, EditorRequired]
     public IReadOnlyList<HeroMatchEntry> Entries { get; set; } = [];
 
+    private int _pageSize = 10;
+    private Dictionary<Guid, bool> _selfWinByMatchId = new();
+
     private int Wins => Entries.Count(e => e.Self.IsWinner);
 
     private int Losses => Entries.Count(e => !e.Self.IsWinner);
+
+    protected override void OnParametersSet()
+        => _selfWinByMatchId = Entries.ToDictionary(e => e.Match.MatchId, e => e.Self.IsWinner);
+
+    private void OnPageSizeChanged(int size) => _pageSize = size;
 }

@@ -28,7 +28,7 @@ public class TournamentService(
     public async Task<Tournament> AddAsync(Tournament dto)
     {
         var tournament = mapper.Map<TournamentEntity>(dto);
-        tournament.Status = TournamentStatus.Draft;
+        tournament.Status = dto.Format == TournamentFormat.Bounty ? TournamentStatus.InProgress : TournamentStatus.Draft;
         tournament.CurrentStage = tournament.InitialStage;
 
         tournament.Participants = dto.ParticipantHeroIds
@@ -94,6 +94,24 @@ public class TournamentService(
         }
 
         tournament.TrophyImageFileName = imageFileName;
+        await unitOfWork.Tournaments.AddOrUpdateAsync(tournament);
+        await unitOfWork.SaveChangesAsync();
+
+        return mapper.Map<Tournament>(tournament);
+    }
+
+    public async Task<Tournament?> UpdateNameAsync(Guid id, string name)
+    {
+        // With participants, unlike UpdateImageAsync/UpdateTrophyImageAsync - the renamed tournament
+        // is shown immediately from this response, and Tournament.razor's participant count would
+        // otherwise flash to zero until the next full reload.
+        var tournament = await unitOfWork.Tournaments.GetByIdWithParticipantsAsync(id);
+        if (tournament is null)
+        {
+            return null;
+        }
+
+        tournament.Name = name;
         await unitOfWork.Tournaments.AddOrUpdateAsync(tournament);
         await unitOfWork.SaveChangesAsync();
 

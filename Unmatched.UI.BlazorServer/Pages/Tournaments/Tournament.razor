@@ -5,12 +5,14 @@
 @using Unmatched.Enums
 @using Unmatched.Extensions
 @using Unmatched.Services.Contracts
+@using Unmatched.UI.BlazorServer.Services
 @using Unmatched.UI.BlazorServer.Shared.DesignSystem
 @inject ITournamentService TournamentService
 @inject IMatchService MatchService
 @inject IHeroService HeroService
 @inject IPlayerService PlayerService
 @inject IMapService MapService
+@inject IImageUploadService ImageUploadService
 @inject NavigationManager NavManager
 @*
     SingleElimination gets the live bracket (PlayoffBracket.razor, design/CLAUDE.md turn 15b) and
@@ -34,13 +36,18 @@
                 Complete tournament
             </UmButton>
         }
-        <UmButton Size="sm" Variant="primary" Icon="bi-plus-lg" OnClick="OpenNewMatch">New match</UmButton>
+        <UmButton Size="sm" Icon="bi-pencil" OnClick="@(() => _renameModal.ShowAsync(_tournament.Name))">Rename</UmButton>
     </Controls>
 </PageHeader>
 
+<TournamentRenameModal @ref="_renameModal" OnRenamed="OnNameChangedAsync"/>
+
 <div class="um-page tournament-detail">
     <div class="td-banner">
-        <img class="td-cover" src="@(_tournament.ImageUrl ?? "/Unmatched-logo.png")" alt="@_tournament.Name"/>
+        <div class="td-cover">
+            <EditableImage ImageUrl="@(_tournament.ImageUrl ?? "/Unmatched-logo.png")" AltText="@_tournament.Name"
+                           FallbackImageUrl="/Unmatched-logo.png" OnFileSelected="OnCoverSelectedAsync"/>
+        </div>
         <div class="td-identity">
             <div class="td-name">@_tournament.Name</div>
             <div class="td-meta">
@@ -183,6 +190,7 @@
     public string Id { get; set; } = string.Empty;
 
     private TournamentDto _tournament = new();
+    private TournamentRenameModal _renameModal = default!;
     private List<UiMatchDto> _matches = new();
     private List<TournamentStandingDto> _standings = new();
     private List<TournamentAwardDto> _awards = new();
@@ -351,6 +359,20 @@
         }
     }
 
-    private void OpenNewMatch()
-        => NavManager.NavigateTo($"{Urls.AddMatch}?tournamentId={_tournament.Id}");
+    private async Task OnCoverSelectedAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(15_000_000);
+        var fileName = await ImageUploadService.SaveAsync("tournaments", _tournament.Name, _tournament.ImageFileName, stream, file.Name);
+        _tournament = await TournamentService.UpdateImageAsync(_tournament.Id, fileName);
+    }
+
+    private async Task OnNameChangedAsync(string name)
+    {
+        if (name == _tournament.Name)
+        {
+            return;
+        }
+
+        _tournament = await TournamentService.UpdateNameAsync(_tournament.Id, name);
+    }
 }
