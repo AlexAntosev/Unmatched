@@ -1,13 +1,9 @@
 namespace Unmatched.MatchService.Tests;
 
-using AutoMapper;
-
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Enums;
-using Unmatched.MatchService.Domain.Mapping;
 using Unmatched.MatchService.Domain.Titles;
 using Unmatched.MatchService.EntityFramework.Context;
 using Unmatched.MatchService.EntityFramework.Repositories;
@@ -19,7 +15,6 @@ public class TitleEvaluatorTests : IDisposable
 {
     private readonly UnmatchedDbContext _dbContext;
     private readonly UnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public TitleEvaluatorTests()
     {
@@ -28,7 +23,6 @@ public class TitleEvaluatorTests : IDisposable
             .Options;
         _dbContext = new UnmatchedDbContext(options);
         _unitOfWork = new UnitOfWork(_dbContext);
-        _mapper = new MapperConfiguration(cfg => cfg.AddProfile<DomainMapper>(), new LoggerFactory()).CreateMapper();
     }
 
     public void Dispose() => _dbContext.Dispose();
@@ -138,6 +132,7 @@ public class TitleEvaluatorTests : IDisposable
 
         Assert.Single(earned);
         Assert.Equal("newly-earned", earned[0].RuleKey);
+        Assert.Equal(newlyEarning, earned[0].HeroId);
     }
 
     [Fact]
@@ -151,6 +146,32 @@ public class TitleEvaluatorTests : IDisposable
 
         var heroTitle = await HeroTitleAsync(titleId, heroId);
         Assert.Equal(214, heroTitle.Metric);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_SharedRule_TwoNewQualifiers_ReturnsOneEarnedTitlePerHero()
+    {
+        var firstHero = Guid.NewGuid();
+        var secondHero = Guid.NewGuid();
+        await SeedTitleAsync("shared-rule", TitleExclusivity.Shared);
+        var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, firstHero, secondHero));
+
+        var earned = await evaluator.EvaluateAsync(CreateMatch());
+
+        Assert.Equal(new[] { firstHero, secondHero }.OrderBy(x => x), earned.Select(e => e.HeroId).OrderBy(x => x));
+        Assert.All(earned, e => Assert.Equal("shared-rule", e.RuleKey));
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_NewQualifier_ReturnsTheMetricOnTheEarnedTitle()
+    {
+        var heroId = Guid.NewGuid();
+        await SeedTitleAsync("shared-rule", TitleExclusivity.Shared);
+        var evaluator = MakeEvaluator(new StubRule("shared-rule", TitleExclusivity.Shared, new Dictionary<Guid, double?> { [heroId] = 214 }));
+
+        var earned = await evaluator.EvaluateAsync(CreateMatch());
+
+        Assert.Equal(214, Assert.Single(earned).Metric);
     }
 
     [Fact]
@@ -203,7 +224,7 @@ public class TitleEvaluatorTests : IDisposable
     }
 
     private TitleEvaluator MakeEvaluator(params ITitleRule[] rules)
-        => new(_unitOfWork, _mapper, rules);
+        => new(_unitOfWork, rules);
 
     private async Task<Guid> SeedTitleAsync(string ruleKey, TitleExclusivity exclusivity, params Guid[] initialHolders)
     {

@@ -34,7 +34,7 @@
         </div>
     }
 
-    <Modal @ref="_savedPopup" Title="Match saved"/>
+    <Modal @ref="_savedPopup" Title="Match saved" Size="ModalSize.ExtraLarge"/>
 
     <header class="add-head">
         <div class="add-title">@(IsEditing ? "Edit match" : "Add match")</div>
@@ -884,13 +884,24 @@
 
             NavCountsService.Invalidate();
 
-            // A tournament match navigates straight back to its bracket below (see AddMatch.OnSaved) -
-            // showing the popup first would just flash it mid-navigation.
-            if (!Embedded && !IsTournamentLockedByContext)
+            // League/GroupStage/Swiss navigate straight back to the bracket below (see
+            // AddMatch.HandleSavedAsync) - showing the popup first would just flash it
+            // mid-navigation. Playoff/Bounty show the popup instead, with a button back to the
+            // tournament.
+            var tournament = Tournaments.FirstOrDefault(t => t.Id == Match.TournamentId);
+            var showPopup = !Embedded && (!IsTournamentLockedByContext
+                || (tournament is not null && TournamentFormatStyle.ShowsMatchResultPopup(tournament.Format)));
+            if (showPopup)
             {
                 await _savedPopup.ShowAsync<MatchSavedPopup>(
                     title: "Match saved",
-                    parameters: new Dictionary<string, object> { ["Result"] = result });
+                    parameters: new Dictionary<string, object>
+                    {
+                        ["Result"] = result,
+                        ["Match"] = Match,
+                        ["TournamentName"] = tournament?.Name!,
+                        ["TournamentId"] = Match.TournamentId!
+                    });
             }
 
             await OnSaved.InvokeAsync(result);

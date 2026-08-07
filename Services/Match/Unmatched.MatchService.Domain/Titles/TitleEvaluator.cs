@@ -1,7 +1,5 @@
 namespace Unmatched.MatchService.Domain.Titles;
 
-using AutoMapper;
-
 using Unmatched.MatchService.Domain.Entities;
 using Unmatched.MatchService.Domain.Enums;
 using Unmatched.MatchService.Domain.Models;
@@ -16,11 +14,14 @@ using Unmatched.MatchService.Domain.Repositories;
 /// seeded yet (RuleKey not found) is silently skipped rather than treated as an error, so new rules can
 /// ship ahead of their seed migration running in a given environment.
 /// </summary>
-public class TitleEvaluator(IUnitOfWork unitOfWork, IMapper mapper, IEnumerable<ITitleRule> rules)
+public class TitleEvaluator(IUnitOfWork unitOfWork, IEnumerable<ITitleRule> rules)
 {
-    public async Task<List<Title>> EvaluateAsync(MatchEntity match)
+    /// <summary>Returns one <see cref="EarnedTitle"/> per hero newly qualifying this match - unlike
+    /// <see cref="Title.Holders"/> (the whole current holder set), this is attributed to the specific
+    /// fighter who just earned it, for the match-saved result screen.</summary>
+    public async Task<List<EarnedTitle>> EvaluateAsync(MatchEntity match)
     {
-        var newlyEarned = new List<Title>();
+        var newlyEarned = new List<EarnedTitle>();
 
         foreach (var rule in rules)
         {
@@ -66,11 +67,7 @@ public class TitleEvaluator(IUnitOfWork unitOfWork, IMapper mapper, IEnumerable<
             foreach (var heroId in newHolderIds)
             {
                 title.HeroTitles.Add(new HeroTitleEntity { HeroesId = heroId, TitlesId = title.Id, EarnedAt = match.Date, Metric = results[heroId] });
-            }
-
-            if (newHolderIds.Count > 0)
-            {
-                newlyEarned.Add(mapper.Map<Title>(title));
+                newlyEarned.Add(new EarnedTitle { HeroId = heroId, RuleKey = rule.RuleKey, Name = title.Name, Metric = results[heroId] });
             }
         }
 

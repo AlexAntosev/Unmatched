@@ -176,10 +176,21 @@
     {
         _state = await TournamentService.GetBountyStateAsync(Tournament.Id);
 
-        // Default to two different players (when there are at least two) rather than both landing on
-        // the same one - the whole point of picking is telling two people's results apart.
-        _championPlayerId ??= Players.FirstOrDefault()?.Id;
-        _challengerPlayerId ??= Players.Skip(1).FirstOrDefault()?.Id ?? Players.FirstOrDefault()?.Id;
+        // Default the pickers to who actually played last - the winner defends as champion, the
+        // loser's opponent steps up to challenge next. The very first challenge has no history to
+        // seed from, so it falls back to two random players instead.
+        var lastMatch = MatchLog.OrderByDescending(m => m.Date).FirstOrDefault();
+        if (lastMatch is not null)
+        {
+            _championPlayerId ??= lastMatch.Fighters.FirstOrDefault(f => f.IsWinner)?.PlayerId;
+            _challengerPlayerId ??= lastMatch.Fighters.FirstOrDefault(f => !f.IsWinner)?.PlayerId;
+        }
+        else
+        {
+            var randomPlayers = Players.ToList().Shuffle();
+            _championPlayerId ??= randomPlayers.ElementAtOrDefault(0)?.Id;
+            _challengerPlayerId ??= randomPlayers.ElementAtOrDefault(1)?.Id ?? randomPlayers.ElementAtOrDefault(0)?.Id;
+        }
     }
 
     private void RandomizeChallenger()

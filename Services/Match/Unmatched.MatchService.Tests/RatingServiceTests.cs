@@ -39,7 +39,7 @@ public class RatingServiceTests
 
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
-        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, _mapper.Object, []);
+        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, []);
         var titleAwarder = new TournamentTitleAwarder(_unitOfWork.Object, new Mock<Domain.Communication.Catalog.ICatalogHeroCache>().Object);
 
         _ratingService = new RatingService(

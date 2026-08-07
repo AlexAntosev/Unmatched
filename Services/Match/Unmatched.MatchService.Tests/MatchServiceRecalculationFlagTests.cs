@@ -44,7 +44,7 @@ public class MatchServiceRecalculationFlagTests
 
         _matchHandler.Setup(h => h.HandleAsync(It.IsAny<MatchEntity>())).Returns(Task.CompletedTask);
 
-        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, _mapper.Object, []);
+        var titleEvaluator = new TitleEvaluator(_unitOfWork.Object, []);
 
         var catalogHeroCache = new Mock<ICatalogHeroCache>();
         catalogHeroCache.Setup(c => c.GetAsync()).ReturnsAsync(new[]

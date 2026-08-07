@@ -1,0 +1,254 @@
+.msp {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.msp-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.msp-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border-radius: var(--um-radius-md);
+    font: 600 10px var(--um-font-mono);
+    letter-spacing: 0.1em;
+}
+
+.msp-winner-badge {
+    padding: 4px 9px;
+    border-radius: var(--um-radius-md);
+    background: var(--um-win-bg);
+    color: var(--um-win);
+    font: 600 10px var(--um-font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.msp-winner-badge:empty {
+    display: none;
+}
+
+.msp-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 400 11.5px var(--um-font-mono);
+    color: var(--um-text-muted);
+}
+
+.msp-map-thumb {
+    width: 34px;
+    height: 22px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.msp-grid {
+    display: grid;
+    gap: 14px;
+}
+
+/* ---- Villain card (co-op) ---- */
+
+.msp-villain {
+    display: flex;
+    flex-direction: column;
+    background: var(--um-bg-panel);
+    border: 1px solid var(--um-info-border);
+    border-radius: var(--um-radius-card);
+    overflow: hidden;
+}
+
+.msp-villain.is-winner {
+    border-color: var(--um-win-ring);
+    background: linear-gradient(160deg, var(--um-win-wash), var(--um-bg-panel) 60%);
+}
+
+.msp-villain-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 14px 14px;
+}
+
+.msp-villain-art {
+    width: 68px;
+    height: 68px;
+    flex: none;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--um-info-border);
+    opacity: 0.8;
+}
+
+.msp-villain-title {
+    min-width: 0;
+}
+
+.msp-villain-eyebrow {
+    font: 500 9px var(--um-font-mono);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--um-info);
+}
+
+.msp-villain-name {
+    margin-top: 6px;
+    font: 700 16.5px var(--um-font-display);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--um-text-bright);
+}
+
+.msp-villain-sub {
+    margin-top: 3px;
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.msp-villain-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 0 12px 10px;
+}
+
+.msp-villain-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    padding: 6px 4px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-inset);
+    text-align: center;
+}
+
+.msp-villain-stat span {
+    font: 400 8px var(--um-font-mono);
+    letter-spacing: 0.1em;
+    color: var(--um-text-faint);
+}
+
+.msp-villain-stat strong {
+    font: 700 14.5px var(--um-font-display);
+    color: var(--um-text-bright);
+}
+
+.msp-minions {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 0 12px 10px;
+}
+
+.msp-minions-caption {
+    font: 500 8.5px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-faint);
+}
+
+.msp-minion-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 9px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-inset);
+}
+
+.msp-minion-row img {
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: var(--um-radius-sm);
+    object-fit: cover;
+    opacity: 0.6;
+}
+
+.msp-minion-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.msp-minion-name {
+    font: 600 12px var(--um-font-body);
+    color: var(--um-text-bright);
+}
+
+.msp-minion-sub {
+    margin-top: 1px;
+    font: 400 9.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+.msp-minion-hp {
+    text-align: right;
+    flex: none;
+}
+
+.msp-minion-hp strong {
+    display: block;
+    font: 600 12px var(--um-font-mono);
+    color: var(--um-text-bright);
+}
+
+.msp-minion-hp span {
+    font: 400 8.5px var(--um-font-mono);
+    letter-spacing: 0.1em;
+    color: var(--um-text-faint);
+}
+
+.msp-villain-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 12px 14px;
+    padding: 9px 10px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-inset);
+    border: 1px dashed var(--um-border-strong);
+    font: 400 10.5px var(--um-font-mono);
+    color: var(--um-text-dim);
+}
+
+/* ---- Footer ---- */
+
+.msp-footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.msp-epic {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 12px;
+    border-radius: var(--um-radius-row);
+    background: var(--um-bg-inset);
+    border: 1px solid var(--um-border-strong);
+    font: 500 9px var(--um-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--um-text-dim);
+}
+
+.msp-comment {
+    flex: 1;
+    min-width: 120px;
+    font: 400 11px var(--um-font-mono);
+    color: var(--um-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

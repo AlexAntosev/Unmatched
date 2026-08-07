@@ -25,4 +25,10 @@ public record TournamentFormatStyle(string Label, string Icon)
     /// League is entered by hand, so "Generate matches" has nothing to do for either.</summary>
     public static bool SupportsGeneration(TournamentFormat format)
         => format is TournamentFormat.SingleElimination or TournamentFormat.GroupStage or TournamentFormat.Swiss;
+
+    /// <summary>Which formats show the "Match saved" popup with a way back to the tournament, instead
+    /// of navigating straight there - only the duel-style formats where one result is worth a beat
+    /// before returning; League/GroupStage/Swiss go straight back to the bracket.</summary>
+    public static bool ShowsMatchResultPopup(TournamentFormat format)
+        => format is TournamentFormat.SingleElimination or TournamentFormat.Bounty;
 }

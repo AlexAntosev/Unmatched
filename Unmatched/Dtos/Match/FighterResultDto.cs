@@ -2,6 +2,8 @@ namespace Unmatched.Dtos.Match;
 
 public class FighterResultDto
 {
+    public Guid HeroId { get; set; }
+
     public string HeroName { get; set; }
 
     public string PlayerName { get; set; }
@@ -13,4 +15,10 @@ public class FighterResultDto
     public int? Placement { get; set; }
 
     public int? Team { get; set; }
+
+    public int? RatingBefore { get; set; }
+
+    public int? RatingAfter { get; set; }
+
+    public List<EarnedTitleDto> EarnedTitles { get; set; } = [];
 }

@@ -39,7 +39,7 @@
             <span class="match-list-footer-page">Page @_currentPage of @PageCount</span>
             <div class="match-list-footer-divider"></div>
             <span class="match-list-footer-pagesize-label">Per page</span>
-            <SegmentedControl TValue="int" Variant="bar" Options="PageSizeOptions" Value="PageSize" ValueChanged="OnPageSizeChanged"/>
+            <SegmentedControl TValue="int" Variant="bar" Options="VisiblePageSizeOptions" Value="EffectivePageSize" ValueChanged="OnPageSizeChanged"/>
             <div class="um-spacer"></div>
             <Pagination Page="_currentPage" PageCount="@PageCount" PageChanged="GoToPage"/>
         }
@@ -105,6 +105,12 @@
         [new(10, "10"), new(20, "20"), new(50, "50"), new(100, "100")];
 
     private int PageCount => Math.Max(1, (int)Math.Ceiling(_all.Count / (double)PageSize));
+
+    private IReadOnlyList<SelectOption<int>> VisiblePageSizeOptions => GridFooter.RelevantOptions(PageSizeOptions, _all.Count);
+
+    private int EffectivePageSize => VisiblePageSizeOptions.Any(o => o.Value == PageSize)
+        ? PageSize
+        : VisiblePageSizeOptions.Max(o => o.Value);
 
     protected override async Task OnInitializedAsync()
     {

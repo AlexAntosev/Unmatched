@@ -190,7 +190,11 @@
     {
         if (_match.TournamentId is { } tournamentId)
         {
-            NavManager.NavigateTo($"{Urls.Tournaments}/{tournamentId}");
+            var format = _tournaments.FirstOrDefault(t => t.Id == tournamentId)?.Format;
+            if (format is null || !TournamentFormatStyle.ShowsMatchResultPopup(format.Value))
+            {
+                NavManager.NavigateTo($"{Urls.Tournaments}/{tournamentId}");
+            }
         }
 
         return Task.CompletedTask;

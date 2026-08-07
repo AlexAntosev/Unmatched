@@ -27,6 +27,20 @@ public class MatchService(
     {
         var match = mapper.Map<MatchEntity>(matchDto);
         await rankedMatchDataValidator.ValidateAsync(match);
+
+        // Captured before the handler applies this match's rating change, so the result can report
+        // each fighter's before -> after movement. An Unranked match never changes ratings, so there
+        // is no "before" worth fetching - both dictionaries stay empty and every fighter's rating
+        // fields come back null, telling the UI to hide the rating pill rather than show a fake +0.
+        var ratingsBefore = new Dictionary<Guid, int?>();
+        if (match.IsRanked)
+        {
+            foreach (var heroId in match.Fighters.Select(f => f.HeroId).Distinct())
+            {
+                ratingsBefore[heroId] = (await unitOfWork.Ratings.GetByHeroIdAsync(heroId))?.Points;
+            }
+        }
+
         await matchHandler.HandleAsync(match);
 
         await FlagRecalculationIfAddedOutOfChronologicalOrderAsync(match);
@@ -34,29 +48,39 @@ public class MatchService(
         var addedEntity = await unitOfWork.Matches.GetByIdAsync(match.Id);
 
         var matchCreatedEvent = mapper.Map<MatchCreated>(addedEntity);
+        var ratingsAfter = new Dictionary<Guid, int?>();
         foreach (var fighter in matchCreatedEvent.Fighters)
         {
             fighter.ResultRating = (await unitOfWork.Ratings.GetByHeroIdAsync(fighter.HeroId))?.Points;
+            if (match.IsRanked)
+            {
+                ratingsAfter[fighter.HeroId] = fighter.ResultRating;
+            }
         }
         await kafkaProducer.PublishAsync("match-created", matchCreatedEvent);
 
-        var titlesEarned = new List<Title>();
+        var earnedTitles = new List<EarnedTitle>();
         if (match.GameMode != Enums.GameMode.Cooperative)
         {
             // TODO: move title logic to title microservice
-            titlesEarned.AddRange(await titleEvaluator.EvaluateAsync(match));
+            earnedTitles.AddRange(await titleEvaluator.EvaluateAsync(match));
         }
+        var earnedTitlesByHero = earnedTitles.ToLookup(t => t.HeroId);
 
         var heroes = await catalogHeroCache.GetAsync();
         var players = await playerCache.GetAsync();
         var fighterResults = match.Fighters.Select(f => new FighterResult
             {
+                HeroId = f.HeroId,
                 HeroName = heroes.First(h => h.Id == f.HeroId).Name,
                 PlayerName = players.First(p => p.Id == f.PlayerId).Name,
                 MatchPoints = f.MatchPoints ?? 0,
                 IsWinner = f.IsWinner,
                 Placement = f.Placement,
-                Team = f.Team
+                Team = f.Team,
+                RatingBefore = ratingsBefore.GetValueOrDefault(f.HeroId),
+                RatingAfter = ratingsAfter.GetValueOrDefault(f.HeroId),
+                EarnedTitles = earnedTitlesByHero[f.HeroId].ToList()
             }).ToList();
 
         var result = new SaveMatchResult
@@ -64,8 +88,7 @@ public class MatchService(
                 GameMode = match.GameMode,
                 FighterResults = fighterResults,
                 PlayersWon = match.GameMode == Enums.GameMode.Cooperative ? match.Fighters.First().IsWinner : null,
-                VillainName = matchCreatedEvent.Villain?.Name,
-                TitlesEarned = titlesEarned.Select(x => x.Name).ToList()
+                VillainName = matchCreatedEvent.Villain?.Name
             };
 
         return result;

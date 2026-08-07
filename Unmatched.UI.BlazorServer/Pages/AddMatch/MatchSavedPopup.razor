@@ -1,57 +1,166 @@
-@using Microsoft.AspNetCore.Components
 @using Unmatched.Dtos
 @using Unmatched.Dtos.Match
 @using Unmatched.Enums
+@inject NavigationManager NavManager
+@*
+    Shown right after a match is saved (design/Unmatched Redesign.dc.html turn 11a "2v2 - four
+    fighter cards" / 11b "co-op - hero cards plus a villain card"): one MatchResultFighterCard per
+    fighter, ordered/grouped by game mode, plus a villain+minions card for co-op. Match is the
+    client-side sheet data (art, HP/Cards/Sidekick, map, date, comment, epic - already loaded before
+    saving); Result is the server-authoritative half (winner, rating movement, earned titles),
+    correlated to each fighter by HeroId. Hosted inside MatchSheet's BlazorBootstrap Modal, which
+    already renders the "Match saved" title bar - this content does not repeat that title.
+*@
+<div class="msp">
+    <div class="msp-head">
+        <span class="msp-mode-badge" style="color:@ModeColor;background:@ModeBadgeBg"><i class="bi @ModeIcon"></i>@ModeLabel</span>
+        <span class="msp-winner-badge">@WinnerHeadline()</span>
+        <div class="um-spacer"></div>
+        <div class="msp-meta">
+            @if (Match.Map is not null)
+            {
+                <img class="msp-map-thumb" src="@Match.Map.ImageUrl" alt=""/>
+            }
+            <span>@Match.Date.ToString("dd MMM yyyy")@(TournamentName is not null ? $" · {TournamentName}" : null)</span>
+        </div>
+    </div>
 
-@if (Result.GameMode == GameMode.Cooperative)
-{
-    <div class="row">
-        <div class="col-12 text-center">
-            @(Result.PlayersWon == true ? "Гравці перемогли" : "Гравці програли") проти @Result.VillainName
+    <div class="msp-grid" style="grid-template-columns:@GridColumns">
+        @foreach (var fighter in OrderedFighters())
+        {
+            <MatchResultFighterCard Fighter="fighter" Result="ResultFor(fighter)"
+                                     Eyebrow="@Eyebrow(fighter)"
+                                     IsWinner="@(fighter.IsWinner)" IsLoser="@(HasDecidedWinner() && !fighter.IsWinner)"
+                                     Placement="@(Match.GameMode == GameMode.FreeForAll ? fighter.Placement : null)"/>
+        }
+
+        @if (Match.GameMode == GameMode.Cooperative && Match.Villain is not null)
+        {
+            <div class="msp-villain @(Match.Villain.IsWinner ? "is-winner" : null)">
+                <div class="msp-villain-head">
+                    <img class="msp-villain-art" src="@(Match.Villain.Villain?.ImageUrl ?? "/Unknown.png")" alt=""/>
+                    <div class="msp-villain-title">
+                        <div class="msp-villain-eyebrow">Villain @(Match.Villain.IsWinner ? "· won" : "· defeated")</div>
+                        <div class="msp-villain-name">@(Match.Villain.Name ?? Match.Villain.Villain?.Name ?? "Villain")</div>
+                        <div class="msp-villain-sub">no player · not rated</div>
+                    </div>
+                </div>
+                <div class="msp-villain-stats">
+                    <div class="msp-villain-stat"><span>HP LEFT</span><strong>@(Match.Villain.HpLeft?.ToString() ?? "—")</strong></div>
+                    <div class="msp-villain-stat"><span>MINIONS</span><strong>@Match.Villain.Minions.Count()</strong></div>
+                </div>
+                @if (Match.Villain.Minions.Any())
+                {
+                    <div class="msp-minions">
+                        <div class="msp-minions-caption">Minions</div>
+                        @foreach (var minion in Match.Villain.Minions)
+                        {
+                            <div class="msp-minion-row">
+                                <img src="@(minion.Minion?.ImageUrl ?? "/Unknown.png")" alt=""/>
+                                <div class="msp-minion-body">
+                                    <div class="msp-minion-name">@(minion.Name ?? minion.Minion?.Name ?? "Minion")</div>
+                                    <div class="msp-minion-sub">not rated</div>
+                                </div>
+                                <div class="msp-minion-hp"><strong>@(minion.HpLeft?.ToString() ?? "—")</strong><span>HP LEFT</span></div>
+                            </div>
+                        }
+                    </div>
+                }
+                <div class="msp-villain-note"><i class="bi bi-award"></i>villains and minions earn no titles</div>
+            </div>
+        }
+    </div>
+
+    <div class="msp-footer">
+        <div class="msp-epic">
+            <span>Epic</span>
+            <EpicStars Value="@(Match.Epic ?? 0)" ReadOnly="true" Size="15"/>
         </div>
+        @if (!string.IsNullOrWhiteSpace(Match.Comment))
+        {
+            <div class="msp-comment">"@Match.Comment"</div>
+        }
+        <div class="um-spacer"></div>
+        @if (TournamentId is { } tournamentId)
+        {
+            <UmButton Size="sm" Icon="bi-trophy-fill" OnClick="@(() => NavManager.NavigateTo($"{Urls.Tournaments}/{tournamentId}"))">Back to tournament</UmButton>
+        }
+        else
+        {
+            <UmButton Size="sm" Icon="bi-list-ul" OnClick="@(() => NavManager.NavigateTo(Urls.MatchLog))">To match log</UmButton>
+        }
+        <UmButton Size="sm" Variant="primary" Icon="bi-bar-chart-fill" OnClick="@(() => NavManager.NavigateTo(Urls.HeroesStatistics))">To hero leaderboard</UmButton>
     </div>
-}
-else if (Result.GameMode == GameMode.FreeForAll)
-{
-    @foreach (var fighter in Result.FighterResults.OrderBy(f => f.Placement))
-    {
-        <div class="row">
-            <div class="col-5 col-md-5 text-end">@fighter.Placement place:</div>
-            <div class="col-7 col-md-7">@fighter.PlayerName - @fighter.HeroName (@fighter.MatchPoints points)</div>
-        </div>
-    }
-}
-else if (Result.GameMode == GameMode.TeamVsTeam)
-{
-    @foreach (var team in Result.FighterResults.GroupBy(f => f.Team).OrderByDescending(g => g.First().IsWinner))
-    {
-        <div class="row">
-            <div class="col-5 col-md-5 text-end">@(team.First().IsWinner ? "Winner team" : "Looser team"):</div>
-            <div class="col-7 col-md-7">@string.Join(", ", team.Select(f => $"{f.PlayerName} - {f.HeroName} ({f.MatchPoints} points)"))</div>
-        </div>
-    }
-}
-else
-{
-    var winner = Result.FighterResults.FirstOrDefault(f => f.IsWinner);
-    var looser = Result.FighterResults.FirstOrDefault(f => !f.IsWinner);
-    <div class="row">
-        <div class="col-5 col-md-5 text-end">Winner :</div>
-        <div class="col-7 col-md-7">@winner?.HeroName (@winner?.MatchPoints points)</div>
-    </div>
-    <div class="row">
-        <div class="col-5 col-md-5 text-end">Looser :</div>
-        <div class="col-7 col-md-7">@looser?.HeroName (@looser?.MatchPoints points)</div>
-    </div>
-}
-@if (Result.TitlesEarned.Any())
-{
-    <div class="row">
-        <div class="col-5 col-md-5 text-end">Titles achieved :</div>
-        <div class="col-7 col-md-7">@Result.TitlesEarned.Select(t => $"{t} Title").Aggregate((a, x) => a + ", " + x)</div>
-    </div>
-}
+</div>
 
 @code {
-    [Parameter] public SaveMatchResultDto Result { get; set; }
+    private static readonly IReadOnlyDictionary<GameMode, (string Label, string Icon, string Color, string Bg)> ModeBadges = new Dictionary<GameMode, (string, string, string, string)>
+    {
+        [GameMode.OneVsOne] = ("1V1", "bi-person-fill", "var(--um-mode-1v1)", "var(--um-mode-1v1-bg)"),
+        [GameMode.TeamVsTeam] = ("2V2", "bi-people-fill", "var(--um-mode-2v2)", "var(--um-mode-2v2-bg)"),
+        [GameMode.FreeForAll] = ("FFA", "bi-diagram-3-fill", "var(--um-mode-ffa)", "var(--um-mode-ffa-bg)"),
+        [GameMode.Cooperative] = ("CO-OP", "bi-shield-fill", "var(--um-mode-coop)", "var(--um-mode-coop-bg)")
+    };
+
+    [Parameter, EditorRequired]
+    public SaveMatchResultDto Result { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public UiMatchDto Match { get; set; } = default!;
+
+    [Parameter]
+    public string? TournamentName { get; set; }
+
+    [Parameter]
+    public Guid? TournamentId { get; set; }
+
+    private string ModeLabel => ModeBadges[Match.GameMode].Label;
+
+    private string ModeIcon => ModeBadges[Match.GameMode].Icon;
+
+    private string ModeColor => ModeBadges[Match.GameMode].Color;
+
+    private string ModeBadgeBg => ModeBadges[Match.GameMode].Bg;
+
+    private string GridColumns => Match.GameMode switch
+    {
+        GameMode.Cooperative => $"repeat({Match.Fighters.Count()}, 1fr) 1.25fr",
+        _ => $"repeat({Math.Max(Match.Fighters.Count(), 1)}, 1fr)"
+    };
+
+    private List<UiFighterDto> OrderedFighters() => Match.GameMode switch
+    {
+        GameMode.FreeForAll => Match.Fighters.OrderBy(f => f.Placement ?? int.MaxValue).ToList(),
+        GameMode.TeamVsTeam => Match.Fighters.OrderBy(f => f.Team ?? 1).ThenBy(f => f.Turn ?? int.MaxValue).ToList(),
+        _ => Match.Fighters.OrderBy(f => f.Turn ?? int.MaxValue).ToList()
+    };
+
+    private FighterResultDto? ResultFor(UiFighterDto fighter) => Result.FighterResults.FirstOrDefault(r => r.HeroId == fighter.HeroId);
+
+    private bool HasDecidedWinner() => Match.GameMode != GameMode.FreeForAll && Match.Fighters.Any(f => f.IsWinner);
+
+    private string Eyebrow(UiFighterDto fighter) => Match.GameMode switch
+    {
+        GameMode.TeamVsTeam => fighter.IsWinner ? $"Winner · Team {fighter.Team ?? 1}" : $"Team {fighter.Team ?? 1}",
+        GameMode.Cooperative => fighter.IsWinner ? "Winner · Heroes" : "Heroes",
+        GameMode.FreeForAll => fighter.Placement is { } place ? Ordinal(place) : "Fighter",
+        _ => fighter.IsWinner ? "Winner" : string.Empty
+    };
+
+    private static string Ordinal(int place) => place switch
+    {
+        1 => "1st place",
+        2 => "2nd place",
+        3 => "3rd place",
+        _ => $"{place}th place"
+    };
+
+    private string WinnerHeadline() => Match.GameMode switch
+    {
+        GameMode.TeamVsTeam when HasDecidedWinner() => $"Team {(Match.Fighters.First(f => f.IsWinner).Team ?? 1)} won",
+        GameMode.FreeForAll => Match.Fighters.FirstOrDefault(f => f.Placement == 1)?.Hero?.Name is { } firstName ? $"{firstName} won" : string.Empty,
+        GameMode.Cooperative when Match.Villain is not null => Match.Fighters.Any(f => f.IsWinner) ? "Heroes won" : "Villain won",
+        _ when HasDecidedWinner() => Match.Fighters.FirstOrDefault(f => f.IsWinner)?.Hero?.Name is { } winnerName ? $"{winnerName} won" : string.Empty,
+        _ => string.Empty
+    };
 }

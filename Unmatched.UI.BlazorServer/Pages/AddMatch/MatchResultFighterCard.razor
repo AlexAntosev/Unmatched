@@ -1,0 +1,122 @@
+@using Unmatched.Dtos
+@using Unmatched.Dtos.Match
+@using Unmatched.Services.Statistics
+@*
+    One participant card on the "Match saved" popup (design/Unmatched Redesign.dc.html turn 11a/11b):
+    hero art + player avatar, HP/Cards/Sidekick read-only tiles, a rating-delta pill (ranked matches
+    only) and an "Earned" list of titles newly awarded this match. Fighter supplies the client-side
+    art/stat data MatchSheet already had before saving; Result supplies the server-authoritative
+    winner flag, rating movement and per-fighter titles - null only if the backend somehow didn't
+    return a matching fighter, in which case the card still renders the client-side half.
+*@
+<div class="mrc @(IsWinner ? "is-winner" : null) @(IsLoser ? "is-loser" : null)">
+    <div class="mrc-head">
+        <div class="mrc-eyebrow">@Eyebrow</div>
+        <div class="mrc-portrait">
+            <img class="mrc-hero-art" src="@Fighter.HeroImageUrl" alt="@(Fighter.Hero?.Name)" onerror="this.onerror=null;this.src='/Unknown.png'"/>
+            <img class="mrc-player-avatar" src="@Fighter.PlayerImageUrl" alt=""/>
+            @if (PlaceLabel is not null)
+            {
+                <span class="mrc-place-badge" style="color:@PlaceColor">@PlaceLabel</span>
+            }
+        </div>
+        <div class="mrc-name">@(Fighter.Hero?.Name ?? "Unknown")</div>
+        <div class="mrc-player">@(Fighter.Player?.Name ?? "Unknown")</div>
+    </div>
+
+    <div class="mrc-stats">
+        <div class="mrc-stat">
+            <span class="mrc-stat-label">HP</span>
+            <span class="mrc-stat-value @(IsLoser && Fighter.HpLeft == 0 ? "is-loss" : null) @(IsWinner ? "is-win" : null)">@(Fighter.HpLeft?.ToString() ?? "—")</span>
+        </div>
+        <div class="mrc-stat">
+            <span class="mrc-stat-label">CARDS</span>
+            <span class="mrc-stat-value">@(Fighter.CardsLeft?.ToString() ?? "—")</span>
+        </div>
+        <div class="mrc-stat">
+            <span class="mrc-stat-label">@(Fighter.SidekickName?.ToUpperInvariant() ?? "SIDEKICK")</span>
+            <span class="mrc-stat-value @(Fighter.SidekickName is null ? "is-dash" : null)">@(Fighter.SidekickName is null ? "—" : Fighter.SidekickHpLeft?.ToString() ?? "—")</span>
+        </div>
+    </div>
+
+    @if (Result is { RatingBefore: { } before, RatingAfter: { } after })
+    {
+        var delta = after - before;
+        <div class="mrc-rating @(delta >= 0 ? "is-positive" : "is-negative")">
+            <span class="mrc-rating-delta">@(delta >= 0 ? "+" : null)@delta</span>
+            <span class="mrc-rating-range">@before &rarr; @after</span>
+        </div>
+    }
+
+    <div class="mrc-earned">
+        <div class="mrc-earned-caption">Earned</div>
+        @if (Result is null || Result.EarnedTitles.Count == 0)
+        {
+            <div class="mrc-earned-empty">nothing this match</div>
+        }
+        else
+        {
+            @foreach (var title in Result.EarnedTitles)
+            {
+                var entry = Entry(title);
+                <div class="mrc-earned-item @AccentClass(entry.Style.Accent)">
+                    <i class="bi @entry.Style.Icon"></i>
+                    <div class="mrc-earned-body">
+                        <div class="mrc-earned-name">@title.Name</div>
+                        @if (entry.MetricLabel(title.Metric) is { } metricLabel)
+                        {
+                            <div class="mrc-earned-metric">@metricLabel</div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private static readonly IReadOnlyDictionary<int, (string Label, string Color)> PlaceBadges = new Dictionary<int, (string, string)>
+    {
+        [1] = ("1ST", "var(--um-gold)"),
+        [2] = ("2ND", "var(--um-silver)"),
+        [3] = ("3RD", "var(--um-bronze)"),
+        [4] = ("4TH", "var(--um-text-muted)")
+    };
+
+    [Parameter, EditorRequired]
+    public UiFighterDto Fighter { get; set; } = default!;
+
+    [Parameter]
+    public FighterResultDto? Result { get; set; }
+
+    /// <summary>Small uppercase caption above the art - "Winner · Team 1", "Team 2", "Heroes", ....</summary>
+    [Parameter]
+    public string Eyebrow { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsWinner { get; set; }
+
+    [Parameter]
+    public bool IsLoser { get; set; }
+
+    /// <summary>Set only in Free-For-All, where placement (not win/lose) is the result.</summary>
+    [Parameter]
+    public int? Placement { get; set; }
+
+    private string? PlaceLabel => Placement is { } place && PlaceBadges.TryGetValue(place, out var badge) ? badge.Label : null;
+
+    private string PlaceColor => Placement is { } place && PlaceBadges.TryGetValue(place, out var badge) ? badge.Color : "var(--um-text-muted)";
+
+    private static TitleEntry Entry(EarnedTitleDto title)
+    {
+        var dto = new TitleDto { Name = title.Name, RuleKey = title.RuleKey, Comment = string.Empty };
+        return new TitleEntry(dto, TitleStyle.For(dto));
+    }
+
+    private static string AccentClass(TitleAccent accent) => accent switch
+    {
+        TitleAccent.Prestige => "is-prestige",
+        TitleAccent.Negative => "is-negative",
+        _ => "is-neutral"
+    };
+}

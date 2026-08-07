@@ -5,7 +5,7 @@
 *@
 <div class="um-grid-footer @Class">
     <span class="um-grid-footer-caption">@Caption</span>
-    <SegmentedControl TValue="int" Variant="bar" Options="PageSizeOptions" Value="PageSize" ValueChanged="OnPageSizeChanged"/>
+    <SegmentedControl TValue="int" Variant="bar" Options="VisiblePageSizeOptions" Value="EffectivePageSize" ValueChanged="OnPageSizeChanged"/>
     <span class="um-grid-footer-range">@RangeLabel</span>
     <div class="um-spacer"></div>
     <Pagination Page="CurrentPage" PageCount="PageCount" PageChanged="PageChanged" ShowLabels="true"/>
@@ -14,6 +14,25 @@
 @code {
     /// <summary>Sentinel page size for an "All" option - Skip/Take handle it with no overflow.</summary>
     public const int AllPageSize = int.MaxValue;
+
+    /// <summary>Options whose page size already fits every row on one page make anything larger
+    /// redundant - keep the smallest option that covers TotalCount plus everything below it, drop the
+    /// rest. Always returns at least one option.</summary>
+    public static IReadOnlyList<SelectOption<int>> RelevantOptions(IReadOnlyList<SelectOption<int>> options, int totalCount)
+    {
+        var sorted = options.OrderBy(o => o.Value).ToList();
+        var result = new List<SelectOption<int>>();
+        foreach (var option in sorted)
+        {
+            result.Add(option);
+            if (option.Value >= totalCount)
+            {
+                break;
+            }
+        }
+
+        return result;
+    }
 
     [Parameter, EditorRequired]
     public string Caption { get; set; } = "ROWS PER PAGE";
@@ -56,6 +75,12 @@
             return $"{start}–{end} of {TotalCount}";
         }
     }
+
+    private IReadOnlyList<SelectOption<int>> VisiblePageSizeOptions => RelevantOptions(PageSizeOptions, TotalCount);
+
+    private int EffectivePageSize => VisiblePageSizeOptions.Any(o => o.Value == PageSize)
+        ? PageSize
+        : VisiblePageSizeOptions.Max(o => o.Value);
 
     private Task OnPageSizeChanged(int size) => PageSizeChanged.InvokeAsync(size);
 }

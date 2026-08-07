@@ -11,6 +11,4 @@ public class SaveMatchResultDto
     public bool? PlayersWon { get; set; }
 
     public string? VillainName { get; set; }
-
-    public List<string> TitlesEarned { get; set; }
 }
